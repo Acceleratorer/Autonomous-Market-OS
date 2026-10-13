@@ -11,6 +11,7 @@ from market_os.contracts import (
     BacktestResult,
     ContractError,
     Evidence,
+    MarketObject,
     Order,
     OrderPlan,
     ResearchResult,
@@ -35,6 +36,7 @@ def test_representative_fixtures_decode_for_every_current_contract() -> None:
     for name, contract_type in types.items():
         value = from_json(fixture(name), contract_type)
         assert json.loads(to_json(value)).get("api_version", API_VERSION) == API_VERSION
+        assert from_json(to_json(value), contract_type) == value
 
 
 def test_stable_json_serialization_is_key_sorted_and_round_trips() -> None:
@@ -86,6 +88,37 @@ def test_unknown_and_missing_fields_are_rejected() -> None:
     with pytest.raises(ContractError) as missing:
         from_json(json.dumps(payload), Task)
     assert missing.value.code == "missing_field"
+
+
+def test_array_fields_reject_strings_and_order_quantities_are_integers() -> None:
+    payload = json.loads(fixture("task"))
+    payload["symbols"] = "SPY"
+    with pytest.raises(ContractError) as symbols:
+        from_json(json.dumps(payload), Task)
+    assert symbols.value.code == "invalid_payload"
+
+    order = json.loads(fixture("order"))
+    order["quantity"] = 1.5
+    with pytest.raises(ContractError) as quantity:
+        from_json(json.dumps(order), Order)
+    assert quantity.value.code == "invalid_number"
+
+
+def test_market_object_rejects_invalid_symbols_and_non_finite_prices() -> None:
+    with pytest.raises(ContractError) as symbol:
+        MarketObject("spy", "fixture", "2026-01-06T00:00:00+00:00", 100.0)
+    assert symbol.value.code == "invalid_symbol"
+    with pytest.raises(ContractError) as price:
+        MarketObject("SPY", "fixture", "2026-01-06T00:00:00+00:00", float("nan"))
+    assert price.value.code == "invalid_number"
+
+
+def test_order_plan_rejects_non_object_orders() -> None:
+    payload = json.loads(fixture("order_plan"))
+    payload["orders"] = [None]
+    with pytest.raises(ContractError) as orders:
+        from_json(json.dumps(payload), OrderPlan)
+    assert orders.value.code == "invalid_payload"
 
 
 def test_error_response_is_json_compatible() -> None:

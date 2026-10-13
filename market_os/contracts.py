@@ -79,9 +79,18 @@ def _symbols(values: tuple[str, ...], field: str = "symbols") -> None:
     if not isinstance(values, tuple) or not values:
         raise ContractError("required", f"{field} must contain at least one symbol", field=field)
     for symbol in values:
-        _text(symbol, field)
-        if not _SYMBOL_RE.fullmatch(symbol):
-            raise ContractError("invalid_symbol", f"{field} contains an invalid US symbol", field=field)
+        _symbol(symbol, field)
+
+
+def _symbol(value: str, field: str) -> None:
+    _text(value, field)
+    if not _SYMBOL_RE.fullmatch(value):
+        raise ContractError("invalid_symbol", f"{field} contains an invalid US symbol", field=field)
+
+
+def _integer(value: int, field: str, *, minimum: int = 0) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        raise ContractError("invalid_number", f"{field} must be an integer >= {minimum}", field=field)
 
 
 @dataclass(frozen=True)
@@ -240,11 +249,10 @@ class MarketObject:
     api_version: str = API_VERSION
 
     def __post_init__(self) -> None:
-        _text(self.symbol, "symbol")
+        _symbol(self.symbol, "symbol")
         _text(self.venue, "venue")
         _timestamp(self.observed_at, "observed_at")
-        if self.price <= 0:
-            raise ContractError("invalid_price", "price must be positive", field="price")
+        _number(self.price, "price", minimum=0.0000001)
         _text(self.currency, "currency")
         _text(self.price_basis, "price_basis")
         _version(self.api_version)
@@ -330,9 +338,9 @@ class Order:
     api_version: str = API_VERSION
 
     def __post_init__(self) -> None:
-        _text(self.symbol, "symbol")
+        _symbol(self.symbol, "symbol")
         _choice(self.side, ("buy", "sell"), "side")
-        _number(self.quantity, "quantity", minimum=1)
+        _integer(self.quantity, "quantity", minimum=1)
         _number(self.reference_price, "reference_price", minimum=0.0000001)
         _number(self.notional, "notional", minimum=0.0000001)
         _version(self.api_version)
@@ -441,21 +449,26 @@ def task_from_dict(payload: Mapping[str, Any]) -> Task:
     """Validate and normalize a task received from JSON or another adapter."""
     values = _payload(payload, {"task_id", "objective", "symbols", "start", "end", "created_at", "execution_mode", "idempotency_key", "api_version"})
     if "symbols" in values:
-        values["symbols"] = tuple(values["symbols"])
+        values["symbols"] = _tuple(values["symbols"], "symbols")
     return Task(**values)
 
 
 def order_plan_from_dict(payload: Mapping[str, Any]) -> OrderPlan:
     """Validate and normalize a paper order plan received from JSON."""
     values = _payload(payload, {"mode", "orders", "total_notional", "api_version"})
-    values["orders"] = tuple(Order(**order) if not isinstance(order, Order) else order for order in values.get("orders", ()))
+    orders = values.get("orders", ())
+    if not isinstance(orders, (list, tuple)):
+        raise ContractError("invalid_payload", "orders must be an array", field="orders")
+    normalized: list[Order] = []
+    for order in orders:
+        if isinstance(order, Order):
+            normalized.append(order)
+        elif isinstance(order, Mapping):
+            normalized.append(order_from_dict(order))
+        else:
+            raise ContractError("invalid_payload", "each order must be an object", field="orders")
+    values["orders"] = tuple(normalized)
     return OrderPlan(**values)
-
-
-def _required(payload: Mapping[str, Any], fields: set[str]) -> None:
-    missing = sorted(fields - set(payload))
-    if missing:
-        raise ContractError("missing_field", f"missing required contract field: {missing[0]}", field=missing[0])
 
 
 def _payload(payload: Mapping[str, Any], allowed: set[str]) -> dict[str, Any]:
@@ -508,11 +521,13 @@ def research_result_from_dict(payload: Mapping[str, Any]) -> ResearchResult:
 
 
 def backtest_result_from_dict(payload: Mapping[str, Any]) -> BacktestResult:
-    return BacktestResult(**_payload(payload, {"initial_cash", "final_cash", "return_pct", "equity_curve", "input_fingerprint", "api_version"}))
+    values = _payload(payload, {"initial_cash", "final_cash", "return_pct", "equity_curve", "input_fingerprint", "api_version"})
+    values["equity_curve"] = _tuple(values.get("equity_curve", ()), "equity_curve")
+    return BacktestResult(**values)
 
 
 def order_from_dict(payload: Mapping[str, Any]) -> Order:
-    return Order(**_payload(payload, {"symbol", "side", "quantity", "reference_price", "notional"}))
+    return Order(**_payload(payload, {"symbol", "side", "quantity", "reference_price", "notional", "api_version"}))
 
 
 def risk_decision_from_dict(payload: Mapping[str, Any]) -> RiskDecision:
