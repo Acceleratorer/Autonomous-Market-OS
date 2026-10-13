@@ -67,3 +67,10 @@ teammate failure propagation, duplicate handling, and deployment controls for
 resource limits, timeouts, and structured logs remain open. The exact next
 milestone is **M1.10: add or reject the bounded deployment wrapper and rerun
 the OpenHarness promotion gate**.
+
+M1.10 accepts a local paper-only wrapper and records 48 named scenarios, but
+ADR-0008 keeps OpenHarness provisional because native persistence cancellation,
+checkpoint/resume, teammate propagation, duplicate handling, and external
+service controls remain open. The exact next milestone is **M1.11: supply or
+reject the external supervisor controls and obtain final native blocker
+evidence**.

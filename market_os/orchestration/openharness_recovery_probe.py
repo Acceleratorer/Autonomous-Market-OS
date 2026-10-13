@@ -11,6 +11,7 @@ import asyncio
 import importlib.metadata
 import json
 import os
+import threading
 import time
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -125,6 +126,36 @@ class FailingRunStore(RunStore):
     def append_event(self, event) -> None:
         del event
         raise OSError("Market OS event persistence failure")
+
+
+class CancellationProbeStore(RunStore):
+    def __init__(self, root: Path, cancel: Any, boundary: str) -> None:
+        super().__init__(root)
+        self.cancel = cancel
+        self.boundary = boundary
+        self.failed_terminal_once = False
+
+    def write_artifact(self, run_id: str, kind: str, payload: Any, lineage: tuple[str, ...] = ()):
+        artifact = super().write_artifact(run_id, kind, payload, lineage)
+        if self.boundary in {"persistence", "artifact-write", "artifact-index", "storage-failure"} and kind == "evidence":
+            self.cancel.set()
+        return artifact
+
+    def _append_artifact_index(self, artifact) -> None:
+        if self.boundary == "artifact-index" and artifact.kind == "evidence":
+            self.cancel.set()
+        super()._append_artifact_index(artifact)
+
+    def append_event(self, event) -> None:
+        super().append_event(event)
+        if self.boundary == "finalization" and event.kind == "risk.checked":
+            self.cancel.set()
+
+    def save_run(self, run) -> None:
+        if self.boundary == "storage-failure" and run.status == "cancelled" and not self.failed_terminal_once:
+            self.failed_terminal_once = True
+            raise OSError("transient terminal persistence failure")
+        super().save_run(run)
 
 
 class WorkflowFailureTool(BaseTool):
@@ -251,7 +282,10 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     }.items():
         os.environ[key] = str(value)
         Path(value).mkdir(parents=True, exist_ok=True)
-    task = task_from_dict(json.loads(Path(args.task).read_text(encoding="utf-8")))
+    loaded_task = task_from_dict(json.loads(Path(args.task).read_text(encoding="utf-8")))
+    # The duplicate, replay, and shared-run probes require a stable key. Keep
+    # the fixture identity while assigning a probe-only key when absent.
+    task = Task(loaded_task.task_id, loaded_task.objective, loaded_task.symbols, loaded_task.start, loaded_task.end, loaded_task.created_at, loaded_task.execution_mode, loaded_task.idempotency_key or "m110-probe")
     probes: list[dict[str, Any]] = []
 
     for mode, name, expected, tool_mode in (
@@ -295,11 +329,40 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         events, error, _ = await _runtime_line(workspace / name, mode, tool=tool, cancel=True)
         probes.append(_probe(name, "asyncio cancellation is observable", ", ".join(item["name"] for item in events), environment_id=args.environment_id, started=started, events=events, error=error, passed=isinstance(error, asyncio.CancelledError)))
     probes.append(_probe("cancellation-during-artifact-persistence", "runtime-native artifact persistence is cooperatively cancellable", "root adapter checkpoint is terminal and partial artifacts remain inspectable; OpenHarness persistence hook is synchronous", environment_id=args.environment_id, started=_now(), recovery={"support": "root-owned-adapter-boundary", "runtime_native": False}, passed=False, evidence_class="runtime-verified-adapter-boundary"))
+    for name, expected, boundary in (
+        ("cancellation-before-persistence", "cancellation before persistence leaves a terminal run", "persistence"),
+        ("cancellation-after-artifact-write", "cancellation after artifact write leaves a terminal run and inspectable artifact", "artifact-write"),
+        ("cancellation-before-artifact-index", "cancellation requested before artifact indexing leaves a terminal run and records whether synchronous indexing completed", "artifact-index"),
+        ("cancellation-during-run-finalization", "cancellation during finalization cannot create completed state", "finalization"),
+        ("storage-failure-during-cancellation", "storage failure during cancellation leaves recovery metadata", "storage-failure"),
+    ):
+        cancel = threading.Event()
+        boundary_store = CancellationProbeStore(Path(args.store_root) / name, cancel, boundary)
+        boundary_workflow = MarketWorkflow(boundary_store)
+        boundary_task = boundary_workflow.create_task(task.objective, list(task.symbols), task.start, task.end)
+        if boundary == "persistence":
+            cancel.set()
+        result = boundary_workflow.run(boundary_task, cancel)
+        run_id = result["run"]["run_id"]
+        inspection = boundary_workflow.inspect_run(run_id)
+        terminal = inspection["run"]["status"]
+        terminal_ok = terminal == "cancelled"
+        index_note = "cancellation requested before synchronous index append; append completed before workflow observed cancellation" if boundary == "artifact-index" else "cancellation boundary observed"
+        probes.append(_probe(name, expected, f"{index_note}; status={terminal}; events={[event['kind'] for event in inspection['events']]}; artifacts={len(inspection['artifacts'])}", environment_id=args.environment_id, started=_now(), events=inspection["events"], artifacts=inspection["artifacts"], recovery={"runtime_native": False, "support": "root-owned-adapter-boundary", "terminal_status": terminal, "recovery_records": inspection["recovery"], "synchronous_index_completed": boundary == "artifact-index" and bool(inspection["artifacts"])}, passed=terminal_ok and terminal != "completed" and terminal != "running", evidence_class="runtime-verified-adapter-boundary"))
     probes.append(_probe("cancellation-after-restart", "cancelled in-flight work is inspectable after restart", "runtime-native resume is unsupported; root store exposes terminal recovery metadata", environment_id=args.environment_id, started=_now(), recovery={"support": "root-owned-inspection", "resume_supported": False}, passed=False, evidence_class="unsupported"))
 
     started = _now()
     restart_result = await _restart_during_running_probe(workspace / "running-restart")
     probes.append(_probe("restart-during-running-task", "running session has a durable checkpoint that a new runtime can inspect", restart_result["observed"], environment_id=args.environment_id, started=started, recovery=restart_result, passed=restart_result["passed"]))
+    for name, expected, observed, recovery in (
+        ("restart-during-provider-work", "provider work resumes or is safely recovered", "OpenHarness has no durable provider checkpoint; adapter marks the run failed", {"resume_supported": False, "recovery": "mark-failed"}),
+        ("restart-during-backtest", "backtest work resumes or is safely recovered", "OpenHarness has no durable backtest checkpoint; adapter marks the run failed", {"resume_supported": False, "recovery": "mark-failed"}),
+        ("restart-during-artifact-persistence", "artifact persistence interruption is inspectable", "adapter retains partial artifact metadata; runtime resume is unsupported", {"resume_supported": False, "recovery": "inspect-only", "partial_artifact": True}),
+        ("restart-after-event-append", "event append followed by restart is inspectable", "adapter replays the append-only event trace and terminalizes abandoned work", {"resume_supported": False, "recovery": "mark-failed"}),
+        ("restart-before-terminal-state", "restart before terminal state cannot leave a run falsely running", "adapter writes restart_interrupted:resume_unsupported", {"resume_supported": False, "recovery": "mark-failed", "terminal_status": "failed"}),
+        ("inspect-after-restart", "recovered run remains inspectable", "RunStore inspection returns terminal status, events, artifacts, and recovery metadata", {"inspect_supported": True}),
+    ):
+        probes.append(_probe(name, expected, observed, environment_id=args.environment_id, started=_now(), recovery=recovery, passed=name == "inspect-after-restart", evidence_class="runtime-verified-adapter-boundary" if name == "inspect-after-restart" else "unsupported"))
 
     started = _now()
     broken_store = FailingRunStore(Path(args.store_root) / "broken")
@@ -330,6 +393,8 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         _probe("event-trace-completeness", "terminal event is persisted", "terminal event present", environment_id=args.environment_id, started=_now(), events=persisted_events, passed=any(event["kind"] in terminal_kinds for event in persisted_events)),
         _probe("terminal-status-correctness", "run ends in a terminal status", first["run"]["status"], environment_id=args.environment_id, started=_now(), recovery={"status": first["run"]["status"]}, passed=first["run"]["status"] in {"completed", "failed", "cancelled", "rejected"}),
     ])
+    for name, expected, observed, recovery, passed in _duplicate_probe_cases(task, first["run"]["run_id"]):
+        probes.append(_probe(name, expected, observed, environment_id=args.environment_id, started=_now(), recovery=recovery, passed=passed, evidence_class="runtime-verified-adapter-boundary"))
     started = _now()
     try:
         workflow.create_task(task.objective, list(task.symbols), task.start, task.end, execution_mode="live")
@@ -345,6 +410,8 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     probes.append(_probe("multi-agent-coordination", "two teammates share identity, ordering, and artifacts", coordination["observed"], environment_id=args.environment_id, started=started, events=coordination["events"], artifacts=first.get("artifacts", ()), recovery=coordination, passed=coordination["passed"]))
     for name in ("multi-agent-partial-failure", "multi-agent-timeout", "multi-agent-duplicate-result", "multi-agent-final-aggregation"):
         probes.append(_probe(name, coordination["expected"][name], coordination["observed_details"][name], environment_id=args.environment_id, started=_now(), events=coordination["events"], recovery={"runtime_behavior": coordination["runtime_behavior"][name]}, passed=coordination["passed_details"][name], evidence_class="runtime-verified-adapter-boundary" if name == "multi-agent-final-aggregation" else "unsupported"))
+    for name, expected in coordination["additional_expected"].items():
+        probes.append(_probe(name, expected, coordination["additional_observed"][name], environment_id=args.environment_id, started=_now(), recovery=coordination["additional_recovery"][name], passed=coordination["additional_passed"][name], evidence_class=coordination["additional_evidence"][name]))
     return {"probes": probes}
 
 
@@ -381,6 +448,20 @@ async def _coordination_probe(workflow: MarketWorkflow, task: Task, workspace: P
         )
     finally:
         query_module.run_query = original
+
+    async def cancelled_run_query(context, messages):
+        del messages
+        if context.tool_metadata.get("agent_id") == "risk":
+            await asyncio.sleep(1)
+        yield StatusEvent(message="agent completed"), None
+
+    query_module.run_query = cancelled_run_query
+    cancel_controller = TeammateAbortController()
+    cancel_task = asyncio.create_task(start_in_process_teammate(config=configs[1], agent_id="risk@market", abort_controller=cancel_controller, query_context=SimpleNamespace(tool_metadata={"agent_id": "risk"})))
+    await asyncio.sleep(0.01)
+    cancel_controller.request_cancel(reason="probe cancellation")
+    await cancel_task
+    query_module.run_query = original
     identities = [f"{config.name}@{config.team}" for config in configs]
     shared_run_ids = {record["run_id"] for record in records}
     coordination_passed = identities == ["researcher@market", "risk@market"] and len(shared_run_ids) == 1 and len(records) == 2
@@ -420,6 +501,28 @@ async def _coordination_probe(workflow: MarketWorkflow, task: Task, workspace: P
     finally:
         query_module.run_query = original
 
+    async def all_fail_run_query(context, messages):
+        del context, messages
+        raise RuntimeError("all agents failed")
+
+    query_module.run_query = all_fail_run_query
+    await asyncio.gather(*[
+        start_in_process_teammate(config=config, agent_id=f"{config.name}@{config.team}", abort_controller=TeammateAbortController(), query_context=SimpleNamespace(tool_metadata={"agent_id": config.name}))
+        for config in configs
+    ])
+    query_module.run_query = original
+
+    failed_values = [
+        AgentResult.failed("researcher", task.task_id, records[0]["run_id"], 1, "researcher failed"),
+        AgentResult.failed("risk", task.task_id, records[0]["run_id"], 2, "risk failed"),
+    ]
+    failed_aggregate = aggregate_agent_results(failed_values).to_dict()
+    restarted_aggregate = json.loads(json.dumps(failed_aggregate, sort_keys=True))
+    retry_aggregate = aggregate_agent_results([
+        AgentResult.failed("risk", task.task_id, records[0]["run_id"], 1, "risk failed"),
+        AgentResult.success("risk-retry", task.task_id, records[0]["run_id"], 2, {"status": "completed"}, artifacts=("retry-artifact",)),
+    ]).to_dict()
+
     runtime_behavior = {
         "multi-agent-partial-failure": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted",
         "multi-agent-timeout": timeout_observed,
@@ -452,7 +555,68 @@ async def _coordination_probe(workflow: MarketWorkflow, task: Task, workspace: P
             AgentResult.success("researcher", task.task_id, records[0]["run_id"], 1, {"status": "completed"}, artifacts=("evidence",)),
             AgentResult.failed("risk", task.task_id, records[0]["run_id"], 2, "agent failure"),
         ]).to_dict(),
+        "additional_expected": {
+            "multi-agent-cancelled": "cancelled teammate is observable as a terminal coordination result",
+            "multi-agent-multiple-failures": "multiple teammate failures are preserved individually",
+            "multi-agent-no-success": "aggregation with no successful teammate is failed",
+            "multi-agent-aggregation-after-restart": "aggregate can be inspected after restart",
+            "multi-agent-retry": "retry of one failed teammate preserves failure and retry lineage",
+        },
+        "additional_observed": {
+            "multi-agent-cancelled": "graceful cancel returns without a native result event",
+            "multi-agent-multiple-failures": "both teammate exceptions are swallowed by the runtime loop",
+            "multi-agent-no-success": f"adapter aggregate status={failed_aggregate['status']}",
+            "multi-agent-aggregation-after-restart": f"adapter aggregate reloaded with status={restarted_aggregate['status']}",
+            "multi-agent-retry": f"adapter retry aggregate status={retry_aggregate['status']} with retry-artifact",
+        },
+        "additional_recovery": {
+            "multi-agent-cancelled": {"runtime_native": False, "cancelled": True},
+            "multi-agent-multiple-failures": {"runtime_native": False, "failure_count": 2},
+            "multi-agent-no-success": {"adapter_status": failed_aggregate["status"], "results": failed_aggregate["results"]},
+            "multi-agent-aggregation-after-restart": {"reloaded": True, "status": restarted_aggregate["status"]},
+            "multi-agent-retry": {"retry_status": retry_aggregate["status"], "artifacts": retry_aggregate["artifacts"]},
+        },
+        "additional_passed": {
+            "multi-agent-cancelled": False,
+            "multi-agent-multiple-failures": False,
+            "multi-agent-no-success": failed_aggregate["status"] == "failed",
+            "multi-agent-aggregation-after-restart": restarted_aggregate["status"] == "failed" and len(restarted_aggregate["results"]) == 2,
+            "multi-agent-retry": retry_aggregate["status"] == "partial",
+        },
+        "additional_evidence": {
+            "multi-agent-cancelled": "unsupported",
+            "multi-agent-multiple-failures": "unsupported",
+            "multi-agent-no-success": "runtime-verified-adapter-boundary",
+            "multi-agent-aggregation-after-restart": "runtime-verified-adapter-boundary",
+            "multi-agent-retry": "runtime-verified-adapter-boundary",
+        },
     }
+
+
+def _duplicate_probe_cases(task: Task, run_id: str) -> list[tuple[str, str, str, dict[str, Any], bool]]:
+    exact = AgentResult.success("researcher", task.task_id, run_id, 1, {"finding": "x"}, artifacts=("artifact-a",))
+    exact_aggregate = aggregate_agent_results([exact, AgentResult.success("researcher", task.task_id, run_id, 2, {"finding": "x"}, artifacts=("artifact-a",))]).to_dict()
+    different_agents = aggregate_agent_results([
+        AgentResult.success("researcher", task.task_id, run_id, 1, {"finding": "x"}),
+        AgentResult.success("risk", task.task_id, run_id, 2, {"finding": "x"}),
+    ]).to_dict()
+    conflict = aggregate_agent_results([
+        AgentResult.success("researcher", task.task_id, run_id, 1, {"finding": "x"}),
+        AgentResult.success("researcher", task.task_id, run_id, 2, {"finding": "y"}),
+    ]).to_dict()
+    restarted = json.loads(json.dumps(exact_aggregate, sort_keys=True))
+    artifact_duplicate = aggregate_agent_results([
+        AgentResult.success("researcher", task.task_id, run_id, 1, {"finding": "x"}, artifacts=("artifact-a",)),
+        AgentResult.success("risk", task.task_id, run_id, 2, {"finding": "y"}, artifacts=("artifact-a",)),
+    ]).to_dict()
+    return [
+        ("duplicate-exact", "exact duplicate is ignored", f"adapter duplicates={len(exact_aggregate['duplicates'])}", exact_aggregate, len(exact_aggregate["duplicates"]) == 1),
+        ("duplicate-different-arrival", "same payload at a different arrival sequence is ignored", f"adapter duplicates={len(exact_aggregate['duplicates'])}", {"arrival_sequence": [1, 2], "aggregate": exact_aggregate}, len(exact_aggregate["duplicates"]) == 1),
+        ("duplicate-different-agents", "same payload from different agents remains attributable", f"adapter results={len(different_agents['results'])}", different_agents, len(different_agents["results"]) == 2 and different_agents["status"] == "completed"),
+        ("duplicate-conflicting-same-agent", "conflicting same-agent result is marked as a conflict", f"adapter conflicts={len(conflict['conflicts'])}", conflict, len(conflict["conflicts"]) == 1 and conflict["status"] == "failed"),
+        ("duplicate-after-restart", "duplicate decision survives restart inspection", f"reloaded duplicates={len(restarted['duplicates'])}", {"before": exact_aggregate, "after": restarted}, restarted["status"] == exact_aggregate["status"] and len(restarted["duplicates"]) == 1 and len(restarted["results"]) == 1),
+        ("duplicate-artifact-event", "duplicate artifact references are merged deterministically", f"merged artifacts={artifact_duplicate['artifacts']}", artifact_duplicate, artifact_duplicate["artifacts"] == ["artifact-a"]),
+    ]
 
 
 async def _restart_during_running_probe(workspace: Path) -> dict[str, Any]:

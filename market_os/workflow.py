@@ -115,6 +115,7 @@ class MarketWorkflow:
                     self.store.save_idempotent_result(task.idempotency_key, result)
                 return result
 
+            self._check_cancel(run, cancel_event)
             operation = "run.finalize"
             completed = Run(run.run_id, run.task_id, "completed", run.started_at, utc_now())
             self.store.save_run(completed)

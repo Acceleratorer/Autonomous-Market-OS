@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from .contracts import Run, RunEvent, utc_now
+from .deployment.wrapper import BoundedService, DeploymentConfig, DeploymentConfigError
 from .store import RunStore
 
 
@@ -146,13 +147,40 @@ def run_probe(output_path: str | Path | None = None, *, openharness_python: str 
 
         probes.extend([
             DeploymentProbe("resource-limits", "unsupported", "service enforces bounded CPU and memory", "no process-level limits are configured", False),
-            DeploymentProbe("timeouts", "unsupported", "service enforces request and shutdown timeouts", "HTTP handler and provider calls have no deployment-level timeout policy", False),
-            DeploymentProbe("logging", "unsupported", "service emits operational logs", "request logging is intentionally suppressed and no structured sink is configured", False),
+            DeploymentProbe("service-request-timeouts", "unsupported", "service enforces request and provider timeouts", "HTTP handler and provider calls have no deployment-level timeout policy", False),
+            DeploymentProbe("service-logging", "unsupported", "service emits request and audit logs", "request logging is intentionally suppressed; wrapper lifecycle logs are separate", False),
             DeploymentProbe("upgrade-rollback", "source-based", "versioned state can be upgraded and rolled back", "documented assumption; no image registry or migration was exercised", True),
             DeploymentProbe("secret-boundary", "deployment-verified", "service workflow accepts no credential payload", "fixture request contained no secrets or provider calls", True),
             DeploymentProbe("filesystem-boundary", "deployment-verified", "state is kept in the configured writable root", str(store), store.exists() and all((store / name).exists() for name in ("events.jsonl", "runs.jsonl", "artifacts.jsonl", "recovery.jsonl"))),
             DeploymentProbe("filesystem-permissions", "unsupported", "state is restricted to a dedicated service identity", "temporary probe state uses the invoking Windows identity", False),
         ])
+        wrapper_root = root / "wrapper"
+        wrapper_config = DeploymentConfig(
+            repo_root=repo_root,
+            runtime_root=wrapper_root,
+            state_root=wrapper_root / "state",
+            log_root=wrapper_root / "logs",
+            port=_free_port(),
+            startup_timeout=5,
+            request_timeout=2,
+            shutdown_timeout=3,
+            force_timeout=2,
+        )
+        wrapper = BoundedService(wrapper_config)
+        try:
+            wrapper.start()
+            probes.append(DeploymentProbe("bounded-wrapper-startup", "deployment-verified", "bounded wrapper starts only a loopback paper service", "ready", True))
+            result = wrapper.stop()
+            log_path = wrapper_config.log_root / "deployment.jsonl"
+            log_records = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            probes.append(DeploymentProbe("bounded-wrapper-shutdown", "deployment-verified", "bounded wrapper normalizes graceful shutdown", str(result.normalized_exit_code), result.normalized_exit_code == 0))
+            probes.append(DeploymentProbe("structured-logs", "deployment-verified", "wrapper writes structured lifecycle logs", str(len(log_records)), len(log_records) >= 3))
+        except Exception as exc:
+            probes.append(DeploymentProbe("bounded-wrapper-startup", "deployment-verified", "bounded wrapper starts only a loopback paper service", str(exc), False))
+            try:
+                wrapper.stop(force=True)
+            except Exception:
+                pass
     report = {
         "schema": "market-os.m1.9-deployment.v1",
         "python_version": platform.python_version(),

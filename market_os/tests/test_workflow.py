@@ -130,6 +130,27 @@ def test_cancellation_during_artifact_index_update_is_terminal(tmp_path: Path) -
     assert store.recovery_for(result["run"]["run_id"])[-1]["terminal_status"] == "cancelled"
 
 
+def test_cancellation_before_run_finalization_cannot_complete(tmp_path: Path) -> None:
+    class CancelAfterRiskEventStore(RunStore):
+        def __init__(self, root: Path, cancel: threading.Event) -> None:
+            super().__init__(root)
+            self.cancel = cancel
+
+        def append_event(self, event) -> None:
+            super().append_event(event)
+            if event.kind == "risk.checked":
+                self.cancel.set()
+
+    cancel = threading.Event()
+    store = CancelAfterRiskEventStore(tmp_path, cancel)
+    workflow = MarketWorkflow(store)
+    task = workflow.create_task("Cancel finalization", ["SPY"], "2026-01-02", "2026-01-06")
+    result = workflow.run(task, cancel)
+
+    assert result["run"]["status"] == "cancelled"
+    assert store.latest_run(result["run"]["run_id"])["status"] == "cancelled"
+
+
 @pytest.mark.parametrize("failure_point", ["run", "artifact", "artifact-index"])
 def test_transient_storage_failures_are_terminal_and_retryable(tmp_path: Path, failure_point: str) -> None:
     class TransientStore(RunStore):

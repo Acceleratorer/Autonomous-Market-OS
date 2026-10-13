@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import signal
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
@@ -62,7 +64,19 @@ def serve(workflow: MarketWorkflow, host: str = "127.0.0.1", port: int = 8787) -
     server = ThreadingHTTPServer((host, port), make_handler(workflow))
     server.daemon_threads = True
     workflow.recover_inflight_runs()
+    handled_signals = [signal.SIGTERM]
+    if hasattr(signal, "SIGBREAK"):
+        handled_signals.append(signal.SIGBREAK)
+    previous_signals = {value: signal.getsignal(value) for value in handled_signals}
+
+    def stop_server(_signum: int, _frame: object) -> None:
+        threading.Thread(target=server.shutdown, daemon=True).start()
+
+    for value in handled_signals:
+        signal.signal(value, stop_server)
     try:
         server.serve_forever()
     finally:
+        for value, previous in previous_signals.items():
+            signal.signal(value, previous)
         server.server_close()

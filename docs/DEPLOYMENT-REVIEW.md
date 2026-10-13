@@ -83,3 +83,9 @@ filesystem state isolation, and the no-secret fixture boundary. Resource
 limits, request/shutdown timeouts, structured logs, production service-account
 permissions, and image-based upgrade/rollback remain unproven or unsupported.
 Those gaps remain promotion blockers.
+
+M1.10 adds a bounded local wrapper that owns loopback startup, paper-only
+configuration, lifecycle timeouts, graceful/forced termination, exit status,
+and wrapper JSONL logs. It explicitly rejects CPU/memory limits without an
+external supervisor. The wrapper is suitable for local paper-only probes; it is
+not a production host isolation layer.

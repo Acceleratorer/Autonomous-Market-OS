@@ -113,3 +113,20 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   persistence cancellation, checkpoint/resume, partial teammate failure, and
   duplicate teammate handling remain unsupported. ADR-0007 keeps OpenHarness
   provisional and blocks M2.
+
+## 2026-10-14 — M1.10 bounded wrapper and final blocker evidence
+
+- Added `market_os/deployment/wrapper.py`, a dependency-free process wrapper
+  with explicit absolute paths, loopback and paper-only enforcement, startup /
+  readiness-request / shutdown timeouts, graceful and forced termination, exit
+  normalization, and structured JSONL lifecycle logs.
+- Host CPU/memory quotas are explicitly rejected without an external supervisor;
+  the wrapper fails closed instead of claiming unsupported process isolation.
+- Added wrapper tests and a launched wrapper probe. The wrapper lifecycle passes;
+  service-level quotas, provider deadlines, service audit logs, and production
+  service-account permissions remain external deployment blockers.
+- Expanded the isolated OpenHarness probe to 48 named cancellation, restart,
+  teammate, retry, duplicate, and artifact cases. Native checkpoint/resume,
+  teammate failure/cancellation propagation, and duplicate handling remain
+  unsupported; root adapter recovery and aggregation cases pass separately.
+- ADR-0008 keeps OpenHarness provisional and sets M1.11 as the next gate.
