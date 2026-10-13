@@ -24,8 +24,8 @@ class FixtureMarketProvider:
             if not rows:
                 raise ValueError(f"no market evidence for {symbol} in {start}:{end}")
             content = ", ".join(f"{day}={price:.2f}" for day, price in rows)
-            result.append(Evidence(f"market-{symbol}", "market", f"{symbol} daily bars", "fixture:market", rows[-1][0], content, (symbol,)))
-        result.append(Evidence("document-policy", "document", "Paper trading policy", "fixture:policy", end, "All generated orders remain paper-only and require risk approval."))
+            result.append(Evidence(f"market-{symbol}", "market", f"{symbol} daily bars", "fixture:market", f"{rows[-1][0]}T00:00:00+00:00", content, (symbol,)))
+        result.append(Evidence("document-policy", "document", "Paper trading policy", "fixture:policy", f"{end}T00:00:00+00:00", "All generated orders remain paper-only and require risk approval."))
         return result
 
 @dataclass(frozen=True)

@@ -45,3 +45,7 @@
 ## Priority rule
 
 Every milestone must improve one complete user workflow. Defer broad integrations that do not improve the current vertical slice or its safety evidence.
+
+## Current status
+
+M1 contract validation, JSON fixtures, and the source-based orchestration benchmark are implemented. The next milestone is an OpenHarness adapter parity harness; no child runtime or live broker is connected yet.

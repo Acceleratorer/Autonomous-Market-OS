@@ -3,12 +3,16 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timezone
+import json
+import math
 import re
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, Mapping, TypeVar
 
 API_VERSION = "market-os.v1"
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
+_SYMBOL_RE = re.compile(r"^[A-Z][A-Z0-9.-]{0,9}$")
+_T = TypeVar("_T")
 
 
 class ContractError(ValueError):
@@ -47,9 +51,23 @@ def _timestamp(value: str, field: str) -> None:
     if not isinstance(value, str):
         raise ContractError("invalid_timestamp", f"{field} must be an ISO-8601 timestamp", field=field)
     try:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
         raise ContractError("invalid_timestamp", f"{field} must be an ISO-8601 timestamp", field=field) from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ContractError("invalid_timestamp", f"{field} must include a UTC offset", field=field)
+    if parsed.utcoffset() != timezone.utc.utcoffset(None):
+        raise ContractError("invalid_timestamp", f"{field} must be in UTC", field=field)
+
+
+def _number(value: float, field: str, *, minimum: float = 0.0) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < minimum:
+        raise ContractError("invalid_number", f"{field} must be finite and >= {minimum}", field=field)
+
+
+def _choice(value: str, choices: tuple[str, ...], field: str) -> None:
+    if value not in choices:
+        raise ContractError("invalid_status", f"{field} must be one of {', '.join(choices)}", field=field)
 
 
 def _version(value: str) -> None:
@@ -62,8 +80,8 @@ def _symbols(values: tuple[str, ...], field: str = "symbols") -> None:
         raise ContractError("required", f"{field} must contain at least one symbol", field=field)
     for symbol in values:
         _text(symbol, field)
-        if symbol != symbol.upper():
-            raise ContractError("invalid_symbol", f"{field} must contain uppercase symbols", field=field)
+        if not _SYMBOL_RE.fullmatch(symbol):
+            raise ContractError("invalid_symbol", f"{field} contains an invalid US symbol", field=field)
 
 
 @dataclass(frozen=True)
@@ -130,6 +148,7 @@ class Run:
         _id(self.run_id, "run_id")
         _id(self.task_id, "task_id")
         _timestamp(self.started_at, "started_at")
+        _choice(self.status, ("running", "completed", "failed", "cancelled", "rejected"), "status")
         if self.finished_at is not None:
             _timestamp(self.finished_at, "finished_at")
         if self.status == "running" and self.finished_at is not None:
@@ -162,8 +181,8 @@ class RunEvent:
         _text(self.kind, "kind")
         _timestamp(self.timestamp, "timestamp")
         _text(self.actor, "actor")
-        if self.cost is not None and self.cost < 0:
-            raise ContractError("invalid_cost", "cost cannot be negative", field="cost")
+        if self.cost is not None:
+            _number(self.cost, "cost")
         _version(self.api_version)
 
 
@@ -248,6 +267,7 @@ class Evidence:
         _text(self.source, "source")
         _timestamp(self.observed_at, "observed_at")
         _text(self.content, "content")
+        _choice(self.kind, ("market", "document"), "kind")
         if self.kind == "market":
             _symbols(self.symbols)
         _version(self.api_version)
@@ -278,8 +298,9 @@ class BacktestResult:
     api_version: str = API_VERSION
 
     def __post_init__(self) -> None:
-        if self.initial_cash <= 0 or self.final_cash < 0:
-            raise ContractError("invalid_cash", "backtest cash values are invalid")
+        _number(self.initial_cash, "initial_cash", minimum=0.0000001)
+        _number(self.final_cash, "final_cash")
+        _number(self.return_pct, "return_pct", minimum=-100.0)
         _text(self.input_fingerprint, "input_fingerprint")
         _version(self.api_version)
 
@@ -295,8 +316,7 @@ class Portfolio:
     def __post_init__(self) -> None:
         _id(self.portfolio_id, "portfolio_id")
         _text(self.base_currency, "base_currency")
-        if self.cash < 0:
-            raise ContractError("invalid_cash", "cash cannot be negative", field="cash")
+        _number(self.cash, "cash")
         _version(self.api_version)
 
 
@@ -307,13 +327,15 @@ class Order:
     quantity: int
     reference_price: float
     notional: float
+    api_version: str = API_VERSION
 
     def __post_init__(self) -> None:
         _text(self.symbol, "symbol")
-        if self.quantity <= 0:
-            raise ContractError("invalid_quantity", "quantity must be positive", field="quantity")
-        if self.reference_price <= 0 or self.notional <= 0:
-            raise ContractError("invalid_order_value", "order values must be positive")
+        _choice(self.side, ("buy", "sell"), "side")
+        _number(self.quantity, "quantity", minimum=1)
+        _number(self.reference_price, "reference_price", minimum=0.0000001)
+        _number(self.notional, "notional", minimum=0.0000001)
+        _version(self.api_version)
 
 
 @dataclass(frozen=True)
@@ -326,8 +348,7 @@ class OrderPlan:
     def __post_init__(self) -> None:
         if self.mode != "paper":
             raise ContractError("live_disabled", "live execution is disabled in market-os.v1", field="mode")
-        if self.total_notional < 0:
-            raise ContractError("invalid_notional", "total_notional cannot be negative", field="total_notional")
+        _number(self.total_notional, "total_notional")
         _version(self.api_version)
 
 
@@ -339,6 +360,7 @@ class RiskDecision:
     api_version: str = API_VERSION
 
     def __post_init__(self) -> None:
+        _choice(self.status, ("approved", "rejected"), "status")
         if self.status == "rejected" and not self.reasons:
             raise ContractError("missing_reason", "rejected risk decisions need a reason")
         _version(self.api_version)
@@ -360,6 +382,9 @@ class Approval:
         _id(self.run_id, "run_id")
         _text(self.requested_by, "requested_by")
         _timestamp(self.created_at, "created_at")
+        _choice(self.status, ("pending", "approved", "rejected"), "status")
+        if self.decided_at is not None:
+            _timestamp(self.decided_at, "decided_at")
         if self.status != "pending" and (not self.decided_by or not self.decided_at):
             raise ContractError("missing_decision", "decided approvals need decided_by and decided_at")
         _version(self.api_version)
@@ -402,12 +427,19 @@ def error_response(error: ContractError, *, request_id: str | None = None) -> di
 
 def to_dict(value: Any) -> dict[str, Any]:
     """Serialize a contract to JSON-compatible primitives."""
+    if not hasattr(value, "__dataclass_fields__"):
+        raise TypeError("value must be a Market OS contract")
     return asdict(value)
+
+
+def to_json(value: Any) -> str:
+    """Serialize a contract with deterministic key ordering and separators."""
+    return json.dumps(to_dict(value), ensure_ascii=True, sort_keys=True, separators=(",", ":"))
 
 
 def task_from_dict(payload: Mapping[str, Any]) -> Task:
     """Validate and normalize a task received from JSON or another adapter."""
-    values = dict(payload)
+    values = _payload(payload, {"task_id", "objective", "symbols", "start", "end", "created_at", "execution_mode", "idempotency_key", "api_version"})
     if "symbols" in values:
         values["symbols"] = tuple(values["symbols"])
     return Task(**values)
@@ -415,6 +447,104 @@ def task_from_dict(payload: Mapping[str, Any]) -> Task:
 
 def order_plan_from_dict(payload: Mapping[str, Any]) -> OrderPlan:
     """Validate and normalize a paper order plan received from JSON."""
-    values = dict(payload)
+    values = _payload(payload, {"mode", "orders", "total_notional", "api_version"})
     values["orders"] = tuple(Order(**order) if not isinstance(order, Order) else order for order in values.get("orders", ()))
     return OrderPlan(**values)
+
+
+def _required(payload: Mapping[str, Any], fields: set[str]) -> None:
+    missing = sorted(fields - set(payload))
+    if missing:
+        raise ContractError("missing_field", f"missing required contract field: {missing[0]}", field=missing[0])
+
+
+def _payload(payload: Mapping[str, Any], allowed: set[str]) -> dict[str, Any]:
+    if not isinstance(payload, Mapping):
+        raise ContractError("invalid_payload", "contract payload must be an object")
+    values = dict(payload)
+    unknown = sorted(set(values) - allowed)
+    if unknown:
+        raise ContractError("unknown_field", f"unknown contract field: {unknown[0]}", field=unknown[0])
+    if "api_version" not in values:
+        values["api_version"] = API_VERSION
+    return values
+
+
+def _tuple(value: Any, field: str) -> tuple[Any, ...]:
+    if not isinstance(value, (list, tuple)):
+        raise ContractError("invalid_payload", f"{field} must be an array", field=field)
+    return tuple(value)
+
+
+def run_from_dict(payload: Mapping[str, Any]) -> Run:
+    return Run(**_payload(payload, {"run_id", "task_id", "status", "started_at", "finished_at", "error", "api_version"}))
+
+
+def run_event_from_dict(payload: Mapping[str, Any]) -> RunEvent:
+    values = _payload(payload, {"event_id", "run_id", "kind", "timestamp", "payload", "actor", "tool", "model", "input_refs", "output_refs", "cost", "error", "provenance", "api_version"})
+    values["input_refs"] = _tuple(values.get("input_refs", ()), "input_refs")
+    values["output_refs"] = _tuple(values.get("output_refs", ()), "output_refs")
+    return RunEvent(**values)
+
+
+def artifact_from_dict(payload: Mapping[str, Any]) -> Artifact:
+    values = _payload(payload, {"artifact_id", "run_id", "kind", "media_type", "path", "created_at", "sha256", "lineage", "access_policy", "api_version"})
+    values["lineage"] = _tuple(values.get("lineage", ()), "lineage")
+    return Artifact(**values)
+
+
+def evidence_from_dict(payload: Mapping[str, Any]) -> Evidence:
+    values = _payload(payload, {"evidence_id", "kind", "title", "source", "observed_at", "content", "symbols", "api_version"})
+    values["symbols"] = _tuple(values.get("symbols", ()), "symbols")
+    return Evidence(**values)
+
+
+def research_result_from_dict(payload: Mapping[str, Any]) -> ResearchResult:
+    values = _payload(payload, {"summary", "citations", "evidence_ids", "assumptions", "api_version"})
+    values["citations"] = _tuple(values.get("citations", ()), "citations")
+    values["evidence_ids"] = _tuple(values.get("evidence_ids", ()), "evidence_ids")
+    values["assumptions"] = _tuple(values.get("assumptions", ()), "assumptions")
+    return ResearchResult(**values)
+
+
+def backtest_result_from_dict(payload: Mapping[str, Any]) -> BacktestResult:
+    return BacktestResult(**_payload(payload, {"initial_cash", "final_cash", "return_pct", "equity_curve", "input_fingerprint", "api_version"}))
+
+
+def order_from_dict(payload: Mapping[str, Any]) -> Order:
+    return Order(**_payload(payload, {"symbol", "side", "quantity", "reference_price", "notional"}))
+
+
+def risk_decision_from_dict(payload: Mapping[str, Any]) -> RiskDecision:
+    values = _payload(payload, {"status", "reasons", "limits", "api_version"})
+    values["reasons"] = _tuple(values.get("reasons", ()), "reasons")
+    return RiskDecision(**values)
+
+
+_READERS: dict[type[Any], Any] = {
+    Task: task_from_dict,
+    Run: run_from_dict,
+    RunEvent: run_event_from_dict,
+    Artifact: artifact_from_dict,
+    Evidence: evidence_from_dict,
+    ResearchResult: research_result_from_dict,
+    BacktestResult: backtest_result_from_dict,
+    Order: order_from_dict,
+    OrderPlan: order_plan_from_dict,
+    RiskDecision: risk_decision_from_dict,
+}
+
+
+def from_json(payload: str | bytes, contract_type: type[_T]) -> _T:
+    """Decode and validate one supported contract from JSON."""
+    reader = _READERS.get(contract_type)
+    if reader is None:
+        raise TypeError(f"unsupported contract type: {contract_type!r}")
+    try:
+        value = json.loads(payload)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ContractError("invalid_json", "contract payload is not valid JSON") from exc
+    try:
+        return reader(value)
+    except TypeError as exc:
+        raise ContractError("missing_field", f"contract payload is missing a required field: {exc}") from exc

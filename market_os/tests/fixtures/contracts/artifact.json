@@ -1,0 +1,1 @@
+{"access_policy":"owner","api_version":"market-os.v1","artifact_id":"artifact-fixture-1","created_at":"2026-10-13T00:00:00+00:00","kind":"research","lineage":["artifact-evidence-1"],"media_type":"application/json","path":"artifacts/research.json","run_id":"run-fixture-1","sha256":"0000000000000000000000000000000000000000000000000000000000000000"}

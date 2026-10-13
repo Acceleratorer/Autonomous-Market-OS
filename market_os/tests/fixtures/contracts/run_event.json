@@ -1,0 +1,1 @@
+{"actor":"market-os","api_version":"market-os.v1","cost":0.0,"error":null,"event_id":"event-fixture-1","input_refs":["task-fixture-1"],"kind":"run.started","model":null,"output_refs":[],"payload":{"task_id":"task-fixture-1"},"provenance":{"source":"fixture"},"run_id":"run-fixture-1","timestamp":"2026-10-13T00:00:00+00:00","tool":null}
