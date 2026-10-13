@@ -5,6 +5,7 @@ import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
+from .contracts import ContractError, error_response
 from .workflow import MarketWorkflow
 
 
@@ -28,8 +29,10 @@ def make_handler(workflow: MarketWorkflow) -> type[BaseHTTPRequestHandler]:
                 task = workflow.create_task(body["objective"], body["symbols"], body["start"], body["end"], execution_mode=body.get("execution_mode", "paper"), idempotency_key=self.headers.get("Idempotency-Key"))
                 result = workflow.run(task)
                 self._send(200, result)
+            except ContractError as exc:
+                self._send(400, {"error": error_response(exc)})
             except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-                self._send(400, {"error": str(exc)})
+                self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.v1"}})
             except Exception as exc:  # pragma: no cover - defensive transport boundary
                 self._send(500, {"error": str(exc)})
 

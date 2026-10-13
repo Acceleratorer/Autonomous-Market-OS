@@ -14,7 +14,9 @@
 
 **Work:** define `AgentProfile`, `Task`, `Run`, `RunEvent`, `Artifact`, `KnowledgeDocument`, `MarketObject`, `Portfolio`, `OrderPlan`, `RiskDecision`, and `Approval` schemas. Define authentication, configuration, errors, idempotency, cancellation, and provenance rules.
 
-**Exit gate:** schemas have examples, validation, versioning rules, and focused contract tests.
+**Exit gate:** schemas have examples, runtime validation, versioning rules, and focused contract tests.
+
+**Status:** contract foundation implemented in `market_os/contracts.py`; the remaining gate is approval of the production adapter and storage choices.
 
 ## Phase 2 — Research MVP
 
