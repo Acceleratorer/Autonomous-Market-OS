@@ -48,4 +48,4 @@ Every milestone must improve one complete user workflow. Defer broad integration
 
 ## Current status
 
-M1 contract validation, JSON fixtures, and the source-based orchestration benchmark are implemented. The next milestone is an OpenHarness adapter parity harness; no child runtime or live broker is connected yet.
+M1 contract validation and JSON fixtures are implemented. M1.5 now has a dependency-light OpenHarness adapter parity harness using a fixture runtime double; the actual child runtime is not verified and is not promoted. The next milestone is a real-runtime parity run in an isolated environment, followed by the M2 cited research adapter.
