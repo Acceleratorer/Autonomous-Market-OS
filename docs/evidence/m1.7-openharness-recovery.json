@@ -1,0 +1,919 @@
+{
+  "blockers": [
+    "market-os-persistence-failure",
+    "cancellation-during-artifact-persistence",
+    "cancellation-after-restart",
+    "multi-agent-partial-failure",
+    "multi-agent-duplicate-result",
+    "multi-agent-final-aggregation",
+    "restart-during-running-task",
+    "deployment-and-dependency-review"
+  ],
+  "probes": [
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "API error: provider failure",
+          "name": "ErrorEvent",
+          "timestamp": "2026-10-13T16:41:18.701900+00:00"
+        }
+      ],
+      "expected_behavior": "runtime emits an observable provider error",
+      "finished_at": "2026-10-13T16:41:18.741022+00:00",
+      "observed_behavior": "ErrorEvent",
+      "passed": true,
+      "probe_name": "provider-failure",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:18.239172+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[ToolUseBlock(type='tool_use', id='tool-1', name='probe', input={})]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:19.217881+00:00"
+        },
+        {
+          "name": "ToolExecutionStarted",
+          "timestamp": "2026-10-13T16:41:19.217881+00:00"
+        },
+        {
+          "detail": "Tool probe failed: RuntimeError: tool failure",
+          "name": "ToolExecutionCompleted",
+          "timestamp": "2026-10-13T16:41:19.221895+00:00"
+        },
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:19.293264+00:00"
+        }
+      ],
+      "expected_behavior": "runtime returns an error tool result and keeps the stream valid",
+      "finished_at": "2026-10-13T16:41:19.308870+00:00",
+      "observed_behavior": "AssistantTurnComplete, ToolExecutionStarted, ToolExecutionCompleted, AssistantTurnComplete",
+      "passed": true,
+      "probe_name": "tool-failure",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:18.741022+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[ToolUseBlock(type='tool_use', id='tool-1', name='probe', input={})]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:19.657905+00:00"
+        },
+        {
+          "name": "ToolExecutionStarted",
+          "timestamp": "2026-10-13T16:41:19.657905+00:00"
+        },
+        {
+          "detail": "Tool probe failed: AttributeError: 'object' object has no attribute 'is_error'",
+          "name": "ToolExecutionCompleted",
+          "timestamp": "2026-10-13T16:41:19.660431+00:00"
+        },
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:19.750074+00:00"
+        }
+      ],
+      "expected_behavior": "malformed tool results are normalized to an error result",
+      "finished_at": "2026-10-13T16:41:19.770176+00:00",
+      "observed_behavior": "AssistantTurnComplete, ToolExecutionStarted, ToolExecutionCompleted, AssistantTurnComplete",
+      "passed": true,
+      "probe_name": "malformed-tool-result",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:19.308870+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[ToolUseBlock(type='tool_use', id='tool-1', name='contract', input={'wrong': 'value'})]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:20.155123+00:00"
+        },
+        {
+          "name": "ToolExecutionStarted",
+          "timestamp": "2026-10-13T16:41:20.155123+00:00"
+        },
+        {
+          "detail": "Invalid input for contract: 1 validation error for RequiredInput\nrequired\n  Field required [type=missing, input_value={'wrong': 'value'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing",
+          "name": "ToolExecutionCompleted",
+          "timestamp": "2026-10-13T16:41:20.155642+00:00"
+        },
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:20.250097+00:00"
+        }
+      ],
+      "expected_behavior": "invalid tool input is observable as an error result",
+      "finished_at": "2026-10-13T16:41:20.285145+00:00",
+      "observed_behavior": "AssistantTurnComplete, ToolExecutionStarted, ToolExecutionCompleted, AssistantTurnComplete",
+      "passed": true,
+      "probe_name": "contract-validation-failure",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:19.770176+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "Model stream finished without a final message",
+        "type": "RuntimeError"
+      },
+      "event_trace": [],
+      "expected_behavior": "unexpected runtime exception is observable",
+      "finished_at": "2026-10-13T16:41:20.695017+00:00",
+      "observed_behavior": "",
+      "passed": true,
+      "probe_name": "unexpected-runtime-exception",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:20.285145+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "persistence failure",
+        "type": "OSError"
+      },
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:21.051352+00:00"
+        }
+      ],
+      "expected_behavior": "session persistence failure is surfaced",
+      "finished_at": "2026-10-13T16:41:21.067010+00:00",
+      "observed_behavior": "AssistantTurnComplete",
+      "passed": true,
+      "probe_name": "persistence-failure",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:20.695017+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "",
+        "type": "CancelledError"
+      },
+      "event_trace": [],
+      "expected_behavior": "cancelled task leaves no successful completion",
+      "finished_at": "2026-10-13T16:41:21.238808+00:00",
+      "observed_behavior": "",
+      "passed": true,
+      "probe_name": "cancellation-before-task-start",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:21.067010+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "",
+        "type": "CancelledError"
+      },
+      "event_trace": [],
+      "expected_behavior": "asyncio cancellation is observable",
+      "finished_at": "2026-10-13T16:41:21.628977+00:00",
+      "observed_behavior": "",
+      "passed": true,
+      "probe_name": "cancellation-during-provider-work",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:21.238808+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "",
+        "type": "CancelledError"
+      },
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[ToolUseBlock(type='tool_use', id='tool-1', name='probe', input={})]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:21.982287+00:00"
+        },
+        {
+          "name": "ToolExecutionStarted",
+          "timestamp": "2026-10-13T16:41:21.982287+00:00"
+        }
+      ],
+      "expected_behavior": "asyncio cancellation is observable",
+      "finished_at": "2026-10-13T16:41:22.001168+00:00",
+      "observed_behavior": "AssistantTurnComplete, ToolExecutionStarted",
+      "passed": true,
+      "probe_name": "cancellation-during-tool-execution",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:21.628977+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "runtime preserves a correct resumable terminal state",
+      "finished_at": "2026-10-13T16:41:22.004688+00:00",
+      "observed_behavior": "unsupported: persistence is synchronous and has no cooperative cancellation hook",
+      "passed": false,
+      "probe_name": "cancellation-during-artifact-persistence",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:22.001168+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "runtime preserves a correct resumable terminal state",
+      "finished_at": "2026-10-13T16:41:22.006698+00:00",
+      "observed_behavior": "unsupported: cancelled in-flight query has no runtime resume protocol",
+      "passed": false,
+      "probe_name": "cancellation-after-restart",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:22.004688+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "running session has a durable checkpoint that a new runtime can inspect",
+      "finished_at": "2026-10-13T16:41:22.461049+00:00",
+      "observed_behavior": "no checkpoint is available while provider work is running",
+      "passed": false,
+      "probe_name": "restart-during-running-task",
+      "recovery_result": {
+        "observed": "no checkpoint is available while provider work is running",
+        "passed": false,
+        "resume_supported": false,
+        "runtime_session_id": "60dbc8618f2e",
+        "snapshot_available": false
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:22.006698+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[ToolUseBlock(type='tool_use', id='tool-1', name='market_os_workflow', input={})]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:22.883935+00:00"
+        },
+        {
+          "name": "ToolExecutionStarted",
+          "timestamp": "2026-10-13T16:41:22.883935+00:00"
+        },
+        {
+          "detail": "Tool market_os_workflow failed: OSError: Market OS event persistence failure",
+          "name": "ToolExecutionCompleted",
+          "timestamp": "2026-10-13T16:41:22.888984+00:00"
+        },
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:22.991906+00:00"
+        }
+      ],
+      "expected_behavior": "Market OS persistence failure is observable",
+      "finished_at": "2026-10-13T16:41:23.036451+00:00",
+      "observed_behavior": "AssistantTurnComplete, ToolExecutionStarted, ToolExecutionCompleted, AssistantTurnComplete",
+      "passed": false,
+      "probe_name": "market-os-persistence-failure",
+      "recovery_result": {
+        "run_status": "running"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:22.461049+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "detail": "role='assistant' content=[TextBlock(type='text', text='done')]",
+          "name": "AssistantTurnComplete",
+          "timestamp": "2026-10-13T16:41:23.582958+00:00"
+        }
+      ],
+      "expected_behavior": "completed task remains completed",
+      "finished_at": "2026-10-13T16:41:23.603205+00:00",
+      "observed_behavior": "AssistantTurnComplete",
+      "passed": true,
+      "probe_name": "cancellation-after-completion",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.036451+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "repeated cancellation is idempotent",
+      "finished_at": "2026-10-13T16:41:23.606727+00:00",
+      "observed_behavior": "asyncio task cancellation is idempotent",
+      "passed": true,
+      "probe_name": "repeated-cancellation",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.603205+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "same request replays the same result",
+      "finished_at": "2026-10-13T16:41:23.653169+00:00",
+      "observed_behavior": "reference workflow replayed",
+      "passed": true,
+      "probe_name": "idempotent-replay",
+      "recovery_result": {
+        "same_result": true
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.648162+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "duplicate request does not create a second run",
+      "finished_at": "2026-10-13T16:41:23.659717+00:00",
+      "observed_behavior": "duplicate request handled by idempotency store",
+      "passed": true,
+      "probe_name": "duplicate-request",
+      "recovery_result": {
+        "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.653169+00:00"
+    },
+    {
+      "artifacts": [
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-434c02dcc7e13e36",
+          "created_at": "2026-10-13T16:41:23.611029+00:00",
+          "kind": "evidence",
+          "lineage": [
+            "market-SPY",
+            "market-QQQ",
+            "market-IWM",
+            "document-policy"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-evidence-434c02dcc7e1.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "434c02dcc7e13e36a525402d147826c3a5337f0ab2f7d17d90d0dc40c5f22639"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-e2928d209f835752",
+          "created_at": "2026-10-13T16:41:23.612220+00:00",
+          "kind": "research",
+          "lineage": [
+            "artifact-434c02dcc7e13e36"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-research-e2928d209f83.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "e2928d209f8357522f6e3f5d691c7075703ca3ff390ef7d9aaf4b844cdfdd7fb"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-c20d65a1a69b3164",
+          "created_at": "2026-10-13T16:41:23.613208+00:00",
+          "kind": "backtest",
+          "lineage": [
+            "artifact-434c02dcc7e13e36"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-backtest-c20d65a1a69b.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "c20d65a1a69b3164c2e9b196776e2a47ff72feb961a3825f4b1f6257693baceb"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-503dded62a9338d8",
+          "created_at": "2026-10-13T16:41:23.615939+00:00",
+          "kind": "order-plan",
+          "lineage": [
+            "artifact-c20d65a1a69b3164"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-order-plan-503dded62a93.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "503dded62a9338d8fbe69928c05f226e2078ccc63a2d88639c001ef63a62342f"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-eee9345c406eae6f",
+          "created_at": "2026-10-13T16:41:23.615939+00:00",
+          "kind": "risk-decision",
+          "lineage": [
+            "artifact-503dded62a9338d8"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-risk-decision-eee9345c406e.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "eee9345c406eae6f5f536da2c77f8d267ab4842b57633b445293e86bb2cd5288"
+        }
+      ],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "artifacts preserve run lineage",
+      "finished_at": "2026-10-13T16:41:23.664727+00:00",
+      "observed_behavior": "artifact lineage present",
+      "passed": true,
+      "probe_name": "artifact-lineage",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.659717+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-6307bc2b32cf497691e56dd74b046da9",
+          "input_refs": [],
+          "kind": "run.started",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "task": {
+              "api_version": "market-os.v1",
+              "created_at": "2026-10-13T00:00:00+00:00",
+              "end": "2026-01-06",
+              "execution_mode": "paper",
+              "idempotency_key": "fixture-task-1",
+              "objective": "Compare three US ETFs",
+              "start": "2026-01-02",
+              "symbols": [
+                "SPY",
+                "QQQ",
+                "IWM"
+              ],
+              "task_id": "task-fixture-1"
+            }
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.608242+00:00",
+          "tool": null
+        },
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-5d88b044a3af4ee98f209158d8e17602",
+          "input_refs": [],
+          "kind": "evidence.retrieved",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "count": 4
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.609752+00:00",
+          "tool": null
+        },
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-06ce1a649c004c71a8b01408acdadb73",
+          "input_refs": [],
+          "kind": "research.completed",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "artifact_id": "artifact-e2928d209f835752"
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.613208+00:00",
+          "tool": null
+        },
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-33afcb01953d4777914126ec08e95440",
+          "input_refs": [],
+          "kind": "backtest.completed",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "artifact_id": "artifact-c20d65a1a69b3164"
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.614712+00:00",
+          "tool": null
+        },
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-fcbe90f9de7c4ed38291122502581ebe",
+          "input_refs": [],
+          "kind": "risk.checked",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "artifact_id": "artifact-eee9345c406eae6f",
+            "status": "approved"
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.616945+00:00",
+          "tool": null
+        },
+        {
+          "actor": "market-os",
+          "api_version": "market-os.v1",
+          "cost": null,
+          "error": null,
+          "event_id": "event-7d9139e2d3944f11af8c34bbf9c58adc",
+          "input_refs": [],
+          "kind": "run.completed",
+          "model": null,
+          "output_refs": [],
+          "payload": {
+            "artifact_ids": [
+              "artifact-e2928d209f835752",
+              "artifact-c20d65a1a69b3164",
+              "artifact-503dded62a9338d8",
+              "artifact-eee9345c406eae6f"
+            ]
+          },
+          "provenance": {},
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "timestamp": "2026-10-13T16:41:23.616945+00:00",
+          "tool": null
+        }
+      ],
+      "expected_behavior": "terminal event is persisted",
+      "finished_at": "2026-10-13T16:41:23.669929+00:00",
+      "observed_behavior": "terminal event present",
+      "passed": true,
+      "probe_name": "event-trace-completeness",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.664727+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [],
+      "expected_behavior": "run ends in a terminal status",
+      "finished_at": "2026-10-13T16:41:23.675441+00:00",
+      "observed_behavior": "completed",
+      "passed": true,
+      "probe_name": "terminal-status-correctness",
+      "recovery_result": {
+        "status": "completed"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.669929+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": {
+        "message": "live execution is disabled in market-os.v1",
+        "type": "ValueError"
+      },
+      "event_trace": [],
+      "expected_behavior": "live execution is rejected at task creation",
+      "finished_at": "2026-10-13T16:41:23.680963+00:00",
+      "observed_behavior": "live execution is disabled in market-os.v1",
+      "passed": true,
+      "probe_name": "paper-only-enforcement",
+      "recovery_result": null,
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.675441+00:00"
+    },
+    {
+      "artifacts": [
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-434c02dcc7e13e36",
+          "created_at": "2026-10-13T16:41:23.611029+00:00",
+          "kind": "evidence",
+          "lineage": [
+            "market-SPY",
+            "market-QQQ",
+            "market-IWM",
+            "document-policy"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-evidence-434c02dcc7e1.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "434c02dcc7e13e36a525402d147826c3a5337f0ab2f7d17d90d0dc40c5f22639"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-e2928d209f835752",
+          "created_at": "2026-10-13T16:41:23.612220+00:00",
+          "kind": "research",
+          "lineage": [
+            "artifact-434c02dcc7e13e36"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-research-e2928d209f83.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "e2928d209f8357522f6e3f5d691c7075703ca3ff390ef7d9aaf4b844cdfdd7fb"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-c20d65a1a69b3164",
+          "created_at": "2026-10-13T16:41:23.613208+00:00",
+          "kind": "backtest",
+          "lineage": [
+            "artifact-434c02dcc7e13e36"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-backtest-c20d65a1a69b.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "c20d65a1a69b3164c2e9b196776e2a47ff72feb961a3825f4b1f6257693baceb"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-503dded62a9338d8",
+          "created_at": "2026-10-13T16:41:23.615939+00:00",
+          "kind": "order-plan",
+          "lineage": [
+            "artifact-c20d65a1a69b3164"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-order-plan-503dded62a93.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "503dded62a9338d8fbe69928c05f226e2078ccc63a2d88639c001ef63a62342f"
+        },
+        {
+          "access_policy": "owner",
+          "api_version": "market-os.v1",
+          "artifact_id": "artifact-eee9345c406eae6f",
+          "created_at": "2026-10-13T16:41:23.615939+00:00",
+          "kind": "risk-decision",
+          "lineage": [
+            "artifact-503dded62a9338d8"
+          ],
+          "media_type": "application/json",
+          "path": "run-a586f9d5c5854b109fb893a530307a7c-risk-decision-eee9345c406e.json",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c",
+          "sha256": "eee9345c406eae6f5f536da2c77f8d267ab4842b57633b445293e86bb2cd5288"
+        }
+      ],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "agent": "researcher",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        },
+        {
+          "agent": "risk",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        }
+      ],
+      "expected_behavior": "two teammates share identity, ordering, and artifacts",
+      "finished_at": "2026-10-13T16:41:25.796403+00:00",
+      "observed_behavior": "agents=['researcher@market', 'risk@market']; shared_run_ids=['run-a586f9d5c5854b109fb893a530307a7c']; records=[{'agent': 'researcher', 'run_id': 'run-a586f9d5c5854b109fb893a530307a7c'}, {'agent': 'risk', 'run_id': 'run-a586f9d5c5854b109fb893a530307a7c'}]",
+      "passed": true,
+      "probe_name": "multi-agent-coordination",
+      "recovery_result": {
+        "agent_ids": [
+          "researcher@market",
+          "risk@market"
+        ],
+        "events": [
+          {
+            "agent": "researcher",
+            "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+          },
+          {
+            "agent": "risk",
+            "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+          }
+        ],
+        "expected": {
+          "multi-agent-duplicate-result": "duplicate agent results are idempotently collapsed",
+          "multi-agent-final-aggregation": "final aggregation preserves shared artifacts and failure semantics",
+          "multi-agent-partial-failure": "partial agent failure is propagated to the final aggregation",
+          "multi-agent-timeout": "agent timeout is observable and leaves a terminal coordination result"
+        },
+        "observed": "agents=['researcher@market', 'risk@market']; shared_run_ids=['run-a586f9d5c5854b109fb893a530307a7c']; records=[{'agent': 'researcher', 'run_id': 'run-a586f9d5c5854b109fb893a530307a7c'}, {'agent': 'risk', 'run_id': 'run-a586f9d5c5854b109fb893a530307a7c'}]",
+        "observed_details": {
+          "multi-agent-duplicate-result": "teammate layer does not deduplicate repeated workflow results",
+          "multi-agent-final-aggregation": "no runtime-native final aggregation contract is exposed by InProcessBackend",
+          "multi-agent-partial-failure": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted",
+          "multi-agent-timeout": "asyncio timeout cancelled the teammate task"
+        },
+        "passed": true,
+        "passed_details": {
+          "multi-agent-duplicate-result": false,
+          "multi-agent-final-aggregation": false,
+          "multi-agent-partial-failure": false,
+          "multi-agent-timeout": true
+        },
+        "runtime_behavior": {
+          "multi-agent-duplicate-result": "teammate layer does not deduplicate repeated workflow results",
+          "multi-agent-final-aggregation": "no runtime-native final aggregation contract is exposed by InProcessBackend",
+          "multi-agent-partial-failure": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted",
+          "multi-agent-timeout": "asyncio timeout cancelled the teammate task"
+        },
+        "shared_parent_session_id": "session-shared"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:23.680963+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "agent": "researcher",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        },
+        {
+          "agent": "risk",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        }
+      ],
+      "expected_behavior": "partial agent failure is propagated to the final aggregation",
+      "finished_at": "2026-10-13T16:41:25.797914+00:00",
+      "observed_behavior": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted",
+      "passed": false,
+      "probe_name": "multi-agent-partial-failure",
+      "recovery_result": {
+        "runtime_behavior": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:25.796403+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "agent": "researcher",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        },
+        {
+          "agent": "risk",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        }
+      ],
+      "expected_behavior": "agent timeout is observable and leaves a terminal coordination result",
+      "finished_at": "2026-10-13T16:41:25.800446+00:00",
+      "observed_behavior": "asyncio timeout cancelled the teammate task",
+      "passed": true,
+      "probe_name": "multi-agent-timeout",
+      "recovery_result": {
+        "runtime_behavior": "asyncio timeout cancelled the teammate task"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:25.797914+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "agent": "researcher",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        },
+        {
+          "agent": "risk",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        }
+      ],
+      "expected_behavior": "duplicate agent results are idempotently collapsed",
+      "finished_at": "2026-10-13T16:41:25.803445+00:00",
+      "observed_behavior": "teammate layer does not deduplicate repeated workflow results",
+      "passed": false,
+      "probe_name": "multi-agent-duplicate-result",
+      "recovery_result": {
+        "runtime_behavior": "teammate layer does not deduplicate repeated workflow results"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:25.800446+00:00"
+    },
+    {
+      "artifacts": [],
+      "environment_id": "openharness-recovery-d9f04a3047ff",
+      "error_details": null,
+      "event_trace": [
+        {
+          "agent": "researcher",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        },
+        {
+          "agent": "risk",
+          "run_id": "run-a586f9d5c5854b109fb893a530307a7c"
+        }
+      ],
+      "expected_behavior": "final aggregation preserves shared artifacts and failure semantics",
+      "finished_at": "2026-10-13T16:41:25.804955+00:00",
+      "observed_behavior": "no runtime-native final aggregation contract is exposed by InProcessBackend",
+      "passed": false,
+      "probe_name": "multi-agent-final-aggregation",
+      "recovery_result": {
+        "runtime_behavior": "no runtime-native final aggregation contract is exposed by InProcessBackend"
+      },
+      "runtime_verified": true,
+      "runtime_version": "openharness-ai:0.1.9",
+      "started_at": "2026-10-13T16:41:25.803445+00:00"
+    }
+  ],
+  "promotable": false,
+  "promotion_status": "Provisional",
+  "runtime_verified": true
+}

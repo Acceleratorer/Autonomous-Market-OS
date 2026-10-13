@@ -25,6 +25,7 @@ from ..providers import default_providers
 from ..store import RunStore
 from ..workflow import MarketWorkflow
 from .openharness_adapter import IsolatedOpenHarnessRuntime, OpenHarnessAdapter
+from .recovery import run_recovery_probes
 
 
 @dataclass(frozen=True)
@@ -349,10 +350,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", default=".market_os-parity")
     parser.add_argument("--fixture", default="market_os/tests/fixtures/contracts/task.json")
     parser.add_argument("--openharness-python", help="isolated Python executable for real OpenHarness verification")
+    parser.add_argument("--recovery-output", help="write M1.7 machine-readable recovery probes")
     args = parser.parse_args(argv)
     task = from_json(Path(args.fixture).read_text(encoding="utf-8"), Task)
     runtime = IsolatedOpenHarnessRuntime(args.openharness_python) if args.openharness_python else None
-    print(json.dumps(run_parity_harness(args.root, task, runtime=runtime).to_dict(), indent=2, sort_keys=True))
+    report = run_parity_harness(args.root, task, runtime=runtime)
+    payload: dict[str, Any] = {"parity": report.to_dict()}
+    if args.recovery_output or args.openharness_python:
+        recovery = run_recovery_probes(
+            Path(args.root) / "recovery",
+            task,
+            openharness_python=args.openharness_python,
+            output_path=args.recovery_output,
+        )
+        payload["recovery"] = recovery.to_dict()
+    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
 
 

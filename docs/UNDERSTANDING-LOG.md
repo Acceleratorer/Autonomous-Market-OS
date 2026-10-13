@@ -52,3 +52,22 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The runtime parity report completed with `runtime_verified=true`, zero mismatches, and exact matches for research, backtest, paper order plan, risk, artifacts, lineage, citations, event ordering, UTC timestamps, contract serialization, and shared result shape.
 - Kept OpenHarness provisional. Runtime-native failure propagation, cancellation, and multi-agent coordination are explicitly unsupported until direct probes exist. Live execution and real providers remain disabled.
 - Added `docs/M1.6-OPENHARNESS-RUNTIME.md`, `docs/decisions/ADR-0004-openharness-runtime.md`, and focused runtime adapter tests.
+
+## 2026-10-13 — M1.7 OpenHarness recovery probes
+
+- Added `market_os/orchestration/recovery.py` and the isolated child-runtime
+  probe `market_os/orchestration/openharness_recovery_probe.py`.
+- Direct runtime evidence verifies provider/tool/contract/session-persistence failure
+  observation, cancellation before and during provider/tool work, replay and
+  duplicate handling, artifact lineage, event trace persistence, terminal
+  status, paper-only enforcement, and basic two-agent shared identity/run
+  coordination.
+- Direct blockers are recorded for artifact-persistence cancellation, restart
+  during running work, resume after cancellation, partial agent failure,
+  duplicate teammate results, final aggregation, and deployment review.
+- Added machine-readable evidence at
+  `docs/evidence/m1.7-openharness-recovery.json`, focused recovery/coordination
+  tests, `docs/M1.7-OPENHARNESS-RECOVERY.md`, and ADR-0005.
+- OpenHarness remains provisional. M2 is blocked; the exact next milestone is
+  M1.8 recovery blocker closure and deployment review. No real providers,
+  brokers, or live execution were added.

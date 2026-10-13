@@ -305,6 +305,24 @@ class OpenHarnessAdapter:
             "artifacts": [artifact.__dict__ for artifact in self.store.artifacts_for(run_id)],
         }
 
+    def probe_recovery(
+        self,
+        task: Task,
+        *,
+        root: str | Path,
+        openharness_python: str | Path | None = None,
+        output_path: str | Path | None = None,
+    ) -> dict[str, Any]:
+        """Run recovery evidence without importing OpenHarness into contracts."""
+        from .recovery import run_recovery_probes
+
+        return run_recovery_probes(
+            root,
+            task,
+            openharness_python=openharness_python,
+            output_path=output_path,
+        ).to_dict()
+
     def runtime_events_for(self, run_id: str) -> list[OpenHarnessEvent]:
         runtime_events = self.capture_store.runtime_events_for(run_id)
         if runtime_events:
