@@ -1,4 +1,4 @@
-"""HKUDS Autonomous Market OS foundation slice."""
+"""Autonomous Market OS foundation slice."""
 
 from .workflow import MarketWorkflow
 

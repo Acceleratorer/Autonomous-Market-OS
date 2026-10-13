@@ -1,10 +1,10 @@
-# HKUDS Fusion Product Vision
+# Autonomous Market OS Product Vision
 
-## Recommended flagship: HKUDS Autonomous Market OS
+## Product: Autonomous Market OS
 
 A multi-agent trading operating system that researches markets, debates strategies, backtests ideas, manages paper/live execution with approval controls, learns from outcomes, and exposes the same capabilities through CLI, web, desktop/mobile app, chat channels, and generated reports/media.
 
-The product should be one platform with domain plugins. The existing repositories become owned capabilities behind contracts; they should not all be copied into one package.
+This personal project should be one platform with domain plugins. The existing repositories become capabilities behind contracts; they should not all be copied into one package.
 
 ## Product loop
 
@@ -37,7 +37,7 @@ User goal or scheduled policy
 
 ### 1. Autonomous Market OS — recommended
 
-A serious trading and research platform. It combines the strongest company assets into one coherent workflow and can monetize through subscriptions, managed research, and execution tooling.
+A serious trading and research platform. It combines useful open source capabilities into one coherent workflow and can later support paid research or execution tooling if that becomes a deliberate product decision.
 
 Core differentiators:
 

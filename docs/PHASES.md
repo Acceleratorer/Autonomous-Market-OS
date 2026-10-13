@@ -1,4 +1,4 @@
-# HKUDS Autonomous Market OS: Phases
+# Autonomous Market OS: Phases
 
 ## Phase 0 — Alignment and inventory
 

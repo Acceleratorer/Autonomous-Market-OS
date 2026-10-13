@@ -1,8 +1,8 @@
-# HKUDS Fusion Workspace Guide
+# Autonomous Market OS Workspace Guide
 
 Status: initial architecture pass, generated 2026-10-13.
 
-This directory documents the repository collection under `D:\Code\Github\HKUDS`. Each top-level project remains an independent Git repository. The documents describe observed boundaries and likely integration seams; they do not claim that the projects already share a runtime or API contract.
+This directory documents the independent source projects used by this personal project. Each child project remains an independent Git repository. The documents describe observed boundaries and likely integration seams; they do not claim that the projects already share a runtime or API contract.
 
 ## Start here
 

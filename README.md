@@ -1,6 +1,6 @@
-# HKUDS Autonomous Market OS
+# Autonomous Market OS
 
-The fusion repository for HKUDS market research, reproducible backtesting, paper trading, and later controlled execution.
+This is a personal project for market research, reproducible backtesting, paper trading, and later controlled execution.
 
 This repository owns the shared contracts, workflow orchestration boundary, persistence model, CLI, and service API. The source projects remain independent repositories and are connected through narrow adapters:
 

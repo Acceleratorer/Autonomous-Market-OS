@@ -1,4 +1,4 @@
-# HKUDS Autonomous Market OS: Roadmap
+# Autonomous Market OS: Roadmap
 
 ## Milestone sequence
 

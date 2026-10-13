@@ -3,9 +3,9 @@
 Copy the following prompt into a new Codex chat:
 
 ```text
-Create and execute a staged implementation plan for the HKUDS Autonomous Market OS in D:\Code\Github\HKUDS.
+Create and execute a staged implementation plan for the Autonomous Market OS in the repository root.
 
-Goal: fuse the company projects into one autonomous trading platform with a shared backend and CLI, web, desktop/mobile, and chat surfaces. The first deliverable is an evidence-backed research and paper-trading workflow. Live trading must remain disabled until explicit safety gates pass.
+Goal: build one personal autonomous trading platform from independent source projects, with a shared backend and CLI, web, desktop/mobile, and chat surfaces. The first deliverable is an evidence-backed research and paper-trading workflow. Live trading must remain disabled until explicit safety gates pass.
 
 Use these documents as the current product source of truth:
 - docs/PRODUCT-VISION.md

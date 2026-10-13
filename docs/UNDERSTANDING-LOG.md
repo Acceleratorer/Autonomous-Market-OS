@@ -25,7 +25,7 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 
 ## 2026-10-13 — Fusion repository created
 
-- Created the independent fusion repository at `https://github.com/Acceleratorer/Autonomous-Market-OS` because the authenticated account could not create repositories in the `HKUDS` organization.
+- Created the independent personal-project repository at `https://github.com/Acceleratorer/Autonomous-Market-OS`.
 - Committed the fusion-owned foundation as `58c9e40` and pushed M1 contract stabilization as `b63f3fe` on `main`.
 - The child repositories remain separate directories and were not added to the fusion Git history. Existing user changes in `ClawWork` and `CLI-Anything` remain preserved.
 
