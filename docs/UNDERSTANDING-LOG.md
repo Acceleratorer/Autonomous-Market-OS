@@ -130,3 +130,19 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   teammate failure/cancellation propagation, and duplicate handling remain
   unsupported; root adapter recovery and aggregation cases pass separately.
 - ADR-0008 keeps OpenHarness provisional and sets M1.11 as the next gate.
+
+## 2026-10-14 — M1.11 blocker classification and promotion readiness
+
+- Added `docs/M1.11-BLOCKER-REVIEW.md`, ADR-0009, and machine-readable
+  `docs/evidence/m1.11-openharness-blockers.json` with a complete blocker
+  matrix, ownership, evidence class, and M2 readiness decision.
+- Closed structured service request logging and bounded HTTP request-body reads
+  at the local service boundary. Provider/workflow execution deadlines remain
+  separate because the workflow is synchronous.
+- Reconfirmed adapter mitigations for terminal persistence recovery,
+  cancellation checkpoints, restart cleanup, partial aggregation, and
+  duplicate/conflict fingerprints. Native OpenHarness persistence
+  cancellation, checkpoint/resume, teammate propagation, duplicate handling,
+  process quotas, and service identity permissions remain promotion blockers.
+- ADR-0009 keeps OpenHarness provisional and defers M2 implementation while
+  permitting planning for the first licensed research adapters.

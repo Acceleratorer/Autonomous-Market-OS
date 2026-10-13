@@ -74,3 +74,12 @@ checkpoint/resume, teammate propagation, duplicate handling, and external
 service controls remain open. The exact next milestone is **M1.11: supply or
 reject the external supervisor controls and obtain final native blocker
 evidence**.
+
+M1.11 classifies every remaining blocker and closes the safe Market OS
+adapter-level behaviors. The service now has a tested HTTP body timeout and
+structured request JSONL logs, while provider/workflow execution deadlines,
+process quotas, service identity permissions, and OpenHarness-native recovery
+remain open. ADR-0009 keeps OpenHarness provisional and defers M2
+implementation. The exact next milestone is **M1.12: choose and verify the
+external supervisor and native closure path, or formally reject this
+deployment/runtime shape**.

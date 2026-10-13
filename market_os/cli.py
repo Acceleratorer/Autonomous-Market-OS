@@ -22,6 +22,8 @@ def build_parser() -> argparse.ArgumentParser:
     server.add_argument("--host", default=os.environ.get("MARKET_OS_HOST", "127.0.0.1"))
     server.add_argument("--port", type=int, default=int(os.environ.get("MARKET_OS_PORT", "8787")))
     server.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
+    server.add_argument("--request-timeout", type=float, default=float(os.environ.get("MARKET_OS_REQUEST_TIMEOUT", "5")))
+    server.add_argument("--service-log", default=os.environ.get("MARKET_OS_SERVICE_LOG"))
     inspect = commands.add_parser("inspect")
     inspect.add_argument("run_id")
     return parser
@@ -31,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "serve":
         workflow = MarketWorkflow(RunStore(args.store_root))
-        serve(workflow, args.host, args.port)
+        serve(workflow, args.host, args.port, request_timeout=args.request_timeout, service_log_path=args.service_log)
         return 0
     workflow = MarketWorkflow()
     if args.command == "inspect":

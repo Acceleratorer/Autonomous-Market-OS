@@ -10,16 +10,20 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
 from .contracts import Run, RunEvent, utc_now
+from .api import make_handler
 from .deployment.wrapper import BoundedService, DeploymentConfig, DeploymentConfigError
 from .store import RunStore
+from .workflow import MarketWorkflow
 
 
 @dataclass(frozen=True)
@@ -45,13 +49,14 @@ def _free_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def _start(repo_root: Path, store_root: Path, port: int) -> subprocess.Popen[str]:
+def _start(repo_root: Path, store_root: Path, log_root: Path, port: int) -> subprocess.Popen[str]:
     env = os.environ.copy()
     env["MARKET_OS_STORE_ROOT"] = str(store_root)
     env["MARKET_OS_HOST"] = "127.0.0.1"
     env["MARKET_OS_PORT"] = str(port)
+    env["MARKET_OS_SERVICE_LOG"] = str(log_root / "service.jsonl")
     return subprocess.Popen(
-        [sys.executable, "-m", "market_os.cli", "serve"],
+        [sys.executable, "-m", "market_os.cli", "serve", "--request-timeout", "2"],
         cwd=repo_root,
         env=env,
         stdout=subprocess.PIPE,
@@ -86,6 +91,42 @@ def _stop(process: subprocess.Popen[str], *, forced: bool = False) -> int | None
         return process.wait(timeout=3)
 
 
+def _probe_http_read_timeout(root: Path) -> DeploymentProbe:
+    server = ThreadingHTTPServer(
+        ("127.0.0.1", 0),
+        make_handler(MarketWorkflow(RunStore(root / "timeout-state")), request_timeout=0.2),
+    )
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    observed = "no response"
+    passed = False
+    try:
+        with socket.create_connection(server.server_address, timeout=2) as client:
+            client.settimeout(2)
+            client.sendall(
+                b"POST /v1/tasks HTTP/1.1\r\n"
+                b"Host: 127.0.0.1\r\n"
+                b"Content-Length: 100\r\n"
+                b"Connection: close\r\n\r\n"
+                b"{\"objective\":"
+            )
+            response = client.recv(256).decode("iso-8859-1", errors="replace")
+        status_line = response.splitlines()[0] if response else "connection closed"
+        observed = status_line
+        passed = " 408 " in f" {status_line} "
+    except OSError as exc:
+        observed = f"{type(exc).__name__}: {exc}"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+    return DeploymentProbe(
+        "service-http-read-timeout",
+        "deployment-verified",
+        "service bounds a stalled HTTP request body",
+        observed,
+        passed,
+    )
 def _probe_openharness(python: str | None) -> DeploymentProbe:
     if not python or not Path(python).exists():
         return DeploymentProbe("openharness-install", "unresolved", "isolated OpenHarness metadata is installed", "interpreter unavailable", False)
@@ -113,11 +154,13 @@ def run_probe(output_path: str | Path | None = None, *, openharness_python: str 
         store = root / "state"
         port = _free_port()
         probes = [_probe_openharness(openharness_python)]
+        probes.append(_probe_http_read_timeout(root))
         abandoned = Run("run-abandoned-m19", "task-abandoned-m19", "running", utc_now())
         seeded_store = RunStore(store)
         seeded_store.save_run(abandoned)
         seeded_store.append_event(RunEvent("event-abandoned-m19", abandoned.run_id, "run.started", utc_now(), {}))
-        process = _start(repo_root, store, port)
+        service_logs = root / "service-logs"
+        process = _start(repo_root, store, service_logs, port)
         ready = _wait_ready(port, process)
         probes.append(DeploymentProbe("service-readiness", "deployment-verified", "launched service reports readiness", "ready" if ready else "not ready", ready))
         if ready:
@@ -137,9 +180,12 @@ def run_probe(output_path: str | Path | None = None, *, openharness_python: str 
             probes.append(DeploymentProbe("startup-recovery", "deployment-verified", "startup terminalizes an abandoned run for inspection", recovered.get("error", "missing"), recovery_status == 200 and recovered.get("status") == "failed" and recovered.get("error") == "restart_interrupted:resume_unsupported"))
         _stop(process)
         probes.append(DeploymentProbe("clean-shutdown", "deployment-verified", "service exits after termination request", str(process.returncode), process.returncode is not None))
+        request_log_path = service_logs / "service.jsonl"
+        request_logs = [json.loads(line) for line in request_log_path.read_text(encoding="utf-8").splitlines() if line.strip()] if request_log_path.exists() else []
+        probes.append(DeploymentProbe("service-structured-logging", "deployment-verified", "service logs request method, path, status, and run identity", f"records={len(request_logs)}", bool(request_logs) and all({"method", "path", "status", "run_id", "error_type"} <= set(item) for item in request_logs)))
 
         restarted_port = _free_port()
-        restarted = _start(repo_root, store, restarted_port)
+        restarted = _start(repo_root, store, root / "restart-logs", restarted_port)
         restart_ready = _wait_ready(restarted_port, restarted)
         probes.append(DeploymentProbe("clean-restart", "deployment-verified", "service restarts against the same state root", "ready" if restart_ready else "not ready", restart_ready))
         _stop(restarted, forced=True)
@@ -147,12 +193,12 @@ def run_probe(output_path: str | Path | None = None, *, openharness_python: str 
 
         probes.extend([
             DeploymentProbe("resource-limits", "unsupported", "service enforces bounded CPU and memory", "no process-level limits are configured", False),
-            DeploymentProbe("service-request-timeouts", "unsupported", "service enforces request and provider timeouts", "HTTP handler and provider calls have no deployment-level timeout policy", False),
-            DeploymentProbe("service-logging", "unsupported", "service emits request and audit logs", "request logging is intentionally suppressed; wrapper lifecycle logs are separate", False),
+            DeploymentProbe("service-request-timeouts", "partial", "service bounds HTTP socket reads and provider execution", "HTTP socket read timeout is configured; synchronous provider execution deadlines require provider or worker isolation", False),
+            DeploymentProbe("service-logging", "deployment-verified", "service emits request and audit logs", f"request JSONL records={len(request_logs)}; wrapper lifecycle logs are separate", bool(request_logs)),
             DeploymentProbe("upgrade-rollback", "source-based", "versioned state can be upgraded and rolled back", "documented assumption; no image registry or migration was exercised", True),
             DeploymentProbe("secret-boundary", "deployment-verified", "service workflow accepts no credential payload", "fixture request contained no secrets or provider calls", True),
             DeploymentProbe("filesystem-boundary", "deployment-verified", "state is kept in the configured writable root", str(store), store.exists() and all((store / name).exists() for name in ("events.jsonl", "runs.jsonl", "artifacts.jsonl", "recovery.jsonl"))),
-            DeploymentProbe("filesystem-permissions", "unsupported", "state is restricted to a dedicated service identity", "temporary probe state uses the invoking Windows identity", False),
+            DeploymentProbe("filesystem-permissions", "unsupported", "state is restricted to a dedicated service identity", f"temporary probe state uses identity {os.environ.get('USERNAME', 'unknown')}; dedicated service ACL not configured", False),
         ])
         wrapper_root = root / "wrapper"
         wrapper_config = DeploymentConfig(
@@ -182,7 +228,7 @@ def run_probe(output_path: str | Path | None = None, *, openharness_python: str 
             except Exception:
                 pass
     report = {
-        "schema": "market-os.m1.9-deployment.v1",
+        "schema": "market-os.m1.11-deployment.v1",
         "python_version": platform.python_version(),
         "platform": platform.platform(),
         "promotion_status": "Provisional",

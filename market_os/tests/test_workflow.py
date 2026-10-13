@@ -252,6 +252,25 @@ def test_service_health_and_readiness_endpoints(tmp_path: Path) -> None:
         thread.join(timeout=2)
 
 
+def test_service_writes_structured_request_audit_log(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path / "state"))
+    log_path = tmp_path / "logs" / "service.jsonl"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow, service_log_path=log_path))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        response = urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2)
+        assert response.status == 200
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+    records = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+    assert records[-1]["method"] == "GET"
+    assert records[-1]["path"] == "/healthz"
+    assert records[-1]["status"] == 200
+
+
 def test_service_startup_recovers_abandoned_run(tmp_path: Path) -> None:
     store = RunStore(tmp_path)
     abandoned = Run("run-abandoned-service", "task-abandoned-service", "running", "2026-01-01T00:00:00+00:00")

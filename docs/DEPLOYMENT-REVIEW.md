@@ -89,3 +89,9 @@ configuration, lifecycle timeouts, graceful/forced termination, exit status,
 and wrapper JSONL logs. It explicitly rejects CPU/memory limits without an
 external supervisor. The wrapper is suitable for local paper-only probes; it is
 not a production host isolation layer.
+
+M1.11 adds a bounded HTTP request-body timeout and structured JSONL service
+request logs containing method, path, status, run identity, and error type.
+Provider and workflow execution deadlines remain unproven because the service
+executes the reference workflow synchronously. Process quotas and dedicated
+service identity permissions remain external deployment requirements.

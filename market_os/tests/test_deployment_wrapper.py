@@ -35,6 +35,12 @@ def test_wrapper_rejects_unbounded_host_limits_and_live_mode(tmp_path: Path) -> 
         DeploymentConfig(**{**config.__dict__, "paper_only": False}).validate()
 
 
+def test_wrapper_rejects_nonpositive_request_timeout(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    with pytest.raises(DeploymentConfigError):
+        DeploymentConfig(**{**config.__dict__, "request_timeout": 0}).validate()
+
+
 def test_wrapper_requires_explicit_runtime_paths(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     for name in ("MARKET_OS_RUNTIME_ROOT", "MARKET_OS_STORE_ROOT", "MARKET_OS_LOG_ROOT"):
         monkeypatch.delenv(name, raising=False)
@@ -51,3 +57,5 @@ def test_wrapper_starts_and_logs_bounded_service(tmp_path: Path) -> None:
     assert result.normalized_exit_code == 0
     records = [json.loads(line) for line in (config.log_root / "deployment.jsonl").read_text(encoding="utf-8").splitlines()]
     assert [record["event"] for record in records] == ["started", "ready", "stop_requested", "stopped"]
+    service_records = [json.loads(line) for line in (config.log_root / "service.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert any(record["path"] == "/readyz" and record["status"] == 200 for record in service_records)

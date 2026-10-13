@@ -104,9 +104,11 @@ class BoundedService:
             "MARKET_OS_HOST": self.config.host,
             "MARKET_OS_PORT": str(self.config.port),
             "MARKET_OS_STORE_ROOT": str(self.config.state_root.resolve()),
+            "MARKET_OS_REQUEST_TIMEOUT": str(self.config.request_timeout),
+            "MARKET_OS_SERVICE_LOG": str(self.config.log_root.resolve() / "service.jsonl"),
             "MARKET_OS_PAPER_ONLY": "1",
         })
-        command = [self.python_executable, "-m", "market_os.cli", "serve", "--host", self.config.host, "--port", str(self.config.port), "--store-root", str(self.config.state_root.resolve())]
+        command = [self.python_executable, "-m", "market_os.cli", "serve", "--host", self.config.host, "--port", str(self.config.port), "--store-root", str(self.config.state_root.resolve()), "--request-timeout", str(self.config.request_timeout), "--service-log", str(self.config.log_root.resolve() / "service.jsonl")]
         flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
         self.process = subprocess.Popen(command, cwd=self.config.repo_root.resolve(), env=env, stdout=self._log_handle, stderr=subprocess.STDOUT, text=True, creationflags=flags)
         self._record("started", {"pid": self.process.pid, "host": self.config.host, "port": self.config.port})
