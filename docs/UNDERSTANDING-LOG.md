@@ -22,3 +22,9 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Added the Phase 1 contract envelopes `AgentProfile`, `KnowledgeDocument`, `MarketObject`, `Portfolio`, `Approval`, `CancellationRequest`, and `ErrorResponse`, while preserving the existing workflow contracts.
 - Added JSON boundary helpers and focused contract tests. The API now returns structured contract errors with stable codes and fields.
 - Kept authentication, tenant isolation, provider-specific bar schemas, asynchronous cancellation, and production storage deferred until the next architecture decisions.
+
+## 2026-10-13 — Fusion repository created
+
+- Created the independent fusion repository at `https://github.com/Acceleratorer/Autonomous-Market-OS` because the authenticated account could not create repositories in the `HKUDS` organization.
+- Committed the fusion-owned foundation as `58c9e40` and pushed M1 contract stabilization as `b63f3fe` on `main`.
+- The child repositories remain separate directories and were not added to the fusion Git history. Existing user changes in `ClawWork` and `CLI-Anything` remain preserved.
