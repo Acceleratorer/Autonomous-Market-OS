@@ -37,6 +37,12 @@ def make_handler(workflow: MarketWorkflow) -> type[BaseHTTPRequestHandler]:
                 self._send(500, {"error": str(exc)})
 
         def do_GET(self) -> None:  # noqa: N802
+            if self.path == "/healthz":
+                self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ok"})
+                return
+            if self.path == "/readyz":
+                self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
+                return
             prefix = "/v1/runs/"
             if not self.path.startswith(prefix):
                 self._send(404, {"error": "not found"})
@@ -53,4 +59,10 @@ def make_handler(workflow: MarketWorkflow) -> type[BaseHTTPRequestHandler]:
 
 
 def serve(workflow: MarketWorkflow, host: str = "127.0.0.1", port: int = 8787) -> None:
-    ThreadingHTTPServer((host, port), make_handler(workflow)).serve_forever()
+    server = ThreadingHTTPServer((host, port), make_handler(workflow))
+    server.daemon_threads = True
+    workflow.recover_inflight_runs()
+    try:
+        server.serve_forever()
+    finally:
+        server.server_close()

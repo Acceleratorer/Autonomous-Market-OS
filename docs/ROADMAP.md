@@ -61,5 +61,9 @@ synchronous persistence cancellation, partial teammate failure propagation,
 duplicate teammate handling, and deployed-service evidence remain open. The
 exact next milestone is **M1.9: validate the deployment shape and close or
 explicitly reject the remaining runtime blockers**, still with no real providers
-or live trading. M2 remains blocked until ADR-0006 can move from Provisional to
-Accepted.
+or live trading. M1.9 now adds launched-service deployment evidence, but ADR-0007
+keeps OpenHarness provisional because runtime-native checkpoint/resume,
+teammate failure propagation, duplicate handling, and deployment controls for
+resource limits, timeouts, and structured logs remain open. The exact next
+milestone is **M1.10: add or reject the bounded deployment wrapper and rerun
+the OpenHarness promotion gate**.

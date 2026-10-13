@@ -208,7 +208,7 @@ class IsolatedOpenHarnessRuntime:
             env = os.environ.copy()
             repo_root = Path(__file__).resolve().parents[2]
             env["PYTHONPATH"] = os.pathsep.join(
-                [str(repo_root), str(repo_root / "company-projects" / "OpenHarness" / "src"), str(repo_root / "company-projects" / "OpenHarness")]
+                [str(repo_root), *openharness_python_paths()]
             )
             command = [
                 str(executable),
@@ -242,6 +242,22 @@ class IsolatedOpenHarnessRuntime:
 
 def self_store_root(workflow: MarketWorkflow) -> Path:
     return Path(workflow.store.root)
+
+
+def openharness_python_paths() -> tuple[str, ...]:
+    """Return existing OpenHarness source roots without assuming a checkout layout."""
+    repo_root = Path(__file__).resolve().parents[2]
+    candidates = (
+        repo_root / "company-projects" / "OpenHarness",
+        repo_root.parent / "company-projects" / "OpenHarness",
+        repo_root.parent / "HKUDS" / "OpenHarness",
+    )
+    paths: list[str] = []
+    for candidate in candidates:
+        for path in (candidate / "src", candidate):
+            if path.exists():
+                paths.append(str(path))
+    return tuple(dict.fromkeys(paths))
 
 
 def _runtime_evidence_from_dict(

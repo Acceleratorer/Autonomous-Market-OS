@@ -21,7 +21,7 @@ from typing import Any
 from ..contracts import Task
 from ..store import RunStore
 from ..workflow import MarketWorkflow
-from .openharness_adapter import OpenHarnessAdapter
+from .openharness_adapter import OpenHarnessAdapter, openharness_python_paths
 
 
 def _now() -> str:
@@ -169,9 +169,7 @@ def _run_isolated(root: Path, task: Task, executable: str) -> list[RecoveryProbe
     task_path.write_text(json.dumps(task.__dict__, sort_keys=True), encoding="utf-8")
     repo_root = Path(__file__).resolve().parents[2]
     env = os.environ.copy()
-    env["PYTHONPATH"] = os.pathsep.join(
-        [str(repo_root), str(repo_root / "company-projects" / "OpenHarness" / "src"), str(repo_root / "company-projects" / "OpenHarness")]
-    )
+    env["PYTHONPATH"] = os.pathsep.join([str(repo_root), *openharness_python_paths()])
     command = [
         executable,
         "-m",

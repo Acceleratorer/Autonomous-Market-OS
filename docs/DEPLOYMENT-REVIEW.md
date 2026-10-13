@@ -1,8 +1,13 @@
-# M1.8 deployment and dependency review
+# Deployment and dependency review
 
 **Review date:** 2026-10-14
-**Result:** documented and reproducible; deployment evidence is incomplete, so
-OpenHarness remains provisional.
+**Result:** the M1.9 launched-service probe verifies the local deployment shape,
+but deployment controls remain incomplete, so OpenHarness remains provisional.
+
+The executable evidence is recorded in
+[`docs/evidence/m1.9-deployment-validation.json`](evidence/m1.9-deployment-validation.json)
+and the reproduction steps are in
+[`docs/M1.9-DEPLOYMENT-VALIDATION.md`](M1.9-DEPLOYMENT-VALIDATION.md).
 
 ## Runtime and dependencies
 
@@ -72,5 +77,9 @@ state volume snapshot; never rewrite event or artifact history.
 
 ## Open deployment gaps
 
-This review is a checklist and local isolated-runtime record, not proof of a
-deployed service. Missing evidence is the remaining promotion blocker.
+The M1.9 service probe now proves local startup, readiness, health, paper task
+execution, audit persistence, startup recovery, clean restart, forced shutdown,
+filesystem state isolation, and the no-secret fixture boundary. Resource
+limits, request/shutdown timeouts, structured logs, production service-account
+permissions, and image-based upgrade/rollback remain unproven or unsupported.
+Those gaps remain promotion blockers.

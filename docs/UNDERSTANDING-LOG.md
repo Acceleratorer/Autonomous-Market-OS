@@ -96,3 +96,20 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   credentials or live integrations.
 - OpenHarness remains provisional under ADR-0006. M2 remains blocked from real
   providers and live trading.
+
+## 2026-10-14 — M1.9 deployment validation
+
+- Added `/healthz` and `/readyz` to the dependency-free service and made startup
+  run `recover_inflight_runs()` before accepting requests.
+- Added `market_os.deployment_probe`, which launches the real local service,
+  submits a paper task, inspects events/artifacts, verifies startup recovery,
+  clean and forced shutdown, clean restart, filesystem isolation, and the
+  no-secret boundary.
+- Fixed isolated OpenHarness source-path discovery for the actual sibling
+  `company-projects/OpenHarness` checkout. The Python 3.12.0 / OpenHarness 0.1.9
+  probe now runs 26 scenarios.
+- Deployment lifecycle evidence passes, but process resource limits, request
+  and shutdown timeouts, and structured logging are unsupported. Runtime-native
+  persistence cancellation, checkpoint/resume, partial teammate failure, and
+  duplicate teammate handling remain unsupported. ADR-0007 keeps OpenHarness
+  provisional and blocks M2.

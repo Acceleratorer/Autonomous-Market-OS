@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from market_os.providers import default_providers
+from market_os.contracts import Run, RunEvent
 from market_os.store import RunStore
 from market_os.workflow import MarketWorkflow
 from market_os.api import make_handler
@@ -214,3 +215,27 @@ def test_service_api_uses_same_workflow_and_exposes_run_events(tmp_path: Path) -
     finally:
         server.shutdown()
         thread.join(timeout=2)
+
+
+def test_service_health_and_readiness_endpoints(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        for path, expected in (("/healthz", "ok"), ("/readyz", "ready")):
+            response = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}{path}", timeout=2).read())
+            assert response["status"] == expected
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+def test_service_startup_recovers_abandoned_run(tmp_path: Path) -> None:
+    store = RunStore(tmp_path)
+    abandoned = Run("run-abandoned-service", "task-abandoned-service", "running", "2026-01-01T00:00:00+00:00")
+    store.save_run(abandoned)
+    store.append_event(RunEvent("event-abandoned-service", abandoned.run_id, "run.started", "2026-01-01T00:00:00+00:00", {}))
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    workflow.recover_inflight_runs()
+    assert workflow.inspect_run(abandoned.run_id)["run"]["error"] == "restart_interrupted:resume_unsupported"
