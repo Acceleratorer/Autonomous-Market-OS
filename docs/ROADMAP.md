@@ -48,4 +48,10 @@ Every milestone must improve one complete user workflow. Defer broad integration
 
 ## Current status
 
-M1 contract validation and JSON fixtures are implemented. M1.5 now has a dependency-light OpenHarness adapter parity harness using a fixture runtime double; the actual child runtime is not verified and is not promoted. The next milestone is a real-runtime parity run in an isolated environment, followed by the M2 cited research adapter.
+M1 contract validation and JSON fixtures are implemented. M1.5's fixture parity
+is complete. M1.6 now runs the actual OpenHarness runtime in an isolated
+environment with a scripted no-network model client; it reports `runtime_verified=true`
+and zero parity mismatches, but OpenHarness remains provisional because
+runtime-native failure, cancellation, and multi-agent scenarios are unsupported.
+The exact next milestone is **M1.7: direct runtime recovery probes and the
+promotion decision**, still with no real providers or live trading.

@@ -24,7 +24,7 @@ from ..contracts import (
 from ..providers import default_providers
 from ..store import RunStore
 from ..workflow import MarketWorkflow
-from .openharness_adapter import OpenHarnessAdapter
+from .openharness_adapter import IsolatedOpenHarnessRuntime, OpenHarnessAdapter
 
 
 @dataclass(frozen=True)
@@ -86,13 +86,18 @@ def compare_results(reference: dict[str, Any], candidate: dict[str, Any]) -> tup
     return tuple(checks)
 
 
-def run_parity_harness(root: str | Path, task: Task) -> ParityReport:
+def run_parity_harness(
+    root: str | Path,
+    task: Task,
+    *,
+    runtime: Any | None = None,
+) -> ParityReport:
     """Run the same task through both paths and return an auditable report."""
     root = Path(root)
     reference_root = root / "reference"
     openharness_root = root / "openharness"
     reference = MarketWorkflow(RunStore(reference_root))
-    adapter = OpenHarnessAdapter(RunStore(openharness_root))
+    adapter = OpenHarnessAdapter(RunStore(openharness_root), runtime=runtime)
     reference_task = reference.create_task(
         task.objective,
         list(task.symbols),
@@ -152,7 +157,11 @@ def run_parity_harness(root: str | Path, task: Task) -> ParityReport:
     else:
         checks.append(ParityCheck("cli-api-shape", "mismatch", "workflow result keys differ"))
     checks.append(ParityCheck("event-mapping", "translation", "OpenHarness session/tool names translate to market-os event kinds"))
-    checks.append(ParityCheck("runtime-execution", "unsupported", "real OpenHarness runtime was not executed; fixture double used"))
+    if adapter.runtime_verified:
+        checks.append(ParityCheck("runtime-execution", "match", "real OpenHarness runtime executed in an isolated environment"))
+        checks.extend(_runtime_checks(adapter))
+    else:
+        checks.append(ParityCheck("runtime-execution", "unsupported", "real OpenHarness runtime was not executed; fixture double used"))
 
     checks.extend(_cancellation_checks(root, task))
     checks.extend(_failure_checks(root, task))
@@ -160,6 +169,17 @@ def run_parity_harness(root: str | Path, task: Task) -> ParityReport:
     checks.extend(_restart_checks(reference_root, openharness_root, reference_run_id, openharness_run_id))
     checks.extend(_live_guard_checks(reference, adapter, task))
     return ParityReport(adapter.runtime_verified, tuple(checks), reference_run_id, openharness_run_id)
+
+
+def _runtime_checks(adapter: OpenHarnessAdapter) -> list[ParityCheck]:
+    checks: list[ParityCheck] = []
+    evidence = getattr(adapter.runtime, "evidence", None)
+    for item in getattr(evidence, "checks", ()):
+        status = item.get("status", "mismatch")
+        if status not in {"match", "translation", "unsupported", "mismatch"}:
+            status = "mismatch"
+        checks.append(ParityCheck(f"runtime.{item.get('name', 'unknown')}", status, item.get("detail", "")))
+    return checks
 
 
 def _artifact_checks(reference: dict[str, Any], candidate: dict[str, Any]) -> list[ParityCheck]:
@@ -328,9 +348,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="market-os-parity")
     parser.add_argument("--root", default=".market_os-parity")
     parser.add_argument("--fixture", default="market_os/tests/fixtures/contracts/task.json")
+    parser.add_argument("--openharness-python", help="isolated Python executable for real OpenHarness verification")
     args = parser.parse_args(argv)
     task = from_json(Path(args.fixture).read_text(encoding="utf-8"), Task)
-    print(json.dumps(run_parity_harness(args.root, task).to_dict(), indent=2, sort_keys=True))
+    runtime = IsolatedOpenHarnessRuntime(args.openharness_python) if args.openharness_python else None
+    print(json.dumps(run_parity_harness(args.root, task, runtime=runtime).to_dict(), indent=2, sort_keys=True))
     return 0
 
 
