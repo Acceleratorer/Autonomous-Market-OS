@@ -53,9 +53,13 @@ is complete. M1.6 now runs the actual OpenHarness runtime in an isolated
 environment with a scripted no-network model client; it reports `runtime_verified=true`
 and zero parity mismatches, but OpenHarness remains provisional because
 runtime-native failure, cancellation, and multi-agent scenarios are unsupported.
-M1.7 direct recovery probes are complete. OpenHarness remains provisional:
-failure and basic cancellation probes pass, while durable restart/resume,
-artifact-persistence cancellation, and multi-agent aggregation remain blocked.
-The exact next milestone is **M1.8: close the OpenHarness recovery blockers and
-deployment review**, still with no real providers or live trading. M2 remains
-blocked until ADR-0005 can move from Provisional to Accepted.
+M1.7 direct recovery probes are complete. M1.8 adds root-owned terminal
+recovery, cancellation checkpoints, abandoned-run cleanup, artifact
+idempotency, a versioned multi-agent aggregation contract, and a deployment
+review. OpenHarness remains provisional because runtime-native restart/resume,
+synchronous persistence cancellation, partial teammate failure propagation,
+duplicate teammate handling, and deployed-service evidence remain open. The
+exact next milestone is **M1.9: validate the deployment shape and close or
+explicitly reject the remaining runtime blockers**, still with no real providers
+or live trading. M2 remains blocked until ADR-0006 can move from Provisional to
+Accepted.

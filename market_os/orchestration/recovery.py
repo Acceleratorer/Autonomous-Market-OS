@@ -55,6 +55,7 @@ class RecoveryProbeResult:
     recovery_result: dict[str, Any] | None = None
     passed: bool = False
     runtime_verified: bool = False
+    evidence_class: str = "runtime-verified"
 
 
 @dataclass(frozen=True)
@@ -63,6 +64,7 @@ class RecoveryReport:
     probes: tuple[RecoveryProbeResult, ...]
     blockers: tuple[str, ...]
     promotion_status: str
+    evidence_summary: dict[str, int] | None = None
 
     @property
     def promotable(self) -> bool:
@@ -74,6 +76,7 @@ class RecoveryReport:
             "promotable": self.promotable,
             "promotion_status": self.promotion_status,
             "blockers": list(self.blockers),
+            "evidence_summary": self.evidence_summary or {},
             "probes": [asdict(probe) for probe in self.probes],
         }
 
@@ -149,6 +152,10 @@ def run_recovery_probes(
         probes=tuple(probes),
         blockers=tuple(dict.fromkeys(blockers)),
         promotion_status="Accepted" if not blockers else "Provisional",
+        evidence_summary={
+            label: sum(1 for probe in probes if probe.evidence_class == label)
+            for label in ("runtime-verified", "runtime-verified-adapter-boundary", "test-double", "source-based", "unsupported", "unresolved")
+        },
     )
     if output_path is not None:
         report.write_json(output_path)
@@ -163,7 +170,7 @@ def _run_isolated(root: Path, task: Task, executable: str) -> list[RecoveryProbe
     repo_root = Path(__file__).resolve().parents[2]
     env = os.environ.copy()
     env["PYTHONPATH"] = os.pathsep.join(
-        [str(repo_root), str(repo_root / "OpenHarness" / "src"), str(repo_root / "OpenHarness")]
+        [str(repo_root), str(repo_root / "company-projects" / "OpenHarness" / "src"), str(repo_root / "company-projects" / "OpenHarness")]
     )
     command = [
         executable,
@@ -228,6 +235,7 @@ def _reference_baseline(root: Path, task: Task, runtime_version: str) -> list[Re
             recovery_result={"run_id": run["run_id"], "status": run["status"]},
             passed=run["status"] == "completed" and result["task"]["execution_mode"] == "paper",
             runtime_verified=False,
+            evidence_class="test-double",
         )
     ]
 

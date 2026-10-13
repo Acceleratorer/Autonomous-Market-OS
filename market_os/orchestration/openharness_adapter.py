@@ -12,6 +12,7 @@ import os
 import subprocess
 import tempfile
 import threading
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -40,6 +41,102 @@ class OpenHarnessRuntimeEvidence:
     events: tuple[OpenHarnessEvent, ...] = ()
     checks: tuple[dict[str, str], ...] = ()
     raw: dict[str, Any] | None = None
+
+
+@dataclass(frozen=True)
+class AgentResult:
+    """Versioned, runtime-neutral result emitted by one coordinating agent."""
+
+    agent_id: str
+    task_id: str
+    run_id: str
+    sequence: int
+    status: str
+    payload: dict[str, Any] | None = None
+    error: dict[str, str] | None = None
+    artifacts: tuple[str, ...] = ()
+    evidence_refs: tuple[str, ...] = ()
+    api_version: str = "market-os.multi-agent.v1"
+
+    def __post_init__(self) -> None:
+        if not self.agent_id.strip() or not self.task_id.strip() or not self.run_id.strip():
+            raise ValueError("agent, task, and run identities are required")
+        if self.sequence < 0:
+            raise ValueError("agent result sequence must be non-negative")
+        if self.status not in {"completed", "failed", "timed_out", "cancelled"}:
+            raise ValueError("invalid agent result status")
+        if self.api_version != "market-os.multi-agent.v1":
+            raise ValueError("unsupported multi-agent result version")
+        if self.status == "completed" and not isinstance(self.payload, dict):
+            raise ValueError("completed agent results require an object payload")
+        if self.status != "completed" and (not isinstance(self.error, dict) or not self.error.get("message")):
+            raise ValueError("non-completed agent results require an error")
+
+    @classmethod
+    def success(cls, agent_id: str, task_id: str, run_id: str, sequence: int, payload: dict[str, Any], *, artifacts: tuple[str, ...] = (), evidence_refs: tuple[str, ...] = ()) -> "AgentResult":
+        return cls(agent_id, task_id, run_id, sequence, "completed", dict(payload), None, artifacts, evidence_refs)
+
+    @classmethod
+    def failed(cls, agent_id: str, task_id: str, run_id: str, sequence: int, message: str) -> "AgentResult":
+        return cls(agent_id, task_id, run_id, sequence, "failed", None, {"code": "agent_failed", "message": message})
+
+    @classmethod
+    def timed_out(cls, agent_id: str, task_id: str, run_id: str, sequence: int, message: str = "agent timed out") -> "AgentResult":
+        return cls(agent_id, task_id, run_id, sequence, "timed_out", None, {"code": "agent_timeout", "message": message})
+
+    @classmethod
+    def cancelled(cls, agent_id: str, task_id: str, run_id: str, sequence: int, message: str = "agent cancelled") -> "AgentResult":
+        return cls(agent_id, task_id, run_id, sequence, "cancelled", None, {"code": "agent_cancelled", "message": message})
+
+    @property
+    def fingerprint(self) -> str:
+        value = {"agent_id": self.agent_id, "task_id": self.task_id, "run_id": self.run_id, "status": self.status, "payload": self.payload, "error": self.error, "artifacts": self.artifacts, "evidence_refs": self.evidence_refs}
+        return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+@dataclass(frozen=True)
+class AgentAggregate:
+    task_id: str
+    run_id: str
+    status: str
+    results: tuple[AgentResult, ...]
+    duplicates: tuple[dict[str, Any], ...] = ()
+    conflicts: tuple[dict[str, Any], ...] = ()
+    artifacts: tuple[str, ...] = ()
+    evidence_refs: tuple[str, ...] = ()
+    api_version: str = "market-os.multi-agent.v1"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"api_version": self.api_version, "task_id": self.task_id, "run_id": self.run_id, "status": self.status, "results": [item.__dict__ | {"fingerprint": item.fingerprint} for item in self.results], "duplicates": list(self.duplicates), "conflicts": list(self.conflicts), "artifacts": list(self.artifacts), "evidence_refs": list(self.evidence_refs)}
+
+
+def aggregate_agent_results(values: list[AgentResult | dict[str, Any]] | tuple[AgentResult | dict[str, Any], ...]) -> AgentAggregate:
+    if not values:
+        raise ValueError("at least one agent result is required")
+    normalized = [AgentResult(**item) if isinstance(item, dict) else item for item in values]
+    identities = {(item.task_id, item.run_id) for item in normalized}
+    if len(identities) != 1:
+        raise ValueError("all agent results must share task and run identity")
+    ordered = sorted(normalized, key=lambda item: (item.sequence, item.agent_id))
+    accepted: list[AgentResult] = []
+    duplicates: list[dict[str, Any]] = []
+    conflicts: list[dict[str, Any]] = []
+    seen: dict[tuple[str, str, str], AgentResult] = {}
+    for item in ordered:
+        key = (item.agent_id, item.task_id, item.run_id)
+        previous = seen.get(key)
+        if previous is not None:
+            if previous.fingerprint == item.fingerprint:
+                duplicates.append({"agent_id": item.agent_id, "fingerprint": item.fingerprint, "sequence": item.sequence})
+                continue
+            conflicts.append({"agent_id": item.agent_id, "first_fingerprint": previous.fingerprint, "conflicting_fingerprint": item.fingerprint, "sequence": item.sequence})
+            continue
+        seen[key] = item
+        accepted.append(item)
+    status = "failed" if conflicts or not any(item.status == "completed" for item in accepted) else "partial" if any(item.status != "completed" for item in accepted) else "completed"
+    artifacts = tuple(dict.fromkeys(ref for item in accepted for ref in item.artifacts))
+    evidence_refs = tuple(dict.fromkeys(ref for item in accepted for ref in item.evidence_refs))
+    return AgentAggregate(accepted[0].task_id, accepted[0].run_id, status, tuple(accepted), tuple(duplicates), tuple(conflicts), artifacts, evidence_refs)
 
 
 class OpenHarnessRuntime(Protocol):
@@ -111,7 +208,7 @@ class IsolatedOpenHarnessRuntime:
             env = os.environ.copy()
             repo_root = Path(__file__).resolve().parents[2]
             env["PYTHONPATH"] = os.pathsep.join(
-                [str(repo_root), str(repo_root / "OpenHarness" / "src"), str(repo_root / "OpenHarness")]
+                [str(repo_root), str(repo_root / "company-projects" / "OpenHarness" / "src"), str(repo_root / "company-projects" / "OpenHarness")]
             )
             command = [
                 str(executable),
@@ -303,6 +400,7 @@ class OpenHarnessAdapter:
             "run_id": run_id,
             "events": [event.__dict__ for event in events],
             "artifacts": [artifact.__dict__ for artifact in self.store.artifacts_for(run_id)],
+            "recovery": self.store.recovery_for(run_id),
         }
 
     def probe_recovery(

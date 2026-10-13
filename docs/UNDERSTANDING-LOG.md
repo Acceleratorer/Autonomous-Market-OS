@@ -71,3 +71,28 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - OpenHarness remains provisional. M2 is blocked; the exact next milestone is
   M1.8 recovery blocker closure and deployment review. No real providers,
   brokers, or live execution were added.
+
+## 2026-10-14 — M1.8 recovery and deployment review
+
+- Added root-owned recovery metadata and terminalization for event, run index,
+  artifact, artifact-index, finalization, idempotency, and provider boundary
+  failures. Failed writes no longer leave a run falsely `running` when storage
+  recovers; partial artifact files remain inspectable.
+- Added cancellation checkpoints around artifact and finalization writes and a
+  restart cleanup method that marks abandoned work failed with an explicit
+  `resume_unsupported` reason.
+- Added the versioned `market-os.multi-agent.v1` result and aggregation
+  contract with deterministic ordering, fingerprints, duplicate suppression,
+  conflict records, partial failure status, artifact lineage, and individual
+  errors.
+- Regenerated `docs/evidence/m1.8-openharness-recovery.json` against the
+  isolated OpenHarness 0.1.9 runtime. Direct runtime evidence passes the safe
+  failure/cancellation/coordination cases; runtime-native resume, synchronous
+  persistence cancellation, partial teammate failure propagation, and native
+  duplicate handling remain unsupported.
+- Completed `docs/DEPLOYMENT-REVIEW.md`. It documents Python/runtime versions,
+  isolation, secrets, filesystem/storage, recovery, limits, network policy,
+  retention, tenant isolation, container shape, and rollback without adding
+  credentials or live integrations.
+- OpenHarness remains provisional under ADR-0006. M2 remains blocked from real
+  providers and live trading.

@@ -60,6 +60,135 @@ def test_failure_is_recorded(tmp_path: Path) -> None:
     assert any(json.loads(line)["kind"] == "run.failed" for line in events)
 
 
+def test_event_persistence_failure_terminalizes_run_and_records_recovery_metadata(tmp_path: Path) -> None:
+    class FailRunStartedOnce(RunStore):
+        def __init__(self, root: Path) -> None:
+            super().__init__(root)
+            self.failed = False
+
+        def append_event(self, event) -> None:
+            if event.kind == "run.started" and not self.failed:
+                self.failed = True
+                raise OSError("event index unavailable")
+            super().append_event(event)
+
+    workflow = MarketWorkflow(FailRunStartedOnce(tmp_path))
+    task = workflow.create_task("Persist", ["SPY"], "2026-01-02", "2026-01-06")
+    with pytest.raises(OSError, match="event index unavailable"):
+        workflow.run(task)
+
+    runs = [json.loads(line) for line in RunStore(tmp_path).runs.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert runs[-1]["status"] == "failed"
+    assert runs[-1]["error"].startswith("persistence_error:")
+    events = RunStore(tmp_path).events_for(runs[-1]["run_id"])
+    assert events[-1].kind == "run.failed"
+    assert events[-1].provenance["recovery"]["operation"] == "event.append"
+
+
+def test_artifact_persistence_cancellation_is_terminal_and_partial_artifact_is_auditable(tmp_path: Path) -> None:
+    class CancelDuringArtifactStore(RunStore):
+        def __init__(self, root: Path, cancel: threading.Event) -> None:
+            super().__init__(root)
+            self.cancel = cancel
+
+        def write_artifact(self, run_id, kind, payload, lineage=()):
+            artifact = super().write_artifact(run_id, kind, payload, lineage)
+            if kind == "evidence":
+                self.cancel.set()
+            return artifact
+
+    cancel = threading.Event()
+    store = CancelDuringArtifactStore(tmp_path, cancel)
+    workflow = MarketWorkflow(store)
+    task = workflow.create_task("Cancel persistence", ["SPY"], "2026-01-02", "2026-01-06")
+    result = workflow.run(task, cancel)
+
+    assert result["run"]["status"] == "cancelled"
+    assert {artifact.kind for artifact in store.artifacts_for(result["run"]["run_id"])} == {"evidence"}
+    assert store.events_for(result["run"]["run_id"])[-1].kind == "run.cancelled"
+
+
+def test_cancellation_during_artifact_index_update_is_terminal(tmp_path: Path) -> None:
+    class CancelAtIndexStore(RunStore):
+        def __init__(self, root: Path, cancel: threading.Event) -> None:
+            super().__init__(root)
+            self.cancel = cancel
+
+        def _append_artifact_index(self, artifact) -> None:
+            if artifact.kind == "research":
+                self.cancel.set()
+            super()._append_artifact_index(artifact)
+
+    cancel = threading.Event()
+    store = CancelAtIndexStore(tmp_path, cancel)
+    workflow = MarketWorkflow(store)
+    task = workflow.create_task("Cancel index", ["SPY"], "2026-01-02", "2026-01-06")
+    result = workflow.run(task, cancel)
+
+    assert result["run"]["status"] == "cancelled"
+    assert store.recovery_for(result["run"]["run_id"])[-1]["terminal_status"] == "cancelled"
+
+
+@pytest.mark.parametrize("failure_point", ["run", "artifact", "artifact-index"])
+def test_transient_storage_failures_are_terminal_and_retryable(tmp_path: Path, failure_point: str) -> None:
+    class TransientStore(RunStore):
+        def __init__(self, root: Path) -> None:
+            super().__init__(root)
+            self.failed = False
+
+        def save_run(self, run) -> None:
+            if failure_point == "run" and not self.failed and run.status == "running":
+                self.failed = True
+                raise OSError("run index unavailable")
+            super().save_run(run)
+
+        def write_artifact(self, run_id, kind, payload, lineage=()):
+            if failure_point == "artifact" and kind == "research" and not self.failed:
+                self.failed = True
+                raise OSError("artifact storage unavailable")
+            return super().write_artifact(run_id, kind, payload, lineage)
+
+        def append_event(self, event) -> None:
+            super().append_event(event)
+
+        def _append_artifact_index(self, artifact) -> None:
+            if failure_point == "artifact-index" and artifact.kind == "research" and not self.failed:
+                self.failed = True
+                raise OSError("artifact index unavailable")
+            super()._append_artifact_index(artifact)
+
+    store = TransientStore(tmp_path)
+    workflow = MarketWorkflow(store)
+    task = workflow.create_task("Transient storage", ["SPY"], "2026-01-02", "2026-01-06", idempotency_key="retry-me")
+    with pytest.raises(OSError):
+        workflow.run(task)
+
+    failed_runs = [json.loads(line) for line in store.runs.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert failed_runs[-1]["status"] == "failed"
+    assert store.recovery_for(failed_runs[-1]["run_id"])[-1]["terminal_status"] == "failed"
+
+    retry = workflow.run(task)
+    assert retry["run"]["status"] == "completed"
+
+
+def test_restart_marks_inflight_run_failed_without_resume(tmp_path: Path) -> None:
+    store = RunStore(tmp_path)
+    workflow = MarketWorkflow(store)
+    task = workflow.create_task("Interrupted", ["SPY"], "2026-01-02", "2026-01-06")
+    from market_os.contracts import Run
+
+    running = Run("run-abandoned", task.task_id, "running", task.created_at)
+    store.save_run(running)
+    workflow._event(running, "run.started", {"task": task.__dict__})
+
+    recovered = MarketWorkflow(RunStore(tmp_path)).recover_inflight_runs()
+
+    assert recovered[0]["status"] == "failed"
+    assert recovered[0]["error"] == "restart_interrupted:resume_unsupported"
+    inspection = MarketWorkflow(RunStore(tmp_path)).inspect_run("run-abandoned")
+    assert inspection["recovery"][-1]["operation"] == "process.restart"
+
+
 def test_idempotency_replays_same_result_and_live_mode_is_rejected(tmp_path: Path) -> None:
     workflow = MarketWorkflow(RunStore(tmp_path))
     task = workflow.create_task("Compare", ["SPY"], "2026-01-02", "2026-01-06", idempotency_key="same-request")

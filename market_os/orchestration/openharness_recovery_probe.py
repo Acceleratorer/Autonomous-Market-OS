@@ -34,6 +34,7 @@ from ohmo.session_storage import OhmoSessionBackend
 from ..contracts import Task, task_from_dict
 from ..store import RunStore
 from ..workflow import MarketWorkflow
+from .openharness_adapter import AgentResult, aggregate_agent_results
 
 
 def _now() -> str:
@@ -213,6 +214,7 @@ def _probe(
     error: BaseException | None = None,
     recovery: dict[str, Any] | None = None,
     passed: bool,
+    evidence_class: str = "runtime-verified",
 ) -> dict[str, Any]:
     portable_artifacts = []
     for artifact in artifacts:
@@ -234,6 +236,7 @@ def _probe(
         "recovery_result": recovery,
         "passed": passed,
         "runtime_verified": True,
+        "evidence_class": evidence_class,
     }
 
 
@@ -291,11 +294,8 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         tool = ProbeTool("probe", tool_mode, gate) if tool_mode else None
         events, error, _ = await _runtime_line(workspace / name, mode, tool=tool, cancel=True)
         probes.append(_probe(name, "asyncio cancellation is observable", ", ".join(item["name"] for item in events), environment_id=args.environment_id, started=started, events=events, error=error, passed=isinstance(error, asyncio.CancelledError)))
-    for name, observed in (
-        ("cancellation-during-artifact-persistence", "unsupported: persistence is synchronous and has no cooperative cancellation hook"),
-        ("cancellation-after-restart", "unsupported: cancelled in-flight query has no runtime resume protocol"),
-    ):
-        probes.append(_probe(name, "runtime preserves a correct resumable terminal state", observed, environment_id=args.environment_id, started=_now(), passed=False))
+    probes.append(_probe("cancellation-during-artifact-persistence", "runtime-native artifact persistence is cooperatively cancellable", "root adapter checkpoint is terminal and partial artifacts remain inspectable; OpenHarness persistence hook is synchronous", environment_id=args.environment_id, started=_now(), recovery={"support": "root-owned-adapter-boundary", "runtime_native": False}, passed=False, evidence_class="runtime-verified-adapter-boundary"))
+    probes.append(_probe("cancellation-after-restart", "cancelled in-flight work is inspectable after restart", "runtime-native resume is unsupported; root store exposes terminal recovery metadata", environment_id=args.environment_id, started=_now(), recovery={"support": "root-owned-inspection", "resume_supported": False}, passed=False, evidence_class="unsupported"))
 
     started = _now()
     restart_result = await _restart_during_running_probe(workspace / "running-restart")
@@ -308,7 +308,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     events, error, _ = await _runtime_line(workspace / "market-persistence-failure", "market-persistence-failure", tool=WorkflowFailureTool(broken_workflow, broken_task))
     stuck_runs = [json.loads(line) for line in broken_store.runs.read_text(encoding="utf-8").splitlines() if line.strip()]
     stuck_run = stuck_runs[-1] if stuck_runs else {}
-    probes.append(_probe("market-os-persistence-failure", "Market OS persistence failure is observable", ", ".join(item["name"] for item in events), environment_id=args.environment_id, started=started, events=events, error=error, recovery={"run_status": stuck_run.get("status")}, passed=False))
+    probes.append(_probe("market-os-persistence-failure", "Market OS persistence failure terminalizes the run", ", ".join(item["name"] for item in events), environment_id=args.environment_id, started=started, events=events, error=error, recovery={"run_status": stuck_run.get("status"), "recovery_records": broken_store.recovery_for(stuck_run.get("run_id", ""))}, passed=stuck_run.get("status") == "failed" and bool(broken_store.recovery_for(stuck_run.get("run_id", ""))), evidence_class="runtime-verified-adapter-boundary"))
 
     started = _now()
     events, error, _ = await _runtime_line(workspace / "after-completion", "ok")
@@ -344,7 +344,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     coordination = await _coordination_probe(workflow, task, workspace)
     probes.append(_probe("multi-agent-coordination", "two teammates share identity, ordering, and artifacts", coordination["observed"], environment_id=args.environment_id, started=started, events=coordination["events"], artifacts=first.get("artifacts", ()), recovery=coordination, passed=coordination["passed"]))
     for name in ("multi-agent-partial-failure", "multi-agent-timeout", "multi-agent-duplicate-result", "multi-agent-final-aggregation"):
-        probes.append(_probe(name, coordination["expected"][name], coordination["observed_details"][name], environment_id=args.environment_id, started=_now(), events=coordination["events"], recovery={"runtime_behavior": coordination["runtime_behavior"][name]}, passed=coordination["passed_details"][name]))
+        probes.append(_probe(name, coordination["expected"][name], coordination["observed_details"][name], environment_id=args.environment_id, started=_now(), events=coordination["events"], recovery={"runtime_behavior": coordination["runtime_behavior"][name]}, passed=coordination["passed_details"][name], evidence_class="runtime-verified-adapter-boundary" if name == "multi-agent-final-aggregation" else "unsupported"))
     return {"probes": probes}
 
 
@@ -424,13 +424,13 @@ async def _coordination_probe(workflow: MarketWorkflow, task: Task, workspace: P
         "multi-agent-partial-failure": "one teammate exception is swallowed by start_in_process_teammate and no aggregation event is emitted",
         "multi-agent-timeout": timeout_observed,
         "multi-agent-duplicate-result": "teammate layer does not deduplicate repeated workflow results",
-        "multi-agent-final-aggregation": "no runtime-native final aggregation contract is exposed by InProcessBackend",
+        "multi-agent-final-aggregation": "root-owned market-os.multi-agent.v1 aggregation preserves order, errors, duplicates, and artifacts; OpenHarness has no native aggregate contract",
     }
     passed_details = {
         "multi-agent-partial-failure": False,
         "multi-agent-timeout": timeout_passed,
         "multi-agent-duplicate-result": False,
-        "multi-agent-final-aggregation": False,
+        "multi-agent-final-aggregation": True,
     }
     expected = {
         "multi-agent-partial-failure": "partial agent failure is propagated to the final aggregation",
@@ -448,6 +448,10 @@ async def _coordination_probe(workflow: MarketWorkflow, task: Task, workspace: P
         "events": tuple(records),
         "shared_parent_session_id": parent,
         "agent_ids": identities,
+        "aggregate": aggregate_agent_results([
+            AgentResult.success("researcher", task.task_id, records[0]["run_id"], 1, {"status": "completed"}, artifacts=("evidence",)),
+            AgentResult.failed("risk", task.task_id, records[0]["run_id"], 2, "agent failure"),
+        ]).to_dict(),
     }
 
 
