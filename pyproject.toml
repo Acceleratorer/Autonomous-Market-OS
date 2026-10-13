@@ -1,0 +1,12 @@
+[project]
+name = "hkuds-market-os"
+version = "0.1.0"
+description = "HKUDS Autonomous Market OS foundation slice"
+requires-python = ">=3.11"
+
+[project.scripts]
+market-os = "market_os.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["market_os/tests"]
+pythonpath = ["."]
