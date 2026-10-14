@@ -1,0 +1,73 @@
+{
+  "schema": "market-os.m2.1.vibe-trading-adapter.v1",
+  "date": "2026-10-14",
+  "status": "verified",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "provider_selection": {
+    "default": "fixture",
+    "explicit": "vibe-trading",
+    "silent_fallback": false
+  },
+  "source": {
+    "name": "Vibe-Trading",
+    "path": "D:/Code/Github/company-projects/Vibe-Trading",
+    "commit": "c25fea2bc261a2d0ed971c989d194de9f04ec963",
+    "license": "MIT",
+    "entry_points": [
+      "agent/src/tools/backtest_tool.py::run_backtest",
+      "agent/mcp_server.py::backtest",
+      "agent/backtest/loaders/local_loader.py::DataLoader"
+    ],
+    "reference_repository_modified": false
+  },
+  "fixture": {
+    "path": "market_os/tests/fixtures/vibe_trading/etf_ohlcv.json",
+    "fixture_id": "m2.1-synthetic-us-etfs-v1",
+    "sha256": "bed2cf6d58dc9fd7bcd4abd9343093a3fedefadafe96de87dd9b7977a07098fd",
+    "symbols": ["SPY", "QQQ", "IWM"],
+    "rows_per_symbol": 6,
+    "label": "synthetic fixture; not historical market data",
+    "venue": "NYSE Arca",
+    "currency": "USD",
+    "adjustment_basis": "synthetic-unadjusted",
+    "license_classification": "synthetic-internal"
+  },
+  "parameters": {
+    "strategy": "equal-weight-long-hold",
+    "start": "2026-01-02",
+    "end": "2026-01-09",
+    "initial_cash": 10000.0,
+    "source": "local",
+    "interval": "1D",
+    "slippage_us": 0.0,
+    "network": false,
+    "credentials": false,
+    "broker": false,
+    "live_execution": false
+  },
+  "actual_execution": {
+    "used_actual_vibe_trading_code": true,
+    "isolated_environment": true,
+    "runtime_prerequisites": ["pandas", "numpy", "pydantic", "pyyaml", "scipy", "fastmcp", "defusedxml", "matplotlib"],
+    "result": {
+      "initial_cash": 10000.0,
+      "final_cash": 10260.1,
+      "return_pct": 2.601,
+      "equity_points": 6,
+      "fingerprint": "3aa2b58c3a07c1e5fbcf95285b7c39eb110efc1cdb04eebfce80576d8bf817be"
+    },
+    "independent_reference_final_cash": 10260.1
+  },
+  "verification": {
+    "focused_tests": "9 passed with actual Vibe-Trading runtime configured",
+    "full_project_tests": "69 passed, 1 skipped; optional actual-runtime tests passed when configured",
+    "compileall": "passed",
+    "cli_smoke": "passed with --provider vibe-trading",
+    "api_smoke": "passed with provider=vibe-trading",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "The optional Vibe-Trading dependencies are not added to Market OS core installation.",
+    "The adapter covers the local offline backtest seam only; network data and other Vibe-Trading tools remain out of scope."
+  ]
+}

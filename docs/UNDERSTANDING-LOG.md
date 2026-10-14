@@ -166,3 +166,21 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   document and multimodal contracts are proven.
 - M2.1 does not require real network access. No provider credentials, brokers,
   live execution, or child-repository changes were added.
+
+## 2026-10-14 — M2.1 fixture-backed Vibe-Trading adapter
+
+- Verified the read-only Vibe-Trading source at commit
+  `c25fea2bc261a2d0ed971c989d194de9f04ec963`; the executed seam is
+  `src.tools.backtest_tool.run_backtest` through the `source=local` loader.
+- Added a synthetic, content-addressed daily OHLCV fixture for SPY, QQQ, and
+  IWM with normalized `MarketBar` metadata, provenance, validation, and
+  internal-only licensing classification.
+- Added explicit CLI/API provider selection and an isolated child-process
+  adapter. The default fixture path is unchanged; an unavailable optional
+  adapter fails closed.
+- Actual offline Vibe-Trading execution passed: `$10,000` became `$10,260.10`
+  (`2.601%`) with reproducible fingerprint
+  `3aa2b58c3a07c1e5fbcf95285b7c39eb110efc1cdb04eebfce80576d8bf817be`.
+- Full project verification passed: 69 tests passed and one optional actual-
+  runtime test was skipped when prerequisites were not configured. The
+  reference repository remained unchanged.

@@ -10,3 +10,4 @@ market-os = "market_os.cli:main"
 [tool.pytest.ini_options]
 testpaths = ["market_os/tests"]
 pythonpath = ["."]
+markers = ["integration: executes the actual optional Vibe-Trading runtime"]

@@ -88,3 +88,10 @@ M2 planning is now unblocked. The exact next milestone is **M2.1: implement
 one deterministic Vibe-Trading-shaped market-data/backtest adapter against the
 root provider contracts**, with no real network access, credentials, brokers,
 or live execution.
+
+M2.1 is implemented. The explicit `vibe-trading` adapter normalizes the
+synthetic three-ETF fixture, executes the actual Vibe-Trading local-loader
+backtest in an isolated environment, persists root-owned evidence/citations,
+lineage, provenance, paper order plans, and risk decisions, and preserves the
+fixture default. The exact next milestone is **M2.2: add a cited document or
+retrieval adapter only after its root document/citation contract is approved**.

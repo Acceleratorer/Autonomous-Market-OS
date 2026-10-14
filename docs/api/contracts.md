@@ -40,3 +40,11 @@ Authentication, tenant isolation, and persistent approval storage remain
 deferred. Normalized provider seam types are now defined; concrete network
 providers remain deferred until an adapter passes the M2 contract and
 operational gates. See [ADR-0010](../decisions/ADR-0010-final-orchestration-owner.md).
+
+## Explicit provider selection
+
+The CLI `research` command accepts `--provider fixture|vibe-trading` and an
+optional `--backtest-provider`. The service `POST /v1/tasks` accepts matching
+`provider` and `backtest_provider` fields. Omitted fields preserve the fixture
+default. Optional provider failures are returned as errors; adapters do not
+silently substitute another backtest engine.

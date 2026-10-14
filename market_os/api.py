@@ -61,8 +61,17 @@ def make_handler(
             try:
                 size = int(self.headers.get("Content-Length", "0"))
                 body = json.loads(self.rfile.read(size))
-                task = workflow.create_task(body["objective"], body["symbols"], body["start"], body["end"], execution_mode=body.get("execution_mode", "paper"), idempotency_key=self.headers.get("Idempotency-Key"))
-                result = workflow.run(task)
+                selected = workflow
+                if body.get("provider") or body.get("backtest_provider"):
+                    from .provider_selection import selected_workflow
+
+                    selected = selected_workflow(
+                        workflow,
+                        body.get("provider", "fixture"),
+                        body.get("backtest_provider"),
+                    )
+                task = selected.create_task(body["objective"], body["symbols"], body["start"], body["end"], execution_mode=body.get("execution_mode", "paper"), idempotency_key=self.headers.get("Idempotency-Key"))
+                result = selected.run(task)
                 run_id = result.get("run", {}).get("run_id")
                 status = 200
                 self._send(200, result)

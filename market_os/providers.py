@@ -74,6 +74,10 @@ class ProviderError:
             raise ValueError("provider error code and message are required")
 
 
+class ProviderCancelled(RuntimeError):
+    """A provider stopped work after the root workflow requested cancellation."""
+
+
 @dataclass(frozen=True)
 class RateLimit:
     """Provider quota state captured at the adapter seam."""

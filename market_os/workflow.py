@@ -4,6 +4,8 @@ from __future__ import annotations
 import threading
 import uuid
 import json
+import inspect
+import math
 import traceback
 from pathlib import Path
 from dataclasses import asdict
@@ -20,7 +22,7 @@ from .contracts import (
     Task,
     utc_now,
 )
-from .providers import BacktestProvider, EvidenceProvider, default_providers
+from .providers import BacktestProvider, EvidenceProvider, ProviderCancelled, default_providers
 from .store import RunStore
 
 
@@ -87,7 +89,21 @@ class MarketWorkflow:
 
             self._check_cancel(run, cancel_event)
             operation = "provider.backtest"
-            backtest = self.backtest_provider.run(task.symbols, task.start, task.end, self.initial_cash)
+            run_provider = self.backtest_provider.run
+            parameters = inspect.signature(run_provider).parameters
+            if "cancel_event" in parameters or any(
+                parameter.kind is inspect.Parameter.VAR_KEYWORD
+                for parameter in parameters.values()
+            ):
+                backtest = run_provider(
+                    task.symbols,
+                    task.start,
+                    task.end,
+                    self.initial_cash,
+                    cancel_event=cancel_event,
+                )
+            else:
+                backtest = run_provider(task.symbols, task.start, task.end, self.initial_cash)
             operation = "artifact.write"
             backtest_artifact = self.store.write_artifact(run.run_id, "backtest", asdict(backtest), (evidence_artifact.artifact_id,))
             self._check_cancel(run, cancel_event)
@@ -127,6 +143,10 @@ class MarketWorkflow:
                 self.store.save_idempotent_result(task.idempotency_key, result)
             return result
         except WorkflowCancelled:
+            cancelled = Run(run.run_id, run.task_id, "cancelled", run.started_at, utc_now())
+            self._terminalize(run, cancelled, "cancelled", operation)
+            return {"run": asdict(cancelled), "task": asdict(task), "events": [asdict(event) for event in self.store.events_for(run.run_id)]}
+        except ProviderCancelled:
             cancelled = Run(run.run_id, run.task_id, "cancelled", run.started_at, utc_now())
             self._terminalize(run, cancelled, "cancelled", operation)
             return {"run": asdict(cancelled), "task": asdict(task), "events": [asdict(event) for event in self.store.events_for(run.run_id)]}
@@ -174,10 +194,23 @@ class MarketWorkflow:
         for item in evidence:
             if item.kind != "market":
                 continue
-            prices[item.symbols[0]] = float(item.content.rsplit("=", 1)[1])
+            prices[item.symbols[0]] = self._latest_evidence_close(item.content)
         notional = self.initial_cash / len(task.symbols)
         orders = tuple(Order(symbol, "buy", max(1, int(notional / prices[symbol])), prices[symbol], max(1, int(notional / prices[symbol])) * prices[symbol]) for symbol in task.symbols)
         return OrderPlan("paper", orders, sum(order.notional for order in orders))
+
+    @staticmethod
+    def _latest_evidence_close(content: str) -> float:
+        try:
+            rows = json.loads(content)
+        except json.JSONDecodeError:
+            return float(content.rsplit("=", 1)[1])
+        if not isinstance(rows, list) or not rows:
+            raise ValueError("market evidence must contain at least one bar")
+        close = rows[-1].get("close") if isinstance(rows[-1], dict) else None
+        if not isinstance(close, (int, float)) or not math.isfinite(close) or close <= 0:
+            raise ValueError("market evidence has an invalid latest close")
+        return float(close)
 
     def _risk(self, order_plan: OrderPlan, task: Task) -> RiskDecision:
         reasons: list[str] = []
@@ -192,7 +225,25 @@ class MarketWorkflow:
             raise WorkflowCancelled
 
     def _event(self, run: Run, kind: str, payload: dict[str, Any]) -> None:
-        self.store.append_event(RunEvent(f"event-{uuid.uuid4().hex}", run.run_id, kind, utc_now(), payload))
+        provider = self._provider_metadata()
+        self.store.append_event(
+            RunEvent(
+                f"event-{uuid.uuid4().hex}",
+                run.run_id,
+                kind,
+                utc_now(),
+                payload,
+                provenance=provider,
+            )
+        )
+
+    def _provider_metadata(self) -> dict[str, Any]:
+        values: dict[str, Any] = {}
+        for name, provider in (("evidence", self.evidence_provider), ("backtest", self.backtest_provider)):
+            metadata = getattr(provider, "provider_metadata", None)
+            if callable(metadata):
+                values[name] = metadata()
+        return values
 
     def _terminalize(self, run: Run, terminal: Run, kind: str, operation: str, *, original: Exception | None = None) -> None:
         recovery = {
@@ -205,6 +256,9 @@ class MarketWorkflow:
             "traceback": traceback.format_exception(original) if original is not None else None,
             "retry_policy": "manual replay is safe only with the same idempotency key",
         }
+        provider_error = getattr(original, "provider_error", None)
+        if provider_error is not None:
+            recovery["provider_error"] = asdict(provider_error)
         for attempt in range(2):
             try:
                 self.store.save_run(terminal)
@@ -213,7 +267,7 @@ class MarketWorkflow:
                 recovery["terminal_write_error"] = str(save_error)
                 recovery["terminal_write_attempts"] = attempt + 1
         try:
-            self.store.append_event(RunEvent(f"event-{uuid.uuid4().hex}", run.run_id, f"run.{kind}", utc_now(), {"error": terminal.error} if terminal.error else {}, provenance={"recovery": recovery}))
+            self.store.append_event(RunEvent(f"event-{uuid.uuid4().hex}", run.run_id, f"run.{kind}", utc_now(), {"error": terminal.error} if terminal.error else {}, provenance={**self._provider_metadata(), "recovery": recovery}))
         except Exception as event_error:
             recovery["event_write_error"] = str(event_error)
         try:

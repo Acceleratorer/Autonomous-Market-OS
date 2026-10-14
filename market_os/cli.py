@@ -18,6 +18,8 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--symbols", nargs="+", required=True)
     research.add_argument("--start", default="2026-01-02")
     research.add_argument("--end", default="2026-01-06")
+    research.add_argument("--provider", choices=("fixture", "vibe-trading"), default="fixture")
+    research.add_argument("--backtest-provider", choices=("fixture", "vibe-trading"))
     server = commands.add_parser("serve")
     server.add_argument("--host", default=os.environ.get("MARKET_OS_HOST", "127.0.0.1"))
     server.add_argument("--port", type=int, default=int(os.environ.get("MARKET_OS_PORT", "8787")))
@@ -39,6 +41,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "inspect":
         print(json.dumps(workflow.inspect_run(args.run_id), indent=2, sort_keys=True))
         return 0
+    if args.command == "research":
+        from .provider_selection import selected_workflow
+
+        workflow = selected_workflow(workflow, args.provider, args.backtest_provider)
     task = workflow.create_task(args.objective, args.symbols, args.start, args.end)
     print(json.dumps(workflow.run(task), indent=2, sort_keys=True))
     return 0
