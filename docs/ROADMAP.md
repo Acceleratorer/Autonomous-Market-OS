@@ -108,3 +108,13 @@ supports, citations, coverage, unsupported-claim records, stable fingerprints,
 and read-only CLI/API inspection with artifact/hash/lineage validation. The
 exact next milestone is **M2.4: evaluate richer research summaries only behind
 an explicit model contract and citation-preserving output gate**.
+
+M2.4 is implemented. The deterministic M2.3 synthesis remains the trusted
+baseline; an explicitly selected local deterministic test provider produces a
+versioned, citation-preserving model-summary artifact. Supported statements are
+exact persisted quotes, inference and unsupported statements are explicit, bad
+output is rejected, provider failure preserves the deterministic synthesis, and
+model-summary/inference inspection is available through CLI and API. The actual
+offline LightRAG and Vibe-Trading seams remain composed and paper-only. The
+exact next milestone is **M2.5: define the next research-quality gate or
+benchmark before considering any real model/provider adapter**.

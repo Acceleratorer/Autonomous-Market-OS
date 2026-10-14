@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .adapters.lightrag import LightRAGFixtureAdapter
 from .adapters.vibe_trading import VibeTradingAdapter
+from .model_summary import DeterministicTestSummaryProvider
 from .providers import BacktestProvider, EvidenceProvider, default_providers
 from .workflow import MarketWorkflow
 
@@ -48,8 +49,13 @@ def selected_workflow(
     workflow: MarketWorkflow,
     provider: str = "fixture",
     backtest_provider: str | None = None,
+    summary_provider: str | None = None,
 ) -> MarketWorkflow:
     """Return a root-owned workflow with explicitly selected provider adapters."""
+    if summary_provider not in {None, "deterministic-test"}:
+        raise ProviderSelectionError("summary_provider must be deterministic-test when explicitly selected")
+    if summary_provider is not None and provider != "lightrag":
+        raise ProviderSelectionError("summary_provider requires provider=lightrag")
     if backtest_provider is None:
         if provider == "lightrag":
             raise ProviderSelectionError("lightrag is retrieval-only; select --backtest-provider vibe-trading")
@@ -62,6 +68,7 @@ def selected_workflow(
         initial_cash=workflow.initial_cash,
         max_notional=workflow.max_notional,
         max_symbols=workflow.max_symbols,
+        summary_provider=DeterministicTestSummaryProvider() if summary_provider == "deterministic-test" else None,
     )
 
 

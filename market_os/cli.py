@@ -20,6 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--end", default="2026-01-06")
     research.add_argument("--provider", choices=("fixture", "vibe-trading", "lightrag"), default="fixture")
     research.add_argument("--backtest-provider", choices=("fixture", "vibe-trading"))
+    research.add_argument("--summary-provider", choices=("deterministic-test",))
     server = commands.add_parser("serve")
     server.add_argument("--host", default=os.environ.get("MARKET_OS_HOST", "127.0.0.1"))
     server.add_argument("--port", type=int, default=int(os.environ.get("MARKET_OS_PORT", "8787")))
@@ -29,7 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
     inspect = commands.add_parser("inspect")
     inspect.add_argument("run_id")
     inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
-    inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "lineage"), default="run")
+    inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "model-summary", "inferences", "lineage"), default="run")
     inspect.add_argument("--id", dest="item_id")
     return parser
 
@@ -52,7 +53,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "research":
         from .provider_selection import selected_workflow
 
-        workflow = selected_workflow(workflow, args.provider, args.backtest_provider)
+        if args.summary_provider is None:
+            workflow = selected_workflow(workflow, args.provider, args.backtest_provider)
+        else:
+            workflow = selected_workflow(workflow, args.provider, args.backtest_provider, args.summary_provider)
     task = workflow.create_task(args.objective, args.symbols, args.start, args.end)
     print(json.dumps(workflow.run(task), indent=2, sort_keys=True))
     return 0

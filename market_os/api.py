@@ -62,14 +62,22 @@ def make_handler(
                 size = int(self.headers.get("Content-Length", "0"))
                 body = json.loads(self.rfile.read(size))
                 selected = workflow
-                if body.get("provider") or body.get("backtest_provider"):
+                if body.get("provider") or body.get("backtest_provider") or body.get("summary_provider"):
                     from .provider_selection import selected_workflow
 
-                    selected = selected_workflow(
-                        workflow,
-                        body.get("provider", "fixture"),
-                        body.get("backtest_provider"),
-                    )
+                    if body.get("summary_provider") is None:
+                        selected = selected_workflow(
+                            workflow,
+                            body.get("provider", "fixture"),
+                            body.get("backtest_provider"),
+                        )
+                    else:
+                        selected = selected_workflow(
+                            workflow,
+                            body.get("provider", "fixture"),
+                            body.get("backtest_provider"),
+                            body.get("summary_provider"),
+                        )
                 task = selected.create_task(body["objective"], body["symbols"], body["start"], body["end"], execution_mode=body.get("execution_mode", "paper"), idempotency_key=self.headers.get("Idempotency-Key"))
                 result = selected.run(task)
                 run_id = result.get("run", {}).get("run_id")
@@ -113,7 +121,7 @@ def make_handler(
                 elif len(parts) in {3, 4} and parts[1] == "research":
                     resource = parts[2]
                     item_id = parts[3] if len(parts) == 4 else None
-                    if resource not in {"documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "lineage"}:
+                    if resource not in {"documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "model-summary", "inferences", "lineage"}:
                         self._send(404, {"error": "research resource not found"})
                         self._audit(404)
                         return

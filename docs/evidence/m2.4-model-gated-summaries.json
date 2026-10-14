@@ -1,0 +1,93 @@
+{
+  "schema": "market-os.m2.4.model-gated-summaries.v1",
+  "date": "2026-10-15",
+  "status": "verified",
+  "starting_head": "682fc81593aa2d6f15534319a742690a8f04b3f0",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "contracts": {
+    "legacy_result_preserved": "market-os.v1",
+    "research_version": "market-os.research.v1",
+    "model_summary_version": "market-os.model-summary.v1",
+    "default_summary": "deterministic M2.3 exact-quote synthesis",
+    "supported_statement_rule": "statement text equals an exact persisted claim support quote",
+    "inference_rule": "inference is separately labeled and not evidence-supported",
+    "unsupported_rule": "unsupported statement cannot carry citation, support, document, or quote IDs",
+    "coverage_definition": "supported generated statements divided by all generated statements"
+  },
+  "source": {
+    "lightrag_commit": "4d0afc1bc36e6a34d4a5895b68efe9413748627a",
+    "vibe_trading_commit": "c25fea2bc261a2d0ed971c989d194de9f04ec963",
+    "actual_entry_points": [
+      "LightRAG.ainsert",
+      "LightRAG.aquery_data(QueryParam(mode=naive))",
+      "Vibe-Trading src.tools.backtest_tool.run_backtest"
+    ],
+    "reference_repositories_modified": false,
+    "real_model_provider": false,
+    "test_provider": "deterministic-test / market-os-test-model / m2.4-v1"
+  },
+  "fixture": {
+    "document_corpus_sha256": "3206fb91eb327fb82b9457315c4cefef91dffa3b6aa2511ef782b4b0764d43a0",
+    "market_fixture_sha256": "bed2cf6d58dc9fd7bcd4abd9343093a3fedefadafe96de87dd9b7977a07098fd",
+    "document_ids": [
+      "doc-spy-factsheet",
+      "doc-market-commentary",
+      "doc-risk-policy",
+      "doc-qqq-news"
+    ]
+  },
+  "verification": {
+    "focused_m2_4_tests": "21 passed",
+    "m2_1_m2_2_m2_3_and_full_suite": "115 passed, 1 skipped",
+    "actual_m2_4_lightrag_vibe_workflow": true,
+    "actual_m2_4_integration_test": "1 passed",
+    "cli_model_summary_inspection": "passed",
+    "api_model_summary_inspection": "passed",
+    "read_only_inspection": "passed",
+    "restart_inspection": "passed",
+    "deterministic_replay": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed",
+    "isolated_dependency_checks": "pip unavailable in both isolated environments; import probes and offline integration passed"
+  },
+  "actual_workflow": {
+    "status": "completed",
+    "final_cash": 10348.25,
+    "paper_only": true,
+    "retrieval_provider": "lightrag",
+    "retrieval_passages": 3,
+    "documents": 3,
+    "supported_claims": 3,
+    "unsupported_claims": 0,
+    "synthesis_coverage_ratio": 1.0,
+    "model_provider": "deterministic-test",
+    "model_gate": "approved",
+    "model_validation": "valid",
+    "model_supported_statements": 3,
+    "model_inference_statements": 0,
+    "model_unsupported_statements": 0,
+    "model_evidence_coverage": 1.0,
+    "synthesis_fingerprint": "542e6d3b85f3019c2d20dd24b85c372ce23adec670f155456493a47057f93d40",
+    "summary_fingerprint": "81c2cf9f2df094be1563e722cd5e4323a81e3f7b01be68ae3c13f697b04c0069",
+    "input_fingerprint": "22e1f36bdea2f45ae4edad7fea9a482c4e999605bf771172fdc166943538d629",
+    "output_fingerprint": "790d6549d0d9f3c7697d7900a5043369db6b79d7a5f68294251cb7c16d47ccc8",
+    "replay_equal": true,
+    "artifact_kinds": [
+      "documents",
+      "retrieval",
+      "evidence",
+      "cited-research",
+      "model-summary",
+      "research",
+      "backtest",
+      "order-plan",
+      "risk-decision"
+    ]
+  },
+  "limitations": [
+    "No real hosted model or external model provider is integrated.",
+    "Exact-quote validation rejects accurate paraphrases without semantic entailment support.",
+    "Inference labels are explicit but citation checks cannot prove semantic correctness.",
+    "Provider timeout/cancellation remains synchronous at the existing adapter seam."
+  ]
+}

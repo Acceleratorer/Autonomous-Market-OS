@@ -43,11 +43,11 @@ operational gates. See [ADR-0010](../decisions/ADR-0010-final-orchestration-owne
 
 ## Explicit provider selection
 
-The CLI `research` command accepts `--provider fixture|vibe-trading` and an
-optional `--backtest-provider`. The service `POST /v1/tasks` accepts matching
-`provider` and `backtest_provider` fields. Omitted fields preserve the fixture
-default. Optional provider failures are returned as errors; adapters do not
-silently substitute another backtest engine.
+The CLI `research` command accepts `--provider fixture|vibe-trading|lightrag`
+and an optional `--backtest-provider`. The service `POST /v1/tasks` accepts
+matching `provider` and `backtest_provider` fields. Omitted fields preserve the
+fixture default. Optional provider failures are returned as errors; adapters do
+not silently substitute another backtest engine.
 
 For M2.2, `--provider lightrag --backtest-provider vibe-trading` selects the
 document retrieval adapter and preserves the existing backtest adapter. The
@@ -61,3 +61,35 @@ alongside any market-evidence citations in the combined workflow.
 
 The cited synthesis is available in the versioned `cited-research` artifact;
 inspection endpoints are read-only and validate hashes and artifact lineage.
+
+## Explicit model-gated summaries
+
+M2.4 adds the opt-in `market-os.model-summary.v1` contract. The deterministic
+M2.3 synthesis remains the default and trusted result. A caller may select the
+local deterministic test double with `summary_provider:
+"deterministic-test"` (or CLI `--summary-provider deterministic-test`) only;
+it must be combined with the explicit `lightrag` cited-retrieval provider;
+unknown providers or summary selection without cited retrieval are rejected,
+and no hosted model is configured.
+
+The persisted `model-summary` artifact records provider/model identity, prompt
+and input fingerprints, classified statements, validation errors, gate status,
+usage metadata, explicit provider failure metadata when fallback is used,
+output/summary fingerprints, and lineage to `cited-research`.
+Supported statement text must equal a persisted exact support quote, and all
+citation, passage, document, content-hash, and run lineage references are
+resolved before approval. Inferences and unsupported statements are explicit
+and separately counted. Rejected output is not published as summary text; a
+provider failure preserves the deterministic synthesis as a `fallback` gate.
+
+The read-only inspection resources are `model-summary` and `inferences`:
+
+```text
+GET /v1/runs/<run-id>/research/model-summary
+GET /v1/runs/<run-id>/research/inferences
+```
+
+They invoke no provider and write no trading state. Inspection rejects missing
+or corrupt artifact content, mismatched fingerprints, missing cited-research
+lineage, and cross-artifact synthesis mismatches. Model summaries cannot alter
+the paper-only order plan or risk decision.

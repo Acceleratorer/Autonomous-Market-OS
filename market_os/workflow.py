@@ -25,6 +25,13 @@ from .contracts import (
 )
 from .providers import BacktestProvider, EvidenceProvider, ProviderCancelled, default_providers
 from .research import DeterministicResearchSynthesizer, research_synthesis_from_dict
+from .model_summary import (
+    ModelGatedSummary,
+    SummaryModelProvider,
+    gate_summary,
+    model_gated_summary_from_dict,
+    validate_persisted_summary,
+)
 from .store import RunStore
 
 
@@ -41,6 +48,7 @@ class MarketWorkflow:
         initial_cash: float = 10_000.0,
         max_notional: float = 10_000.0,
         max_symbols: int = 10,
+        summary_provider: SummaryModelProvider | None = None,
     ) -> None:
         default_evidence, default_backtest = default_providers()
         self.store = store or RunStore()
@@ -49,6 +57,7 @@ class MarketWorkflow:
         self.initial_cash = initial_cash
         self.max_notional = max_notional
         self.max_symbols = max_symbols
+        self.summary_provider = summary_provider
 
     def create_task(self, objective: str, symbols: list[str], start: str, end: str, *, execution_mode: str = "paper", idempotency_key: str | None = None) -> Task:
         clean_symbols = tuple(dict.fromkeys(s.strip().upper() for s in symbols if s.strip()))
@@ -81,10 +90,14 @@ class MarketWorkflow:
             operation = "event.append"
             self._event(run, "evidence.retrieved", {"count": len(evidence)})
             document_context = self._document_context()
+            if self.summary_provider is not None and document_context is None:
+                raise ValueError("summary_provider requires a cited-research retrieval provider")
             document_artifact = None
             retrieval_artifact = None
             cited_research = None
             cited_research_artifact = None
+            model_summary = None
+            model_summary_artifact = None
             if document_context is not None:
                 documents, document_payload, retrieval = document_context
                 operation = "artifact.write"
@@ -138,6 +151,24 @@ class MarketWorkflow:
                         "coverage": asdict(cited_research.coverage),
                     },
                 )
+                if self.summary_provider is not None:
+                    model_summary = gate_summary(
+                        self.summary_provider,
+                        task.objective,
+                        cited_research,
+                        synthesis_artifact_id=cited_research_artifact.artifact_id,
+                    )
+                    model_summary_artifact = self.store.write_artifact(
+                        run.run_id,
+                        "model-summary",
+                        asdict(model_summary),
+                        (cited_research_artifact.artifact_id,),
+                    )
+                    self._event(
+                        run,
+                        "research.summary-gated",
+                        {"artifact_id": model_summary_artifact.artifact_id, "gate": asdict(model_summary.gate)},
+                    )
             operation = "artifact.write"
             research = self._research(task, evidence)
             research_lineage = [evidence_artifact.artifact_id]
@@ -188,7 +219,7 @@ class MarketWorkflow:
                 self.store.save_run(rejected)
                 operation = "event.append"
                 self._event(run, "run.rejected", {"reasons": risk.reasons})
-                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research)})
+                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research, model_summary)})
                 if task.idempotency_key:
                     self.store.save_idempotent_result(task.idempotency_key, result)
                 return result
@@ -201,8 +232,10 @@ class MarketWorkflow:
             artifact_ids = [research_artifact.artifact_id, backtest_artifact.artifact_id, order_artifact.artifact_id, risk_artifact.artifact_id]
             if cited_research_artifact is not None:
                 artifact_ids.extend((document_artifact.artifact_id, retrieval_artifact.artifact_id, cited_research_artifact.artifact_id))
+            if model_summary_artifact is not None:
+                artifact_ids.append(model_summary_artifact.artifact_id)
             self._event(run, "run.completed", {"artifact_ids": artifact_ids})
-            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research)})
+            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research, model_summary)})
             if task.idempotency_key:
                 operation = "idempotency.save"
                 self.store.save_idempotent_result(task.idempotency_key, result)
@@ -238,6 +271,7 @@ class MarketWorkflow:
         artifacts = {item["artifact_id"]: item for item in inspected["artifacts"]}
         payloads = {item["kind"]: self._read_inspection_artifact(item, artifacts) for item in inspected["artifacts"]}
         cited = payloads.get("cited-research")
+        model_summary = payloads.get("model-summary")
         documents = payloads.get("documents")
         retrieval = payloads.get("retrieval")
         if resource == "lineage":
@@ -245,6 +279,11 @@ class MarketWorkflow:
                 raise KeyError(item_id or "artifact")
             artifact = artifacts[item_id]
             return {"run_id": run_id, "artifact": artifact, "lineage": [self._artifact_summary(artifacts[ref]) for ref in artifact.get("lineage", ()) if ref in artifacts]}
+        if resource in {"model-summary", "inferences"}:
+            summary = self._validated_model_summary(model_summary, cited, artifacts)
+            if resource == "model-summary":
+                return {"run_id": run_id, "model_summary": asdict(summary)}
+            return {"run_id": run_id, "inferences": [asdict(statement) for statement in summary.statements if statement.classification == "inference"]}
         if cited is None or documents is None or retrieval is None:
             raise ValueError("cited research artifacts are incomplete")
         self._validate_document_payload(documents)
@@ -330,6 +369,29 @@ class MarketWorkflow:
         return json.loads(raw)
 
     @staticmethod
+    def _validated_model_summary(
+        model_summary: Any,
+        cited: Any,
+        artifacts: dict[str, dict[str, Any]],
+    ) -> ModelGatedSummary:
+        if model_summary is None:
+            raise ValueError("model summary artifact is unavailable")
+        summary = model_gated_summary_from_dict(model_summary)
+        model_artifact = next(item for item in artifacts.values() if item["kind"] == "model-summary")
+        cited_artifact = next((item for item in artifacts.values() if item["kind"] == "cited-research"), None)
+        if cited_artifact is None or summary.synthesis_lineage_artifact_id != cited_artifact["artifact_id"]:
+            raise ValueError("model summary lineage is incomplete")
+        if cited_artifact["artifact_id"] not in model_artifact.get("lineage", ()):
+            raise ValueError("model summary lineage is incomplete")
+        if cited is None:
+            raise ValueError("cited research artifact is unavailable")
+        synthesis = research_synthesis_from_dict(cited)
+        if synthesis.synthesis_fingerprint != summary.request.synthesis_fingerprint:
+            raise ValueError("model summary synthesis fingerprint does not match cited research")
+        validate_persisted_summary(summary, synthesis)
+        return summary
+
+    @staticmethod
     def _artifact_summary(artifact: dict[str, Any]) -> dict[str, Any]:
         return {key: artifact[key] for key in ("artifact_id", "kind", "sha256", "lineage", "media_type", "created_at")}
 
@@ -377,7 +439,7 @@ class MarketWorkflow:
         return None
 
     @staticmethod
-    def _document_result(context, cited_research=None) -> dict[str, Any]:
+    def _document_result(context, cited_research=None, model_summary: ModelGatedSummary | None = None) -> dict[str, Any]:
         if context is None:
             return {}
         documents, payload, retrieval = context
@@ -387,6 +449,8 @@ class MarketWorkflow:
         }
         if cited_research is not None:
             result["cited_research"] = asdict(cited_research)
+        if model_summary is not None:
+            result["model_summary"] = asdict(model_summary)
         return result
 
     def _order_plan(self, task: Task, evidence: list[Evidence]) -> OrderPlan:

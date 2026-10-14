@@ -217,3 +217,27 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Verified actual LightRAG and Vibe-Trading offline workflow behavior,
   deterministic replay, paper-only enforcement, and corruption failures.
 - Final verification passed: 93 tests passed and one optional test skipped.
+
+## 2026-10-15 — M2.4 model-gated cited summaries
+
+- Preserved M2.3 deterministic exact-quote synthesis as the default and trusted
+  baseline; added the versioned `market-os.model-summary.v1` contract behind an
+  explicit `deterministic-test` provider selection.
+- Added provider identity, prompt/input/output/summary fingerprints, usage
+  metadata, classified supported/inference/unsupported/rejected statements,
+  validation errors, gate decisions, deterministic fallback identity, and
+  cited-research artifact lineage.
+- The output gate resolves citation/support/document/passages against persisted
+  M2.3 evidence, checks content/provenance hashes and exact quotes, rejects
+  unsupported citations and cross-claim links, and renders only visibly
+  classified statement text. Model failures preserve deterministic output;
+  rejected model text is not published.
+- Added read-only CLI/API inspection for model summaries and inferences with
+  artifact hash, fingerprint, and lineage validation. The workflow remains
+  paper-only and model output cannot change risk or order-plan state.
+- Actual offline LightRAG and Vibe-Trading seams were re-run with the local
+  deterministic model double. The composed workflow completed with three
+  supported claims, 100% M2.3 and model evidence coverage, final cash 10348.25,
+  stable replay, and persisted `model-summary` lineage. No hosted model,
+  credentials, network path, broker, or child-repository modification was
+  added.

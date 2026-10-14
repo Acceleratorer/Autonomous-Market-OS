@@ -141,3 +141,14 @@ optional data sources. LightRAG has a broad storage and model dependency graph;
 RAG-Anything adds parser and multimodal dependencies. The fusion repository
 will not add those dependencies until a concrete adapter passes its contract
 and operational review.
+
+## M2.4 model-gated synthesis
+
+M2.4 adds an additive `market-os.model-summary.v1` contract behind explicit
+`summary_provider` selection on the `lightrag` cited-retrieval workflow. The
+deterministic M2.3 exact-quote synthesis is the default and trusted baseline.
+The only available provider is the local `deterministic-test` double; it never
+calls a hosted model and cannot change paper-only or risk state. Its output must
+resolve to persisted claim supports, citations, passages, documents, hashes,
+and artifact lineage before approval.
+See [M2.4 model-gated summaries](M2.4-MODEL-GATED-SUMMARIES.md).
