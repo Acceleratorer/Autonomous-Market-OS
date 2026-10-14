@@ -228,8 +228,6 @@ class LightRAGFixtureAdapter:
                     document.symbols,
                 )
             )
-        if not evidence:
-            raise ValueError("LightRAG returned no cited passages")
         return evidence
 
     def retrieve_documents(
@@ -396,7 +394,29 @@ class LightRAGFixtureAdapter:
         return self.records[0].retrieved_at
 
     def _normalise_result(self, query: str, documents: tuple[DocumentRecord, ...], raw: Any) -> RetrievalResult:
-        if not isinstance(raw, dict) or raw.get("status") != "success":
+        if not isinstance(raw, dict):
+            raise LightRAGUnavailable("LightRAG returned a malformed retrieval result", code="provider_failed")
+        query_fingerprint = _sha256(json.dumps({
+            "query": query,
+            "documents": [document.document_id for document in documents],
+            "content": [document.content_hash for document in documents],
+            "provider_version": self.provider_version,
+        }, sort_keys=True))
+        if raw.get("status") == "failure":
+            message = str(raw.get("message") or "no retrieval results")
+            return RetrievalResult(
+                query,
+                tuple(document.document_id for document in documents),
+                (),
+                (),
+                self.provider_name,
+                self.provider_version,
+                self._retrieved_at(),
+                query_fingerprint,
+                tuple(document.content_hash for document in documents),
+                error=message,
+            )
+        if raw.get("status") != "success":
             raise LightRAGUnavailable("LightRAG returned a malformed retrieval result", code="provider_failed")
         data = raw.get("data")
         if not isinstance(data, dict) or not isinstance(data.get("chunks"), list):
@@ -426,13 +446,18 @@ class LightRAGFixtureAdapter:
                 )
             )
         if not passages:
-            raise LightRAGUnavailable("LightRAG returned no cited passages", code="provider_failed")
-        query_fingerprint = _sha256(json.dumps({
-            "query": query,
-            "documents": [document.document_id for document in documents],
-            "content": [document.content_hash for document in documents],
-            "provider_version": self.provider_version,
-        }, sort_keys=True))
+            return RetrievalResult(
+                query,
+                tuple(document.document_id for document in documents),
+                (),
+                (),
+                self.provider_name,
+                self.provider_version,
+                self._retrieved_at(),
+                query_fingerprint,
+                tuple(document.content_hash for document in documents),
+                error="no_results",
+            )
         return RetrievalResult(
             query,
             tuple(document.document_id for document in documents),

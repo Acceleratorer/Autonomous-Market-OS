@@ -275,6 +275,8 @@ class RetrievedPassage:
             raise ValueError("passage rank must be positive")
         if not re.fullmatch(r"[0-9a-f]{64}", self.content_hash):
             raise ValueError("passage content_hash must be a lowercase SHA-256 digest")
+        if sha256(self.text.encode("utf-8")).hexdigest() != self.content_hash:
+            raise ValueError("content_hash does not match passage text")
         if self.score is not None and (
             not math.isfinite(self.score) or self.score < 0
         ):

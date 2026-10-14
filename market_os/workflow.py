@@ -4,6 +4,7 @@ from __future__ import annotations
 import threading
 import uuid
 import json
+import hashlib
 import inspect
 import math
 import traceback
@@ -23,6 +24,7 @@ from .contracts import (
     utc_now,
 )
 from .providers import BacktestProvider, EvidenceProvider, ProviderCancelled, default_providers
+from .research import DeterministicResearchSynthesizer, research_synthesis_from_dict
 from .store import RunStore
 
 
@@ -81,6 +83,8 @@ class MarketWorkflow:
             document_context = self._document_context()
             document_artifact = None
             retrieval_artifact = None
+            cited_research = None
+            cited_research_artifact = None
             if document_context is not None:
                 documents, document_payload, retrieval = document_context
                 operation = "artifact.write"
@@ -110,11 +114,37 @@ class MarketWorkflow:
                 evidence_lineage = [document_artifact.artifact_id, retrieval_artifact.artifact_id, *evidence_lineage]
             evidence_artifact = self.store.write_artifact(run.run_id, "evidence", [asdict(item) for item in evidence], tuple(evidence_lineage))
             self._check_cancel(run, cancel_event)
+            if document_context is not None and document_artifact is not None and retrieval_artifact is not None:
+                documents, _, retrieval = document_context
+                cited_research = DeterministicResearchSynthesizer().synthesize(
+                    task.objective,
+                    documents,
+                    retrieval,
+                    retrieval_artifact_id=retrieval_artifact.artifact_id,
+                    document_artifact_id=document_artifact.artifact_id,
+                    evidence_artifact_id=evidence_artifact.artifact_id,
+                )
+                cited_research_artifact = self.store.write_artifact(
+                    run.run_id,
+                    "cited-research",
+                    asdict(cited_research),
+                    (document_artifact.artifact_id, retrieval_artifact.artifact_id, evidence_artifact.artifact_id),
+                )
+                self._event(
+                    run,
+                    "research.synthesized",
+                    {
+                        "artifact_id": cited_research_artifact.artifact_id,
+                        "coverage": asdict(cited_research.coverage),
+                    },
+                )
             operation = "artifact.write"
             research = self._research(task, evidence)
             research_lineage = [evidence_artifact.artifact_id]
             if retrieval_artifact is not None:
                 research_lineage.append(retrieval_artifact.artifact_id)
+            if cited_research_artifact is not None:
+                research_lineage.append(cited_research_artifact.artifact_id)
             research_artifact = self.store.write_artifact(run.run_id, "research", asdict(research), tuple(research_lineage))
             operation = "event.append"
             self._event(run, "research.completed", {"artifact_id": research_artifact.artifact_id})
@@ -158,7 +188,7 @@ class MarketWorkflow:
                 self.store.save_run(rejected)
                 operation = "event.append"
                 self._event(run, "run.rejected", {"reasons": risk.reasons})
-                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context)})
+                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research)})
                 if task.idempotency_key:
                     self.store.save_idempotent_result(task.idempotency_key, result)
                 return result
@@ -168,8 +198,11 @@ class MarketWorkflow:
             completed = Run(run.run_id, run.task_id, "completed", run.started_at, utc_now())
             self.store.save_run(completed)
             operation = "event.append"
-            self._event(run, "run.completed", {"artifact_ids": [research_artifact.artifact_id, backtest_artifact.artifact_id, order_artifact.artifact_id, risk_artifact.artifact_id]})
-            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context)})
+            artifact_ids = [research_artifact.artifact_id, backtest_artifact.artifact_id, order_artifact.artifact_id, risk_artifact.artifact_id]
+            if cited_research_artifact is not None:
+                artifact_ids.extend((document_artifact.artifact_id, retrieval_artifact.artifact_id, cited_research_artifact.artifact_id))
+            self._event(run, "run.completed", {"artifact_ids": artifact_ids})
+            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context, cited_research)})
             if task.idempotency_key:
                 operation = "idempotency.save"
                 self.store.save_idempotent_result(task.idempotency_key, result)
@@ -198,6 +231,119 @@ class MarketWorkflow:
             "artifacts": [asdict(item) for item in self.store.artifacts_for(run_id)],
             "recovery": self.store.recovery_for(run_id),
         }
+
+    def inspect_resource(self, run_id: str, resource: str, item_id: str | None = None) -> dict[str, Any]:
+        """Read persisted cited-research resources without invoking providers."""
+        inspected = self.inspect_run(run_id)
+        artifacts = {item["artifact_id"]: item for item in inspected["artifacts"]}
+        payloads = {item["kind"]: self._read_inspection_artifact(item, artifacts) for item in inspected["artifacts"]}
+        cited = payloads.get("cited-research")
+        documents = payloads.get("documents")
+        retrieval = payloads.get("retrieval")
+        if resource == "lineage":
+            if item_id is None or item_id not in artifacts:
+                raise KeyError(item_id or "artifact")
+            artifact = artifacts[item_id]
+            return {"run_id": run_id, "artifact": artifact, "lineage": [self._artifact_summary(artifacts[ref]) for ref in artifact.get("lineage", ()) if ref in artifacts]}
+        if cited is None or documents is None or retrieval is None:
+            raise ValueError("cited research artifacts are incomplete")
+        self._validate_document_payload(documents)
+        synthesis = research_synthesis_from_dict(cited)
+        artifact_ids = set(artifacts)
+        referenced_lineage = {
+            *(document.lineage_artifact_id for document in synthesis.documents),
+            *(passage.lineage_artifact_id for passage in synthesis.passages),
+            *(citation.lineage_artifact_id for citation in synthesis.citations),
+            *(support.lineage_artifact_id for support in synthesis.supports),
+            synthesis.lineage_artifact_id,
+        }
+        if not referenced_lineage.issubset(artifact_ids):
+            raise ValueError("research lineage is incomplete")
+        if resource == "documents":
+            values = documents
+            if item_id is not None:
+                values = [item for item in values if item["document"]["document_id"] == item_id]
+                if not values:
+                    raise KeyError(item_id)
+            return {"run_id": run_id, "documents": values}
+        if resource == "passages":
+            values = cited.get("passages", [])
+            if item_id is not None:
+                values = [item for item in values if item["passage_id"] == item_id]
+                if not values:
+                    raise KeyError(item_id)
+            return {"run_id": run_id, "passages": values}
+        if resource == "claims":
+            values = [*cited.get("claims", []), *cited.get("unsupported_claims", [])]
+            if item_id is not None:
+                values = [item for item in values if item["claim_id"] == item_id]
+                if not values:
+                    raise KeyError(item_id)
+            return {"run_id": run_id, "claims": values, "coverage": asdict(synthesis.coverage)}
+        if resource == "unsupported-claims":
+            values = cited.get("unsupported_claims", [])
+            if item_id is not None:
+                values = [item for item in values if item["claim_id"] == item_id]
+                if not values:
+                    raise KeyError(item_id)
+            return {"run_id": run_id, "unsupported_claims": values, "coverage": asdict(synthesis.coverage)}
+        if resource == "passage-claims":
+            if item_id is None:
+                raise KeyError("passage_id")
+            passage_ids = {item["passage_id"] for item in cited.get("passages", [])}
+            if item_id not in passage_ids:
+                raise KeyError(item_id)
+            support_by_passage = {
+                support["passage_id"]: support["claim_id"]
+                for support in cited.get("supports", [])
+            }
+            claims = [
+                claim
+                for claim in cited.get("claims", [])
+                if claim["claim_id"] == support_by_passage.get(item_id)
+            ]
+            return {"run_id": run_id, "passage_id": item_id, "claims": claims}
+        if resource == "citations":
+            citations = [asdict(citation) for citation in synthesis.citations]
+            if item_id is not None:
+                claim_ids = {item["claim_id"] for item in cited.get("claims", []) if item["claim_id"] == item_id}
+                if not claim_ids:
+                    raise KeyError(item_id)
+                citations = [item for item in citations if item["claim_id"] == item_id]
+            return {"run_id": run_id, "citations": citations}
+        raise ValueError(f"unknown inspection resource: {resource}")
+
+    def _read_inspection_artifact(self, artifact: dict[str, Any], artifacts: dict[str, dict[str, Any]]) -> Any:
+        path = Path(artifact["path"])
+        artifact_root = self.store.artifacts.resolve()
+        resolved_path = path.resolve()
+        if not resolved_path.is_relative_to(artifact_root):
+            raise ValueError(f"artifact path is outside the run store: {artifact['artifact_id']}")
+        if not path.exists():
+            raise ValueError(f"artifact is missing: {artifact['artifact_id']}")
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != artifact["sha256"]:
+            raise ValueError(f"artifact content hash mismatch: {artifact['artifact_id']}")
+        for ref in artifact.get("lineage", ()):
+            if ref.startswith("artifact-") and ref not in artifacts:
+                raise ValueError(f"artifact lineage is incomplete: {ref}")
+        return json.loads(raw)
+
+    @staticmethod
+    def _artifact_summary(artifact: dict[str, Any]) -> dict[str, Any]:
+        return {key: artifact[key] for key in ("artifact_id", "kind", "sha256", "lineage", "media_type", "created_at")}
+
+    @staticmethod
+    def _validate_document_payload(payload: Any) -> None:
+        if not isinstance(payload, list):
+            raise ValueError("document artifact is malformed")
+        for item in payload:
+            document = item.get("document") if isinstance(item, dict) else None
+            content = item.get("content") if isinstance(item, dict) else None
+            if not isinstance(document, dict) or not isinstance(content, str):
+                raise ValueError("document artifact is malformed")
+            if hashlib.sha256(content.encode("utf-8")).hexdigest() != document.get("content_hash"):
+                raise ValueError(f"document content hash mismatch: {document.get('document_id')}")
 
     def recover_inflight_runs(self) -> list[dict[str, Any]]:
         """Mark abandoned runs failed; provider/backtest work is never resumed."""
@@ -231,14 +377,17 @@ class MarketWorkflow:
         return None
 
     @staticmethod
-    def _document_result(context) -> dict[str, Any]:
+    def _document_result(context, cited_research=None) -> dict[str, Any]:
         if context is None:
             return {}
         documents, payload, retrieval = context
-        return {
+        result = {
             "documents": payload,
             "retrieval": asdict(retrieval),
         }
+        if cited_research is not None:
+            result["cited_research"] = asdict(cited_research)
+        return result
 
     def _order_plan(self, task: Task, evidence: list[Evidence]) -> OrderPlan:
         prices: dict[str, float] = {}

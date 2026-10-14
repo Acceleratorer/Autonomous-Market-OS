@@ -102,3 +102,9 @@ four-document corpus, executes LightRAG's actual offline `ainsert` and
 lineage, and composes with the Vibe-Trading backtest and paper-only workflow.
 The exact next milestone is **M2.3: harden cited research synthesis and
 document/passage inspection without adding external providers**.
+
+M2.3 is implemented. Deterministic cited synthesis now emits versioned claims,
+supports, citations, coverage, unsupported-claim records, stable fingerprints,
+and read-only CLI/API inspection with artifact/hash/lineage validation. The
+exact next milestone is **M2.4: evaluate richer research summaries only behind
+an explicit model contract and citation-preserving output gate**.

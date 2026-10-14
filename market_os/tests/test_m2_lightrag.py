@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -77,13 +78,14 @@ def test_document_contract_rejects_bad_timestamp_and_provenance() -> None:
 
 
 def test_retrieval_contract_rejects_unknown_citation() -> None:
+    content_hash = hashlib.sha256(b"text").hexdigest()
     passage = RetrievedPassage(
-        "passage-1", "doc-1", "text", 1, "citation-1", "fixture:doc-1", "0" * 64
+        "passage-1", "doc-1", "text", 1, "citation-1", "fixture:doc-1", content_hash
     )
     with pytest.raises(ValueError, match="citations"):
         RetrievalResult(
             "query", ("doc-1",), (passage,), ("missing-citation",), "lightrag", "v1",
-            "2026-01-10T00:00:00+00:00", "0" * 64, ("0" * 64,)
+            "2026-01-10T00:00:00+00:00", "0" * 64, (content_hash,)
         )
 
 
@@ -201,6 +203,14 @@ def test_actual_lightrag_workflow_persists_documents_retrieval_and_lineage(tmp_p
     assert result["order_plan"]["mode"] == "paper"
     assert result["retrieval"]["citations"]
     assert set(result["retrieval"]["citations"]).issubset(result["research"]["citations"])
-    assert {item["kind"] for item in result["artifacts"]} >= {"documents", "retrieval", "evidence", "research", "backtest"}
+    assert result["cited_research"]["claims"]
+    assert result["cited_research"]["coverage"]["coverage_ratio"] == 1.0
+    assert {item["kind"] for item in result["artifacts"]} >= {"documents", "retrieval", "evidence", "cited-research", "research", "backtest"}
     assert any(item["kind"] == "retrieval" and item["lineage"] for item in result["artifacts"])
     assert workflow.run(workflow.create_task("Cited SPY research", ["SPY"], "2026-01-02", "2026-01-09", idempotency_key="m2.2-actual")) == result
+    restarted = selected_workflow(MarketWorkflow(RunStore(tmp_path / "store")), "lightrag", "vibe-trading")
+    inspection = restarted.inspect_run(result["run"]["run_id"])
+    cited_artifact = next(item for item in inspection["artifacts"] if item["kind"] == "cited-research")
+    cited_payload = json.loads(Path(cited_artifact["path"]).read_text(encoding="utf-8"))
+    assert cited_payload["synthesis_fingerprint"] == result["cited_research"]["synthesis_fingerprint"]
+    assert cited_payload["coverage"]["coverage_ratio"] == 1.0

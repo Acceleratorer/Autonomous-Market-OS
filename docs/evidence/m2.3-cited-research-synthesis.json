@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.m2.3.cited-research-synthesis.v1",
+  "date": "2026-10-15",
+  "status": "verified",
+  "starting_head": "d33d1ef27f9ffc822da5a2255d7c33fa0fc4ffc6",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "contracts": {
+    "research_version": "market-os.research.v1",
+    "legacy_result_preserved": "market-os.v1",
+    "supported_claim_rule": "claim text equals an exact retrieved passage",
+    "unsupported_claim_rule": "no passage means explicit unsupported claim",
+    "coverage_definition": "supported claims divided by all claims"
+  },
+  "source": {
+    "lightrag_commit": "4d0afc1bc36e6a34d4a5895b68efe9413748627a",
+    "vibe_trading_commit": "c25fea2bc261a2d0ed971c989d194de9f04ec963",
+    "actual_entry_points": [
+      "LightRAG.ainsert",
+      "LightRAG.aquery_data",
+      "Vibe-Trading run_backtest"
+    ],
+    "reference_repositories_modified": false
+  },
+  "fixture": {
+    "document_corpus_sha256": "3206fb91eb327fb82b9457315c4cefef91dffa3b6aa2511ef782b4b0764d43a0",
+    "market_fixture_sha256": "bed2cf6d58dc9fd7bcd4abd9343093a3fedefadafe96de87dd9b7977a07098fd",
+    "document_ids": ["doc-spy-factsheet", "doc-market-commentary", "doc-risk-policy", "doc-qqq-news"]
+  },
+  "verification": {
+    "m2_3_focused_tests": "10 passed",
+    "m2_2_and_m2_3_focused_tests": "24 passed",
+    "full_project_tests": "94 passed, 1 skipped",
+    "actual_lightrag_offline": true,
+    "actual_vibe_trading_offline": true,
+    "cli_inspection": "passed",
+    "api_inspection": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "actual_workflow": {
+    "run_id": "run-df41340f30624fdbaa5b11ba9a243ff2",
+    "status": "completed",
+    "final_cash": 10348.25,
+    "paper_only": true,
+    "synthesis_fingerprint": "e9596b4029974c572a309fb479ea4dc5fea0c8a95f7845a7e343547ad8f62ba1",
+    "supported_claims": 3,
+    "unsupported_claims": 0,
+    "coverage_ratio": 1.0,
+    "document_count": 3,
+    "retrieval_passage_count": 3,
+    "artifact_kinds": ["documents", "retrieval", "evidence", "cited-research", "research", "backtest", "order-plan", "risk-decision"]
+    ,"inspection": {
+      "claims": 3,
+      "citations_for_claim": 1,
+      "claims_for_passage": 1
+    }
+  },
+  "limitations": [
+    "Deterministic synthesis emits exact retrieved passages rather than semantic summaries.",
+    "Inspection is local read-only artifact inspection; external providers remain disabled.",
+    "Research contracts are additive and versioned separately from market-os.v1."
+  ]
+}

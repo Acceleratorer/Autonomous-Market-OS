@@ -28,6 +28,9 @@ def build_parser() -> argparse.ArgumentParser:
     server.add_argument("--service-log", default=os.environ.get("MARKET_OS_SERVICE_LOG"))
     inspect = commands.add_parser("inspect")
     inspect.add_argument("run_id")
+    inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
+    inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "lineage"), default="run")
+    inspect.add_argument("--id", dest="item_id")
     return parser
 
 
@@ -37,10 +40,15 @@ def main(argv: list[str] | None = None) -> int:
         workflow = MarketWorkflow(RunStore(args.store_root))
         serve(workflow, args.host, args.port, request_timeout=args.request_timeout, service_log_path=args.service_log)
         return 0
-    workflow = MarketWorkflow()
     if args.command == "inspect":
-        print(json.dumps(workflow.inspect_run(args.run_id), indent=2, sort_keys=True))
+        workflow = MarketWorkflow(RunStore(args.store_root))
+        if args.resource == "run":
+            result = workflow.inspect_run(args.run_id)
+        else:
+            result = workflow.inspect_resource(args.run_id, args.resource, args.item_id)
+        print(json.dumps(result, indent=2, sort_keys=True))
         return 0
+    workflow = MarketWorkflow()
     if args.command == "research":
         from .provider_selection import selected_workflow
 

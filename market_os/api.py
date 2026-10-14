@@ -106,11 +106,31 @@ def make_handler(
             status = 200
             error_type = None
             try:
-                self._send(200, workflow.inspect_run(self.path[len(prefix):]))
+                suffix = self.path[len(prefix):]
+                parts = suffix.split("/")
+                if len(parts) == 1:
+                    result = workflow.inspect_run(parts[0])
+                elif len(parts) in {3, 4} and parts[1] == "research":
+                    resource = parts[2]
+                    item_id = parts[3] if len(parts) == 4 else None
+                    if resource not in {"documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "lineage"}:
+                        self._send(404, {"error": "research resource not found"})
+                        self._audit(404)
+                        return
+                    result = workflow.inspect_resource(parts[0], resource, item_id)
+                else:
+                    self._send(404, {"error": "run resource not found"})
+                    self._audit(404)
+                    return
+                self._send(200, result)
             except KeyError:
                 status = 404
                 error_type = "KeyError"
-                self._send(404, {"error": "run not found"})
+                self._send(404, {"error": "run or research item not found"})
+            except ValueError as exc:
+                status = 409
+                error_type = type(exc).__name__
+                self._send(409, {"error": {"code": "research_integrity_error", "message": str(exc), "api_version": "market-os.v1"}})
             finally:
                 self._audit(status, error_type=error_type)
 

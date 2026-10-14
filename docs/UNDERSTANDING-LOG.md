@@ -202,3 +202,18 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Verification passed: 13 focused M2.2 tests, 9 M2.1 tests, and 82 full-suite
   tests with one optional test skipped. All three reference repositories stayed
   unchanged.
+
+## 2026-10-15 — M2.3 cited research synthesis and inspection
+
+- Confirmed the M2.2 research layer was summary-only: citations existed, but
+  claims, exact supports, coverage, and read-only resource inspection did not.
+- Added `market-os.research.v1` contracts for document/passage references,
+  citations, exact-quote claim support, supported/unsupported claims, evidence
+  coverage, and deterministic synthesis fingerprints.
+- Added root-owned `cited-research` artifacts and read-only CLI/API inspection
+  for documents, passages, claims, passage-to-claim links, citations, and
+  artifact lineage. Inspection validates artifact/content hashes and lineage
+  without invoking providers.
+- Verified actual LightRAG and Vibe-Trading offline workflow behavior,
+  deterministic replay, paper-only enforcement, and corruption failures.
+- Final verification passed: 93 tests passed and one optional test skipped.

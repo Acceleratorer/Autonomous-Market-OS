@@ -58,3 +58,6 @@ lineage is rooted in the Market OS store.
 identity/version, retrieval time, query/content fingerprints, and partial/error
 metadata. Root research citations include the same adapter citation references
 alongside any market-evidence citations in the combined workflow.
+
+The cited synthesis is available in the versioned `cited-research` artifact;
+inspection endpoints are read-only and validate hashes and artifact lineage.
