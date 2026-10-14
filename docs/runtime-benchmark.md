@@ -1,7 +1,7 @@
 # Orchestration runtime benchmark
 
 **Date:** 2026-10-13
-**Status:** source-based comparison; direct runtime execution was not performed because the child repositories have incompatible dependency floors and provider configuration requirements. The benchmark is therefore an architecture fit assessment, not a performance result.
+**Status:** historical source-based comparison; direct runtime execution was not performed because the child repositories have incompatible dependency floors and provider configuration requirements. The benchmark is an architecture fit assessment, not a performance result. ADR-0010 is the later final ownership decision.
 
 ## Comparison
 
@@ -24,7 +24,13 @@
 
 ## Recommendation
 
-Use **OpenHarness as the provisional orchestration owner** behind a narrow Market OS adapter. Keep nanobot available for channel and personal-assistant integration. Reuse DeepCode's event, persistence, checkpoint, and recovery ideas selectively rather than importing its application architecture.
+The historical recommendation was to use **OpenHarness as the provisional
+orchestration owner** behind a narrow Market OS adapter. ADR-0010 supersedes
+that recommendation: Market OS owns production orchestration, while
+OpenHarness remains an optional adapter. Nanobot remains available for channel
+and personal-assistant integration, and DeepCode's event, persistence,
+checkpoint, and recovery ideas remain reference material rather than imported
+architecture.
 
 This recommendation is based on source inspection. Before the adapter is accepted, run a fixture-parity harness that compares task creation, event translation, cancellation, restart inspection, idempotency, and paper-only enforcement against the dependency-free `market_os` workflow.
 

@@ -75,11 +75,16 @@ service controls remain open. The exact next milestone is **M1.11: supply or
 reject the external supervisor controls and obtain final native blocker
 evidence**.
 
-M1.11 classifies every remaining blocker and closes the safe Market OS
-adapter-level behaviors. The service now has a tested HTTP body timeout and
-structured request JSONL logs, while provider/workflow execution deadlines,
-process quotas, service identity permissions, and OpenHarness-native recovery
-remain open. ADR-0009 keeps OpenHarness provisional and defers M2
-implementation. The exact next milestone is **M1.12: choose and verify the
-external supervisor and native closure path, or formally reject this
-deployment/runtime shape**.
+M1.11 classified every remaining blocker and closed the safe Market OS
+adapter-level behaviors. M1.12 makes the final decision: **Market OS owns
+orchestration; OpenHarness is optional**. Market OS is the sole owner of
+production orchestration, safety policies, events, persistence, cancellation,
+restart recovery, multi-agent aggregation, and the deployment boundary.
+OpenHarness remains available behind the optional adapter for local,
+no-network, paper-only agent capabilities. ADR-0010 supersedes the provisional
+ownership and promotion decisions while preserving their historical evidence.
+
+M2 planning is now unblocked. The exact next milestone is **M2.1: implement
+one deterministic Vibe-Trading-shaped market-data/backtest adapter against the
+root provider contracts**, with no real network access, credentials, brokers,
+or live execution.

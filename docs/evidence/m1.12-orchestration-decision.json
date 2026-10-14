@@ -1,0 +1,65 @@
+{
+  "schema": "market-os.m1.12.orchestration-decision.v1",
+  "date": "2026-10-14",
+  "decision": "Accepted — Market OS owns orchestration; OpenHarness is optional",
+  "production_owner": "Market OS MarketWorkflow",
+  "openharness_status": "optional-adapter",
+  "m2_readiness": "planning-and-deterministic-fixture-implementation-unblocked",
+  "additional_openharness_probe_required": false,
+  "ownership": {
+    "safety_policies": "Market OS",
+    "events": "Market OS RunEvent and RunStore",
+    "persistence": "Market OS RunStore",
+    "cancellation": "Market OS MarketWorkflow",
+    "restart_recovery": "Market OS startup recovery",
+    "multi_agent_aggregation": "Market OS AgentAggregate contract",
+    "deployment_boundary": "Market OS service and bounded wrapper",
+    "adapter_runtime": "OpenHarness adapter when explicitly enabled"
+  },
+  "remaining_native_openharness_gaps": [
+    "synchronous persistence cancellation",
+    "checkpoint and resume",
+    "teammate failure and cancellation propagation",
+    "duplicate result handling",
+    "provider and workflow execution deadlines",
+    "process CPU and memory quotas",
+    "service identity and filesystem permissions"
+  ],
+  "source_repositories": [
+    {
+      "name": "Vibe-Trading",
+      "path": "D:/Code/Github/company-projects/Vibe-Trading",
+      "commit": "c25fea2bc261a2d0ed971c989d194de9f04ec963",
+      "license": "MIT",
+      "inspection": "read-only",
+      "recommended_role": "first offline market-data and backtest adapter"
+    },
+    {
+      "name": "LightRAG",
+      "path": "D:/Code/Github/company-projects/LightRAG",
+      "commit": "4d0afc1bc36e6a34d4a5895b68efe9413748627a",
+      "license": "MIT",
+      "inspection": "read-only",
+      "recommended_role": "later document and graph retrieval adapter"
+    },
+    {
+      "name": "RAG-Anything",
+      "path": "D:/Code/Github/company-projects/RAG-Anything",
+      "commit": "da6e2d87a7d3f2746c4541f59953b8764213f6a2",
+      "license": "MIT",
+      "inspection": "read-only",
+      "recommended_role": "later multimodal document adapter"
+    }
+  ],
+  "verification_baseline": {
+    "m1.11_full_tests": "53 passed, 1 skipped",
+    "compileall": "passed",
+    "git_diff_check": "passed",
+    "isolated_openharness_pip_check": "No broken requirements found"
+  },
+  "network_access_required_for_m2_1": false,
+  "credentials_added": false,
+  "brokers_added": false,
+  "live_execution_enabled": false,
+  "child_repositories_modified": false
+}

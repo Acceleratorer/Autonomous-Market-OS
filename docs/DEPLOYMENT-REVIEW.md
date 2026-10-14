@@ -1,8 +1,10 @@
 # Deployment and dependency review
 
 **Review date:** 2026-10-14
-**Result:** the M1.9 launched-service probe verifies the local deployment shape,
-but deployment controls remain incomplete, so OpenHarness remains provisional.
+**Result:** the M1.9–M1.11 probes verify the local Market OS deployment shape
+and document the remaining external controls. ADR-0010 makes Market OS the
+production orchestration owner; OpenHarness is optional and remains outside the
+core dependency path.
 
 The executable evidence is recorded in
 [`docs/evidence/m1.9-deployment-validation.json`](evidence/m1.9-deployment-validation.json)
@@ -82,7 +84,10 @@ execution, audit persistence, startup recovery, clean restart, forced shutdown,
 filesystem state isolation, and the no-secret fixture boundary. Resource
 limits, request/shutdown timeouts, structured logs, production service-account
 permissions, and image-based upgrade/rollback remain unproven or unsupported.
-Those gaps remain promotion blockers.
+Those gaps remain deployment risks for any shared or production deployment;
+they do not block the dependency-free Market OS owner decision. OpenHarness
+native recovery gaps remain adapter limitations and are not silently promoted
+to root guarantees.
 
 M1.10 adds a bounded local wrapper that owns loopback startup, paper-only
 configuration, lifecycle timeouts, graceful/forced termination, exit status,

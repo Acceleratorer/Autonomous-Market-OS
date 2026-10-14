@@ -22,7 +22,11 @@ Storage and operations
 
 ## Candidate ownership
 
-- **Orchestration kernel:** compare `OpenHarness`, `nanobot`, and `DeepCode`. Prefer one kernel and adapters for the others. Their overlapping concerns are tool invocation, skills, sessions, memory, and multi-agent execution.
+- **Orchestration kernel:** Market OS owns production orchestration and its
+  safety-critical state. `OpenHarness`, `nanobot`, and `DeepCode` are optional
+  capability adapters or reference implementations; their overlapping
+  concerns are tool invocation, skills, sessions, memory, and multi-agent
+  execution.
 - **Knowledge subsystem:** use `LightRAG` as the graph-RAG foundation and `RAG-Anything` as multimodal ingestion. Keep `MiniRAG` as a benchmark/reference rather than a second production backend.
 - **Tool subsystem:** expose `CLI-Anything` harnesses through a registry and typed tool gateway. Do not let arbitrary generated CLIs receive unrestricted host access.
 - **Finance subsystem:** keep `Vibe-Trading` as research/backtesting domain logic and `AI-Trader` as social/live signal and experiment logic. Define a shared instrument, portfolio, signal, and provenance schema.

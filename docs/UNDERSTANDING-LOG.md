@@ -146,3 +146,23 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   process quotas, and service identity permissions remain promotion blockers.
 - ADR-0009 keeps OpenHarness provisional and defers M2 implementation while
   permitting planning for the first licensed research adapters.
+
+## 2026-10-14 — M1.12 final orchestration owner and M2 adapter plan
+
+- Evaluated the three required choices: OpenHarness owner, Market OS owner with
+  optional OpenHarness, and OpenHarness rejection. Accepted **Market OS owns
+  orchestration; OpenHarness is optional** because the root workflow already
+  owns and tests the safety-critical state transitions while the native runtime
+  still lacks repeatable recovery and deployment guarantees.
+- Added ADR-0010 and the final decision record. Market OS now has one explicit
+  owner for production orchestration, safety, events, persistence,
+  cancellation, restart recovery, multi-agent aggregation, and deployment.
+- Added dependency-free provider seam contracts for health, capabilities,
+  deadlines, errors, rate limits, freshness, licensing, provenance, cache
+  policy, deterministic fixtures, normalized market bars, and documents.
+- Read the Vibe-Trading, LightRAG, and RAG-Anything entry points without
+  modifying those repositories. Recommended one deterministic Vibe-Trading
+  market-data/backtest adapter as M2.1; defer LightRAG and RAG-Anything until
+  document and multimodal contracts are proven.
+- M2.1 does not require real network access. No provider credentials, brokers,
+  live execution, or child-repository changes were added.

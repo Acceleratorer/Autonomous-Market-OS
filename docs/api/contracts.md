@@ -12,7 +12,9 @@ The contract module is the boundary between applications, orchestration, storage
 - A `Run` is terminal only with `completed`, `failed`, `cancelled`, or `rejected`; failed and rejected runs include an error.
 - `RunEvent` carries actor, tool/model, input/output references, cost, error, and provenance fields even when a provider does not populate all of them yet.
 - `Artifact` stores immutable content metadata, SHA-256, lineage, and access policy.
-- Provider-specific payloads stay behind adapters; core contracts use `MarketObject`, `KnowledgeDocument`, and `Evidence`.
+- Provider-specific payloads stay behind adapters; core contracts use
+  `MarketObject`, `KnowledgeDocument`, `Evidence`, and the dependency-free
+  provider seam types in `market_os.providers`.
 
 ## Example task
 
@@ -34,4 +36,7 @@ Adapters should call `task_from_dict` and `order_plan_from_dict` at the transpor
 
 ## Deferred fields
 
-Authentication, tenant isolation, persistent approval storage, and provider-specific market bar schemas are intentionally deferred until the OpenHarness/runtime and storage decisions are approved.
+Authentication, tenant isolation, and persistent approval storage remain
+deferred. Normalized provider seam types are now defined; concrete network
+providers remain deferred until an adapter passes the M2 contract and
+operational gates. See [ADR-0010](../decisions/ADR-0010-final-orchestration-owner.md).
