@@ -78,12 +78,44 @@ class MarketWorkflow:
             evidence = self.evidence_provider.retrieve(task.objective, task.symbols, task.start, task.end)
             operation = "event.append"
             self._event(run, "evidence.retrieved", {"count": len(evidence)})
+            document_context = self._document_context()
+            document_artifact = None
+            retrieval_artifact = None
+            if document_context is not None:
+                documents, document_payload, retrieval = document_context
+                operation = "artifact.write"
+                document_artifact = self.store.write_artifact(
+                    run.run_id,
+                    "documents",
+                    document_payload,
+                    tuple(document.document_id for document in documents),
+                )
+                retrieval_artifact = self.store.write_artifact(
+                    run.run_id,
+                    "retrieval",
+                    asdict(retrieval),
+                    (document_artifact.artifact_id,),
+                )
+                self._event(
+                    run,
+                    "retrieval.completed",
+                    {
+                        "artifact_id": retrieval_artifact.artifact_id,
+                        "citations": list(retrieval.citations),
+                    },
+                )
             operation = "artifact.write"
-            evidence_artifact = self.store.write_artifact(run.run_id, "evidence", [asdict(item) for item in evidence], tuple(item.evidence_id for item in evidence))
+            evidence_lineage = [item.evidence_id for item in evidence]
+            if document_artifact is not None and retrieval_artifact is not None:
+                evidence_lineage = [document_artifact.artifact_id, retrieval_artifact.artifact_id, *evidence_lineage]
+            evidence_artifact = self.store.write_artifact(run.run_id, "evidence", [asdict(item) for item in evidence], tuple(evidence_lineage))
             self._check_cancel(run, cancel_event)
             operation = "artifact.write"
             research = self._research(task, evidence)
-            research_artifact = self.store.write_artifact(run.run_id, "research", asdict(research), (evidence_artifact.artifact_id,))
+            research_lineage = [evidence_artifact.artifact_id]
+            if retrieval_artifact is not None:
+                research_lineage.append(retrieval_artifact.artifact_id)
+            research_artifact = self.store.write_artifact(run.run_id, "research", asdict(research), tuple(research_lineage))
             operation = "event.append"
             self._event(run, "research.completed", {"artifact_id": research_artifact.artifact_id})
 
@@ -126,7 +158,7 @@ class MarketWorkflow:
                 self.store.save_run(rejected)
                 operation = "event.append"
                 self._event(run, "run.rejected", {"reasons": risk.reasons})
-                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)]})
+                result = self._stable({"run": asdict(rejected), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context)})
                 if task.idempotency_key:
                     self.store.save_idempotent_result(task.idempotency_key, result)
                 return result
@@ -137,7 +169,7 @@ class MarketWorkflow:
             self.store.save_run(completed)
             operation = "event.append"
             self._event(run, "run.completed", {"artifact_ids": [research_artifact.artifact_id, backtest_artifact.artifact_id, order_artifact.artifact_id, risk_artifact.artifact_id]})
-            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)]})
+            result = self._stable({"run": asdict(completed), "task": asdict(task), "research": asdict(research), "backtest": asdict(backtest), "order_plan": asdict(order_plan), "risk": asdict(risk), "artifacts": [asdict(item) for item in self.store.artifacts_for(run.run_id)], **self._document_result(document_context)})
             if task.idempotency_key:
                 operation = "idempotency.save"
                 self.store.save_idempotent_result(task.idempotency_key, result)
@@ -188,6 +220,25 @@ class MarketWorkflow:
         citations = tuple(item.evidence_id for item in evidence)
         summary = f"Evidence-backed review for {', '.join(task.symbols)} from {task.start} through {task.end}. Orders remain paper-only."
         return ResearchResult(summary, citations, citations)
+
+    def _document_context(self):
+        provider = self.evidence_provider
+        documents = getattr(provider, "last_documents", ())
+        payload = getattr(provider, "last_document_payload", ())
+        retrieval = getattr(provider, "last_retrieval_result", None)
+        if documents and payload and retrieval is not None:
+            return tuple(documents), list(payload), retrieval
+        return None
+
+    @staticmethod
+    def _document_result(context) -> dict[str, Any]:
+        if context is None:
+            return {}
+        documents, payload, retrieval = context
+        return {
+            "documents": payload,
+            "retrieval": asdict(retrieval),
+        }
 
     def _order_plan(self, task: Task, evidence: list[Evidence]) -> OrderPlan:
         prices: dict[str, float] = {}

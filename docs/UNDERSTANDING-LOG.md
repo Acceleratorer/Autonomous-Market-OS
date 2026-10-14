@@ -184,3 +184,21 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Full project verification passed: 69 tests passed and one optional actual-
   runtime test was skipped when prerequisites were not configured. The
   reference repository remained unchanged.
+
+## 2026-10-15 — M2.2 cited LightRAG retrieval adapter
+
+- Evaluated LightRAG, RAG-Anything, and MiniRAG read-only. Selected LightRAG at
+  `4d0afc1bc36e6a34d4a5895b68efe9413748627a` because its `ainsert` plus
+  structured `aquery_data(mode="naive")` path is the smallest useful offline
+  document/retrieval seam.
+- Added four synthetic, content-hashed documents with provenance, licensing,
+  stable IDs, timestamps, symbol metadata, and validation.
+- Actual LightRAG code executed offline in an isolated environment and returned
+  cited chunks with `reference_id` and source file paths. RAG-Anything and
+  MiniRAG were not integrated.
+- Added explicit `lightrag` document selection with `vibe-trading` backtest
+  selection, root-owned document/retrieval artifacts, citations, lineage,
+  restart/idempotency behavior, and paper-only enforcement.
+- Verification passed: 13 focused M2.2 tests, 9 M2.1 tests, and 82 full-suite
+  tests with one optional test skipped. All three reference repositories stayed
+  unchanged.

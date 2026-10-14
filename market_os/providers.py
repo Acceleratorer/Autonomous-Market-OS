@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
 import math
+import re
+import threading
 from typing import Literal, Protocol
 
 from .contracts import BacktestResult, Evidence, ResearchResult
@@ -225,6 +227,7 @@ class DocumentRecord:
     content_hash: str
     license: LicenseMetadata
     provenance: Provenance
+    content_ref: str | None = None
 
     def __post_init__(self) -> None:
         for value, field in (
@@ -239,6 +242,83 @@ class DocumentRecord:
                 raise ValueError(f"{field} is required")
         _utc_timestamp(self.published_at, "published_at")
         _utc_timestamp(self.retrieved_at, "retrieved_at")
+        if self.content_ref is not None and not self.content_ref.strip():
+            raise ValueError("content_ref must not be blank")
+
+
+@dataclass(frozen=True)
+class RetrievedPassage:
+    """One cited passage returned by a document retrieval adapter."""
+
+    passage_id: str
+    document_id: str
+    text: str
+    rank: int
+    citation_ref: str
+    source_ref: str
+    content_hash: str
+    score: float | None = None
+
+    def __post_init__(self) -> None:
+        for value, field in (
+            (self.passage_id, "passage_id"),
+            (self.document_id, "document_id"),
+            (self.citation_ref, "citation_ref"),
+            (self.source_ref, "source_ref"),
+            (self.content_hash, "content_hash"),
+        ):
+            if not value.strip():
+                raise ValueError(f"{field} is required")
+        if not self.text.strip():
+            raise ValueError("passage text is required")
+        if self.rank < 1:
+            raise ValueError("passage rank must be positive")
+        if not re.fullmatch(r"[0-9a-f]{64}", self.content_hash):
+            raise ValueError("passage content_hash must be a lowercase SHA-256 digest")
+        if self.score is not None and (
+            not math.isfinite(self.score) or self.score < 0
+        ):
+            raise ValueError("passage score must be finite and non-negative")
+
+
+@dataclass(frozen=True)
+class RetrievalResult:
+    """Normalized, citable retrieval output with deterministic lineage."""
+
+    query: str
+    document_ids: tuple[str, ...]
+    passages: tuple[RetrievedPassage, ...]
+    citations: tuple[str, ...]
+    provider: str
+    provider_version: str
+    retrieved_at: str
+    query_fingerprint: str
+    content_fingerprints: tuple[str, ...]
+    partial: bool = False
+    error: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.query.strip():
+            raise ValueError("retrieval query is required")
+        if not self.document_ids:
+            raise ValueError("retrieval document_ids are required")
+        if not self.passages and not self.error:
+            raise ValueError("retrieval result needs passages or an error")
+        if self.passages and not self.citations:
+            raise ValueError("retrieval passages need citations")
+        if not self.provider.strip() or not self.provider_version.strip():
+            raise ValueError("retrieval provider identity is required")
+        _utc_timestamp(self.retrieved_at, "retrieved_at")
+        if not re.fullmatch(r"[0-9a-f]{64}", self.query_fingerprint):
+            raise ValueError("query_fingerprint must be a lowercase SHA-256 digest")
+        if any(not re.fullmatch(r"[0-9a-f]{64}", value) for value in self.content_fingerprints):
+            raise ValueError("content_fingerprints must be lowercase SHA-256 digests")
+        document_ids = set(self.document_ids)
+        passage_citations = {passage.citation_ref for passage in self.passages}
+        if any(passage.document_id not in document_ids for passage in self.passages):
+            raise ValueError("retrieval passages reference an unknown document")
+        if any(citation not in passage_citations for citation in self.citations):
+            raise ValueError("retrieval citations must reference returned passages")
 
 
 class MarketDataProvider(Protocol):
@@ -266,6 +346,18 @@ class DocumentProvider(Protocol):
         deadline: ProviderDeadline,
         cache: CachePolicy,
     ) -> tuple[DocumentRecord, ...]: ...
+
+
+class RetrievalProvider(Protocol):
+    def retrieve(
+        self,
+        query: str,
+        documents: tuple[DocumentRecord, ...],
+        *,
+        deadline: ProviderDeadline | None = None,
+        cache: CachePolicy | None = None,
+        cancel_event: threading.Event | None = None,
+    ) -> RetrievalResult: ...
 
 
 class ResearchProvider(Protocol):

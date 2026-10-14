@@ -48,3 +48,13 @@ optional `--backtest-provider`. The service `POST /v1/tasks` accepts matching
 `provider` and `backtest_provider` fields. Omitted fields preserve the fixture
 default. Optional provider failures are returned as errors; adapters do not
 silently substitute another backtest engine.
+
+For M2.2, `--provider lightrag --backtest-provider vibe-trading` selects the
+document retrieval adapter and preserves the existing backtest adapter. The
+result includes normalized `documents` and `retrieval` records; their artifact
+lineage is rooted in the Market OS store.
+
+`retrieval` carries `query`, document IDs, cited passage IDs/excerpts, provider
+identity/version, retrieval time, query/content fingerprints, and partial/error
+metadata. Root research citations include the same adapter citation references
+alongside any market-evidence citations in the combined workflow.

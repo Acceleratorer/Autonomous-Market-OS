@@ -1,0 +1,91 @@
+{
+  "schema": "market-os.m2.2.cited-retrieval.v1",
+  "date": "2026-10-15",
+  "status": "verified",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "selection": {
+    "document_provider": "lightrag",
+    "backtest_provider": "vibe-trading",
+    "default_workflow_unchanged": true,
+    "silent_fallback": false
+  },
+  "source": {
+    "selected": "LightRAG",
+    "path": "D:/Code/Github/company-projects/LightRAG",
+    "commit": "4d0afc1bc36e6a34d4a5895b68efe9413748627a",
+    "license": "MIT",
+    "entry_points": [
+      "lightrag.lightrag.LightRAG.ainsert",
+      "lightrag.lightrag.LightRAG.aquery_data",
+      "lightrag.lightrag.LightRAG.initialize_storages",
+      "lightrag.lightrag.LightRAG.finalize_storages"
+    ],
+    "reference_repository_modified": false,
+    "alternatives": {
+      "RAG-Anything": {
+        "commit": "da6e2d87a7d3f2746c4541f59953b8764213f6a2",
+        "reason_not_selected": "parser/VLM/LightRAG dependency expansion"
+      },
+      "MiniRAG": {
+        "commit": "e204d239421f45004852953679927fdf6733f236",
+        "reason_not_selected": "baseline/reference role, not production backend"
+      }
+    }
+  },
+  "fixture": {
+    "path": "market_os/tests/fixtures/lightrag/corpus.json",
+    "fixture_id": "m2.2-synthetic-research-corpus-v1",
+    "sha256": "3206fb91eb327fb82b9457315c4cefef91dffa3b6aa2511ef782b4b0764d43a0",
+    "document_ids": [
+      "doc-spy-factsheet",
+      "doc-market-commentary",
+      "doc-risk-policy",
+      "doc-qqq-news"
+    ],
+    "label": "synthetic fixture corpus; not market advice or historical news",
+    "license_classification": "synthetic-internal"
+  },
+  "actual_execution": {
+    "used_actual_lightrag_code": true,
+    "isolated_environment": true,
+    "network": false,
+    "credentials": false,
+    "query": "What does the SPY risk policy limit?",
+    "query_fingerprint": "c4947c075399f54b2f1012655a640fd47808b2335ab3571e0c3e2aa4e6ea6556",
+    "citations": [
+      "lightrag:doc-risk-policy:doc-risk-policy-chunk-000",
+      "lightrag:doc-spy-factsheet:doc-spy-factsheet-chunk-000",
+      "lightrag:doc-market-commentary:doc-market-commentary-chunk-000"
+    ],
+    "retrieval_mode": "naive",
+    "result_shape": ["chunks", "references", "file_path", "reference_id"],
+    "cli": {
+      "status": "completed",
+      "final_cash": 10348.25,
+      "paper_only": true,
+      "documents": 3,
+      "citations": 3,
+      "artifacts": ["documents", "retrieval", "evidence", "research", "backtest", "order-plan", "risk-decision"]
+    },
+    "api": {
+      "status": "completed",
+      "final_cash": 10348.25,
+      "paper_only": true,
+      "documents": 3,
+      "citations": 3,
+      "artifacts": ["documents", "retrieval", "evidence", "research", "backtest", "order-plan", "risk-decision"]
+    }
+  },
+  "verification": {
+    "focused_m2_2_tests": "15 passed",
+    "m2_1_tests": "9 passed",
+    "full_project_tests": "84 passed, 1 skipped",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "Only LightRAG text ingestion and naive structured chunk retrieval are supported.",
+    "LightRAG dependencies are isolated and not added to Market OS core.",
+    "Generated answers, multimodal parsing, graph retrieval modes, and external document providers remain out of scope."
+  ]
+}

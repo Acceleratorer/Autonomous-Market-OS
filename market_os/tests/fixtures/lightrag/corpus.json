@@ -1,0 +1,60 @@
+{
+  "fixture_id": "m2.2-synthetic-research-corpus-v1",
+  "label": "synthetic fixture corpus; not market advice or historical news",
+  "license": {
+    "classification": "synthetic-internal",
+    "license_name": "internal fixture",
+    "attribution": "Market OS generated synthetic documents",
+    "restrictions": ["not for redistribution"]
+  },
+  "documents": [
+    {
+      "document_id": "doc-spy-factsheet",
+      "title": "Synthetic SPY ETF factsheet",
+      "publisher": "Market OS Synthetic Research",
+      "source_ref": "fixture:m2.2-synthetic-research-corpus-v1:doc-spy-factsheet",
+      "published_at": "2026-01-10T00:00:00+00:00",
+      "retrieved_at": "2026-01-10T00:00:00+00:00",
+      "symbols": ["SPY"],
+      "media_type": "text/markdown",
+      "content_hash": "6964ac8a3859c2811b90d6cb8ed4e1709883682fe2a48f3e06fdc4a39d6c8f54",
+      "content": "# Synthetic SPY ETF factsheet\n\nSPY is a synthetic ETF fixture representing a broad US equity basket. This document is illustrative internal research data, not historical market data or investment advice."
+    },
+    {
+      "document_id": "doc-market-commentary",
+      "title": "Synthetic ETF market commentary",
+      "publisher": "Market OS Synthetic Research",
+      "source_ref": "fixture:m2.2-synthetic-research-corpus-v1:doc-market-commentary",
+      "published_at": "2026-01-11T00:00:00+00:00",
+      "retrieved_at": "2026-01-11T00:00:00+00:00",
+      "symbols": ["SPY", "QQQ"],
+      "media_type": "text/plain",
+      "content_hash": "2e321b524ccb033714dbf48e94eba99eb84055042b70d9d853fc7747f95fde5f",
+      "content": "Synthetic market commentary compares SPY and QQQ by cited evidence quality and scenario assumptions. It does not make a trading recommendation."
+    },
+    {
+      "document_id": "doc-risk-policy",
+      "title": "Synthetic paper-trading risk policy",
+      "publisher": "Market OS Safety",
+      "source_ref": "fixture:m2.2-synthetic-research-corpus-v1:doc-risk-policy",
+      "published_at": "2026-01-12T00:00:00+00:00",
+      "retrieved_at": "2026-01-12T00:00:00+00:00",
+      "symbols": [],
+      "media_type": "text/markdown",
+      "content_hash": "143de360c0c2a52e8e36d644406e1ca79bf7bc163ad155c24314fdbaa0834f90",
+      "content": "# Synthetic paper-trading risk policy\n\nMarket OS permits only paper orders from cited research. A risk decision must approve the order plan before any later execution adapter could act."
+    },
+    {
+      "document_id": "doc-qqq-news",
+      "title": "Synthetic QQQ earnings-style note",
+      "publisher": "Market OS Synthetic Research",
+      "source_ref": "fixture:m2.2-synthetic-research-corpus-v1:doc-qqq-news",
+      "published_at": "2026-01-13T00:00:00+00:00",
+      "retrieved_at": "2026-01-13T00:00:00+00:00",
+      "symbols": ["QQQ"],
+      "media_type": "text/plain",
+      "content_hash": "763d6f1c1e8da6e350ba841c1e2539ab5080d14ea6367f9c4dc8f7c81026666d",
+      "content": "Synthetic news-style commentary describes a hypothetical QQQ earnings update. The note is fabricated for deterministic retrieval tests and has no connection to a real issuer or event."
+    }
+  ]
+}

@@ -95,3 +95,10 @@ backtest in an isolated environment, persists root-owned evidence/citations,
 lineage, provenance, paper order plans, and risk decisions, and preserves the
 fixture default. The exact next milestone is **M2.2: add a cited document or
 retrieval adapter only after its root document/citation contract is approved**.
+
+M2.2 is implemented. The explicit `lightrag` adapter validates a synthetic
+four-document corpus, executes LightRAG's actual offline `ainsert` and
+`aquery_data(mode="naive")` seam in isolation, persists document/retrieval
+lineage, and composes with the Vibe-Trading backtest and paper-only workflow.
+The exact next milestone is **M2.3: harden cited research synthesis and
+document/passage inspection without adding external providers**.
