@@ -152,3 +152,12 @@ calls a hosted model and cannot change paper-only or risk state. Its output must
 resolve to persisted claim supports, citations, passages, documents, hashes,
 and artifact lineage before approval.
 See [M2.4 model-gated summaries](M2.4-MODEL-GATED-SUMMARIES.md).
+
+## M2.5 research-quality benchmark
+
+M2.5 adds a dependency-free, local benchmark over synthetic cases and compares
+M2.3 exact-quote synthesis with the M2.4 deterministic test double. It is a
+quality and promotion gate, not a model provider. It must remain read-only with
+respect to trading state and must report independent citation, grounding,
+fallback, security, lineage, latency, usage, and cost dimensions. See
+[M2.5 research-quality benchmark](M2.5-RESEARCH-QUALITY-BENCHMARK.md).

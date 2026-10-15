@@ -1,0 +1,87 @@
+{
+  "schema": "market-os.m2.5.research-quality.v1",
+  "date": "2026-10-15",
+  "status": "verified",
+  "starting_head": "f117c3cc4ec6152c7907d0806e385781c9fca81d",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "fixture": {
+    "fixture_id": "m2.5-research-quality-corpus-v1",
+    "sha256": "9d877cd0be2b79df2f346dfe1eb02f67eb018a4ed4582a9b9189f0a4a4275144",
+    "case_count": 18,
+    "evaluation_count": 36,
+    "families": [
+      "fully-supported", "partial-retrieval", "unsupported", "inference",
+      "conflict", "duplicate", "similar-quote", "missing-citations",
+      "invalid-citation", "cross-run", "corrupt-hash", "empty-retrieval",
+      "timeout", "failure", "malformed", "prompt-injection", "secret-like",
+      "excessive-output"
+    ]
+  },
+  "methods": {
+    "deterministic-exact-quote": {"is_test_double": false, "description": "M2.3 deterministic exact-quote synthesis"},
+    "deterministic-test-model": {"is_test_double": true, "description": "M2.4 local deterministic model-style gate"}
+  },
+  "benchmark_fingerprint": "dd3d12552a647bec4f1611b1433dcd9ed034a6142c5faec865cbf3e8bd422bdf",
+  "results": {
+    "evaluations_passed": 28,
+    "evaluations_failed": 8,
+    "deterministic_exact_quote_evidence_coverage": 0.8333333333333334,
+    "deterministic_test_model_evidence_coverage": 0.6111111111111112,
+    "deterministic_exact_quote_metrics": {
+      "citation_precision": 1.0, "citation_recall": 1.0, "quote_exactness": 1.0,
+      "claim_support_accuracy": 1.0, "unsupported_claim_detection": 1.0,
+      "inference_labeling_accuracy": 1.0, "evidence_coverage_accuracy": 0.9444444444444444,
+      "cross_run_citation_isolation": 1.0, "content_hash_integrity": 1.0,
+      "deterministic_replay": 1.0, "fallback_correctness": 1.0,
+      "malformed_output_rejection": 1.0, "prompt_injection_isolation": 1.0,
+      "secret_like_rejection": 1.0, "artifact_lineage_completeness": 1.0,
+      "usage_accounting": 1.0
+    },
+    "deterministic_test_model_metrics": {
+      "citation_precision": 1.0, "citation_recall": 1.0, "quote_exactness": 0.5555555555555556,
+      "claim_support_accuracy": 0.5555555555555556, "unsupported_claim_detection": 1.0,
+      "inference_labeling_accuracy": 1.0, "evidence_coverage_accuracy": 0.6111111111111112,
+      "cross_run_citation_isolation": 1.0, "content_hash_integrity": 1.0,
+      "deterministic_replay": 1.0, "fallback_correctness": 1.0,
+      "malformed_output_rejection": 1.0, "prompt_injection_isolation": 1.0,
+      "secret_like_rejection": 1.0, "artifact_lineage_completeness": 1.0,
+      "usage_accounting": 1.0
+    },
+    "latency_ms_p95": {"deterministic-exact-quote": 0.37184000393608585, "deterministic-test-model": 0.6686950036964842},
+    "estimated_cost": "not available for deterministic test double"
+  },
+  "thresholds": {"integrity_metrics": 1.0, "latency_ms_p95_maximum": 100.0, "real_provider_cost_required": true},
+  "promotion": {
+    "status": "Not ready — specific failures remain",
+    "real_model_provider": false,
+    "human_approval": false,
+    "reasons": [
+      "real model provider was not exercised",
+      "deterministic test double cannot establish linguistic quality",
+      "human approval is required before a real model adapter",
+      "estimated cost is unavailable for the deterministic test double",
+      "quote_exactness is below threshold",
+      "claim_support_accuracy is below threshold",
+      "evidence_coverage_accuracy is below threshold"
+    ]
+  },
+  "security": {
+    "prompt_injection_isolation": "passed", "secret_like_output_rejection": "passed",
+    "cross_run_citation_isolation": "passed", "content_hash_integrity": "passed",
+    "output_size_limit": "passed", "network_access": false, "credentials": false,
+    "reference_repositories_modified": false
+  },
+  "verification": {
+    "focused_m2_5_tests": "12 passed",
+    "m2_1_m2_2_m2_3_m2_4_regression_tests": "68 passed",
+    "full_project_suite": "128 passed, 1 skipped",
+    "actual_lightrag_offline": true,
+    "actual_vibe_trading_offline": true,
+    "cli_benchmark_smoke": "passed",
+    "api_benchmark_smoke": "passed",
+    "benchmark_replay": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "exact_m2_6_entry_condition": "A reviewed real-model adapter plan backed by a passing benchmark report, measured usage/cost/latency/error evidence, security review, and explicit human approval."
+}

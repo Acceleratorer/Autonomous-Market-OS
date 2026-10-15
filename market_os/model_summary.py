@@ -4,12 +4,15 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from dataclasses import asdict, dataclass
 from typing import Literal, Protocol
 
 from .research import ResearchSynthesis
 
 MODEL_SUMMARY_API_VERSION = "market-os.model-summary.v1"
+MAX_MODEL_OUTPUT_CHARS = 16_384
+_SECRET_LIKE_RE = re.compile(r"(?:api[_-]?key|secret|access[_-]?token|password)\s*=", re.IGNORECASE)
 
 
 def _text(value: str, field: str) -> None:
@@ -418,10 +421,18 @@ def validate_model_output(
     passages = {passage.passage_id: passage for passage in synthesis.passages}
     documents = {document.document_id: document for document in synthesis.documents}
     errors: list[str] = []
+    if len(output.summary_text) > MAX_MODEL_OUTPUT_CHARS:
+        errors.append("summary output exceeds maximum length")
+    if _SECRET_LIKE_RE.search(output.summary_text):
+        errors.append("summary output contains secret-like material")
     counts = {"supported": 0, "inference": 0, "unsupported": 0, "rejected": 0}
     validated: list[str] = []
     for statement in output.statements:
         counts[statement.classification] += 1
+        if len(statement.text) > MAX_MODEL_OUTPUT_CHARS:
+            errors.append(f"{statement.statement_id}: statement output exceeds maximum length")
+        if _SECRET_LIKE_RE.search(statement.text):
+            errors.append(f"{statement.statement_id}: statement contains secret-like material")
         if statement.classification == "rejected":
             errors.append(f"{statement.statement_id}: rejected classification")
         for document_id in statement.document_ids:

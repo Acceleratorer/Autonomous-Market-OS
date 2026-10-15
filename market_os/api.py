@@ -51,6 +51,24 @@ def make_handler(
             self.wfile.write(raw)
 
         def do_POST(self) -> None:  # noqa: N802
+            if self.path == "/v1/benchmarks":
+                status = 500
+                try:
+                    size = int(self.headers.get("Content-Length", "0"))
+                    body = json.loads(self.rfile.read(size))
+                    from .quality_benchmark import run_quality_benchmark
+
+                    result = run_quality_benchmark(workflow.store.root, body.get("fixture"))
+                    status = 200
+                    self._send(200, result)
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+                    status = 400
+                    self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.v1"}})
+                except Exception as exc:  # pragma: no cover - defensive transport boundary
+                    self._send(500, {"error": str(exc)})
+                finally:
+                    self._audit(status)
+                return
             if self.path != "/v1/tasks":
                 self._send(404, {"error": "not found"})
                 self._audit(404)
@@ -105,6 +123,29 @@ def make_handler(
             if self.path == "/readyz":
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
+                return
+            benchmark_prefix = "/v1/benchmarks/"
+            if self.path.startswith(benchmark_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parts = self.path[len(benchmark_prefix):].split("/")
+                    if len(parts) not in {2, 3}:
+                        raise KeyError("benchmark resource")
+                    from .quality_benchmark import BenchmarkStore
+
+                    result = BenchmarkStore(workflow.store.root).inspect(parts[0], parts[1], parts[2] if len(parts) == 3 else None)
+                    self._send(200, result)
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "benchmark not found"})
+                except ValueError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "benchmark_integrity_error", "message": str(exc), "api_version": "market-os.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
                 return
             prefix = "/v1/runs/"
             if not self.path.startswith(prefix):

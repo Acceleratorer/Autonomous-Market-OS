@@ -118,3 +118,13 @@ model-summary/inference inspection is available through CLI and API. The actual
 offline LightRAG and Vibe-Trading seams remain composed and paper-only. The
 exact next milestone is **M2.5: define the next research-quality gate or
 benchmark before considering any real model/provider adapter**.
+
+M2.5 is implemented. The offline research-quality benchmark evaluates 18
+synthetic cases through deterministic exact-quote and deterministic test-model
+methods, measures independent citation/grounding/replay/fallback/security/
+lineage/latency/usage metrics, persists read-only benchmark artifacts, and
+exposes CLI/API inspection. The promotion decision is **Not ready — specific
+failures remain**: no real model was exercised, cost is unavailable, and the
+test-model quote/support/coverage metrics remain below thresholds. The exact
+next milestone is **M2.6: prepare a reviewed real-model adapter plan only
+after an approved isolated provider and human approval are available**.

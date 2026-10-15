@@ -93,3 +93,24 @@ They invoke no provider and write no trading state. Inspection rejects missing
 or corrupt artifact content, mismatched fingerprints, missing cited-research
 lineage, and cross-artifact synthesis mismatches. Model summaries cannot alter
 the paper-only order plan or risk decision.
+
+## Research-quality benchmark
+
+M2.5 adds the dependency-free `market-os.quality-benchmark.v1` report. It is
+explicitly offline and read-only with respect to trading state. `POST
+/v1/benchmarks` accepts a local synthetic fixture path and returns independent
+case metrics, thresholds, replay status, lineage, and a model-adapter promotion
+decision. The read-only resources are:
+
+```text
+GET /v1/benchmarks/<benchmark-id>/cases
+GET /v1/benchmarks/<benchmark-id>/metrics
+GET /v1/benchmarks/<benchmark-id>/failed-cases
+GET /v1/benchmarks/<benchmark-id>/thresholds
+GET /v1/benchmarks/<benchmark-id>/fingerprint
+```
+
+The benchmark compares M2.3 deterministic exact-quote synthesis with the M2.4
+deterministic test double. It does not claim real-model quality, does not add a
+provider, and cannot approve a real adapter without the documented thresholds,
+security checks, measured cost/usage/latency, and human approval.

@@ -98,6 +98,24 @@ def test_model_output_with_unknown_citation_is_rejected() -> None:
     assert any("unknown citation" in error for error in validation.errors)
 
 
+def test_secret_like_and_excessive_model_output_is_rejected() -> None:
+    synthesis = _synthesis()
+    statement = GeneratedStatement(
+        "statement-hostile",
+        "api_key=fixture-not-a-secret",
+        "unsupported",
+    )
+    output = ModelOutput("api_key=fixture-not-a-secret", (statement,))
+    validation = validate_model_output(output, synthesis)
+    assert validation.status == "rejected"
+    assert any("secret-like" in error for error in validation.errors)
+
+    excessive = ModelOutput("x" * 17_000, (GeneratedStatement("statement-long", "x", "unsupported"),))
+    validation = validate_model_output(excessive, synthesis)
+    assert validation.status == "rejected"
+    assert any("maximum length" in error for error in validation.errors)
+
+
 def test_inference_is_explicitly_labeled_and_separately_counted() -> None:
     synthesis = _synthesis()
     output = ModelOutput(

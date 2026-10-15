@@ -241,3 +241,21 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   stable replay, and persisted `model-summary` lineage. No hosted model,
   credentials, network path, broker, or child-repository modification was
   added.
+
+## 2026-10-15 — M2.5 research-quality benchmark
+
+- Added the local `market-os.quality-benchmark.v1` benchmark over an 18-case
+  synthetic corpus covering supported, unsupported, inference, conflict,
+  duplicate, citation, hash, lineage, fallback, malformed, excessive,
+  prompt-injection-like, and secret-like cases.
+- Compared M2.3 deterministic exact-quote synthesis with the explicitly labeled
+  M2.4 deterministic test-model double. Reports include independently
+  inspectable citation, quote, support, unsupported/inference, evidence,
+  isolation, hash, replay, fallback, malformed-output, security, lineage,
+  latency, usage, and cost dimensions.
+- Added read-only CLI/API benchmark run and inspection, content-addressed
+  benchmark artifacts, stable fixture/case/report fingerprints, and ADR-0011.
+- Baseline evidence: 36 evaluations, 28 pass and 8 intentional adversarial or
+  quality failures. Promotion is **Not ready — specific failures remain**;
+  there is no real model/provider, no cost signal, and human approval remains
+  required before M2.6.

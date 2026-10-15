@@ -32,6 +32,16 @@ def build_parser() -> argparse.ArgumentParser:
     inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
     inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "model-summary", "inferences", "lineage"), default="run")
     inspect.add_argument("--id", dest="item_id")
+    benchmark = commands.add_parser("benchmark")
+    benchmark_commands = benchmark.add_subparsers(dest="benchmark_command", required=True)
+    benchmark_run = benchmark_commands.add_parser("run")
+    benchmark_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
+    benchmark_run.add_argument("--fixture", required=True)
+    benchmark_inspect = benchmark_commands.add_parser("inspect")
+    benchmark_inspect.add_argument("benchmark_id")
+    benchmark_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
+    benchmark_inspect.add_argument("--resource", choices=("cases", "metrics", "failed-cases", "thresholds", "fingerprint"), default="metrics")
+    benchmark_inspect.add_argument("--id", dest="item_id")
     return parser
 
 
@@ -47,6 +57,15 @@ def main(argv: list[str] | None = None) -> int:
             result = workflow.inspect_run(args.run_id)
         else:
             result = workflow.inspect_resource(args.run_id, args.resource, args.item_id)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "benchmark":
+        from .quality_benchmark import BenchmarkStore, run_quality_benchmark
+
+        if args.benchmark_command == "run":
+            result = run_quality_benchmark(args.store_root, args.fixture)
+        else:
+            result = BenchmarkStore(args.store_root).inspect(args.benchmark_id, args.resource, args.item_id)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     workflow = MarketWorkflow()
