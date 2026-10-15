@@ -40,7 +40,20 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_inspect = benchmark_commands.add_parser("inspect")
     benchmark_inspect.add_argument("benchmark_id")
     benchmark_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
-    benchmark_inspect.add_argument("--resource", choices=("cases", "metrics", "failed-cases", "thresholds", "fingerprint"), default="metrics")
+    benchmark_inspect.add_argument(
+        "--resource",
+        choices=(
+            "cases",
+            "metrics",
+            "failed-cases",
+            "benchmark-failures",
+            "candidate-quality-failures",
+            "evaluation",
+            "thresholds",
+            "fingerprint",
+        ),
+        default="metrics",
+    )
     benchmark_inspect.add_argument("--id", dest="item_id")
     return parser
 

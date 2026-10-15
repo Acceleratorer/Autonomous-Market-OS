@@ -1,0 +1,125 @@
+{
+  "schema": "market-os.m2.6.quality-review.v1",
+  "date": "2026-10-15",
+  "status": "verified-offline",
+  "starting_head": "8169f8cef9f460895b9342092aeba7c4d90a1c64",
+  "orchestration_owner": "Market OS MarketWorkflow",
+  "provider_calls": false,
+  "credentials_used": false,
+  "network_access": false,
+  "reference_repositories_modified": false,
+  "fixture": {
+    "fixture_id": "m2.5-research-quality-corpus-v1",
+    "sha256": "9d877cd0be2b79df2f346dfe1eb02f67eb018a4ed4582a9b9189f0a4a4275144",
+    "case_count": 18,
+    "evaluation_count": 36
+  },
+  "report": {
+    "api_version": "market-os.quality-benchmark.v2",
+    "benchmark_id": "benchmark-0826845d928bc7b6",
+    "benchmark_fingerprint": "0826845d928bc7b651cb380a5f4b458829832e857ac26ae51b69acce191e5048",
+    "benchmark_success": {
+      "passed": 36,
+      "failed": 0
+    },
+    "gate_correctness": {
+      "passed": 36,
+      "false_accepts": [],
+      "false_rejects": []
+    },
+    "candidate_quality": {
+      "deterministic-exact-quote": {
+        "status": "trusted-baseline",
+        "evaluations": 0,
+        "failed": 0
+      },
+      "deterministic-test-model": {
+        "evaluations": 14,
+        "passed": 7,
+        "failed": 7,
+        "failed_case_ids": [
+          "similar-nonidentical-quote",
+          "missing-citations",
+          "invalid-citation-id",
+          "cross-run-citation",
+          "prompt-injection",
+          "secret-like-output",
+          "excessive-output"
+        ]
+      }
+    },
+    "metrics": {
+      "deterministic-exact-quote": {
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "quote_exactness": 1.0,
+        "claim_support_accuracy": 1.0,
+        "evidence_coverage": 0.8823529411764706,
+        "content_hash_integrity": 1.0,
+        "cross_run_citation_isolation": 1.0,
+        "deterministic_replay": 1.0,
+        "fallback_correctness": 1.0,
+        "malformed_output_rejection": 1.0,
+        "prompt_injection_isolation": 1.0,
+        "secret_like_rejection": 1.0,
+        "artifact_lineage_completeness": 1.0
+      },
+      "deterministic-test-model": {
+        "citation_precision": 0.8,
+        "citation_recall": 1.0,
+        "quote_exactness": 0.5882352941176471,
+        "claim_support_accuracy": 0.5882352941176471,
+        "evidence_coverage": 0.5714285714285714,
+        "content_hash_integrity": 1.0,
+        "cross_run_citation_isolation": 1.0,
+        "deterministic_replay": 1.0,
+        "fallback_correctness": 1.0,
+        "malformed_output_rejection": 1.0,
+        "prompt_injection_isolation": 1.0,
+        "secret_like_rejection": 1.0,
+        "artifact_lineage_completeness": 1.0
+      },
+      "latency_ms_p95": {
+        "deterministic-exact-quote": 0.5037600029027087,
+        "deterministic-test-model": 0.5578800046350805,
+        "status": "informational"
+      },
+      "estimated_cost": null
+    }
+  },
+  "failure_classification": {
+    "expected_invalid_or_hostile_rejection": 7,
+    "expected_integrity_rejection": 1,
+    "unexpected_acceptance": 0,
+    "unexpected_rejection": 0,
+    "benchmark_oracle_or_scoring_defect": "M2.5 aggregate passed/failed field and denominator/unknown semantics were corrected in v2",
+    "deterministic_synthesis_limitation": 0,
+    "test_double_limitation": "The deterministic test model is a deliberately hostile/invalid candidate source and cannot establish real-model usefulness",
+    "unresolved_defect": 0
+  },
+  "adapter_plan": {
+    "provider": "OpenAI",
+    "model": "gpt-6.1-sol",
+    "api": "Responses API",
+    "implemented": false,
+    "live_smoke_authorized": false,
+    "maximum_expected_live_smoke_spend_usd": 0.02,
+    "approval_required": [
+      "provider and model selection",
+      "credential mechanism",
+      "data retention and regional processing",
+      "allowed outbound destination and payload",
+      "maximum spend"
+    ]
+  },
+  "verification": {
+    "focused_m2_1_m2_6_tests": "72 passed",
+    "full_project_suite": "132 passed, 0 failed, 1 skipped",
+    "cli_api_smoke": "passed",
+    "restart_replay_and_paper_only": "passed",
+    "actual_lightrag_and_vibe_trading_checks": "passed",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "next_milestone": "M2.7: recorded-response tests and bounded optional model adapter after explicit approval"
+}

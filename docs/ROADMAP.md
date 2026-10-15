@@ -126,5 +126,15 @@ lineage/latency/usage metrics, persists read-only benchmark artifacts, and
 exposes CLI/API inspection. The promotion decision is **Not ready — specific
 failures remain**: no real model was exercised, cost is unavailable, and the
 test-model quote/support/coverage metrics remain below thresholds. The exact
-next milestone is **M2.6: prepare a reviewed real-model adapter plan only
-after an approved isolated provider and human approval are available**.
+next milestone was M2.6 quality review.
+
+M2.6 is implemented offline. It reproduces all 36 evaluations, classifies the
+eight reported v1 failures as expected invalid/hostile candidate rejection or
+integrity rejection, and fixes the benchmark's combined pass/fail semantics,
+empty-denominator handling, invalid-citation accounting, unavailable usage
+reporting, latency threshold brittleness, and v1 artifact inspection path. The
+v2 report has 36/36 benchmark-success checks and 36/36 gate-correctness checks;
+seven deterministic test-model candidate-quality failures remain intentionally
+visible. No hosted model is called. The exact next milestone is **M2.7:
+implement recorded-response tests and one bounded optional model adapter after
+explicit provider, data-retention, credential, and spend approval**.

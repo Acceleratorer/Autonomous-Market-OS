@@ -53,3 +53,14 @@ The benchmark adds local fixture and artifact state but no trading state. It
 keeps model adapter readiness observable and prevents structural test-double
 success from being misreported as model quality. It also means the next
 milestone may remain benchmark hardening if a future real-model run fails.
+
+## M2.6 follow-up — 2026-10-15
+
+The readiness decision is unchanged. M2.6 is permitted to write a bounded,
+reviewed plan for one optional provider without adding its implementation,
+credentials, network access, or dependency. A real adapter remains blocked
+until the same corpus has real-provider quality, citation-integrity,
+timeout/error, usage, cost, latency, security, lineage, and human-approval
+evidence. The next implementation slice is recorded in
+`docs/M2.6-MODEL-ADAPTER-PLAN.md`; fixture-based work does not wait for model
+access.

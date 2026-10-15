@@ -259,3 +259,27 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   quality failures. Promotion is **Not ready — specific failures remain**;
   there is no real model/provider, no cost signal, and human approval remains
   required before M2.6.
+
+## 2026-10-15 — M2.6 research-quality failure review and bounded adapter plan
+
+- Reproduced the M2.5 corpus: 18 cases × 2 methods = 36 evaluations. The eight
+  reported failures were correctly rejected invalid/hostile deterministic
+  test-model outputs or the corrupt-hash integrity case; there were no gate
+  false accepts or false rejects.
+- Versioned the benchmark report as `market-os.quality-benchmark.v2` and
+  separated benchmark success, gate correctness, and candidate quality. The
+  v2 report records 36/36 benchmark-success checks and 36/36 gate-correctness
+  checks while retaining seven candidate-quality failures as explicit negative
+  cases.
+- Corrected citation precision denominators to include invalid citation IDs,
+  represented empty denominators and unavailable provider usage/cost/latency as
+  unknown or not applicable, and removed the machine-specific latency
+  promotion threshold from the stable decision path. Latency remains observed
+  and excluded from fingerprints.
+- Added read-only CLI/API benchmark inspection for evaluation,
+  candidate-quality failures, and benchmark failures. Added a compatibility
+  fingerprint path for persisted v1 benchmark artifacts.
+- Wrote the quality review and a bounded optional OpenAI Responses API plan for
+  `gpt-6.1-sol`; no model calls, credentials, network access, or provider
+  dependencies were added. The next milestone is M2.7 recorded-response tests
+  and optional adapter implementation only after explicit approval.

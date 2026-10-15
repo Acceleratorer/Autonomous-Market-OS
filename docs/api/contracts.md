@@ -96,21 +96,33 @@ the paper-only order plan or risk decision.
 
 ## Research-quality benchmark
 
-M2.5 adds the dependency-free `market-os.quality-benchmark.v1` report. It is
+M2.6 refines the dependency-free `market-os.quality-benchmark.v2` report. It is
 explicitly offline and read-only with respect to trading state. `POST
 /v1/benchmarks` accepts a local synthetic fixture path and returns independent
-case metrics, thresholds, replay status, lineage, and a model-adapter promotion
-decision. The read-only resources are:
+case metrics, thresholds, replay status, lineage, separate benchmark/gate/
+candidate-quality outcomes, and a model-adapter promotion decision. The
+read-only resources are:
 
 ```text
 GET /v1/benchmarks/<benchmark-id>/cases
 GET /v1/benchmarks/<benchmark-id>/metrics
 GET /v1/benchmarks/<benchmark-id>/failed-cases
+GET /v1/benchmarks/<benchmark-id>/benchmark-failures
+GET /v1/benchmarks/<benchmark-id>/candidate-quality-failures
+GET /v1/benchmarks/<benchmark-id>/evaluation
 GET /v1/benchmarks/<benchmark-id>/thresholds
 GET /v1/benchmarks/<benchmark-id>/fingerprint
 ```
 
+In v2, `failed-cases` means candidate-quality failures and
+`benchmark-failures` means failures of the benchmark procedure or integrity
+checks. Empty metric denominators and unavailable usage/cost/latency are
+reported as not applicable or unknown rather than zero or perfect. Existing v1
+artifacts remain readable through the versioned legacy fingerprint path.
+
 The benchmark compares M2.3 deterministic exact-quote synthesis with the M2.4
 deterministic test double. It does not claim real-model quality, does not add a
 provider, and cannot approve a real adapter without the documented thresholds,
-security checks, measured cost/usage/latency, and human approval.
+security checks, measured cost/usage/latency, and human approval. See the
+[M2.6 quality review](../M2.6-QUALITY-REVIEW.md) and
+[bounded model-adapter plan](../M2.6-MODEL-ADAPTER-PLAN.md).

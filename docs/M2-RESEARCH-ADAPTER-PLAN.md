@@ -161,3 +161,14 @@ quality and promotion gate, not a model provider. It must remain read-only with
 respect to trading state and must report independent citation, grounding,
 fallback, security, lineage, latency, usage, and cost dimensions. See
 [M2.5 research-quality benchmark](M2.5-RESEARCH-QUALITY-BENCHMARK.md).
+
+## M2.6 quality review and bounded model plan
+
+M2.6 supersedes the v1 benchmark aggregation semantics with the versioned
+`market-os.quality-benchmark.v2` report. It separates benchmark execution
+success, gate correctness, and candidate quality; preserves intentionally bad
+candidate cases; reports empty denominators and unavailable usage as unknown;
+and keeps latency informational. The gate has no false accepts or false
+rejects in the 36-evaluation offline reproduction. No real provider is added.
+See [M2.6 quality review](M2.6-QUALITY-REVIEW.md) and the
+[bounded optional model-adapter plan](M2.6-MODEL-ADAPTER-PLAN.md).

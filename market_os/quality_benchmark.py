@@ -1,4 +1,4 @@
-"""Reproducible, offline research-quality benchmark for M2.5."""
+"""Reproducible, offline research-quality benchmark."""
 from __future__ import annotations
 
 import hashlib
@@ -29,7 +29,8 @@ from .providers import (
 )
 from .research import DeterministicResearchSynthesizer, ResearchSynthesis, research_synthesis_from_dict
 
-QUALITY_BENCHMARK_API_VERSION = "market-os.quality-benchmark.v1"
+QUALITY_BENCHMARK_API_VERSION = "market-os.quality-benchmark.v2"
+LEGACY_QUALITY_BENCHMARK_API_VERSION = "market-os.quality-benchmark.v1"
 _METHOD_BASELINE = "deterministic-exact-quote"
 _METHOD_MODEL = "deterministic-test-model"
 _BENCHMARK_DIR = "benchmarks"
@@ -53,7 +54,7 @@ THRESHOLDS: dict[str, dict[str, Any]] = {
     "secret_like_rejection": {"minimum": 1.0, "definition": "secret-like output is rejected or safely isolated"},
     "artifact_lineage_completeness": {"minimum": 1.0, "definition": "benchmark and case results carry resolvable fixture lineage"},
     "usage_accounting": {"minimum": 1.0, "definition": "input and output usage values are present and non-negative"},
-    "latency_ms_p95": {"maximum": 100.0, "definition": "local benchmark p95 execution latency in milliseconds"},
+    "latency_ms_p95": {"informational": True, "definition": "observed local benchmark p95 execution latency in milliseconds; not a machine-independent quality gate"},
 }
 
 
@@ -79,8 +80,13 @@ def _percentile(values: list[float], percentile: float) -> float:
     return ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower)
 
 
-def _ratio(numerator: int | float, denominator: int | float) -> float:
-    return 1.0 if denominator == 0 and numerator == 0 else (float(numerator) / float(denominator) if denominator else 0.0)
+def _ratio(numerator: int | float, denominator: int | float) -> float | None:
+    return float(numerator) / float(denominator) if denominator else None
+
+
+def _mean(values: list[float | None]) -> float | None:
+    applicable = [value for value in values if value is not None]
+    return statistics.mean(applicable) if applicable else None
 
 
 def _near(left: float, right: float) -> bool:
@@ -165,7 +171,12 @@ class BenchmarkStore:
         report = json.loads(path.read_text(encoding="utf-8"))
         if report.get("benchmark_id") != benchmark_id:
             raise ValueError("benchmark artifact ID mismatch")
-        if _report_fingerprint(report) != report.get("benchmark_fingerprint"):
+        legacy = report.get("api_version") == LEGACY_QUALITY_BENCHMARK_API_VERSION
+        if legacy:
+            fingerprint_matches = _legacy_report_fingerprint(report) == report.get("benchmark_fingerprint")
+        else:
+            fingerprint_matches = _report_fingerprint(report) == report.get("benchmark_fingerprint")
+        if not fingerprint_matches:
             raise ValueError("benchmark fingerprint mismatch")
         if resource == "cases":
             if item_id is None:
@@ -177,7 +188,23 @@ class BenchmarkStore:
         if resource == "metrics":
             return report["metrics"]
         if resource == "failed-cases":
-            return [case for case in report["cases"] if not case["passed"]]
+            if legacy:
+                return [case for case in report["cases"] if not case["passed"]]
+            return [
+                case
+                for case in report["cases"]
+                if case.get("candidate_quality", {}).get("status") == "failed"
+            ]
+        if resource == "benchmark-failures":
+            return [case for case in report["cases"] if not case["benchmark_success"]]
+        if resource == "evaluation":
+            return report.get("evaluation", {"legacy_report": True})
+        if resource == "candidate-quality-failures":
+            return [
+                case
+                for case in report["cases"]
+                if case.get("candidate_quality", {}).get("status") == "failed"
+            ]
         if resource == "thresholds":
             return {
                 "thresholds": report["thresholds"],
@@ -369,14 +396,20 @@ def _baseline_result(case: BenchmarkCaseSpec, synthesis: ResearchSynthesis, case
         "supported_count": len(synthesis.claims) if case.family != "corrupt-hash" else 0,
         "inference_count": 0,
         "unsupported_count": len(synthesis.unsupported_claims) if case.family != "corrupt-hash" else 0,
-        "evidence_coverage": synthesis.coverage.coverage_ratio if case.family != "corrupt-hash" else 0.0,
+        "evidence_coverage": synthesis.coverage.coverage_ratio if case.family != "corrupt-hash" else None,
         "citation_ids": [citation.citation_id for citation in synthesis.citations] if case.family != "corrupt-hash" else [],
-        "quote_exactness": 1.0,
-        "claim_support_accuracy": 1.0,
+        "quote_exactness": 1.0 if case.family != "corrupt-hash" else None,
+        "claim_support_accuracy": 1.0 if case.family != "corrupt-hash" else None,
+        "predicted_citation_ids": [citation.citation_id for citation in synthesis.citations] if case.family != "corrupt-hash" else [],
         "errors": ["content_hash_mismatch"] if case.family == "corrupt-hash" else [],
-        "usage": {"input_units": len(json.dumps(asdict(synthesis), sort_keys=True)), "output_units": len(synthesis.summary), "estimated_cost": None},
+        "usage": {
+            "input_units": len(json.dumps(asdict(synthesis), sort_keys=True)) if case.family != "corrupt-hash" else None,
+            "output_units": len(synthesis.summary) if case.family != "corrupt-hash" else None,
+            "estimated_cost": None,
+        },
+        "usage_known": case.family != "corrupt-hash",
         "usage_kind": "canonical-json-size-proxy",
-        "latency_ms": latency_ms,
+        "latency_ms": latency_ms if latency_ms > 0 else None,
         "lineage": [f"fixture:{fixture_fingerprint}", f"case:{case_fingerprint}"],
     }
 
@@ -392,14 +425,16 @@ def _model_result(case: BenchmarkCaseSpec, synthesis: ResearchSynthesis, case_fi
             "supported_count": 0,
             "inference_count": 0,
             "unsupported_count": 0,
-            "evidence_coverage": 0.0,
+            "evidence_coverage": None,
             "citation_ids": [],
-            "quote_exactness": 0.0,
-            "claim_support_accuracy": 0.0,
+            "quote_exactness": None,
+            "claim_support_accuracy": None,
+            "predicted_citation_ids": [],
             "errors": ["content_hash_mismatch"],
-            "usage": {"input_units": 0, "output_units": 0, "estimated_cost": None},
+            "usage": {"input_units": None, "output_units": None, "estimated_cost": None},
+            "usage_known": False,
             "usage_kind": "provider-reported-test-double-units",
-            "latency_ms": 0.0,
+            "latency_ms": None,
             "lineage": [f"fixture:{fixture_fingerprint}", f"case:{case_fingerprint}"],
         }
     provider = _case_provider(case, synthesis)
@@ -407,6 +442,10 @@ def _model_result(case: BenchmarkCaseSpec, synthesis: ResearchSynthesis, case_fi
     summary = gate_summary(provider, case.query, synthesis, synthesis_artifact_id=f"artifact-quality-{case.case_id}-synthesis")
     latency = (time.perf_counter() - started) * 1000
     validation = summary.validation
+    usage = asdict(summary.usage)
+    usage_known = any(usage[field] > 0 for field in ("input_units", "output_units"))
+    if not usage_known:
+        usage.update(input_units=None, output_units=None)
     return {
         "method": _METHOD_MODEL,
         "case_id": case.case_id,
@@ -416,12 +455,26 @@ def _model_result(case: BenchmarkCaseSpec, synthesis: ResearchSynthesis, case_fi
         "supported_count": validation.supported_count,
         "inference_count": validation.inference_count,
         "unsupported_count": validation.unsupported_count,
-        "evidence_coverage": validation.evidence_coverage,
+        "evidence_coverage": validation.evidence_coverage if summary.gate.status == "approved" else None,
         "citation_ids": list(validation.validated_citation_ids),
-        "quote_exactness": 1.0 if case.expected_supported == 0 and validation.supported_count == 0 else _ratio(validation.supported_count, case.expected_supported),
-        "claim_support_accuracy": 1.0 if case.expected_supported == 0 and validation.supported_count == 0 else _ratio(validation.supported_count, case.expected_supported),
+        "predicted_citation_ids": [
+            citation_id
+            for statement in summary.statements
+            for citation_id in statement.citation_ids
+        ],
+        "quote_exactness": (
+            _ratio(validation.supported_count, case.expected_supported)
+            if case.expected_supported
+            else (0.0 if validation.supported_count else 1.0)
+        ),
+        "claim_support_accuracy": (
+            _ratio(validation.supported_count, case.expected_supported)
+            if case.expected_supported
+            else (0.0 if validation.supported_count else 1.0)
+        ),
         "errors": list(validation.errors),
-        "usage": asdict(summary.usage),
+        "usage": usage,
+        "usage_known": usage_known,
         "usage_kind": "provider-reported-test-double-units",
         "failure": asdict(summary.failure) if summary.failure else None,
         "summary_fingerprint": summary.summary_fingerprint,
@@ -441,15 +494,26 @@ def _expected_citations(case: BenchmarkCaseSpec, method: str) -> set[str]:
 
 def _enrich_case_result(case: BenchmarkCaseSpec, result: dict[str, Any], synthesis: ResearchSynthesis, replay_stable: bool) -> dict[str, Any]:
     passage_ids = {item["passage_id"] for item in case.passages}
-    predicted_ids = set(result.get("citation_ids", ()))
+    predicted_ids = set(result.get("predicted_citation_ids", ()))
+    citation_by_id = {citation.citation_id: citation for citation in synthesis.citations}
     predicted_passages = {
-        citation.passage_id
-        for citation in synthesis.citations
-        if citation.citation_id in predicted_ids
+        citation_by_id[citation_id].passage_id
+        for citation_id in predicted_ids
+        if citation_id in citation_by_id
     }
+    invalid_citation_count = len(predicted_ids - citation_by_id.keys())
     expected_ids = _expected_citations(case, result["method"])
-    precision = _ratio(len(predicted_passages & passage_ids), len(predicted_passages))
-    recall = _ratio(len(predicted_passages & expected_ids), len(expected_ids))
+    precision_denominator = len(predicted_passages) + invalid_citation_count
+    precision = (
+        _ratio(len(predicted_passages & passage_ids), precision_denominator)
+        if precision_denominator
+        else None
+    )
+    recall = (
+        _ratio(len(predicted_passages & expected_ids), len(expected_ids))
+        if expected_ids
+        else None
+    )
     if result["method"] == _METHOD_BASELINE:
         expected_unsupported = len(synthesis.unsupported_claims)
         expected_inference = 0
@@ -460,12 +524,32 @@ def _enrich_case_result(case: BenchmarkCaseSpec, result: dict[str, Any], synthes
         expected_inference = case.expected_inference
         expected_coverage = case.expected_coverage
         gate_expected = case.expected_gate
+    supported_count_for_quality = (
+        result["supported_count"]
+        if result["method"] == _METHOD_BASELINE or result["gate"] == "approved"
+        else 0
+    )
+    quote_exactness = result.get("quote_exactness")
+    if result["method"] != _METHOD_BASELINE and case.expected_supported:
+        quote_exactness = _ratio(supported_count_for_quality, case.expected_supported)
+    claim_support_accuracy = result.get("claim_support_accuracy")
+    if result["method"] != _METHOD_BASELINE and case.expected_supported:
+        claim_support_accuracy = _ratio(supported_count_for_quality, case.expected_supported)
+    if result["method"] != _METHOD_BASELINE and result["gate"] != "approved":
+        result["evidence_coverage"] = None
+    expected_coverage = None if case.family == "corrupt-hash" else expected_coverage
+    coverage_accuracy = (
+        1.0 if _near(result["evidence_coverage"], expected_coverage)
+        else 0.0
+    ) if result["evidence_coverage"] is not None and expected_coverage is not None else None
     result.update({
         "citation_precision": precision,
         "citation_recall": recall,
         "unsupported_detection": 1.0 if result["unsupported_count"] == expected_unsupported else 0.0,
         "inference_labeling": 1.0 if result["inference_count"] == expected_inference else 0.0,
-        "evidence_coverage_accuracy": 1.0 if _near(result["evidence_coverage"], expected_coverage) else 0.0,
+        "evidence_coverage_accuracy": coverage_accuracy,
+        "quote_exactness": quote_exactness,
+        "claim_support_accuracy": claim_support_accuracy,
         "gate_correctness": 1.0 if result["gate"] == gate_expected else 0.0,
         "cross_run_isolation": 1.0 if result["method"] == _METHOD_BASELINE or case.family != "cross-run" or not predicted_passages else 0.0,
         "content_hash_integrity": 1.0 if case.family != "corrupt-hash" or result["gate"] == "integrity-rejected" else 0.0,
@@ -475,15 +559,44 @@ def _enrich_case_result(case: BenchmarkCaseSpec, result: dict[str, Any], synthes
         "secret_like_rejection": 1.0 if result["method"] == _METHOD_BASELINE or case.family != "secret-like" or result["gate"] in {"rejected", "integrity-rejected"} else 0.0,
         "artifact_lineage_completeness": 1.0 if result.get("lineage") else 0.0,
         "replay_stable": 1.0 if replay_stable else 0.0,
-        "usage_accounting": 1.0 if result["usage"]["input_units"] >= 0 and result["usage"]["output_units"] >= 0 else 0.0,
-        "passed": result["gate"] == gate_expected and result["gate_correctness"] if "gate_correctness" in result else result["gate"] == gate_expected,
+        "usage_accounting": (
+            1.0 if result.get("usage_known") and result["usage"]["input_units"] >= 0 and result["usage"]["output_units"] >= 0
+            else None
+        ),
     })
-    result["passed"] = all(result[key] == 1.0 for key in (
-        "gate_correctness", "citation_precision", "citation_recall", "unsupported_detection",
-        "inference_labeling", "evidence_coverage_accuracy", "cross_run_isolation",
-        "content_hash_integrity", "fallback_correctness", "malformed_output_rejection",
-        "replay_stable", "usage_accounting",
-    ))
+    quality_metrics = {
+        "quote_exactness": quote_exactness,
+        "claim_support_accuracy": claim_support_accuracy,
+        "evidence_coverage_accuracy": coverage_accuracy,
+        "unsupported_detection": result["unsupported_detection"],
+        "inference_labeling": result["inference_labeling"],
+    }
+    quality_failed = any(value is not None and value < 1.0 for value in quality_metrics.values())
+    negative_case = gate_expected in {"rejected", "integrity-rejected"}
+    benchmark_checks = (
+        "gate_correctness", "cross_run_isolation", "content_hash_integrity",
+        "fallback_correctness", "malformed_output_rejection", "prompt_injection_isolation",
+        "secret_like_rejection", "artifact_lineage_completeness", "replay_stable",
+    )
+    benchmark_success = all(result[key] == 1.0 for key in benchmark_checks)
+    if negative_case:
+        benchmark_success = benchmark_success and result["gate"] == gate_expected
+    if result["method"] == _METHOD_BASELINE:
+        quality_status = "trusted-baseline"
+    elif quality_failed:
+        quality_status = "failed"
+    elif result["gate"] == "approved":
+        quality_status = "passed"
+    elif case.family in {"timeout", "failure"}:
+        quality_status = "not-applicable-provider-failure"
+    else:
+        quality_status = "not-applicable-invalid-candidate"
+    result["candidate_quality"] = {
+        "status": quality_status,
+        "metrics": quality_metrics,
+    }
+    result["benchmark_success"] = bool(benchmark_success)
+    result["passed"] = bool(benchmark_success)
     return result
 
 
@@ -493,6 +606,36 @@ def _semantic_result(result: dict[str, Any]) -> dict[str, Any]:
 
 
 def _report_fingerprint(report: dict[str, Any]) -> str:
+    metrics = {
+        key: value
+        for key, value in report["metrics"].items()
+        if key != "latency_ms_p95"
+    }
+    threshold_decisions = {
+        key: value
+        for key, value in report["threshold_decisions"].items()
+        if key != "latency_ms_p95"
+    }
+    return _digest({
+        "api_version": report["api_version"],
+        "fixture_id": report["fixture_id"],
+        "fixture_fingerprint": report["fixture_fingerprint"],
+        "methods": report["methods"],
+        "safety": report["safety"],
+        "cases": [
+            {key: value for key, value in case.items() if key not in {"latency_ms", "passed"}}
+            for case in report["cases"]
+        ],
+        "evaluation": report["evaluation"],
+        "metrics": metrics,
+        "thresholds": report["thresholds"],
+        "threshold_decisions": threshold_decisions,
+        "promotion": report["promotion"],
+    })
+
+
+def _legacy_report_fingerprint(report: dict[str, Any]) -> str:
+    """Recompute the M2.5 v1 fingerprint for backward-compatible inspection."""
     metrics = {
         key: value
         for key, value in report["metrics"].items()
@@ -542,32 +685,116 @@ def _aggregate_metrics(results: list[dict[str, Any]]) -> dict[str, Any]:
         "usage_accounting": "usage_accounting",
     }
     for metric, field in metric_fields.items():
+        values_by_method = {
+            method: [result[field] for result in results if result["method"] == method]
+            for method in methods
+        }
         metrics[metric] = {
             "definition": THRESHOLDS[metric]["definition"],
-            "values": {method: statistics.mean(result[field] for result in results if result["method"] == method) for method in methods},
+            "values": {method: _mean(values) for method, values in values_by_method.items()},
+            "applicable_count": {
+                method: sum(value is not None for value in values)
+                for method, values in values_by_method.items()
+            },
+            "not_applicable_count": {
+                method: sum(value is None for value in values)
+                for method, values in values_by_method.items()
+            },
             "threshold": THRESHOLDS[metric],
         }
-    latency_values = [result["latency_ms"] for result in results if "latency_ms" in result]
     metrics["latency_ms_p95"] = {
         "definition": THRESHOLDS["latency_ms_p95"]["definition"],
         "values": {
-            method: _percentile([result["latency_ms"] for result in results if result["method"] == method], 0.95)
+            method: _percentile(
+                [result["latency_ms"] for result in results if result["method"] == method and result["latency_ms"] is not None],
+                0.95,
+            ) if any(result["latency_ms"] is not None for result in results if result["method"] == method) else None
             for method in methods
         },
         "threshold": THRESHOLDS["latency_ms_p95"],
     }
     metrics["evidence_coverage"] = {
         "definition": "observed supported claims divided by all claims",
-        "values": {method: statistics.mean(result["evidence_coverage"] for result in results if result["method"] == method) for method in methods},
+        "values": {
+            method: _mean([result["evidence_coverage"] for result in results if result["method"] == method])
+            for method in methods
+        },
         "threshold": {"informational": True},
     }
     metrics["estimated_cost_reporting"] = {
         "definition": "cost is reported when usage metadata supplies it",
         "status": "not_available_for_deterministic_test_double",
-        "values": {method: any(result["usage"].get("estimated_cost") is not None for result in results if result["method"] == method) for method in methods},
+        "values": {
+            method: (
+                True
+                if any(result["usage"].get("estimated_cost") is not None for result in results if result["method"] == method)
+                else None
+            )
+            for method in methods
+        },
         "threshold": {"required_for_real_model": True},
     }
     return metrics
+
+
+def _evaluation_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    false_accepts = [
+        result["case_id"] + ":" + result["method"]
+        for result in results
+        if result["gate_correctness"] == 0.0 and result["gate"] == "approved"
+    ]
+    false_rejects = [
+        result["case_id"] + ":" + result["method"]
+        for result in results
+        if result["gate_correctness"] == 0.0 and result["gate"] != "approved"
+    ]
+    benchmark_failures = [
+        result["case_id"] + ":" + result["method"]
+        for result in results
+        if not result["benchmark_success"]
+    ]
+    quality: dict[str, Any] = {}
+    for method in sorted({result["method"] for result in results}):
+        failed = [
+            result["case_id"]
+            for result in results
+            if result["method"] == method
+            and result.get("candidate_quality", {}).get("status") == "failed"
+        ]
+        applicable = [
+            result
+            for result in results
+            if result["method"] == method
+            and result.get("candidate_quality", {}).get("status") not in {
+                "trusted-baseline",
+                "not-applicable-invalid-candidate",
+                "not-applicable-provider-failure",
+            }
+        ]
+        quality[method] = {
+            "evaluations": len(applicable),
+            "failed": len(failed),
+            "passed": len(applicable) - len(failed),
+            "failed_case_ids": failed,
+        }
+    return {
+        "benchmark_success": {
+            "passed": len(results) - len(benchmark_failures),
+            "failed": len(benchmark_failures),
+            "failure_ids": benchmark_failures,
+        },
+        "gate_correctness": {
+            "false_accepts": false_accepts,
+            "false_rejects": false_rejects,
+            "passed": len(results) - len(false_accepts) - len(false_rejects),
+        },
+        "candidate_quality": quality,
+        "unsupported_semantic_guarantees": [
+            "exact quotes establish textual support only",
+            "citation presence does not establish paraphrase or inference entailment",
+            "deterministic rules do not prove arbitrary generated statements true",
+        ],
+    }
 
 
 def _promotion(metrics: dict[str, Any], cases: list[dict[str, Any]]) -> dict[str, Any]:
@@ -579,16 +806,23 @@ def _promotion(metrics: dict[str, Any], cases: list[dict[str, Any]]) -> dict[str
     ]
     for metric, definition in THRESHOLDS.items():
         if metric == "latency_ms_p95":
-            if any(value > definition["maximum"] for value in metrics[metric]["values"].values()):
-                reasons.append(f"{metric} exceeds threshold")
-        elif metric in metrics and any(value < definition["minimum"] for value in metrics[metric]["values"].values()):
+            continue
+        elif metric in metrics and any(
+            value is not None and value < definition["minimum"]
+            for value in metrics[metric]["values"].values()
+        ):
             reasons.append(f"{metric} is below threshold")
+    if not any(
+        result["candidate_quality"]["status"] == "failed"
+        for result in cases
+    ):
+        reasons.append("no candidate-quality failures observed in the evaluated methods")
     return {
         "status": "Not ready — specific failures remain",
         "reasons": reasons,
         "real_model_provider": False,
         "human_approval": False,
-        "required_before_m2_6": [
+        "required_before_real_adapter": [
             "run the same corpus against a real model in an approved isolated environment",
             "meet every integrity threshold without bypassing the gate",
             "report measured token usage, cost, timeout, and latency distributions",
@@ -604,12 +838,17 @@ def _threshold_decisions(metrics: dict[str, Any]) -> dict[str, Any]:
         values = metrics.get(metric, {}).get("values", {})
         if metric == "latency_ms_p95":
             decisions[metric] = {
-                method: {"passed": value <= threshold["maximum"], "observed": value, "threshold": threshold["maximum"]}
+                method: {"applicable": value is not None, "observed": value, "threshold": None}
                 for method, value in values.items()
             }
         elif metric in metrics:
             decisions[metric] = {
-                method: {"passed": value >= threshold["minimum"], "observed": value, "threshold": threshold["minimum"]}
+                method: {
+                    "applicable": value is not None,
+                    "passed": value >= threshold["minimum"] if value is not None else None,
+                    "observed": value,
+                    "threshold": threshold["minimum"],
+                }
                 for method, value in values.items()
             }
     return decisions
@@ -663,6 +902,7 @@ def run_quality_benchmark(root: str | Path, fixture_path: str | Path) -> dict[st
             "external_provider_called": False,
         },
         "cases": results,
+        "evaluation": _evaluation_summary(results),
         "metrics": metrics,
         "thresholds": thresholds,
         "threshold_decisions": _threshold_decisions(metrics),
