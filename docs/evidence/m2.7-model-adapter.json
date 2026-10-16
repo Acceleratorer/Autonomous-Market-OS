@@ -1,0 +1,53 @@
+{
+  "schema": "market-os.m2.7.model-adapter.v1",
+  "date": "2026-10-16",
+  "status": "verified-offline",
+  "starting_head": "402a2f557ee8ff1cb77fab837d7e94968bb9d077",
+  "provider": "OpenAI Responses API",
+  "model": "gpt-6.1-sol",
+  "official_model_confirmed": true,
+  "implemented": true,
+  "live_smoke_run": false,
+  "credentials_used": false,
+  "network_model_calls": false,
+  "default_offline": true,
+  "paper_only": true,
+  "recorded_fixture": {
+    "path": "market_os/tests/fixtures/model_summary/openai_responses.json",
+    "fixture_id": "m2.7-openai-responses-synthetic-v1",
+    "classification": "synthetic-internal"
+  },
+  "approval_requirements": [
+    "provider and model",
+    "credential source",
+    "data sent",
+    "retention acknowledgement",
+    "maximum spend",
+    "maximum request count",
+    "output/token limit",
+    "allowed network destination",
+    "persisted-result policy"
+  ],
+  "verification": {
+    "recorded_response_tests": "29 passed",
+    "model_summary_regressions": "22 passed",
+    "quality_benchmark_regressions": "16 passed",
+    "focused_m2_1_m2_7_tests": "101 passed",
+    "full_project_suite": "161 passed, 0 failed, 1 skipped",
+    "integration_marked_tests": "5 passed",
+    "compileall": "passed",
+    "evidence_validation": "passed",
+    "secret_scan": "passed",
+    "git_diff_check": "passed",
+    "offline_guard": "passed",
+    "approval_and_budget_fail_closed": "passed",
+    "retry_bound": "passed"
+  },
+  "limitations": [
+    "No real-model quality evidence",
+    "No live latency or provider error distribution",
+    "No account-specific retention or entitlement verification",
+    "No live smoke approval was supplied"
+  ],
+  "next_milestone": "M2.8: separately approved single synthetic live smoke, if approved"
+}

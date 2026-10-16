@@ -66,11 +66,13 @@ inspection endpoints are read-only and validate hashes and artifact lineage.
 
 M2.4 adds the opt-in `market-os.model-summary.v1` contract. The deterministic
 M2.3 synthesis remains the default and trusted result. A caller may select the
-local deterministic test double with `summary_provider:
-"deterministic-test"` (or CLI `--summary-provider deterministic-test`) only;
-it must be combined with the explicit `lightrag` cited-retrieval provider;
-unknown providers or summary selection without cited retrieval are rejected,
-and no hosted model is configured.
+local deterministic test double with `summary_provider: "deterministic-test"`,
+the synthetic recorded-response adapter with `summary_provider:
+"openai-recorded"`, or the approval-gated OpenAI adapter with
+`summary_provider: "openai"` (and the matching CLI flag). All selections must
+use the explicit `lightrag` cited-retrieval provider. Unknown providers or
+summary selection without cited retrieval are rejected. The live OpenAI path
+fails closed before network access when its approval configuration is absent.
 
 The persisted `model-summary` artifact records provider/model identity, prompt
 and input fingerprints, classified statements, validation errors, gate status,

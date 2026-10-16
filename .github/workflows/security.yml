@@ -1,0 +1,31 @@
+name: Security and package checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install project
+        run: python -m pip install --upgrade pip && python -m pip install -e . pytest
+      - name: Dependency consistency
+        run: python -m pip check
+      - name: High-confidence secret scan
+        run: python scripts/ci_checks.py secret-scan
+      - name: Evidence JSON validation
+        run: python scripts/ci_checks.py validate-evidence
+      - name: Model boundary and paper-only tests
+        run: python -m pytest -q market_os/tests/test_m2_openai_summary.py market_os/tests/test_m2_model_summary.py
+      - name: Compile and diff checks
+        run: python -m compileall -q market_os && git diff --check

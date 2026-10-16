@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--end", default="2026-01-06")
     research.add_argument("--provider", choices=("fixture", "vibe-trading", "lightrag"), default="fixture")
     research.add_argument("--backtest-provider", choices=("fixture", "vibe-trading"))
-    research.add_argument("--summary-provider", choices=("deterministic-test",))
+    research.add_argument("--summary-provider", choices=("deterministic-test", "openai-recorded", "openai"))
     server = commands.add_parser("serve")
     server.add_argument("--host", default=os.environ.get("MARKET_OS_HOST", "127.0.0.1"))
     server.add_argument("--port", type=int, default=int(os.environ.get("MARKET_OS_PORT", "8787")))

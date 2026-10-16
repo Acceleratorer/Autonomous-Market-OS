@@ -138,3 +138,15 @@ seven deterministic test-model candidate-quality failures remain intentionally
 visible. No hosted model is called. The exact next milestone is **M2.7:
 implement recorded-response tests and one bounded optional model adapter after
 explicit provider, data-retention, credential, and spend approval**.
+
+M2.7 is implemented as an offline foundation. Recorded Responses-shaped
+fixtures exercise parsing, grounding, fallback, replay, usage-unknown behavior,
+and hostile-output rejection. A stdlib-only optional OpenAI Responses adapter
+supports `gpt-6.1-sol` behind explicit approval, bounded budgets, `store: false`,
+paper-only mode, and bounded transient retries; it is not selected by default
+and no live call was made. Fusion-repository CI and security workflows validate
+tests, offline integration markers, compilation, evidence JSON, diff hygiene,
+secret-like fixture content, and model-boundary checks without credentials.
+The exact next milestone is **M2.8: run an explicitly approved single live
+synthetic smoke only if provider, credential, retention, destination, request,
+token, and spend approvals are separately supplied**.

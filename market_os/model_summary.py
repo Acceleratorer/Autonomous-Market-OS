@@ -104,21 +104,17 @@ class ModelProviderIdentity:
 
 @dataclass(frozen=True)
 class ModelUsage:
-    input_units: int = 0
-    output_units: int = 0
+    input_units: int | None = None
+    output_units: int | None = None
     estimated_cost: float | None = None
     api_version: str = MODEL_SUMMARY_API_VERSION
 
     def __post_init__(self) -> None:
-        if (
-            not isinstance(self.input_units, int)
-            or isinstance(self.input_units, bool)
-            or not isinstance(self.output_units, int)
-            or isinstance(self.output_units, bool)
-            or self.input_units < 0
-            or self.output_units < 0
-        ):
-            raise ValueError("model usage units must be non-negative")
+        for value, field in ((self.input_units, "input_units"), (self.output_units, "output_units")):
+            if value is not None and (
+                not isinstance(value, int) or isinstance(value, bool) or value < 0
+            ):
+                raise ValueError(f"{field} must be a non-negative integer or null")
         if self.estimated_cost is not None and (
             not math.isfinite(self.estimated_cost) or self.estimated_cost < 0
         ):

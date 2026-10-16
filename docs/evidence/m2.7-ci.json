@@ -1,0 +1,35 @@
+{
+  "schema": "market-os.m2.7.ci.v1",
+  "date": "2026-10-16",
+  "status": "configured-and-locally-verified",
+  "starting_head": "402a2f557ee8ff1cb77fab837d7e94968bb9d077",
+  "workflows": [".github/workflows/ci.yml", ".github/workflows/security.yml"],
+  "checks": [
+    "pull requests and main pushes",
+    "Python 3.12",
+    "offline unit tests",
+    "offline integration-marked tests",
+    "full project suite",
+    "compileall",
+    "evidence JSON validation",
+    "CLI/API/model-boundary smoke tests",
+    "pip check",
+    "high-confidence secret scan",
+    "git diff --check"
+  ],
+  "credentials_required": false,
+  "network_model_calls_required": false,
+  "child_repositories_required": false,
+  "local_verification": {
+    "workflow_yaml_parse": "passed",
+    "evidence_validation": "passed",
+    "ci_local_equivalents": "passed",
+    "focused_m2_1_m2_7_tests": "101 passed",
+    "unit_suite": "156 passed, 0 failed, 1 skipped",
+    "full_suite": "161 passed, 0 failed, 1 skipped",
+    "integration_marked_suite": "5 passed",
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "next_milestone": "M2.8: separately approved live smoke workflow, if approved"
+}

@@ -283,3 +283,23 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   `gpt-6.1-sol`; no model calls, credentials, network access, or provider
   dependencies were added. The next milestone is M2.7 recorded-response tests
   and optional adapter implementation only after explicit approval.
+
+## 2026-10-16 — M2.7 recorded model adapter and CI foundation
+
+- Added synthetic, clearly labeled Responses-shaped fixtures for valid
+  citation-preserving output, explicit inference/unsupported statements,
+  malformed/error/timeout responses, invalid citations, quote mismatch,
+  cross-run references, oversized/secret-like/prompt-injection-like output,
+  deterministic fallback, stable replay, and unknown usage.
+- Added the optional stdlib-only `openai` adapter behind
+  `SummaryModelProvider`. It is never imported by the default offline path;
+  `openai-recorded` is fixture-only and `openai` requires explicit model,
+  credential, request/output/input/spend budgets, data-retention acknowledgement,
+  non-production, and paper-only configuration before transport.
+- Confirmed official documentation for `gpt-6.1-sol`, the Responses endpoint,
+  Structured Outputs, and US/EU data-residency support. No SDK, credentials,
+  model call, or external network request was used.
+- Added `.github/workflows/ci.yml` and `security.yml` for the fusion repository
+  only. Workflows run offline unit/integration tests, the full suite,
+  compileall, evidence validation, CLI/API/model-boundary smoke checks,
+  dependency consistency, high-confidence secret scanning, and diff checks.

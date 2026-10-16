@@ -52,8 +52,8 @@ def selected_workflow(
     summary_provider: str | None = None,
 ) -> MarketWorkflow:
     """Return a root-owned workflow with explicitly selected provider adapters."""
-    if summary_provider not in {None, "deterministic-test"}:
-        raise ProviderSelectionError("summary_provider must be deterministic-test when explicitly selected")
+    if summary_provider not in {None, "deterministic-test", "openai", "openai-recorded"}:
+        raise ProviderSelectionError("summary_provider must be deterministic-test, openai-recorded, or openai when explicitly selected")
     if summary_provider is not None and provider != "lightrag":
         raise ProviderSelectionError("summary_provider requires provider=lightrag")
     if backtest_provider is None:
@@ -61,6 +61,17 @@ def selected_workflow(
             raise ProviderSelectionError("lightrag is retrieval-only; select --backtest-provider vibe-trading")
         backtest_provider = provider
     evidence, backtest = _providers(provider, backtest_provider)
+    summary = None
+    if summary_provider == "deterministic-test":
+        summary = DeterministicTestSummaryProvider()
+    elif summary_provider == "openai-recorded":
+        from .adapters.openai_summary import RecordedResponsesSummaryProvider
+
+        summary = RecordedResponsesSummaryProvider.from_environment()
+    elif summary_provider == "openai":
+        from .adapters.openai_summary import OpenAIResponsesSummaryProvider
+
+        summary = OpenAIResponsesSummaryProvider.from_environment()
     return MarketWorkflow(
         workflow.store,
         evidence_provider=evidence,
@@ -68,7 +79,7 @@ def selected_workflow(
         initial_cash=workflow.initial_cash,
         max_notional=workflow.max_notional,
         max_symbols=workflow.max_symbols,
-        summary_provider=DeterministicTestSummaryProvider() if summary_provider == "deterministic-test" else None,
+        summary_provider=summary,
     )
 
 

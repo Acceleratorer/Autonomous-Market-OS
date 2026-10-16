@@ -443,7 +443,10 @@ def _model_result(case: BenchmarkCaseSpec, synthesis: ResearchSynthesis, case_fi
     latency = (time.perf_counter() - started) * 1000
     validation = summary.validation
     usage = asdict(summary.usage)
-    usage_known = any(usage[field] > 0 for field in ("input_units", "output_units"))
+    usage_known = all(
+        isinstance(usage[field], int) and not isinstance(usage[field], bool) and usage[field] >= 0
+        for field in ("input_units", "output_units")
+    )
     if not usage_known:
         usage.update(input_units=None, output_units=None)
     return {
