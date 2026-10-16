@@ -1,0 +1,49 @@
+{
+  "approval": {
+    "adapter": true,
+    "m2_8_execution": false
+  },
+  "citation_ids": [
+    "citation-fbd05cc1c092115a"
+  ],
+  "citation_validation": "pending-live-response",
+  "data_class": "synthetic-internal",
+  "date": "2026-10-16",
+  "endpoint": "https://api.openai.com/v1/responses",
+  "estimated_worst_case_cost_usd": 0.012988,
+  "execution_reserved": false,
+  "fallback": "deterministic M2.3 synthesis preserved on provider failure or gate rejection",
+  "grounding": "pending-live-response",
+  "live_smoke_run": false,
+  "max_input_bytes": 16000,
+  "max_output_tokens": 512,
+  "max_spend_usd": 0.02,
+  "model": "gpt-6.1-sol",
+  "official_sources": [
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "https://developers.openai.com/api/docs/guides/your-data",
+    "https://developers.openai.com/api/docs/guides/rate-limits",
+    "https://developers.openai.com/api/reference/resources/responses/methods/create"
+  ],
+  "passage_ids": [
+    "doc-spy-factsheet:chunk-0"
+  ],
+  "payload_bytes": 3934,
+  "payload_sha256": "176832c20d2f35fed98d7d66c62e0d4dd65fc68db66c93fe51a820765268d024",
+  "persisted_response": false,
+  "provider": "OpenAI Responses API",
+  "redaction": {
+    "api_key": "omitted",
+    "raw_request": "omitted",
+    "raw_response": "omitted"
+  },
+  "request_count": 0,
+  "retention_policy": "store=false; account-specific eligibility must be confirmed before execution",
+  "retry_count": 0,
+  "schema": "market-os.m2.8.live-smoke.v1",
+  "status": "pending-approval",
+  "store": false,
+  "synthesis_fingerprint": "7b6a7db9835c62364ee105b95429b7884ddb924c653236c482b558aea57271e1",
+  "timeout_seconds": 20.0,
+  "tools": []
+}

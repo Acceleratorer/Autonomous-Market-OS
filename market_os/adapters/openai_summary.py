@@ -1,6 +1,7 @@
 """Optional stdlib-only OpenAI Responses adapter; imported only by explicit selection."""
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -8,6 +9,7 @@ import re
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from ..model_summary import GeneratedStatement, ModelOutput, ModelProviderIdentity, ModelUsage, SummaryModelProvider, SummaryRequest, render_summary_text
@@ -190,6 +192,28 @@ class OpenAIResponsesSummaryProvider:
         self.identity = ModelProviderIdentity("openai", config.model, "responses-api-v1")
         self._requests = 0
         self._reserved_spend = 0.0
+        self._last_response_metadata: dict[str, Any] | None = None
+        self._last_error_metadata: dict[str, Any] | None = None
+        self._last_response_received_at: str | None = None
+
+    @property
+    def attempts(self) -> int:
+        """Number of transport attempts made by this provider instance."""
+        return self._requests
+
+    @property
+    def last_response_metadata(self) -> dict[str, Any] | None:
+        """Safe response metadata without response text, headers, or credentials."""
+        return dict(self._last_response_metadata) if self._last_response_metadata is not None else None
+
+    @property
+    def last_error_metadata(self) -> dict[str, Any] | None:
+        """Safe error metadata without provider body, headers, or credentials."""
+        return dict(self._last_error_metadata) if self._last_error_metadata is not None else None
+
+    @property
+    def last_response_received_at(self) -> str | None:
+        return self._last_response_received_at
 
     @classmethod
     def from_environment(cls, values: Mapping[str, str] | None = None) -> "OpenAIResponsesSummaryProvider":
@@ -217,15 +241,25 @@ class OpenAIResponsesSummaryProvider:
                 response = self._post(encoded)
                 output = _decode_output(response)
                 return output
-            except TimeoutError:
+            except TimeoutError as exc:
+                self._last_error_metadata = {"error_type": type(exc).__name__}
                 raise
             except urllib.error.HTTPError as exc:
+                self._last_error_metadata = {
+                    "http_status": exc.code,
+                    "error_type": "HTTPError",
+                }
                 if exc.code not in {408, 429, 500, 502, 503, 504}:
                     raise OpenAIRequestError(f"OpenAI request failed with HTTP {exc.code}") from None
                 last_error = exc
             except urllib.error.URLError as exc:
+                self._last_error_metadata = {"error_type": type(exc).__name__}
                 last_error = exc
+            except OpenAIRequestError as exc:
+                self._last_error_metadata = {"error_type": type(exc).__name__}
+                raise
             except (ValueError, TypeError, KeyError, OSError) as exc:
+                self._last_error_metadata = {"error_type": type(exc).__name__}
                 raise OpenAIRequestError(f"OpenAI returned an unusable response ({type(exc).__name__})") from None
             if attempt >= self.config.max_retries:
                 break
@@ -281,7 +315,27 @@ class OpenAIResponsesSummaryProvider:
             raw = response.read(128 * 1024 + 1)
         if len(raw) > 128 * 1024:
             raise OpenAIRequestError("OpenAI response exceeds adapter byte limit")
+        self._last_response_received_at = datetime.now(timezone.utc).isoformat()
+        self._last_response_metadata = {
+            "http_status": 200,
+            "response_bytes": len(raw),
+            "response_sha256": hashlib.sha256(raw).hexdigest(),
+            "response_id_present": False,
+            "model_matches_expected": False,
+            "usage_present": False,
+        }
         parsed = json.loads(raw)
         if not isinstance(parsed, dict):
             raise OpenAIRequestError("OpenAI response envelope is invalid")
+        usage = parsed.get("usage")
+        self._last_error_metadata = None
+        self._last_response_metadata = {
+            "http_status": 200,
+            "response_bytes": len(raw),
+            "response_sha256": hashlib.sha256(raw).hexdigest(),
+            "response_status": parsed.get("status") if parsed.get("status") in {"completed", "incomplete", "failed", "cancelled"} else "other",
+            "response_id_present": isinstance(parsed.get("id"), str) and bool(parsed["id"]),
+            "model_matches_expected": parsed.get("model") == self.config.model,
+            "usage_present": isinstance(usage, dict),
+        }
         return parsed

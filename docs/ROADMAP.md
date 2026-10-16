@@ -150,3 +150,10 @@ secret-like fixture content, and model-boundary checks without credentials.
 The exact next milestone is **M2.8: run an explicitly approved single live
 synthetic smoke only if provider, credential, retention, destination, request,
 token, and spend approvals are separately supplied**.
+
+M2.8 offline preparation is complete. The local harness validates one synthetic
+payload, exact one-request/zero-retry/$0.02/20-second bounds, redaction, and the
+existing citation gate while ordinary CI remains credential-free. The live
+smoke is **Pending approval — offline preparation complete, no live request
+made**. The exact next action is a separate human approval followed by one
+manual execution, or a recorded decision to keep the smoke pending.

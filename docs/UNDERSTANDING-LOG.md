@@ -303,3 +303,18 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   only. Workflows run offline unit/integration tests, the full suite,
   compileall, evidence validation, CLI/API/model-boundary smoke checks,
   dependency consistency, high-confidence secret scanning, and diff checks.
+
+## 2026-10-16 — M2.8 approval-gated synthetic live-smoke preparation
+
+- Revalidated official OpenAI facts for `gpt-6.1-sol`, `/v1/responses`,
+  structured outputs, standard pricing, `store:false`, usage, data controls,
+  and rate-limit behavior. Account entitlement and retention eligibility remain
+  unresolved until an approved live run.
+- Added the offline `scripts/m2_8_live_smoke.py` harness and focused tests. It
+  prepares one 3.4 KB synthetic payload from the existing internal fixture,
+  requires an execution-only approval flag for transport, enforces exactly one
+  request, zero retries, a 20-second timeout, 512 output tokens, 16 KB input,
+  and a $0.02 ceiling, and emits redacted evidence only.
+- Added `docs/M2.8-LIVE-SMOKE.md`, ADR-0013, and pending evidence. No live
+  provider request, credential use, broker connection, or child-repository
+  modification occurred. Ordinary CI remains offline and credential-free.

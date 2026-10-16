@@ -12,6 +12,7 @@
     "full project suite",
     "compileall",
     "evidence JSON validation",
+    "M2.8 pending live-smoke evidence gate",
     "CLI/API/model-boundary smoke tests",
     "pip check",
     "high-confidence secret scan",
