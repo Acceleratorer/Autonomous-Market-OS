@@ -318,3 +318,13 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Added `docs/M2.8-LIVE-SMOKE.md`, ADR-0013, and pending evidence. No live
   provider request, credential use, broker connection, or child-repository
   modification occurred. Ordinary CI remains offline and credential-free.
+
+## 2026-10-16 — M2.9 approved smoke safely blocked
+
+- Received the exact approval phrase `APPROVE M2.9 LIVE SMOKE`.
+- Re-ran the offline preflight: full suite 171 passed with one skipped, focused
+  M2.8/OpenAI tests 39 passed, payload/evidence/secret/compile/dependency/diff
+  checks passed.
+- `OPENAI_API_KEY` was absent from process, user, and machine environments. The
+  one-shot reservation remained unused and no network request was attempted.
+- Recorded the blocked result in the M2.9 result, evidence, and ADR artifacts.

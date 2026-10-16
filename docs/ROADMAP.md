@@ -157,3 +157,9 @@ existing citation gate while ordinary CI remains credential-free. The live
 smoke is **Pending approval — offline preparation complete, no live request
 made**. The exact next action is a separate human approval followed by one
 manual execution, or a recorded decision to keep the smoke pending.
+
+M2.9 approval was received, but execution was **Blocked — approval, credential,
+or provider requirements incomplete** because `OPENAI_API_KEY` was unavailable
+through the approved secret boundary. No reservation was consumed and no network
+request was made. The exact next action is to supply the credential through that
+boundary before a new approved execution decision.

@@ -1,0 +1,49 @@
+{
+  "schema": "market-os.m2.9.live-smoke.v1",
+  "status": "Blocked — approval, credential, or provider requirements incomplete",
+  "approval_phrase": "APPROVE M2.9 LIVE SMOKE",
+  "approval_received": true,
+  "provider": "OpenAI Responses API",
+  "endpoint": "https://api.openai.com/v1/responses",
+  "model": "gpt-6.1-sol",
+  "data_class": "synthetic-internal",
+  "request_count": 0,
+  "retry_count": 0,
+  "reservation_consumed": false,
+  "transport": "not attempted",
+  "credential_boundary": "OPENAI_API_KEY absent from process, user, and machine environments; value not persisted",
+  "payload_bytes": 3934,
+  "payload_sha256": "176832c20d2f35fed98d7d66c62e0d4dd65fc68db66c93fe51a820765268d024",
+  "max_input_bytes": 16000,
+  "max_output_tokens": 512,
+  "max_spend_usd": 0.02,
+  "estimated_worst_case_cost_usd": 0.012988,
+  "timeout_seconds": 20,
+  "store": false,
+  "tools": [],
+  "latency_seconds": null,
+  "usage": null,
+  "estimated_cost_usd": null,
+  "grounding": "not attempted",
+  "citation_validation": "not attempted",
+  "fallback": "deterministic M2.3 synthesis remains authoritative; no model output exists",
+  "redaction": {
+    "api_key": "omitted",
+    "authorization_headers": "omitted",
+    "raw_request": "omitted",
+    "raw_response": "omitted",
+    "private_environment": "omitted"
+  },
+  "persisted_response": false,
+  "retention_policy": "store=false; no provider request was made",
+  "limitations": [
+    "No transport, usage, latency, provider quality, or real-model grounding result was observed.",
+    "The approved smoke remains runnable only after OPENAI_API_KEY is supplied through the approved secret boundary."
+  ],
+  "official_sources": [
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "https://developers.openai.com/api/docs/guides/your-data",
+    "https://developers.openai.com/api/docs/guides/rate-limits",
+    "https://developers.openai.com/api/reference/resources/responses/methods/create"
+  ]
+}
