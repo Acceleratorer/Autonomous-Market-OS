@@ -55,6 +55,10 @@ def build_parser() -> argparse.ArgumentParser:
         default="metrics",
     )
     benchmark_inspect.add_argument("--id", dest="item_id")
+    btc = commands.add_parser("btc-paper")
+    btc_commands = btc.add_subparsers(dest="btc_command", required=True)
+    btc_replay = btc_commands.add_parser("replay")
+    btc_replay.add_argument("--fixture", required=True)
     return parser
 
 
@@ -80,6 +84,18 @@ def main(argv: list[str] | None = None) -> int:
         else:
             result = BenchmarkStore(args.store_root).inspect(args.benchmark_id, args.resource, args.item_id)
         print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "btc-paper":
+        from dataclasses import asdict
+        from pathlib import Path
+        from .btc_paper import replay_fixture
+
+        try:
+            fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise SystemExit(f"cannot read BTC replay fixture: {exc}") from exc
+        result = replay_fixture(fixture)
+        print(json.dumps(asdict(result), indent=2, sort_keys=True))
         return 0
     workflow = MarketWorkflow()
     if args.command == "research":

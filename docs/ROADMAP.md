@@ -163,3 +163,36 @@ or provider requirements incomplete** because `OPENAI_API_KEY` was unavailable
 through the approved secret boundary. No reservation was consumed and no network
 request was made. The exact next action is to supply the credential through that
 boundary before a new approved execution decision.
+
+## BTC paper experiment direction
+
+The next product track is a **BTCUSDT Spot, five-minute-horizon, paper-only**
+research experiment. ADR-0015 adopts a math-first design: deterministic Market
+OS code owns time-valid data, feature calculation, evaluation, policy, virtual
+fills, risk, persistence, and audit. Jev is an optional typed-decision
+experiment, evaluated only for incremental out-of-sample value beyond matched
+statistical and LightGBM baselines.
+
+The delivery sequence is **local engine → web deployment → CLI extension → app
+shell**. B0 contracts and offline fixture replay are implemented; the exact
+next milestone is **B1: historical closed-candle ingestion and canonical local
+dataset**, with source/network policy resolved before any ingestion connection.
+No model request, credential, broker path, or live trading is part of B0.
+
+See `TECH_DOCS.md`, `docs/BTC-PAPER-EXPERIMENT-ROADMAP.md`, and
+`docs/decisions/ADR-0015-btc-math-first-jev-experiment.md`.
+
+## 2026-10-18 — BTC paper experiment B0 offline replay
+
+- Implemented and verified the `market-os.btc-paper.v1` contract family and
+  deterministic synthetic fixture replay. The replay canonicalizes 12 candles
+  from 19 events, records outcomes/gaps, produces point-in-time feature rows,
+  and keeps future five-minute labels on a separate fingerprint/lineage path.
+- Added read-only `market-os btc-paper replay --fixture ...` and updated the
+  BTC design, stack, roadmap, ADR, implementation report, evidence, and log.
+  The existing equities/ETF workflow and model-summary lane are unchanged.
+- Full suite: 185 passed, 1 skipped; integration-marked suite: 5 passed;
+  compilation, evidence, secret, dependency, and diff checks passed. No network,
+  model request, credential, broker, or live-execution path was used.
+- Exact next milestone: **B1 historical closed-candle ingestion and canonical
+  local Parquet/DuckDB dataset**, after source and network policy are decided.

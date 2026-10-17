@@ -1,0 +1,90 @@
+{
+  "schema": "market-os.b0.btc-paper-replay.v1",
+  "date": "2026-10-18",
+  "status": "implemented-and-locally-verified",
+  "fixture_summary": {
+    "raw_events": 19,
+    "canonical_candles": 12,
+    "features": 12,
+    "available_labels": 6,
+    "outcomes": {
+      "accepted": 11,
+      "duplicate": 2,
+      "conflict": 1,
+      "invalid": 2,
+      "open": 1,
+      "stale": 1,
+      "out_of_order": 1
+    },
+    "gaps": [["2026-01-01T00:11:00+00:00", "2026-01-01T00:20:00+00:00"]],
+    "dataset_revision": "btc-dataset-ee742818d5cd976d",
+    "dataset_fingerprint": "ee742818d5cd976d8fa95716e9cfaf3fa2661a3afc238da3dd405a3d065502f2"
+  },
+  "scope": "BTCUSDT Spot, closed one-minute synthetic fixtures, five-minute labels, paper-only",
+  "contract_version": "market-os.btc-paper.v1",
+  "fixture_schema": "market-os.btc-paper-fixture.v1",
+  "implementation": [
+    "market_os/btc_paper.py",
+    "market_os/cli.py",
+    "market_os/tests/fixtures/btc_paper/replay.json",
+    "market_os/tests/test_btc_paper.py",
+    "market_os/tests/test_btc_paper_cli.py"
+  ],
+  "contracts": [
+    "RawMarketEvent",
+    "ClosedCandle",
+    "DatasetManifest",
+    "FeatureRow",
+    "LabelRow",
+    "PredictionRequest",
+    "PredictionResult",
+    "ExperimentConfig"
+  ],
+  "timestamp_rules": {
+    "timezone": "UTC only",
+    "event_order": "source_timestamp <= received_at <= availability_timestamp",
+    "feature_eligibility": "max(candle close_time, availability_timestamp)",
+    "feature_inputs": "only candles closed by feature candle close and available by decision eligibility",
+    "label_target": "log(close at feature close + 5 minutes / feature candle close); label and future refs are separate from feature inputs",
+    "staleness_clock": "fixture as_of; never wall clock"
+  },
+  "replay_outcomes": [
+    "accepted",
+    "duplicate",
+    "conflict",
+    "open",
+    "invalid",
+    "stale",
+    "not_yet_available",
+    "out_of_order"
+  ],
+  "network_requests": 0,
+  "binance_client_or_request": false,
+  "jev_or_openai_requests": 0,
+  "credentials_used": false,
+  "broker_or_live_execution": false,
+  "new_dependencies": [],
+  "verification": {
+    "focused_command": "python -m pytest -q market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py",
+    "focused_result": "14 passed",
+    "evidence_validation_command": "python scripts/ci_checks.py validate-evidence",
+    "evidence_validation": "passed; validates JSON syntax for all evidence records",
+    "full_suite_command": "python -m pytest -q",
+    "full_suite_result": "185 passed, 0 failed, 1 skipped",
+    "compile_command": "python -m compileall -q market_os",
+    "compile_result": "passed",
+    "diff_check_command": "git diff --check",
+    "diff_check_result": "passed",
+    "integration_command": "python -m pytest -q -m integration",
+    "integration_result": "5 passed",
+    "dependency_check": "python -m pip check: No broken requirements found",
+    "secret_scan": "passed",
+    "m2_8_evidence_compatibility": "passed"
+  },
+  "remaining_limits": [
+    "No historical network ingestion or persistent Parquet/DuckDB dataset in B0.",
+    "Features are deliberately limited to close and one-minute log return.",
+    "No prediction model, calibration, backtest, virtual broker, or paper ledger is implemented."
+  ],
+  "next_milestone": "B1: historical closed-candle ingestion and canonical local Parquet/DuckDB dataset with reproducible replay, gap/deduplication handling, and no-look-ahead evidence; resolve source authorization and network policy before implementing network ingestion."
+}

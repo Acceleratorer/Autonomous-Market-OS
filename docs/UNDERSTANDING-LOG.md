@@ -328,3 +328,31 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - `OPENAI_API_KEY` was absent from process, user, and machine environments. The
   one-shot reservation remained unused and no network request was attempted.
 - Recorded the blocked result in the M2.9 result, evidence, and ADR artifacts.
+
+## 2026-10-17 — BTC paper experiment architecture direction
+
+- Accepted ADR-0015: the BTCUSDT five-minute experiment is math-first and
+  strictly paper-only. Market OS retains deterministic ownership of data
+  eligibility, features, policy, virtual fills, risk, persistence, and audit.
+- Selected Jev as the primary optional experimental typed-decision provider;
+  it may provide market-context or evidence classification features, but it is
+  neither a numerical-computation engine nor a direct trade authority.
+- Defined delivery order: local reproducible data/evaluation engine, web
+  deployment, CLI extension, then desktop/mobile app. Existing CLI support
+  remains intact while BTC-specific CLI work waits for stable local/API
+  contracts.
+- Implemented B0 as an isolated `market-os.btc-paper.v1` contract family and
+  offline synthetic replay with provenance, closed-candle validation,
+  deduplication/conflict classification, out-of-order reporting, gaps, stale
+  and future-availability outcomes, point-in-time features, separate
+  five-minute labels, and deterministic fingerprints/lineage.
+- Added read-only `market-os btc-paper replay --fixture ...` inspection without
+  changing the existing workflow/API or model-summary lane. Added the B0
+  implementation report and machine-readable evidence.
+- B0 made no network, provider, credential, exchange-account, broker, model, or
+  training request. The exact next milestone is B1 historical closed-candle
+  ingestion into a canonical local Parquet/DuckDB dataset, after source and
+  network policy are separately decided.
+- Implementation details and machine-readable verification are recorded in
+  `docs/B0-BTC-PAPER-REPLAY-REPORT.md` and
+  `docs/evidence/b0-btc-paper-replay.json`.
