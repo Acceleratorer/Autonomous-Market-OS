@@ -415,3 +415,31 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Exact next milestone: **U3/B3 — controlled Jev incremental-value benchmark**
   after a larger leakage-safe local dataset and matched numerical controls are
   available.
+
+## 2026-10-18 — U3/B3 controlled Jev incremental-value benchmark
+
+- Implemented `market_os/btc_b3.py` as a fixture-only, offline Jev-shaped
+  adapter and benchmark. The contract records the frozen B2 dataset/feature
+  identity, exact typed question/answer schema, provider/model/resolved version,
+  request/response fingerprints, timestamps, failures, abstentions, cache,
+  split/calibration fingerprints, and artifact lineage.
+- Added explicit valid, unavailable, malformed, late, abstaining,
+  inconsistent, and hostile/invalid recorded response cases. No TypeSafe SDK,
+  credential, HTTP client, socket, retry, provider request, or network path is
+  present; offline latency, usage, and cost remain unknown rather than zero.
+- Compared E1's numerical B2 conditional-rate arm with E2's same numerical
+  inputs plus a typed recorded assessment. Chronological B2 purge/embargo and
+  calibration-only fitting are reused. Matched deltas use the identical test
+  input intersection with usable predictions; no context `Z` or LightGBM was
+  added.
+- Added read-only `market-os btc-paper b3` CLI and `/v1/btc/b3` API run/
+  inspection routes, replay/fingerprint checks, ADR-0019, the implementation
+  report, TypeSafe primary-source research note, and machine-readable evidence.
+- The shipped B1 fixture still has no leakage-safe labels, so predictive and
+  calibration metrics are explicitly unavailable. The result is **not
+  promoted**; Jev remains an experimental typed assessment and never a
+  `BUY`, `SELL`, order, risk override, execution authority, or calibrated
+  five-minute BTC return probability.
+- Focused B3 tests pass: 8 passed. The exact next unified milestone is
+  **U4/B4 — shared paper portfolio and virtual broker**, subject to the
+  separate paper-portfolio gate.

@@ -11,7 +11,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U0 | M0–M1 | Foundation, contracts, Market OS orchestration ownership, persistence, recovery, and paper-only boundaries | Complete |
 | U1 | M2 | Cited research, Vibe-Trading and LightRAG adapters, model-summary gate, quality benchmark, CI/CD | Built offline; M2.9 blocked on credential boundary |
 | U2 | B0–B1 | BTCUSDT data contracts, fixture replay, canonical Parquet/DuckDB dataset, provenance, gaps, and stored replay | Complete offline |
-| U3 | B2–B3 + M5 controls | Features, labels, numerical baselines, calibration, walk-forward evaluation, and Jev incremental-value benchmark | B2 complete offline; B3 next |
+| U3 | B2–B3 + M5 controls | Features, labels, numerical baselines, calibration, walk-forward evaluation, and Jev incremental-value benchmark | B2/B3 implemented offline; B3 not promoted |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | Planned |
 | U5 | M4 web + B5 | Web deployment and operator views over the shared API | Planned |
 | U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | Planned |
@@ -32,7 +32,7 @@ U0 foundation
   -> U8 separate live-readiness decision
 ```
 
-U3/B2 is complete offline. It remained local, deterministic, and offline, reused the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions, and did not wait for M2.9. The next gate is U3/B3.
+U3/B2 is complete offline. It remained local, deterministic, and offline, reused the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions, and did not wait for M2.9. U3/B3 is now implemented as an offline controlled Jev-shaped benchmark and is not promoted because the shipped fixture has no leakage-safe labels.
 
 ## U3/B2 implementation result
 
@@ -43,7 +43,8 @@ U3/B2 is complete offline. It remained local, deterministic, and offline, reused
 5. Persisted config, features, labels, predictions, metrics, calibration, split, lineage, and replay fingerprints.
 6. Added read-only `btc-paper b2` CLI and `/v1/btc/b2` API routes.
 7. The shipped B1 fixture has no leakage-safe labeled samples because its feature-eligible rows reach the documented gap; metrics are explicitly unavailable. Evidence is in `docs/evidence/u3-b2-btc-features-baselines.json`.
-8. Keep Jev, hosted models, network ingestion, broker adapters, and live execution out of B2; the exact next milestone is U3/B3.
+8. Keep Jev, hosted models, network ingestion, broker adapters, and live execution out of B2; B3 evaluates only deterministic recorded Jev-shaped responses.
+9. B3 is not promoted. The next unified milestone is U4/B4 only after the U3 evidence is accepted and the separate paper-portfolio gate is authorized.
 
 ## Product surface order
 

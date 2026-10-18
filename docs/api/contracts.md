@@ -202,3 +202,42 @@ embargoed. Configuration, fingerprints, predictions, metrics, calibration,
 split metadata, artifact hashes, and lineage are persisted and replay-checked.
 LightGBM is deliberately deferred until a larger, leakage-safe offline
 evaluation justifies the dependency.
+
+## U3/B3 controlled Jev incremental-value benchmark
+
+B3 consumes the same frozen B2 dataset, feature fingerprint, five-minute
+target, chronological split, purge, embargo, and calibration path. It adds no
+context input, LightGBM, broker, portfolio, execution, provider SDK, network,
+credential, or real Jev request. The Jev-shaped adapter reads deterministic
+recorded JSON responses only.
+
+The CLI surfaces are:
+
+```text
+market-os btc-paper b3 run --dataset-revision <revision> --history-store-root <b1-root> --fixture <recorded-responses.json> --store-root <b3-root>
+market-os btc-paper b3 inspect <run-id> --resource manifest|config|fixture_cases|responses|abstentions|splits|predictions|metrics|calibration|control_baselines|matched_controls|report|lineage|artifacts|fingerprints|replay --store-root <b3-root>
+```
+
+The API surfaces are:
+
+```text
+POST /v1/btc/b3/runs
+GET /v1/btc/b3/<run-id>/<resource>?store_root=<b3-root>
+```
+
+The versioned contract records the B2 dataset/feature revision, exact
+question and answer schema, provider/model/resolved-version/adapter identity, request
+and response fingerprints, eligibility/availability timestamps, usage/cost/
+latency status, failures, abstentions, cache metadata, split/calibration
+fingerprints, and artifact lineage. Offline latency, usage, and cost are
+`unknown-not-observed-offline`.
+
+E1 is the numerical B2 conditional-rate arm. E2 uses the same numerical input
+plus a typed recorded Jev assessment. Matched deltas are computed only on the
+identical held-out test-row intersection where both arms have usable
+predictions. Jev output is an experimental typed assessment, never `BUY`,
+`SELL`, an order, a risk override, execution authority, or a calibrated
+five-minute BTC return probability. The B3 result is explicitly not promoted;
+see [ADR-0019](../decisions/ADR-0019-u3-b3-jev-experimental-boundary.md), the
+[implementation report](../U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md), and
+`docs/evidence/u3-b3-jev-incremental.json`.

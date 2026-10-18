@@ -154,3 +154,24 @@ LightGBM is deferred: the small offline B2 result does not justify a new model
 dependency. B1 historical transport remains disabled until source/legal review
 and explicit approval resolve the network gate. The exact next milestone is
 **U3/B3 — controlled Jev incremental-value benchmark**.
+
+## B3 implementation result
+
+U3/B3 is implemented as an offline-only controlled benchmark. The recorded
+adapter validates a versioned Jev-shaped `Choice` response and explicitly
+handles valid, unavailable, malformed, late, abstaining, inconsistent, and
+hostile/invalid cases. E1 is the numerical B2 conditional-rate arm; E2 uses
+the same frozen numerical inputs plus the typed recorded assessment. Calibration
+is fit on the calibration range only, and matched deltas use the identical
+held-out test intersection where both arms have usable predictions.
+
+No context `Z`, LightGBM, network, provider SDK, credential, broker, portfolio,
+paper fill, or live path is added. Jev output remains an experimental typed
+assessment and is not a calibrated five-minute return probability or execution
+authority. The shipped B1 fixture has no leakage-safe labels, so B3's
+predictive and calibration metrics are unavailable; the promotion decision is
+**not promoted**. See `docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md`,
+ADR-0019, and `docs/evidence/u3-b3-jev-incremental.json`.
+
+The exact next unified milestone is **U4/B4 — shared paper portfolio and
+virtual broker**, subject to its separate paper-only gate.

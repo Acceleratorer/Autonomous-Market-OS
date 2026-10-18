@@ -84,6 +84,19 @@ def build_parser() -> argparse.ArgumentParser:
     b2_inspect.add_argument("--resource", choices=("manifest", "config", "features", "labels", "splits", "predictions", "metrics", "calibration", "lineage", "artifacts"), default="manifest")
     b2_inspect.add_argument("--id", dest="item_id")
     b2_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
+    b3 = btc_commands.add_parser("b3")
+    b3_commands = b3.add_subparsers(dest="b3_command", required=True)
+    b3_run = b3_commands.add_parser("run")
+    b3_run.add_argument("--dataset-revision", required=True)
+    b3_run.add_argument("--history-store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    b3_run.add_argument("--fixture", required=True)
+    b3_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
+    b3_run.add_argument("--experiment-id", default="btc-b3-jev-offline")
+    b3_inspect = b3_commands.add_parser("inspect")
+    b3_inspect.add_argument("run_id")
+    b3_inspect.add_argument("--resource", choices=("manifest", "config", "fixture_cases", "responses", "abstentions", "splits", "predictions", "metrics", "calibration", "control_baselines", "matched_controls", "report", "lineage", "artifacts", "fingerprints", "replay"), default="manifest")
+    b3_inspect.add_argument("--id", dest="item_id")
+    b3_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
     return parser
 
 
@@ -147,6 +160,17 @@ def main(argv: list[str] | None = None) -> int:
                 result = run_b2(history, args.dataset_revision, b2_store, B2Config(args.experiment_id))
             else:
                 result = b2_store.inspect(args.run_id, args.resource, args.item_id)
+            print(json.dumps(result, indent=2, sort_keys=True, default=str))
+            return 0
+        if args.btc_command == "b3":
+            from .btc_b3 import B3Store, RecordedJevAdapter, run_b3
+
+            b3_store = B3Store(args.store_root)
+            if args.b3_command == "run":
+                history = HistoryStore(args.history_store_root)
+                result = run_b3(history, args.dataset_revision, RecordedJevAdapter.from_path(args.fixture), b3_store, experiment_id=args.experiment_id)
+            else:
+                result = b3_store.inspect(args.run_id, args.resource, args.item_id)
             print(json.dumps(result, indent=2, sort_keys=True, default=str))
             return 0
         store = HistoryStore(args.store_root)

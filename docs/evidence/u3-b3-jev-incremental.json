@@ -1,0 +1,97 @@
+{
+  "schema": "market-os.u3-b3.jev-incremental.v1",
+  "status": "implemented-and-locally-verified-offline",
+  "scope": "U3/B3 controlled Jev incremental-value benchmark only",
+  "experiment": {
+    "version": "btc.b3.jev-incremental.v1",
+    "provider": "typesafe",
+    "model": "jev",
+    "model_version": "jev-1.14.0",
+    "adapter_version": "market-os.btc-b3.recorded-adapter.v1",
+    "transport": "offline-recorded-only",
+    "question_id": "btc_5m_market_assessment",
+    "answer_schema": "choice+bullish|bearish|indeterminate+probabilities+confidence",
+    "semantic_boundary": "experimental typed assessment; not BUY, SELL, order, risk override, execution authority, or calibrated five-minute BTC return probability"
+  },
+  "source_boundary": {
+    "dataset_revision": "btc-history-49b70e7dcbfac660e863",
+    "canonical_fingerprint": "49b70e7dcbfac660e8636dc0871a0623273d4dafadce93d50ba6b143656cf70c",
+    "feature_fingerprint": "797fefa4fa68c69f65a5e9e277144a7b748b4e3b439579c1372a09d5d04d5740",
+    "fixture_id": "btc-b3-response-cases.v1",
+    "network_requests": 0,
+    "provider_requests": 0,
+    "credentials_used": false,
+    "sdk_used": false,
+    "context_input_z": false
+  },
+  "run": {
+    "run_id": "btc-b3-4f262abcfd1e66c79440",
+    "fixture_fingerprint": "ec50b638b9ffc85bc08eaa9bedab0b3b989d3a92ac920197c6280dbec65b3be5",
+    "request_fingerprint": "99f3bd30ae2dda40523c3275dc6a366de376ff61e8873e8a4d51baaf5dad20c9",
+    "response_fingerprint": "4c5f7cfab45bf06337efe906faede0bd29444e4202cdd269f9851b472ab83a2d",
+    "split_fingerprint": "54efeb082248e3a9f4ab000d99bec34e8ecef1fa291a0938c4e5678422b8807d",
+    "calibration_fingerprint": "6bdc6317406a7e4f91437fe69613c286a32b1d43f13244650236a4795812a1cd",
+    "replay_fingerprint": "665ad195bd3a4091074106db1bac9f9ca4db2acc7dc4c1c9355f22198993042a",
+    "artifact_count": 11,
+    "sample_count": 0
+  },
+  "matched_control_protocol": {
+    "control": "E1 numerical B2 conditional-rate baseline over frozen X",
+    "candidate": "E2 same X plus recorded typed Jev assessment",
+    "same_test_input_intersection": true,
+    "chronological": true,
+    "purge_minutes": 5,
+    "embargo_minutes": 5,
+    "calibration_fit_range": "calibration only",
+    "test_tuning": false
+  },
+  "fixture_cases": {
+    "valid": true,
+    "unavailable": true,
+    "malformed": true,
+    "late": true,
+    "abstaining": true,
+    "inconsistent": true,
+    "hostile_invalid": true
+  },
+  "metrics": {
+    "classification_prediction": {
+      "status": "unavailable",
+      "reason": "the frozen B1 fixture has no leakage-safe labels after its documented gap"
+    },
+    "calibration": {
+      "status": "unavailable",
+      "reason": "no leakage-safe calibration/test labels exist in the shipped fixture"
+    },
+    "coverage_abstention": "recorded by arm when candidate rows exist",
+    "latency": "unknown-not-observed-offline",
+    "usage": "unknown-not-observed-offline",
+    "cost": "unknown-not-observed-offline",
+    "uncertainty": "not-estimated; larger approved dataset required"
+  },
+  "promotion": {
+    "decision": "not-promoted",
+    "reason": "offline contract and failure behavior do not establish incremental value",
+    "required_next_evidence": [
+      "larger continuous approved local dataset",
+      "stable matched-control out-of-sample improvement",
+      "target-specific calibration",
+      "uncertainty analysis",
+      "cost-aware paper evaluation",
+      "prospective shadow verification"
+    ]
+  },
+  "verification": {
+    "focused_b3_tests": "8 passed",
+    "focused_b0_b1_b2_regression_tests": "40 passed",
+    "compileall": "passed",
+    "evidence_validation": "passed",
+    "dependency_check": "passed",
+    "secret_scan": "passed",
+    "replay_fingerprint": "passed in focused tests",
+    "cli_api_smoke": "passed in focused tests",
+    "full_suite": "211 passed, 1 skipped",
+    "diff_check": "passed"
+  },
+  "next_unified_milestone": "U4/B4 shared paper portfolio and virtual broker, only after U3/B3 evidence is accepted"
+}
