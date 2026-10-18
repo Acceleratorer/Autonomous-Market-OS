@@ -1,7 +1,9 @@
 # BTC Spot Paper Experiment Roadmap
 
-**Status:** B0 implemented with deterministic synthetic fixtures. Verification
-results are recorded in its evidence file. This roadmap does not authorize a
+**Status:** B0 implemented and B1 offline storage/replay implemented with
+synthetic source-shaped fixtures. Verification results are recorded in the
+respective evidence files. Public market-data transport remains disabled until
+source/legal review and explicit approval. This roadmap does not authorize a
 market-data network connection, a Jev request, a model credential, or a real
 exchange action.
 
@@ -42,6 +44,10 @@ closed market data
 The existing research CLI remains intact. B0 adds the narrow read-only command
 `market-os btc-paper replay --fixture <path>`; broader BTC CLI/API work remains
 deferred until its contracts stabilize.
+
+B1 adds fixture-backed `btc-paper ingest` plus read-only manifest, candle,
+outcome, provenance, gap, and stored-replay inspection. The candidate public
+transport is isolated and disabled.
 
 ## B0: data contract and replay foundation
 
@@ -124,16 +130,19 @@ calibrated, post-cost positive relative to a matched control, and reproducible.
 - Update `STACK.md` when model-lane status changes; M2.9 is currently blocked
   by a missing approved credential, not waiting for an approval phrase.
 
-## B0 implementation evidence
+## B0/B1 implementation evidence
 
 See `docs/B0-BTC-PAPER-REPLAY-REPORT.md` and
-`docs/evidence/b0-btc-paper-replay.json`. B0 has no network/model/broker code;
+`docs/evidence/b0-btc-paper-replay.json` for B0, and
+`docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md`,
+`docs/evidence/b1-btc-historical-ingestion.json`, and ADR-0016 for B1. B1 has
+no network/model/broker code;
 the implementation and tests use only the standard library and existing
 pytest.
 
 ## Next milestone
 
-**B1 — historical closed-candle ingestion and canonical Parquet/DuckDB dataset**
-with replay reproducibility, gap/deduplication handling, and no-look-ahead
-evidence. B1 must separately resolve source authorization and connection
-policy before any network ingestion is implemented.
+**B2 — deterministic feature/label materialization and chronological numerical
+baselines** with calibration and walk-forward evidence. B1 historical transport
+remains disabled until source/legal review and explicit approval resolve the
+network gate.

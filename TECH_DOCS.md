@@ -92,7 +92,7 @@ The chosen development philosophy is **math-first, model-assisted, and evidence-
 | Hosting strategy | Hybrid cloud/local, benchmarked—not unconditional fallback routing |
 | Optimization criterion | Out-of-sample accuracy/calibration **and** executable net economic value |
 | Phase 0 scope | Repository audit, data contracts, ingestion design, QA, reproducibility |
-| Implementation status | B0 offline contract and fixture replay implemented; no network, model, or broker calls |
+| Implementation status | B0 contracts/replay and B1 offline storage/replay implemented; public transport disabled, no model or broker calls |
 
 ### 2.2 Explicit assumptions to validate
 

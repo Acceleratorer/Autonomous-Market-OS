@@ -128,3 +128,31 @@ provider, and cannot approve a real adapter without the documented thresholds,
 security checks, measured cost/usage/latency, and human approval. See the
 [M2.6 quality review](../M2.6-QUALITY-REVIEW.md) and
 [bounded model-adapter plan](../M2.6-MODEL-ADAPTER-PLAN.md).
+
+## B1 BTC historical dataset inspection
+
+B1 adds offline fixture ingestion and read-only dataset inspection. Public
+Binance transport is disabled pending ADR-0016 source/legal review and explicit
+approval. The CLI surfaces are:
+
+```text
+market-os btc-paper ingest --fixture <path> --store-root <path>
+market-os btc-paper acquire --start-ms <ms> --end-ms <ms> --store-root <path>
+market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outcomes|provenance|gaps|replay --store-root <path>
+```
+
+The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local
+`store_root` and fixture object. Read-only resources are:
+
+```text
+GET /v1/btc/history/<dataset-revision>/manifest
+GET /v1/btc/history/<dataset-revision>/candles
+GET /v1/btc/history/<dataset-revision>/outcomes
+GET /v1/btc/history/<dataset-revision>/provenance
+GET /v1/btc/history/<dataset-revision>/gaps
+GET /v1/btc/history/<dataset-revision>/replay
+```
+
+These paths invoke no model, broker, or network transport. Canonical Parquet
+content is hash-checked before inspection; DuckDB stores raw-page, manifest,
+outcome, and provenance lineage.

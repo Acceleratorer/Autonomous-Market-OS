@@ -59,6 +59,19 @@ def build_parser() -> argparse.ArgumentParser:
     btc_commands = btc.add_subparsers(dest="btc_command", required=True)
     btc_replay = btc_commands.add_parser("replay")
     btc_replay.add_argument("--fixture", required=True)
+    btc_ingest = btc_commands.add_parser("ingest")
+    btc_ingest.add_argument("--fixture", required=True)
+    btc_ingest.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_acquire = btc_commands.add_parser("acquire")
+    btc_acquire.add_argument("--start-ms", type=int, required=True)
+    btc_acquire.add_argument("--end-ms", type=int, required=True)
+    btc_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_inspect = btc_commands.add_parser("inspect")
+    btc_inspect.add_argument("dataset_id")
+    btc_inspect.add_argument("--resource", choices=("manifest", "candles", "outcomes", "provenance", "gaps", "replay"), default="manifest")
+    btc_inspect.add_argument("--start-ms", type=int)
+    btc_inspect.add_argument("--end-ms", type=int)
+    btc_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     return parser
 
 
@@ -88,14 +101,44 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "btc-paper":
         from dataclasses import asdict
         from pathlib import Path
+        from .btc_history import HistoryStore
         from .btc_paper import replay_fixture
 
-        try:
-            fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
-        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-            raise SystemExit(f"cannot read BTC replay fixture: {exc}") from exc
-        result = replay_fixture(fixture)
-        print(json.dumps(asdict(result), indent=2, sort_keys=True))
+        if args.btc_command == "replay":
+            try:
+                fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise SystemExit(f"cannot read BTC replay fixture: {exc}") from exc
+            result = replay_fixture(fixture)
+            print(json.dumps(asdict(result), indent=2, sort_keys=True))
+            return 0
+        store = HistoryStore(args.store_root)
+        if args.btc_command == "ingest":
+            try:
+                fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
+                result = store.ingest_fixture(fixture)
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise SystemExit(f"cannot read BTC history fixture: {exc}") from exc
+            print(json.dumps(asdict(result), indent=2, sort_keys=True))
+            return 0
+        if args.btc_command == "acquire":
+            result = store.acquire(args.start_ms, args.end_ms)
+            print(json.dumps(asdict(result), indent=2, sort_keys=True))
+            return 0
+        resource = args.resource
+        if resource == "manifest":
+            result = store.inspect_manifest(args.dataset_id)
+        elif resource == "candles":
+            result = store.inspect_candles(args.dataset_id, start_time_ms=args.start_ms, end_time_ms=args.end_ms)
+        elif resource == "outcomes":
+            result = store.inspect_outcomes(args.dataset_id)
+        elif resource == "provenance":
+            result = store.inspect_provenance(args.dataset_id)
+        elif resource == "gaps":
+            result = store.inspect_gaps(args.dataset_id)
+        else:
+            result = store.replay(args.dataset_id)
+        print(json.dumps(result, indent=2, sort_keys=True, default=str))
         return 0
     workflow = MarketWorkflow()
     if args.command == "research":

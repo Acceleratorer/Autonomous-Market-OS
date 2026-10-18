@@ -196,3 +196,17 @@ See `TECH_DOCS.md`, `docs/BTC-PAPER-EXPERIMENT-ROADMAP.md`, and
   model request, credential, broker, or live-execution path was used.
 - Exact next milestone: **B1 historical closed-candle ingestion and canonical
   local Parquet/DuckDB dataset**, after source and network policy are decided.
+
+## 2026-10-18 — BTC paper experiment B1 offline historical dataset
+
+- Documented the candidate Binance public market-data source, REST kline
+  pagination/limits, IP rate-limit behavior, and the unresolved terms/region/
+  retention gate in ADR-0016. No candle request was authorized or made.
+- Implemented the disabled transport seam and fixture-backed B1 ingestion:
+  immutable raw pages, B0 candle normalization, Parquet snapshots, DuckDB
+  catalog, manifests, fingerprints, lineage, gaps, duplicates, conflicts,
+  bounded checkpoints, and no-network replay.
+- Added read-only B1 CLI/API inspection and recorded the storage/dependency
+  rationale. Existing equities/ETF and paper-only workflows remain unchanged.
+- Exact next milestone: **B2 deterministic feature/label materialization and
+  chronological numerical baselines with calibration and walk-forward evidence.**

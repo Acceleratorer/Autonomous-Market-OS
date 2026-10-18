@@ -3,6 +3,10 @@ name = "autonomous-market-os"
 version = "0.1.0"
 description = "Autonomous Market OS foundation slice"
 requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.4,<2",
+    "pyarrow>=18,<27",
+]
 
 [project.scripts]
 market-os = "market_os.cli:main"

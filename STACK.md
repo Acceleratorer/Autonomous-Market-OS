@@ -130,3 +130,14 @@ When discussing model choices, preserve these constraints:
 - Exact next milestone: **B1 historical closed-candle ingestion and canonical
   local Parquet/DuckDB dataset**, after source authorization and network policy
   are separately resolved.
+
+## BTC paper experiment B1 status (2026-10-18)
+
+- B1's offline storage/replay path is implemented with immutable raw JSON pages,
+  Parquet canonical snapshots, a DuckDB catalog, manifests, checkpoints, and
+  read-only CLI/API inspection.
+- The candidate Binance public REST transport is isolated but disabled. No
+  candle request was made because explicit approval and terms/region/retention
+  review are absent.
+- Exact next milestone: **B2 deterministic feature/label materialization and
+  chronological numerical baselines with calibration and walk-forward evidence.**

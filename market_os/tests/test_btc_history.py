@@ -1,0 +1,215 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+import threading
+from http.server import ThreadingHTTPServer
+import urllib.request
+import urllib.parse
+
+from market_os.btc_history import (
+    BinanceHistoricalTransport,
+    HistoryError,
+    HistoryStore,
+    HttpResponse,
+    classify_http_failure,
+    fetch_pages,
+    plan_pages,
+    parse_kline_row,
+)
+from market_os.api import make_handler
+from market_os.store import RunStore
+from market_os.workflow import MarketWorkflow
+
+FIXTURE = Path(__file__).parent / "fixtures" / "btc_paper" / "history.json"
+MINUTE = 60_000
+START = 1_767_225_600_000
+
+
+def test_kline_parser_normalizes_closed_row_and_preserves_raw_fingerprint() -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    candle, _ = parse_kline_row(fixture["pages"][0][0], received_at=fixture["received_at"], as_of_ms=fixture["as_of_ms"])
+    assert candle.open_time == "2026-01-01T00:00:00.000+00:00"
+    assert candle.close_time == "2026-01-01T00:01:00.000+00:00"
+    assert candle.source_timestamp == candle.close_time
+    assert candle.received_at == fixture["received_at"]
+    assert candle.availability_timestamp == "2026-01-01T00:30:01.000+00:00"
+    assert len(candle.candle_fingerprint) == 64
+
+
+def test_kline_parser_rejects_bad_shape_numbers_and_open_candle() -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    row = fixture["pages"][0][0]
+    with pytest.raises(HistoryError, match="12 fields"):
+        parse_kline_row(row[:-1], received_at=fixture["received_at"], as_of_ms=fixture["as_of_ms"])
+    invalid = list(row)
+    invalid[5] = "-1"
+    with pytest.raises(HistoryError, match="volume"):
+        parse_kline_row(invalid, received_at=fixture["received_at"], as_of_ms=fixture["as_of_ms"])
+    open_row = list(fixture["pages"][0][0])
+    open_row[0] = START + 12 * MINUTE
+    open_row[6] = open_row[0] + MINUTE - 1
+    with pytest.raises(HistoryError, match="has not passed"):
+        parse_kline_row(open_row, received_at="2026-01-01T00:12:30+00:00", as_of_ms=START + 12 * MINUTE + 30_000)
+
+
+def test_page_planner_is_bounded_and_uses_exclusive_end() -> None:
+    pages = plan_pages(START, START + 2001 * MINUTE)
+    assert len(pages) == 3
+    assert pages[0].start_time_ms == START
+    assert pages[0].end_time_ms == START + 1000 * MINUTE - 1
+    assert pages[-1].end_time_ms == START + 2001 * MINUTE - 1
+    with pytest.raises(HistoryError, match="acquisition limit"):
+        plan_pages(START, START + 101 * MINUTE, page_size=100, max_pages=1)
+
+
+def test_rate_limit_and_timeout_errors_classify_without_transport() -> None:
+    assert classify_http_failure(429, {"Retry-After": "3"}).code == "rate_limited"
+    assert classify_http_failure(418, {"Retry-After": "60"}).code == "ip_banned"
+    assert classify_http_failure(503, {}).code == "server_error"
+    with pytest.raises(HistoryError, match="disabled pending explicit approval"):
+        BinanceHistoricalTransport().fetch_page(plan_pages(START, START + MINUTE)[0])
+
+
+def test_injected_transport_retries_5xx_and_rate_limits_but_stops_at_retry_cap() -> None:
+    request = plan_pages(START, START + MINUTE)[0]
+    waits: list[float] = []
+
+    class Recovering:
+        approved = True
+        calls = 0
+
+        def fetch_page(self, _request):
+            self.calls += 1
+            if self.calls == 1:
+                return HttpResponse(503, {}, b"{}", "2026-01-01T00:30:00+00:00")
+            if self.calls == 2:
+                return HttpResponse(429, {"Retry-After": "2"}, b"{}", "2026-01-01T00:30:02+00:00")
+            return HttpResponse(200, {}, b"[]", "2026-01-01T00:30:04+00:00")
+
+    result = fetch_pages(Recovering(), (request,), wait=waits.append)
+    assert result[0].status == 200
+    assert waits == [2.0]
+
+    class AlwaysFail:
+        approved = True
+
+        def fetch_page(self, _request):
+            return HttpResponse(503, {}, b"{}", "2026-01-01T00:30:00+00:00")
+
+    with pytest.raises(HistoryError) as failure:
+        fetch_pages(AlwaysFail(), (request,))
+    assert failure.value.code == "retry_exhausted"
+
+
+def test_fixture_ingestion_persists_parquet_raw_pages_catalog_and_manifest(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    store = HistoryStore(tmp_path)
+    result = store.ingest_fixture(fixture)
+    manifest = store.inspect_manifest(result.dataset_revision)
+
+    assert result.dataset_revision == manifest["dataset_revision"]
+    assert manifest["canonical_candle_count"] == 10
+    assert manifest["raw_record_count"] == len(fixture["pages"][0])
+    assert manifest["network_requests"] == 0
+    assert manifest["source_identity"] == "binance.spot.rest.klines.synthetic-fixture"
+    assert manifest["parent_revisions"] == []
+    assert (tmp_path / manifest["parquet_path"]).is_file()
+    assert len(list((tmp_path / "raw").glob("*.json"))) == 1
+    assert store.inspect_outcomes(result.dataset_revision)
+    assert len(store.inspect_candles(result.dataset_revision)) == 10
+    assert store.replay(result.dataset_revision)["canonical_fingerprint"] == manifest["canonical_fingerprint"]
+
+
+def test_reingest_and_overlapping_page_are_idempotent_and_keep_raw_immutable(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    store = HistoryStore(tmp_path)
+    first = store.ingest_fixture(fixture)
+    raw_files_before = sorted(p.name for p in (tmp_path / "raw").glob("*.json"))
+    repeated = store.ingest_fixture(fixture)
+    assert repeated.dataset_revision == first.dataset_revision
+    assert sorted(p.name for p in (tmp_path / "raw").glob("*.json")) == raw_files_before
+
+    overlap = {**fixture, "pages": [[fixture["pages"][0][0]]]}
+    overlap["requested_start_ms"] = START
+    overlap["requested_end_ms_exclusive"] = START + MINUTE
+    overlapped = store.ingest_fixture(overlap)
+    assert overlapped.dataset_revision == first.dataset_revision
+    assert len(store.inspect_candles(first.dataset_revision)) == 10
+    assert len(list((tmp_path / "raw").glob("*.json"))) == len(raw_files_before) + 1
+
+
+def test_inspection_range_and_no_network_replay(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    store = HistoryStore(tmp_path)
+    result = store.ingest_fixture(fixture)
+    ranged = store.inspect_candles(result.dataset_revision, start_time_ms=START, end_time_ms=START + 2 * MINUTE)
+    assert [row["open_time_ms"] for row in ranged] == [START, START + MINUTE]
+    before = list(tmp_path.rglob("*"))
+    assert store.replay(result.dataset_revision)["replayed"] is True
+    assert list(tmp_path.rglob("*")) == before
+
+
+def test_injected_acquisition_checkpoints_and_resumes_without_refetching_completed_pages(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    rows = fixture["pages"][0]
+    start = fixture["requested_start_ms"]
+    end = fixture["requested_end_ms_exclusive"]
+
+    class Flaky:
+        approved = True
+
+        def __init__(self):
+            self.calls: list[int] = []
+            self.fail_page_once = True
+
+        def fetch_page(self, request):
+            self.calls.append(request.page_index)
+            if request.page_index == 1 and self.fail_page_once:
+                raise TimeoutError("synthetic timeout")
+            page = [row for row in rows if request.start_time_ms <= row[0] <= request.end_time_ms][:request.limit]
+            return HttpResponse(200, {}, json.dumps(page).encode(), "2026-01-01T00:30:01+00:00")
+
+    transport = Flaky()
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError) as failure:
+        store.acquire(start, end, transport=transport, page_size=5)
+    assert failure.value.code == "retry_exhausted"
+    assert transport.calls[:4] == [0, 1, 1, 1]
+    transport.fail_page_once = False
+    result = store.acquire(start, end, transport=transport, page_size=5)
+    assert result.canonical_count == 10
+    assert transport.calls.count(0) == 1
+    assert store.replay(result.dataset_revision)["network_requests"] == 0
+
+
+def test_disabled_acquisition_cannot_make_a_network_request(tmp_path: Path) -> None:
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError, match="source/legal review"):
+        store.acquire(START, START + MINUTE)
+    assert not list((tmp_path / "raw").glob("*.json"))
+
+
+def test_fixture_ingest_cli_and_api_inspection_are_read_only(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    assert main(["btc-paper", "ingest", "--fixture", str(FIXTURE), "--store-root", str(tmp_path)]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    dataset_revision = payload["dataset_revision"]
+    assert main(["btc-paper", "inspect", dataset_revision, "--resource", "manifest", "--store-root", str(tmp_path)]) == 0
+    assert "dataset_revision" in json.loads(capsys.readouterr().out)
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(tmp_path / "workflow"))))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        body = json.dumps({"store_root": str(tmp_path / "api"), "fixture": json.loads(FIXTURE.read_text(encoding="utf-8"))}).encode()
+        request = urllib.request.Request(f"http://127.0.0.1:{server.server_port}/v1/btc/history/ingest", data=body, headers={"Content-Type": "application/json"}, method="POST")
+        response = json.loads(urllib.request.urlopen(request, timeout=2).read())
+        inspected = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/v1/btc/history/{response['dataset_revision']}/replay?store_root={urllib.parse.quote(str(tmp_path / 'api'))}", timeout=2).read())
+        assert inspected["replayed"] is True
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)

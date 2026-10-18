@@ -356,3 +356,22 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Implementation details and machine-readable verification are recorded in
   `docs/B0-BTC-PAPER-REPLAY-REPORT.md` and
   `docs/evidence/b0-btc-paper-replay.json`.
+
+## 2026-10-18 — BTC paper experiment B1 offline historical dataset
+
+- Researched primary Binance documentation only. The candidate source is
+  `GET /api/v3/klines` on `data-api.binance.vision`, with one-minute support,
+  open-time identity, limit 1000, weight 2, and documented 429/418 backoff
+  behavior. Binance legal pages returned HTTP 202, so terms, region, retention,
+  and redistribution rights remain unresolved.
+- Added ADR-0016 and a hard-disabled transport seam. No public candle request,
+  authenticated request, credential, WebSocket, model, or broker request was
+  made.
+- Implemented fixture-backed B1 storage: immutable raw JSON pages, canonical
+  Parquet snapshots, DuckDB catalog, manifests/fingerprints/lineage, bounded
+  checkpoints, gaps, duplicate/conflict/invalid outcomes, and deterministic
+  stored replay. Added CLI/API read-only inspection.
+- Added DuckDB and PyArrow as constrained direct dependencies because the
+  requested formats were absent from the existing environment and standard
+  library. Exact next milestone: B2 deterministic features and numerical
+  baselines.

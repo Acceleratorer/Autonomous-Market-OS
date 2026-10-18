@@ -1,0 +1,74 @@
+{
+  "schema": "market-os.b1.btc-historical-ingestion.v1",
+  "date": "2026-10-18",
+  "status": "offline-implemented-transport-disabled",
+  "source_decision": {
+    "candidate_source": "Binance Spot REST GET /api/v3/klines",
+    "market_data_host": "data-api.binance.vision",
+    "endpoint_class": "public-market-data-only",
+    "network_requests": 0,
+    "explicit_approval_present": false,
+    "legal_terms_verified": false,
+    "regional_eligibility_verified": false,
+    "retention_rights_verified": false,
+    "transport_status": "disabled; raises source_not_approved before connection"
+  },
+  "primary_sources": [
+    "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#ip-limits",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md",
+    "https://github.com/binance/binance-spot-api-docs",
+    "https://www.binance.com/en/terms"
+  ],
+  "implementation": [
+    "market_os/btc_history.py",
+    "market_os/cli.py",
+    "market_os/api.py",
+    "market_os/tests/test_btc_history.py",
+    "market_os/tests/fixtures/btc_paper/history.json",
+    "pyproject.toml"
+  ],
+  "storage": {
+    "raw": "immutable SHA-256 JSON pages",
+    "canonical": "Parquet snapshots with SHA-256",
+    "catalog": "DuckDB local catalog",
+    "checkpoint": "bounded JSON checkpoint seam for approved future transport",
+    "lineage": "manifest -> raw pages -> source rows -> canonical fingerprints"
+  },
+  "fixture_summary": {
+    "source_rows": 13,
+    "canonical_candles": 10,
+    "dataset_revision": "btc-history-7e910cbf4c3484a34249",
+    "canonical_fingerprint": "7e910cbf4c3484a34249d59901b284069a2fae23ea10e7fde38951070327f866",
+    "duplicate_outcomes": 1,
+    "conflict_outcomes": 1,
+    "invalid_outcomes": 1,
+    "gaps": 2,
+    "network_requests": 0,
+    "dataset_is_synthetic": true
+  },
+  "dependencies": {
+    "duckdb": ">=1.4,<2",
+    "pyarrow": ">=18,<27",
+    "reason": "explicit Parquet and DuckDB requirements are not met by the standard library or existing environment"
+  },
+  "verification": {
+    "focused_b1": "11 passed",
+    "focused_b0": "14 passed",
+    "full_suite": "196 passed, 0 failed, 1 skipped",
+    "integration_suite": "5 passed",
+    "compileall": "passed",
+    "evidence_validation": "passed; 18 JSON files",
+    "secret_scan": "passed",
+    "pip_check": "No broken requirements found",
+    "diff_check": "passed"
+  },
+  "acquired_data_range": null,
+  "acquired_dataset_fingerprint": null,
+  "remaining_risks": [
+    "Terms, regional access, retention, and redistribution rights remain unresolved.",
+    "No transport runtime evidence exists because public fetch approval was not provided.",
+    "B1 does not train models, generate predictions, backtest, or create paper orders."
+  ],
+  "next_milestone": "B2: deterministic feature/label materialization and chronological numerical baselines with calibration and walk-forward evidence."
+}

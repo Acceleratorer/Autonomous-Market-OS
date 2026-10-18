@@ -4,10 +4,12 @@ from __future__ import annotations
 import json
 import threading
 import signal
+import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from dataclasses import asdict
 
 from .contracts import ContractError, error_response
 from .workflow import MarketWorkflow
@@ -51,6 +53,24 @@ def make_handler(
             self.wfile.write(raw)
 
         def do_POST(self) -> None:  # noqa: N802
+            if self.path == "/v1/btc/history/ingest":
+                status = 500
+                try:
+                    size = int(self.headers.get("Content-Length", "0"))
+                    body = json.loads(self.rfile.read(size))
+                    from .btc_history import HistoryStore
+
+                    result = HistoryStore(body["store_root"]).ingest_fixture(body["fixture"])
+                    status = 200
+                    self._send(200, asdict(result))
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+                    status = 400
+                    self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.btc-history.v1"}})
+                except Exception as exc:  # pragma: no cover
+                    self._send(500, {"error": str(exc)})
+                finally:
+                    self._audit(status)
+                return
             if self.path == "/v1/benchmarks":
                 status = 500
                 try:
@@ -123,6 +143,48 @@ def make_handler(
             if self.path == "/readyz":
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
+                return
+            btc_prefix = "/v1/btc/history/"
+            if self.path.startswith(btc_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    parts = parsed.path[len(btc_prefix):].split("/")
+                    if len(parts) != 2:
+                        raise KeyError("BTC dataset resource")
+                    from .btc_history import HistoryStore
+
+                    query = urllib.parse.parse_qs(parsed.query)
+                    store = HistoryStore(query.get("store_root", [str(workflow.store.root / "btc-history")])[0])
+                    dataset_id, resource = parts
+                    if resource == "manifest":
+                        result = store.inspect_manifest(dataset_id)
+                    elif resource == "candles":
+                        start_ms = int(query["start-ms"][0]) if "start-ms" in query else None
+                        end_ms = int(query["end-ms"][0]) if "end-ms" in query else None
+                        result = store.inspect_candles(dataset_id, start_time_ms=start_ms, end_time_ms=end_ms)
+                    elif resource == "outcomes":
+                        result = store.inspect_outcomes(dataset_id)
+                    elif resource == "provenance":
+                        result = store.inspect_provenance(dataset_id)
+                    elif resource == "gaps":
+                        result = store.inspect_gaps(dataset_id)
+                    elif resource == "replay":
+                        result = store.replay(dataset_id)
+                    else:
+                        raise KeyError("BTC dataset resource")
+                    self._send(200, result)
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "BTC dataset or resource not found"})
+                except ValueError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "btc_history_integrity_error", "message": str(exc), "api_version": "market-os.btc-history.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
                 return
             benchmark_prefix = "/v1/benchmarks/"
             if self.path.startswith(benchmark_prefix):
