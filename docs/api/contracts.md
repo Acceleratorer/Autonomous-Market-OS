@@ -241,3 +241,40 @@ five-minute BTC return probability. The B3 result is explicitly not promoted;
 see [ADR-0019](../decisions/ADR-0019-u3-b3-jev-experimental-boundary.md), the
 [implementation report](../U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md), and
 `docs/evidence/u3-b3-jev-incremental.json`.
+
+## U3/API bounded connectivity
+
+The connectivity slice is fixture-first and paper-only. Offline mode performs
+zero network requests and uses synthetic Binance ticker/kline and TypeSafe
+wire-format fixtures. The public CLI surfaces are:
+
+```text
+market-os btc-paper connectivity offline
+market-os btc-paper connectivity binance --operation ticker|kline --allow-live-probe
+market-os btc-paper connectivity jev --allow-live-probe --model-version <version> --max-spend-usd 0.05 --paper-only
+market-os btc-paper connectivity inspect <probe-id> --resource manifest|result|fingerprints|replay
+```
+
+Binance is restricted to `https://data-api.binance.vision` and the public GET
+paths `/api/v3/ticker/price` and `/api/v3/klines`; only BTCUSDT and 1m klines
+are supported. No authenticated, account, order, withdrawal, margin, futures,
+WebSocket, or execution endpoint exists in this slice.
+
+Jev uses the documented `POST https://api.typesafe.ai/v1/systemone` wire
+contract through stdlib HTTPS transport. A live Jev probe requires
+`TYPESAFE_API_KEY`, an explicit `--allow-live-probe`, a versioned model, paper
+only mode, the exact `$0.05` ceiling, one request, and zero retries. Responses
+preserve provider/model/version, question version, request/response
+fingerprints, timestamps, latency, usage, cost status, failure, abstention,
+and validation status. Choice probabilities, confidence, Noul, and Score are
+descriptive model outputs, not calibrated five-minute BTC-return probabilities.
+
+Read-only inspection is exposed at:
+
+```text
+GET /v1/btc/connectivity/<probe-id>/<resource>?store_root=<connectivity-root>
+```
+
+See [ADR-0020](../decisions/ADR-0020-u3-api-connectivity-boundary.md), the
+[implementation report](../U3-API-CONNECTIVITY-REPORT.md), and
+`docs/evidence/u3-api-connectivity.json`.

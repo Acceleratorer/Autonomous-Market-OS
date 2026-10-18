@@ -97,6 +97,24 @@ def build_parser() -> argparse.ArgumentParser:
     b3_inspect.add_argument("--resource", choices=("manifest", "config", "fixture_cases", "responses", "abstentions", "splits", "predictions", "metrics", "calibration", "control_baselines", "matched_controls", "report", "lineage", "artifacts", "fingerprints", "replay"), default="manifest")
     b3_inspect.add_argument("--id", dest="item_id")
     b3_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
+    connectivity = btc_commands.add_parser("connectivity")
+    connectivity_commands = connectivity.add_subparsers(dest="connectivity_command", required=True)
+    connectivity_offline = connectivity_commands.add_parser("offline")
+    connectivity_offline.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    connectivity_binance = connectivity_commands.add_parser("binance")
+    connectivity_binance.add_argument("--operation", choices=("ticker", "kline"), required=True)
+    connectivity_binance.add_argument("--allow-live-probe", action="store_true")
+    connectivity_binance.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    connectivity_jev = connectivity_commands.add_parser("jev")
+    connectivity_jev.add_argument("--allow-live-probe", action="store_true")
+    connectivity_jev.add_argument("--model-version", required=True)
+    connectivity_jev.add_argument("--max-spend-usd", type=float, required=True)
+    connectivity_jev.add_argument("--paper-only", action="store_true")
+    connectivity_jev.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    connectivity_inspect = connectivity_commands.add_parser("inspect")
+    connectivity_inspect.add_argument("probe_id")
+    connectivity_inspect.add_argument("--resource", choices=("manifest", "result", "fingerprints", "replay"), default="manifest")
+    connectivity_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
     return parser
 
 
@@ -172,6 +190,35 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 result = b3_store.inspect(args.run_id, args.resource, args.item_id)
             print(json.dumps(result, indent=2, sort_keys=True, default=str))
+            return 0
+        if args.btc_command == "connectivity":
+            from .btc_connectivity import (
+                BinancePublicAdapter,
+                ConnectivityStore,
+                FixtureConnectivityAdapter,
+                TypeSafeHttpAdapter,
+                binance_probe,
+                jev_probe,
+                offline_probe,
+            )
+            store = ConnectivityStore(args.store_root)
+            fixture_root = Path(__file__).parent / "tests" / "fixtures" / "btc_connectivity"
+            if args.connectivity_command == "offline":
+                result = offline_probe(FixtureConnectivityAdapter.from_paths(fixture_root / "ticker.json", fixture_root / "klines.json", fixture_root / "jev_response.json"))
+                persisted = store.persist(result)
+                print(json.dumps(persisted, indent=2, sort_keys=True, default=str))
+                return 0
+            if args.connectivity_command == "inspect":
+                print(json.dumps(store.inspect(args.probe_id, args.resource), indent=2, sort_keys=True, default=str))
+                return 0
+            if args.connectivity_command == "binance":
+                if not args.allow_live_probe:
+                    raise SystemExit("Binance connectivity requires --allow-live-probe")
+                result = binance_probe(BinancePublicAdapter(), args.operation)
+                print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
+                return 0
+            result = jev_probe(TypeSafeHttpAdapter(), model=args.model_version, api_key=os.environ.get("TYPESAFE_API_KEY"), allow_live_probe=args.allow_live_probe, paper_only=args.paper_only, max_spend_usd=args.max_spend_usd)
+            print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
             return 0
         store = HistoryStore(args.store_root)
         resource = args.resource

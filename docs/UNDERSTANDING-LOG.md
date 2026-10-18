@@ -443,3 +443,26 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Focused B3 tests pass: 8 passed. The exact next unified milestone is
   **U4/B4 — shared paper portfolio and virtual broker**, subject to the
   separate paper-portfolio gate.
+
+## 2026-10-19 — U3/API bounded connectivity
+
+- Added `market_os/btc_connectivity.py` with versioned fixture-first contracts,
+  strict Binance public ticker/1m kline parsing, literal host/path/method
+  allowlists, bounded timeout/retry handling, HTTP error categories, and
+  redacted immutable probe artifacts.
+- Added the documented TypeSafe `POST /v1/systemone` HTTP adapter without the
+  SDK or a new runtime dependency. It validates Choice, Noul, and Score wire
+  responses against a fixed synthetic question set and preserves provider/model
+  version, question version, fingerprints, timestamps, latency, usage, cost,
+  failure, abstention, and validation state.
+- Live probes are explicit only: Binance requires `--allow-live-probe`; Jev
+  additionally requires `TYPESAFE_API_KEY`, a versioned model, paper-only mode,
+  exactly `$0.05`, one request, and zero retries. No live or paid request was
+  made during implementation or verification.
+- Added offline fixtures, CLI commands, read-only API inspection, ADR-0020,
+  the U3/API report, and machine-readable evidence. Jev remains descriptive
+  experimental assessment only and cannot create orders, fills, portfolio
+  mutations, risk overrides, or execution authority.
+- Focused connectivity tests pass: 39 tests; B0/B1/B2/B3 regression tests pass:
+  40; full suite passes: 250 with one existing skipped test. U4/B4 and U5/B5
+  remain untouched.

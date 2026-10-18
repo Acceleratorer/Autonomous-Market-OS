@@ -287,6 +287,32 @@ def make_handler(
                 finally:
                     self._audit(status, error_type=error_type)
                 return
+            connectivity_prefix = "/v1/btc/connectivity/"
+            if self.path.startswith(connectivity_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    parts = parsed.path[len(connectivity_prefix):].split("/")
+                    if len(parts) != 2:
+                        raise KeyError("connectivity resource")
+                    from .btc_connectivity import ConnectivityStore
+
+                    query = urllib.parse.parse_qs(parsed.query)
+                    store = ConnectivityStore(query.get("store_root", [str(workflow.store.root / "btc-connectivity")])[0])
+                    result = store.inspect(parts[0], parts[1])
+                    self._send(200, result)
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "connectivity probe or resource not found"})
+                except ValueError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "btc_connectivity_integrity_error", "message": str(exc), "api_version": "market-os.u3-api-connectivity.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
+                return
             benchmark_prefix = "/v1/benchmarks/"
             if self.path.startswith(benchmark_prefix):
                 status = 200

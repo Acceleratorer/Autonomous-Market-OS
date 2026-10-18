@@ -1,0 +1,55 @@
+{
+  "schema": "market-os.u3-api-connectivity.v1",
+  "status": "implemented-and-locally-verified-offline",
+  "scope": "bounded public Binance and optional TypeSafe/Jev connectivity only",
+  "boundary": {
+    "execution_mode": "paper",
+    "u4_b4_started": false,
+    "u5_b5_started": false,
+    "authenticated_binance": false,
+    "binance_hosts": ["data-api.binance.vision"],
+    "binance_paths": ["/api/v3/ticker/price", "/api/v3/klines"],
+    "typesafe_endpoint": "https://api.typesafe.ai/v1/systemone",
+    "websocket": false,
+    "orders": false,
+    "portfolio_mutations": false
+  },
+  "offline": {
+    "fixture_mode": true,
+    "network_requests": 0,
+    "provider_requests": 0,
+    "credentials_used": false,
+    "paid_jev_requests": 0,
+    "replay_fingerprint_checked": true
+  },
+  "live_probe_policy": {
+    "explicit_flag": "--allow-live-probe",
+    "jev_max_requests": 1,
+    "jev_retries": 0,
+    "jev_max_spend_usd": 0.05,
+    "jev_credential": "TYPESAFE_API_KEY",
+    "paper_only_required": true,
+    "raw_secret_persistence": false
+  },
+  "contracts": {
+    "api_version": "market-os.u3-api-connectivity.v1",
+    "jev_question_version": "btc.connectivity.synthetic-descriptive.v1",
+    "jev_model_versions": ["jev-1.14.0", "jev-1.13.0"],
+    "semantic_boundary": "descriptive_experimental_assessment_not_calibrated_btc_return_probability"
+  },
+  "verification": {
+    "focused_connectivity_tests": "39 passed",
+    "b0_b1_b2_b3_regression_tests": "40 passed",
+    "baseline_before_changes": "211 passed, 1 skipped",
+    "full_suite": "250 passed, 1 skipped",
+    "live_provider_requests": 0,
+    "trade_or_execution_requests": 0
+  },
+  "risks": [
+    "Binance regional availability, legal terms, and retention remain unresolved",
+    "TypeSafe account entitlement, regional availability, and pricing may change",
+    "Provider/model drift requires version pinning and requalification",
+    "Jev outputs have no target-specific five-minute BTC calibration"
+  ],
+  "next_milestone": "review bounded connectivity evidence before any separate U4/B4 decision"
+}
