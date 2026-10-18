@@ -164,6 +164,7 @@ def test_jev_request_is_fixed_synthetic_and_secret_free() -> None:
     request = build_jev_request()
     assert request.question_version == JEV_QUESTION_VERSION
     assert request.payload == SYNTHETIC_JEV_REQUEST
+    assert request.payload == json.loads((FIXTURE_ROOT / "jev_request.json").read_text(encoding="utf-8"))
     assert "TYPESAFE_API_KEY" not in json.dumps(request.payload)
     assert request.fingerprint == build_jev_request().fingerprint
 

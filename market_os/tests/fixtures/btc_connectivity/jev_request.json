@@ -1,0 +1,34 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "symbol": "BTCUSDT",
+    "note": "synthetic connectivity fixture; descriptive assessment only",
+    "past_5m_return": 0.0021,
+    "rsi_14": 58.2,
+    "volume_zscore_30m": 1.25
+  },
+  "questions": {
+    "descriptive_regime": {
+      "type": "choice",
+      "instructions": "Classify observed momentum context only; do not predict future prices.",
+      "criteria": {
+        "positive_momentum": "Recent observed momentum is positive",
+        "negative_momentum": "Recent observed momentum is negative",
+        "mixed_or_uncertain": "Signals are mixed or insufficient"
+      }
+    },
+    "evidence_is_limited": {
+      "type": "noul",
+      "instructions": "The supplied synthetic indicators alone are insufficient to assert a future BTC move."
+    },
+    "context_score": {
+      "type": "score",
+      "instructions": "Rate the descriptive strength of the observed momentum context.",
+      "criteria": [
+        "Weak observed context",
+        "Mixed observed context",
+        "Strong observed context"
+      ]
+    }
+  }
+}
