@@ -375,3 +375,11 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   requested formats were absent from the existing environment and standard
   library. Exact next milestone: B2 deterministic features and numerical
   baselines.
+
+## 2026-10-18 — Unified M/B roadmap
+
+- Replaced the two forward milestone queues with unified milestones U0–U8 while preserving M0–M7 and B0–B7 as historical traceability labels.
+- Recorded ADR-0017: U0 covers the completed platform foundation, U1 covers the M2 research platform, U2 covers B0/B1 quantitative data, U3 covers B2/B3 evaluation, U4 joins M3 with B4 for one shared paper portfolio, and later U5/U6 deliver web, CLI, and app surfaces.
+- Kept M2.9 isolated and blocked by the missing approved credential; it does not block the BTC quantitative track.
+- Updated the target structure so `Autonomous-Market-OS` remains the product repository and `company-projects` remains separate source material integrated only through adapters.
+- Exact next milestone: **U3/B2 — deterministic feature/label materialization and chronological numerical baselines**.

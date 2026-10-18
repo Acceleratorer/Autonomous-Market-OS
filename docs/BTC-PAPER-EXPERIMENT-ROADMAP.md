@@ -1,15 +1,14 @@
 # BTC Spot Paper Experiment Roadmap
 
-**Status:** B0 implemented and B1 offline storage/replay implemented with
-synthetic source-shaped fixtures. Verification results are recorded in the
-respective evidence files. Public market-data transport remains disabled until
-source/legal review and explicit approval. This roadmap does not authorize a
-market-data network connection, a Jev request, a model credential, or a real
-exchange action.
+**Unified position:** This is the detailed BTC workstream inside the unified
+`U0–U8` roadmap. B0/B1 map to U2; B2/B3 map to U3; B4 maps to U4; B5 maps to
+U5; and B6/B7 map to U6. Use `docs/ROADMAP.md`, `docs/PHASES.md`, and
+`docs/decisions/ADR-0017-unified-roadmap.md` for the forward sequence.
 
-**Source of truth:** `TECH_DOCS.md` contains the complete technical design.
-This file is the execution sequence for the fusion repository.
-
+**Safety status:** B0 and B1 are complete offline. Public market-data transport
+remains disabled until source/legal review and explicit approval. This roadmap
+does not authorize a market-data network connection, a Jev request, a model
+credential, or a real exchange action.
 ## Product boundary
 
 The experiment studies BTCUSDT Spot with a five-minute horizon using closed

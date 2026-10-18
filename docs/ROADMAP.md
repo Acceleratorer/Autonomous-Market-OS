@@ -1,212 +1,78 @@
-# Autonomous Market OS: Roadmap
+# Autonomous Market OS: Unified Roadmap
 
-## Milestone sequence
+## Purpose
 
-| Milestone | Target result | Main projects | Gate |
+This is the forward roadmap for the fusion repository. It merges the original platform roadmap (`M0–M7`) and the BTC experiment roadmap (`B0–B7`) into one sequence (`U0–U8`). Historical milestone names remain valid in implementation reports and ADRs.
+
+## Roadmap
+
+| Milestone | Scope | Main result | Current state |
 |---|---|---|---|
-| M0 | Product and repository decision record | All | Scope and ownership agreed |
-| M1 | Versioned platform contracts | OpenHarness/nanobot/DeepCode comparison | Contract tests pass |
-| M2 | Cited research API and CLI | Vibe-Trading, LightRAG, RAG-Anything | Reproducible research run |
-| M3 | Paper portfolio and order plans | AI-Trader, Vibe-Trading | No live side effects |
-| M4 | Web and desktop operator console | OpenHarness, existing frontends | Shared API state |
-| M5 | Evaluation and reports | ClawWork, DeepTutor, Paper2Slides | Benchmark baseline |
-| M6 | Live trading pilot | Broker adapters | Safety review passed |
-| M7 | Media, marketplace, and tool ecosystem | ViMax, CLI-Anything | Isolation and governance passed |
+| U0 | M0–M1 | Foundation, contracts, Market OS orchestration ownership, persistence, recovery, and paper-only boundaries | Complete |
+| U1 | M2 | Cited research, Vibe-Trading and LightRAG adapters, model-summary gate, quality benchmark, CI/CD | Built offline; M2.9 blocked on credential boundary |
+| U2 | B0–B1 | BTCUSDT data contracts, fixture replay, canonical Parquet/DuckDB dataset, provenance, gaps, and stored replay | Complete offline |
+| U3 | B2–B3 + M5 controls | Features, labels, numerical baselines, calibration, walk-forward evaluation, and Jev incremental-value benchmark | Next |
+| U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | Planned |
+| U5 | M4 web + B5 | Web deployment and operator views over the shared API | Planned |
+| U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | Planned |
+| U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | Planned selectively |
+| U8 | M6 | Separate live-readiness review or explicit permanent paper mode | Deferred; no automatic live trading |
 
-## First 90 days
+## Execution order
 
-### Weeks 1–2: decide
+```text
+U0 foundation
+  -> U1 research platform
+  -> U2 BTC data foundation
+  -> U3 quantitative evaluation
+  -> U4 paper portfolio
+  -> U5 web operations
+  -> U6 CLI and app surfaces
+  -> U7 evaluation and artifact products
+  -> U8 separate live-readiness decision
+```
 
-- Select the orchestration kernel.
-- Define the first user and supported markets.
-- Record contracts and ownership.
-- Establish one development environment and one configuration model.
+The immediate work is U3/B2. It must remain local, deterministic, and offline. It may reuse the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions. It must not wait for M2.9.
 
-### Weeks 3–6: prove research
+## U3/B2 next work
 
-- Build the gateway service.
-- Implement research task creation and run events.
-- Connect market data, retrieval, citations, and backtesting.
-- Ship a CLI that can start, inspect, and export a run.
+1. Read the repository guidance, unified phase documents, BTC technical specification, B0/B1 reports, ADRs, and existing feature/data code.
+2. Materialize deterministic point-in-time features and separate five-minute labels from the B1 canonical dataset.
+3. Define warm-up, gap, stale-data, and eligibility behavior as inspectable outcomes.
+4. Implement naïve and statistical baselines before adding LightGBM.
+5. Use chronological train/calibration/test splits with purge/embargo for overlapping labels.
+6. Record predictions, calibration, metrics, configurations, fingerprints, and lineage.
+7. Add read-only CLI/API inspection and reproducible evidence reports.
+8. Keep Jev, hosted models, network ingestion, broker adapters, and live execution out of B2.
 
-### Weeks 7–10: prove paper trading
+## Product surface order
 
-- Add portfolio and order-plan schemas.
-- Add simulated broker execution and risk policy checks.
-- Add approval and cancellation flows.
-- Persist artifacts and audit events.
+```text
+local engine -> web deployment -> CLI extension -> app shell
+```
 
-### Weeks 11–13: prove product surface
+The web, CLI, and app must consume the same versioned backend contracts. They must not duplicate market calculations, policy, risk, portfolio accounting, or order logic.
 
-- Add web dashboard for runs, evidence, portfolio, and approvals.
-- Add desktop/mobile shell against the same API.
-- Add baseline cost, quality, latency, and recovery benchmarks.
+## Non-negotiable boundaries
 
-## Priority rule
+- Source repositories under `D:\Code\Github\company-projects` remain separate and untouched.
+- Existing `.gitignore`, `README.md`, `.tmp-*` probe directories, and unrelated user changes remain preserved.
+- No authenticated exchange endpoints, balances, orders, withdrawals, or live broker code are added by U0–U7.
+- Model outputs are typed inputs to experiments or explanations; deterministic policy and risk remain authoritative.
+- Every long-running action has events, artifacts, provenance, lineage, and replay evidence.
 
-Every milestone must improve one complete user workflow. Defer broad integrations that do not improve the current vertical slice or its safety evidence.
+## Decision points
 
-## Current status
+| Decision | Needed before |
+|---|---|
+| B1 public source terms, region, and retention authorization | Any network historical ingestion |
+| Feature/label and evaluation configuration freeze | U3 final benchmark |
+| Jev access, cost, semantics, and contamination treatment | U3/B3 adapter |
+| Paper wallet, fees, slippage, and latency assumptions | U4 paper portfolio |
+| Deployment/auth/observability policy | U5 web operations |
+| App framework and supported platforms | U6 app shell |
+| Live trading authorization and compliance review | U8 only |
 
-M1 contract validation and JSON fixtures are implemented. M1.5's fixture parity
-is complete. M1.6 now runs the actual OpenHarness runtime in an isolated
-environment with a scripted no-network model client; it reports `runtime_verified=true`
-and zero parity mismatches, but OpenHarness remains provisional because
-runtime-native failure, cancellation, and multi-agent scenarios are unsupported.
-M1.7 direct recovery probes are complete. M1.8 adds root-owned terminal
-recovery, cancellation checkpoints, abandoned-run cleanup, artifact
-idempotency, a versioned multi-agent aggregation contract, and a deployment
-review. OpenHarness remains provisional because runtime-native restart/resume,
-synchronous persistence cancellation, partial teammate failure propagation,
-duplicate teammate handling, and deployed-service evidence remain open. The
-exact next milestone is **M1.9: validate the deployment shape and close or
-explicitly reject the remaining runtime blockers**, still with no real providers
-or live trading. M1.9 now adds launched-service deployment evidence, but ADR-0007
-keeps OpenHarness provisional because runtime-native checkpoint/resume,
-teammate failure propagation, duplicate handling, and deployment controls for
-resource limits, timeouts, and structured logs remain open. The exact next
-milestone is **M1.10: add or reject the bounded deployment wrapper and rerun
-the OpenHarness promotion gate**.
+## Evidence convention
 
-M1.10 accepts a local paper-only wrapper and records 48 named scenarios, but
-ADR-0008 keeps OpenHarness provisional because native persistence cancellation,
-checkpoint/resume, teammate propagation, duplicate handling, and external
-service controls remain open. The exact next milestone is **M1.11: supply or
-reject the external supervisor controls and obtain final native blocker
-evidence**.
-
-M1.11 classified every remaining blocker and closed the safe Market OS
-adapter-level behaviors. M1.12 makes the final decision: **Market OS owns
-orchestration; OpenHarness is optional**. Market OS is the sole owner of
-production orchestration, safety policies, events, persistence, cancellation,
-restart recovery, multi-agent aggregation, and the deployment boundary.
-OpenHarness remains available behind the optional adapter for local,
-no-network, paper-only agent capabilities. ADR-0010 supersedes the provisional
-ownership and promotion decisions while preserving their historical evidence.
-
-M2 planning is now unblocked. The exact next milestone is **M2.1: implement
-one deterministic Vibe-Trading-shaped market-data/backtest adapter against the
-root provider contracts**, with no real network access, credentials, brokers,
-or live execution.
-
-M2.1 is implemented. The explicit `vibe-trading` adapter normalizes the
-synthetic three-ETF fixture, executes the actual Vibe-Trading local-loader
-backtest in an isolated environment, persists root-owned evidence/citations,
-lineage, provenance, paper order plans, and risk decisions, and preserves the
-fixture default. The exact next milestone is **M2.2: add a cited document or
-retrieval adapter only after its root document/citation contract is approved**.
-
-M2.2 is implemented. The explicit `lightrag` adapter validates a synthetic
-four-document corpus, executes LightRAG's actual offline `ainsert` and
-`aquery_data(mode="naive")` seam in isolation, persists document/retrieval
-lineage, and composes with the Vibe-Trading backtest and paper-only workflow.
-The exact next milestone is **M2.3: harden cited research synthesis and
-document/passage inspection without adding external providers**.
-
-M2.3 is implemented. Deterministic cited synthesis now emits versioned claims,
-supports, citations, coverage, unsupported-claim records, stable fingerprints,
-and read-only CLI/API inspection with artifact/hash/lineage validation. The
-exact next milestone is **M2.4: evaluate richer research summaries only behind
-an explicit model contract and citation-preserving output gate**.
-
-M2.4 is implemented. The deterministic M2.3 synthesis remains the trusted
-baseline; an explicitly selected local deterministic test provider produces a
-versioned, citation-preserving model-summary artifact. Supported statements are
-exact persisted quotes, inference and unsupported statements are explicit, bad
-output is rejected, provider failure preserves the deterministic synthesis, and
-model-summary/inference inspection is available through CLI and API. The actual
-offline LightRAG and Vibe-Trading seams remain composed and paper-only. The
-exact next milestone is **M2.5: define the next research-quality gate or
-benchmark before considering any real model/provider adapter**.
-
-M2.5 is implemented. The offline research-quality benchmark evaluates 18
-synthetic cases through deterministic exact-quote and deterministic test-model
-methods, measures independent citation/grounding/replay/fallback/security/
-lineage/latency/usage metrics, persists read-only benchmark artifacts, and
-exposes CLI/API inspection. The promotion decision is **Not ready — specific
-failures remain**: no real model was exercised, cost is unavailable, and the
-test-model quote/support/coverage metrics remain below thresholds. The exact
-next milestone was M2.6 quality review.
-
-M2.6 is implemented offline. It reproduces all 36 evaluations, classifies the
-eight reported v1 failures as expected invalid/hostile candidate rejection or
-integrity rejection, and fixes the benchmark's combined pass/fail semantics,
-empty-denominator handling, invalid-citation accounting, unavailable usage
-reporting, latency threshold brittleness, and v1 artifact inspection path. The
-v2 report has 36/36 benchmark-success checks and 36/36 gate-correctness checks;
-seven deterministic test-model candidate-quality failures remain intentionally
-visible. No hosted model is called. The exact next milestone is **M2.7:
-implement recorded-response tests and one bounded optional model adapter after
-explicit provider, data-retention, credential, and spend approval**.
-
-M2.7 is implemented as an offline foundation. Recorded Responses-shaped
-fixtures exercise parsing, grounding, fallback, replay, usage-unknown behavior,
-and hostile-output rejection. A stdlib-only optional OpenAI Responses adapter
-supports `gpt-6.1-sol` behind explicit approval, bounded budgets, `store: false`,
-paper-only mode, and bounded transient retries; it is not selected by default
-and no live call was made. Fusion-repository CI and security workflows validate
-tests, offline integration markers, compilation, evidence JSON, diff hygiene,
-secret-like fixture content, and model-boundary checks without credentials.
-The exact next milestone is **M2.8: run an explicitly approved single live
-synthetic smoke only if provider, credential, retention, destination, request,
-token, and spend approvals are separately supplied**.
-
-M2.8 offline preparation is complete. The local harness validates one synthetic
-payload, exact one-request/zero-retry/$0.02/20-second bounds, redaction, and the
-existing citation gate while ordinary CI remains credential-free. The live
-smoke is **Pending approval — offline preparation complete, no live request
-made**. The exact next action is a separate human approval followed by one
-manual execution, or a recorded decision to keep the smoke pending.
-
-M2.9 approval was received, but execution was **Blocked — approval, credential,
-or provider requirements incomplete** because `OPENAI_API_KEY` was unavailable
-through the approved secret boundary. No reservation was consumed and no network
-request was made. The exact next action is to supply the credential through that
-boundary before a new approved execution decision.
-
-## BTC paper experiment direction
-
-The next product track is a **BTCUSDT Spot, five-minute-horizon, paper-only**
-research experiment. ADR-0015 adopts a math-first design: deterministic Market
-OS code owns time-valid data, feature calculation, evaluation, policy, virtual
-fills, risk, persistence, and audit. Jev is an optional typed-decision
-experiment, evaluated only for incremental out-of-sample value beyond matched
-statistical and LightGBM baselines.
-
-The delivery sequence is **local engine → web deployment → CLI extension → app
-shell**. B0 contracts and offline fixture replay are implemented; the exact
-next milestone is **B1: historical closed-candle ingestion and canonical local
-dataset**, with source/network policy resolved before any ingestion connection.
-No model request, credential, broker path, or live trading is part of B0.
-
-See `TECH_DOCS.md`, `docs/BTC-PAPER-EXPERIMENT-ROADMAP.md`, and
-`docs/decisions/ADR-0015-btc-math-first-jev-experiment.md`.
-
-## 2026-10-18 — BTC paper experiment B0 offline replay
-
-- Implemented and verified the `market-os.btc-paper.v1` contract family and
-  deterministic synthetic fixture replay. The replay canonicalizes 12 candles
-  from 19 events, records outcomes/gaps, produces point-in-time feature rows,
-  and keeps future five-minute labels on a separate fingerprint/lineage path.
-- Added read-only `market-os btc-paper replay --fixture ...` and updated the
-  BTC design, stack, roadmap, ADR, implementation report, evidence, and log.
-  The existing equities/ETF workflow and model-summary lane are unchanged.
-- Full suite: 185 passed, 1 skipped; integration-marked suite: 5 passed;
-  compilation, evidence, secret, dependency, and diff checks passed. No network,
-  model request, credential, broker, or live-execution path was used.
-- Exact next milestone: **B1 historical closed-candle ingestion and canonical
-  local Parquet/DuckDB dataset**, after source and network policy are decided.
-
-## 2026-10-18 — BTC paper experiment B1 offline historical dataset
-
-- Documented the candidate Binance public market-data source, REST kline
-  pagination/limits, IP rate-limit behavior, and the unresolved terms/region/
-  retention gate in ADR-0016. No candle request was authorized or made.
-- Implemented the disabled transport seam and fixture-backed B1 ingestion:
-  immutable raw pages, B0 candle normalization, Parquet snapshots, DuckDB
-  catalog, manifests, fingerprints, lineage, gaps, duplicates, conflicts,
-  bounded checkpoints, and no-network replay.
-- Added read-only B1 CLI/API inspection and recorded the storage/dependency
-  rationale. Existing equities/ETF and paper-only workflows remain unchanged.
-- Exact next milestone: **B2 deterministic feature/label materialization and
-  chronological numerical baselines with calibration and walk-forward evidence.**
+Each unified milestone updates `docs/UNDERSTANDING-LOG.md`, adds or updates an ADR when a boundary changes, and writes machine-readable evidence under `docs/evidence/`. Reports must state what was implemented, what was verified, what remains unknown, and the exact next gate.

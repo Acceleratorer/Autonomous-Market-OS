@@ -1,41 +1,44 @@
-# Prompt for a Separate `/goal` Chat
+# Prompt for the next implementation chat
 
-Copy the following prompt into a new Codex chat:
+Copy the following prompt into a new Codex chat after reviewing the current repository state. The unified roadmap is in `docs/ROADMAP.md`; this prompt targets U3/B2.
 
 ```text
-Create and execute a staged implementation plan for the Autonomous Market OS in the repository root.
+Start unified milestone U3/B2 in D:\Code\Github\Autonomous-Market-OS.
 
-Goal: build one personal autonomous trading platform from independent source projects, with a shared backend and CLI, web, desktop/mobile, and chat surfaces. The first deliverable is an evidence-backed research and paper-trading workflow. Live trading must remain disabled until explicit safety gates pass.
-
-Use these documents as the current product source of truth:
-- docs/PRODUCT-VISION.md
-- docs/PHASES.md
+Use these documents as the source of truth:
 - docs/ROADMAP.md
+- docs/PHASES.md
 - docs/TARGET-STRUCTURE.md
-- docs/FUSION-MAP.md
-- docs/INTEGRATION-GUIDE.md
+- docs/decisions/ADR-0017-unified-roadmap.md
+- TECH_DOCS.md
+- docs/BTC-PAPER-EXPERIMENT-ROADMAP.md
+- docs/B0-BTC-PAPER-REPLAY-REPORT.md
+- docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md
+- docs/UNDERSTANDING-LOG.md
+- STACK.md
 
-Inspect all child repositories before choosing implementation boundaries. Preserve existing user changes. Use the repository guidance and the coding workflow skills, including cautious-coding, ecc-harness, ponytail, and code review where applicable.
+Read the repository AGENTS.md guidance and use the narrowest relevant skills. For coding work use ecc-harness, cautious-coding, and ponytail. Inspect the actual market_os code, tests, contracts, B0/B1 implementation, CLI, API, persistence, and evidence before editing. Preserve pre-existing .gitignore, README.md, .tmp-* directories, and unrelated changes. Never modify D:\Code\Github\company-projects.
 
-First produce a concrete Phase 0 decision record covering:
-1. the first user and supported market scope;
-2. the orchestration runtime to own sessions, tools, skills, memory, and approvals;
-3. the initial API and domain contract schemas;
-4. the first vertical slice and its acceptance criteria;
-5. the minimum repository/package layout;
-6. risks, unknowns, and decisions that require human input.
+Implement only U3/B2:
+1. Materialize deterministic point-in-time BTCUSDT feature rows from the B1 canonical local dataset.
+2. Materialize separate five-minute labels with explicit future-data lineage.
+3. Define and validate warm-up, gap, stale-data, availability, and no-look-ahead outcomes.
+4. Add hand-checkable features first; keep the set small and documented.
+5. Add naïve and statistical numerical baselines before considering LightGBM. If LightGBM is not already justified by the current environment, leave it as a documented follow-up rather than adding speculative dependencies.
+6. Use chronological train/calibration/test splits with a documented purge/embargo rule for overlapping five-minute labels.
+7. Persist configurations, feature/label fingerprints, predictions, metrics, calibration results, split metadata, and artifact lineage.
+8. Add read-only CLI/API inspection and deterministic replay evidence.
+9. Update the unified roadmap, BTC roadmap, ADRs if needed, and docs/UNDERSTANDING-LOG.md.
 
-Then implement only the smallest vertical slice that can:
-- create a research task;
-- retrieve timestamped market/document evidence;
-- produce cited research;
-- run a reproducible backtest;
-- create a paper-trading order plan;
-- apply risk checks without live side effects;
-- persist run events and artifacts;
-- expose the workflow through a CLI and one service API.
+Hard boundaries:
+- Offline fixtures/local B1 data only; do not enable network ingestion.
+- No Jev request, OpenAI request, hosted model, credentials, broker, live exchange endpoint, live trading, or virtual portfolio implementation in B2.
+- Models are numerical experiment inputs only; deterministic policy and risk remain authoritative.
+- Do not rename historical M/B reports or rewrite unrelated code.
 
-For every change, inspect the real code path first, keep adapters narrow, avoid copying entire repositories, and add focused contract/integration tests. Do not add live broker execution, marketplace billing, or broad UI polish before the paper-trading slice is verified.
-
-At the end of each phase, update docs/UNDERSTANDING-LOG.md and record what was verified, what remains unknown, and the next gate. Finish with a concise implementation report, test results, and the exact next decision needed from me.
+Verification:
+- Run focused B2 tests first, then the full suite.
+- Run compileall, evidence JSON validation, secret/dependency checks, CLI/API smoke tests, replay/fingerprint checks, and git diff --check.
+- Review the final diff and report exact tests, evidence, remaining risks, and the next unified milestone.
+- Commit and push the completed work to origin/main, preserving unrelated unstaged changes. Include the commit SHA and remote verification in the final report.
 ```
