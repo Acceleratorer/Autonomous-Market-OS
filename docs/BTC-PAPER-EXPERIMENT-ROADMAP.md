@@ -20,7 +20,7 @@ measurable experiments, never direct execution commands.
 closed market data
   -> validation and replay
   -> deterministic features and labels
-  -> statistical + LightGBM baselines
+  -> naïve/statistical baselines -> optional LightGBM if justified
   -> optional Jev typed context signal
   -> calibration and walk-forward evaluation
   -> deterministic policy
@@ -139,9 +139,18 @@ no network/model/broker code;
 the implementation and tests use only the standard library and existing
 pytest.
 
-## Next milestone
+## B2 implementation result and next milestone
 
 **B2 — deterministic feature/label materialization and chronological numerical
-baselines** with calibration and walk-forward evidence. B1 historical transport
-remains disabled until source/legal review and explicit approval resolve the
-network gate.
+baselines** is implemented offline. The code persists versioned features,
+separate future labels, outcome statuses, chronological splits, purge/embargo
+metadata, baseline predictions, metrics, calibration output, and lineage. The
+shipped B1 fixture has no leakage-safe labeled samples because its eligible
+rows reach the documented gap; its metrics are therefore explicitly
+unavailable. See `docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and
+`docs/evidence/u3-b2-btc-features-baselines.json`.
+
+LightGBM is deferred: the small offline B2 result does not justify a new model
+dependency. B1 historical transport remains disabled until source/legal review
+and explicit approval resolve the network gate. The exact next milestone is
+**U3/B3 — controlled Jev incremental-value benchmark**.

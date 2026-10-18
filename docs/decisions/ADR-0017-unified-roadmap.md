@@ -33,5 +33,5 @@ M2.9 remains an isolated blocked provider-smoke record and does not block U2 or 
 
 - New reports use the U milestone plus historical tags when useful, for example `U3/B2`.
 - Existing M/B reports and evidence are not renamed.
-- The next implementation prompt targets U3/B2.
+- U3/B2 is implemented offline; the next implementation gate is U3/B3.
 - Live trading remains outside the normal sequence and requires a separate decision record.

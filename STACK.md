@@ -139,5 +139,10 @@ When discussing model choices, preserve these constraints:
 - The candidate Binance public REST transport is isolated but disabled. No
   candle request was made because explicit approval and terms/region/retention
   review are absent.
-- Exact next milestone: **B2 deterministic feature/label materialization and
-  chronological numerical baselines with calibration and walk-forward evidence.**
+- B2 is implemented offline with deterministic features/labels, numerical
+baselines, chronological purge/embargo metadata, persisted lineage, and
+read-only CLI/API inspection. The small B1 fixture yields no leakage-safe test
+labels, so its B2 metrics remain explicitly unavailable. See
+`docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and the U3/B2 evidence JSON.
+- Exact next milestone: **U3/B3 controlled Jev incremental-value benchmark**;
+Jev remains excluded from B2.

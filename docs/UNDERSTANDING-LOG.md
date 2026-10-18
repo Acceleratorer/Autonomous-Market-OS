@@ -383,3 +383,35 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Kept M2.9 isolated and blocked by the missing approved credential; it does not block the BTC quantitative track.
 - Updated the target structure so `Autonomous-Market-OS` remains the product repository and `company-projects` remains separate source material integrated only through adapters.
 - Exact next milestone: **U3/B2 — deterministic feature/label materialization and chronological numerical baselines**.
+
+## 2026-10-18 — U3/B2 deterministic features and numerical baselines
+
+- Implemented `market_os/btc_b2.py` as an offline-only consumer of hash-checked
+  B1 canonical candles. Feature version `btc.b2.features.v1` contains only
+  `close`, one-minute log return, five-minute past log return, candle range
+  percentage, and log-volume. Inputs are the current candle plus five exact
+  contiguous historical candles, each closed and available at the recorded
+  decision eligibility time.
+- Implemented separate target version `btc.b2.close-return-5m.v1` with
+  `ln(C[t+5]/C[t])`, direction, future target fingerprint, and target
+  reference. Future rows never enter feature inputs. Warm-up, gap, stale,
+  unavailable, invalid, and eligible outcomes are inspectable.
+- Added deterministic `naive_0_5`, `empirical_rate`, and `conditional_rate`
+  baselines; chronological train/calibration/test metadata; five-minute
+  target-overlap purge; five-minute embargo; one-bin calibration; predictions,
+  metrics, and replay-checked JSON artifact lineage.
+- Added read-only `market-os btc-paper b2` CLI commands and `/v1/btc/b2`
+  execution/inspection routes. No network, Jev/OpenAI/hosted model,
+  credential, broker, portfolio, or live-trading code was added.
+- The existing B1 synthetic fixture produces two eligible feature rows but no
+  eligible labels because the five-minute future paths reach the documented
+  gap. Metrics and calibration are recorded as unavailable rather than zero.
+  Positive baseline and calibration behavior is covered by a larger synthetic
+  unit seam. LightGBM is deferred because the current local evidence does not
+  justify a new dependency.
+- Verification passed: focused B2/B0/B1/CLI tests 32 passed; compileall,
+  evidence validation, secret scan, pip check, CLI/API smoke, replay/fingerprint,
+  and diff checks passed. Evidence: `docs/evidence/u3-b2-btc-features-baselines.json`.
+- Exact next milestone: **U3/B3 — controlled Jev incremental-value benchmark**
+  after a larger leakage-safe local dataset and matched numerical controls are
+  available.

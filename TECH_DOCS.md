@@ -9,7 +9,7 @@
 **Project:** [Acceleratorer/Autonomous-Market-OS](https://github.com/Acceleratorer/Autonomous-Market-OS)
 **Companion document:** `STACK.md` (existing project constraints)
 
-> **Foundational rule:** The deterministic platform controls data validity, risk, state transitions, simulation, and all execution permissions. Models provide optional analysis, explanations, or experimental predictions. **Nothing in this document authorizes real trading, live exchange orders, or a real model/API request.** B0 implements only offline contracts and synthetic replay; the remaining ingestion, modeling, and paper-simulation design is not implemented.
+> **Foundational rule:** The deterministic platform controls data validity, risk, state transitions, simulation, and all execution permissions. Models provide optional analysis, explanations, or experimental predictions. **Nothing in this document authorizes real trading, live exchange orders, or a real model/API request.** B0/B1 and U3/B2 implement only offline contracts, local canonical storage, deterministic feature/label materialization, and numerical baseline evaluation; network ingestion, Jev, and paper-simulation execution remain outside this milestone.
 
 ---
 
@@ -53,10 +53,10 @@ The research question is not “Can Jev return `BUY` or `SELL`?” It is:
 
 The chosen development philosophy is **math-first, model-assisted, and evidence-driven**:
 
-1. Build trustworthy, timestamped Binance public market data.
+1. Build trustworthy, timestamped local/Binance market data under a separately approved source policy.
 2. Preserve raw events, normalize closed candles, and test reproducibility.
 3. Compute deterministic numerical features and point-in-time targets.
-4. Establish simple statistical models and a well-tuned LightGBM baseline.
+4. Establish simple statistical baselines first; consider LightGBM only after a larger leakage-safe dataset justifies the dependency.
 5. Evaluate Jev independently and as an additional feature producer.
 6. Control for whether apparent improvements arise from Jev itself or merely from giving it additional information (for example, news text).
 7. Select models using held-out prediction quality, calibration, inference cost, stability, and **net paper-trading utility**.
@@ -86,13 +86,13 @@ The chosen development philosophy is **math-first, model-assisted, and evidence-
 | Real capital | None |
 | Initial execution | Deterministic virtual broker only |
 | Primary analytical stack | Python, Polars/NumPy, Parquet/DuckDB |
-| First trained baseline | LightGBM, following trivial/statistical baselines |
+| First numerical baseline | Naïve and statistical controls; LightGBM is a later, evidence-gated option |
 | Jev | Experimental, optional typed-decision / semantic-feature provider |
 | Generative LLM | Optional grounded research summarization/explanation only |
 | Hosting strategy | Hybrid cloud/local, benchmarked—not unconditional fallback routing |
 | Optimization criterion | Out-of-sample accuracy/calibration **and** executable net economic value |
 | Phase 0 scope | Repository audit, data contracts, ingestion design, QA, reproducibility |
-| Implementation status | B0 contracts/replay and B1 offline storage/replay implemented; public transport disabled, no model or broker calls |
+| Implementation status | B0/B1 offline contracts/storage/replay and U3/B2 feature/label/baseline evaluation implemented; public transport disabled, no Jev/model/broker calls |
 
 ### 2.2 Explicit assumptions to validate
 
@@ -172,6 +172,19 @@ The B0 implementation audit inspected the actual `market_os/` contracts, workflo
 
 Before coding: inventory `market_os/`, `docs/`, and `scripts/`; review the relevant ADRs; map existing interfaces; choose the smallest surgical change. Do not copy/paste a speculative directory tree into the project without this audit.
 
+### 3.5 U3/B2 implementation boundary
+
+U3/B2 is implemented in `market_os/btc_b2.py` as a local consumer of the
+hash-checked B1 canonical dataset. It materializes the small deterministic
+feature set and separate five-minute labels, records warm-up/gap/stale/
+unavailable/invalid eligibility outcomes, evaluates naïve and statistical
+baselines with chronological purge/embargo metadata, and persists replay-
+checked JSON artifacts. The shipped B1 fixture has no leakage-safe labeled
+samples because its eligible rows reach the documented gap, so metrics and
+calibration are explicitly unavailable. LightGBM, Jev, network ingestion,
+brokers, portfolios, and live trading remain outside B2. See
+`docs/B2-BTC-FEATURES-BASELINES-REPORT.md`, ADR-0018, and the U3/B2 evidence.
+
 ## 4. Core Research Question and Hypotheses
 
 Let:
@@ -219,7 +232,7 @@ Mutual information is a useful conceptual lens, **not** a promise that a high-di
 |---|---|---|---|
 | Binance market-data-only ingestion | High if reachable and within terms | High for data acquisition; not for edge | Adopt |
 | Parquet + DuckDB + Polars feature pipeline | High | High for reproducibility | Adopt |
-| Statistical and LightGBM baselines | High | Strong baseline methodology | Adopt |
+| Statistical baselines; optional LightGBM | High for the stdlib controls; LightGBM needs a larger justified dataset | Statistical controls now; LightGBM only after an evidence gate | Adopt incrementally |
 | Jev market-state `choice` inference | Plausible to integrate | **Unproven** as BTC forecaster | Experimental |
 | Jev as a semantic feature extractor | Plausible | Potentially useful, requires controls | Experimental |
 | Jev fine-tuned on BTC data | **Not supported by documented customer tuning** | N/A | Do not plan around it |
@@ -876,7 +889,7 @@ Bayesian updating is relevant when likelihoods, priors, event dependencies, and 
 |---|---|---|---|
 | B0 | Historical base rates | Constant / no-skill predictor | Sanity baseline |
 | B1 | Historical returns | Logistic regression / simple statistical forecasting | Lightweight numeric control |
-| B2 | `X_t` | LightGBM | **Primary numerical baseline** |
+| B2 | `X_t` | Naïve/statistical controls; optional LightGBM later | **U3/B2 numerical controls; LightGBM requires a later evidence gate** |
 | J0 | `X_t` | Jev, pinned question set | Same-input model assessment |
 | J1 | `X_t + J_t(X_t)` | LightGBM | Test Jev representation on same features |
 | Z0 | `X_t + Z_t` or independently derived `Z` features | LightGBM / independent encoder | Control for additional information |
@@ -1179,19 +1192,20 @@ The exact numerical thresholds are **not yet agreed**; define them using develop
 - **P0.2 Contracts:** versioned raw event, closed candle, dataset manifest/revision, feature, five-minute label, prediction envelopes, and experiment configuration. **Completed for B0; see report for exact rules.**
 - **P0.3 Historical market data:** separately approved source policy, pagination, checkpoint/retry, raw captures, canonical Parquet, gap report. **Deferred to B1; B0 has no network source.**
 - **P0.4 Live market data:** public WebSocket, closed-candle filter, reconnect, backfill, stable replay. **Deferred; no B0 network connection.**
-- **P0.5 Feature processor:** small deterministic feature set, time-safe availability, warm-up flags. **B0 includes only close and one-minute log-return fixture features; expansion is deferred.**
+- **P0.5 Feature processor:** small deterministic feature set, time-safe availability, warm-up flags. **Implemented for U3/B2; see ADR-0018 and the B2 report.**
 - **P0.6 Data quality gate:** offline tests, replay determinism, manifest, dataset freeze. **B0 fixture/replay checks completed; production dataset freeze is deferred.**
 
 **Remaining exit:** One auditable, point-in-time historical data pipeline; no trading model required. B0 alone does not satisfy this Phase 0 exit.
 
-### Phase 1 — Statistical baselines
+### Phase 1 — Statistical baselines (U3/B2)
 
-- Formalize target and executable-price simulation assumptions.
-- Implement naïve, random-walk, logistic/statistical and LightGBM baselines.
-- Establish walk-forward folds, purges, frozen training/calibration/test ranges.
-- Run feature ablations and create reproducible model cards.
+- Formalized the five-minute research target and explicit future-data lineage.
+- Implemented naïve 0.5, empirical-rate, and conditional-rate numerical baselines.
+- Established chronological train/calibration/test metadata with five-minute purge and embargo.
+- Persisted reproducible feature/label/prediction/metric/calibration artifacts and documented the negative B1-fixture result.
+- Deferred LightGBM until a larger leakage-safe local dataset justifies the dependency.
 
-**Exit:** Credible B2 baseline and OOS metrics, or documented negative result.
+**Exit:** Complete offline; the current B1 fixture produces a documented negative data-availability result. U3/B3 is the next gate.
 
 ### Phase 2 — Jev feasibility research
 
@@ -1308,7 +1322,7 @@ These are genuine unresolved decisions; do not invent answers when implementing:
 
 ## 24. Definition of Done and Handoff Checklist
 
-The full Phase 0 design should be considered ready for promotion only when the following are verified. B0 has completed only the local audit/contracts/fixture-replay subset; see §20 and `docs/B0-BTC-PAPER-REPLAY-REPORT.md` for the split between completed B0 work and deferred ingestion requirements.
+The full Phase 0 design should be considered ready for promotion only when the following are verified. B0/B1 and U3/B2 are implemented offline; live transport, Jev, and paper-broker work remain separately gated. See §20, the B0/B1 reports, and `docs/B2-BTC-FEATURES-BASELINES-REPORT.md`.
 
 ### Repository and safety
 
@@ -1386,6 +1400,6 @@ The links below are public references checked for this document on **2026-10-17*
 
 ## Final Architectural Recommendation
 
-Build a **deterministic, time-correct BTC market-data and evaluation system first**. Treat LightGBM as the numerical benchmark, Jev as an optional experimental representation/semantic feature source, and generated language as an optional grounded explanation capability. Promote Jev to a paper-trading signal **only if** it delivers reproducible out-of-sample incremental value under fair baselines and the improvement survives calibrated decision-making, post-decision execution timing, transaction friction, and prospective verification.
+Build a **deterministic, time-correct BTC market-data and evaluation system first**. Treat naïve/statistical controls as the current U3/B2 numerical baseline and LightGBM as an optional later model, Jev as an optional experimental representation/semantic feature source, and generated language as an optional grounded explanation capability. Promote Jev to a paper-trading signal **only if** it delivers reproducible out-of-sample incremental value under fair baselines and the improvement survives calibrated decision-making, post-decision execution timing, transaction friction, and prospective verification.
 
 **Good research does not have to find a profitable bot. It has to produce results that can be reproduced, challenged, and trusted.**

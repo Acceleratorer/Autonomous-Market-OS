@@ -72,6 +72,18 @@ def build_parser() -> argparse.ArgumentParser:
     btc_inspect.add_argument("--start-ms", type=int)
     btc_inspect.add_argument("--end-ms", type=int)
     btc_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    b2 = btc_commands.add_parser("b2")
+    b2_commands = b2.add_subparsers(dest="b2_command", required=True)
+    b2_run = b2_commands.add_parser("run")
+    b2_run.add_argument("--dataset-revision", required=True)
+    b2_run.add_argument("--history-store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    b2_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
+    b2_run.add_argument("--experiment-id", default="btc-b2-offline")
+    b2_inspect = b2_commands.add_parser("inspect")
+    b2_inspect.add_argument("run_id")
+    b2_inspect.add_argument("--resource", choices=("manifest", "config", "features", "labels", "splits", "predictions", "metrics", "calibration", "lineage", "artifacts"), default="manifest")
+    b2_inspect.add_argument("--id", dest="item_id")
+    b2_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
     return parser
 
 
@@ -112,8 +124,8 @@ def main(argv: list[str] | None = None) -> int:
             result = replay_fixture(fixture)
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
             return 0
-        store = HistoryStore(args.store_root)
         if args.btc_command == "ingest":
+            store = HistoryStore(args.store_root)
             try:
                 fixture = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
                 result = store.ingest_fixture(fixture)
@@ -122,9 +134,22 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
             return 0
         if args.btc_command == "acquire":
+            store = HistoryStore(args.store_root)
             result = store.acquire(args.start_ms, args.end_ms)
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
             return 0
+        if args.btc_command == "b2":
+            from .btc_b2 import B2Config, B2Store, run_b2
+
+            b2_store = B2Store(args.store_root)
+            if args.b2_command == "run":
+                history = HistoryStore(args.history_store_root)
+                result = run_b2(history, args.dataset_revision, b2_store, B2Config(args.experiment_id))
+            else:
+                result = b2_store.inspect(args.run_id, args.resource, args.item_id)
+            print(json.dumps(result, indent=2, sort_keys=True, default=str))
+            return 0
+        store = HistoryStore(args.store_root)
         resource = args.resource
         if resource == "manifest":
             result = store.inspect_manifest(args.dataset_id)

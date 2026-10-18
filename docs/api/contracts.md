@@ -156,3 +156,49 @@ GET /v1/btc/history/<dataset-revision>/replay
 These paths invoke no model, broker, or network transport. Canonical Parquet
 content is hash-checked before inspection; DuckDB stores raw-page, manifest,
 outcome, and provenance lineage.
+
+## U3/B2 BTC feature and baseline evaluation
+
+B2 consumes an existing B1 `dataset_revision` only. It never acquires market
+data and never calls Jev, OpenAI, a hosted model, a broker, or an exchange.
+The read/write boundary is a local research artifact store; inspection is
+read-only after the run is materialized.
+
+The CLI surfaces are:
+
+```text
+market-os btc-paper b2 run --dataset-revision <revision> --history-store-root <b1-root> --store-root <b2-root>
+market-os btc-paper b2 inspect <run-id> --resource manifest|config|features|labels|splits|predictions|metrics|calibration|lineage|artifacts --store-root <b2-root>
+```
+
+The API surfaces are:
+
+```text
+POST /v1/btc/b2/runs
+GET /v1/btc/b2/<run-id>/<resource>?store_root=<b2-root>
+```
+
+The POST body names the local `history_store_root`, B1 `dataset_revision`,
+optional `experiment_id`, optional UTC `as_of`, and optional B2 `store_root`.
+The GET resource is one of `config`, `features`, `labels`, `splits`,
+`predictions`, `metrics`, `calibration`, `lineage`, or `manifest`.
+
+B2 feature version `btc.b2.features.v1` materializes only these deterministic
+values from closed candles: `close`, `ln(C_t/C_{t-1})`,
+`ln(C_t/C_{t-5})`, `(H_t-L_t)/C_t`, and `ln(1+V_t)`. Inputs are the current
+candle plus the exact five prior contiguous candles, and each input reference
+must be closed and available by `decision_eligible_at`.
+
+Target version `btc.b2.close-return-5m.v1` stores the separate label
+`ln(C_{t+5}/C_t)`, direction, target fingerprint, and future target reference.
+The target is withheld for missing continuity or unavailable future data; no
+target reference is included in feature inputs.
+
+Feature statuses are `eligible`, `warm_up`, `gap`, `stale`, `unavailable`, and
+`invalid`. B2 baselines are fixed to `naive_0_5`, `empirical_rate`, and
+`conditional_rate`. Split metadata is chronological; rows with
+`target_end_ms >= boundary` are purged and the next five minutes are
+embargoed. Configuration, fingerprints, predictions, metrics, calibration,
+split metadata, artifact hashes, and lineage are persisted and replay-checked.
+LightGBM is deliberately deferred until a larger, leakage-safe offline
+evaluation justifies the dependency.

@@ -71,6 +71,30 @@ def make_handler(
                 finally:
                     self._audit(status)
                 return
+            if self.path == "/v1/btc/b2/runs":
+                status = 500
+                try:
+                    size = int(self.headers.get("Content-Length", "0"))
+                    body = json.loads(self.rfile.read(size))
+                    from .btc_b2 import B2Config, B2Store, run_b2
+                    from .btc_history import HistoryStore
+
+                    result = run_b2(
+                        HistoryStore(body["history_store_root"]),
+                        body["dataset_revision"],
+                        B2Store(body.get("store_root", str(workflow.store.root / "btc-b2"))),
+                        B2Config(body.get("experiment_id", "btc-b2-offline"), body.get("as_of")),
+                    )
+                    status = 200
+                    self._send(200, result)
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+                    status = 400
+                    self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.btc-b2.v1"}})
+                except Exception as exc:  # pragma: no cover - defensive transport boundary
+                    self._send(500, {"error": str(exc)})
+                finally:
+                    self._audit(status)
+                return
             if self.path == "/v1/benchmarks":
                 status = 500
                 try:
@@ -183,6 +207,32 @@ def make_handler(
                     status = 409
                     error_type = type(exc).__name__
                     self._send(409, {"error": {"code": "btc_history_integrity_error", "message": str(exc), "api_version": "market-os.btc-history.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
+                return
+            btc_b2_prefix = "/v1/btc/b2/"
+            if self.path.startswith(btc_b2_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    parts = parsed.path[len(btc_b2_prefix):].split("/")
+                    if len(parts) != 2:
+                        raise KeyError("B2 run resource")
+                    from .btc_b2 import B2Store
+
+                    query = urllib.parse.parse_qs(parsed.query)
+                    store = B2Store(query.get("store_root", [str(workflow.store.root / "btc-b2")])[0])
+                    result = store.inspect(parts[0], parts[1])
+                    self._send(200, result)
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "B2 run not found"})
+                except ValueError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "btc_b2_integrity_error", "message": str(exc), "api_version": "market-os.btc-b2.v1"}})
                 finally:
                     self._audit(status, error_type=error_type)
                 return

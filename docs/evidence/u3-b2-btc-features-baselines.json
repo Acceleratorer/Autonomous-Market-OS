@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-18",
+  "evaluation": {
+    "baselines": [
+      "naive_0_5",
+      "empirical_rate",
+      "conditional_rate"
+    ],
+    "calibration": {
+      "conditional_rate": {
+        "method": "one-bin empirical calibration",
+        "n": 0,
+        "reason": "no leakage-safe calibration rows after purge/embargo",
+        "status": "unavailable"
+      },
+      "empirical_rate": {
+        "method": "one-bin empirical calibration",
+        "n": 0,
+        "reason": "no leakage-safe calibration rows after purge/embargo",
+        "status": "unavailable"
+      },
+      "naive_0_5": {
+        "method": "one-bin empirical calibration",
+        "n": 0,
+        "reason": "no leakage-safe calibration rows after purge/embargo",
+        "status": "unavailable"
+      }
+    },
+    "metrics": {
+      "conditional_rate": {
+        "calibrated": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        },
+        "raw": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        }
+      },
+      "empirical_rate": {
+        "calibrated": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        },
+        "raw": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        }
+      },
+      "naive_0_5": {
+        "calibrated": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        },
+        "raw": {
+          "accuracy": null,
+          "brier": null,
+          "log_loss": null,
+          "n": 0,
+          "status": "unavailable"
+        }
+      }
+    },
+    "replay": {
+      "network_requests": 0,
+      "replay_fingerprint": "b738d6a3ff24ef25110111e1222e9ea2863cdbee4ce33ade043ab341b176d8be",
+      "replayed": true,
+      "run_id": "btc-b2-f165f28380ed8413cebe"
+    },
+    "run_id": "btc-b2-f165f28380ed8413cebe",
+    "sample_count": 0,
+    "splits": {
+      "boundaries": {},
+      "counts": {},
+      "policy": {
+        "boundaries_are_frozen_before_model_fit": true,
+        "embargo": "remove the first 5 minutes after each split boundary",
+        "horizon_minutes": 5,
+        "purge": "remove rows with target_end_ms >= the next split boundary"
+      },
+      "rows": []
+    }
+  },
+  "excluded": [
+    "network ingestion",
+    "Binance transport",
+    "Jev",
+    "OpenAI",
+    "hosted models",
+    "credentials",
+    "broker",
+    "portfolio",
+    "live trading"
+  ],
+  "feature_outcomes": {
+    "counts": {
+      "eligible": 2,
+      "gap": 1,
+      "warm_up": 7
+    },
+    "eligibility": "decision_eligible_at=max(close_time,availability_timestamp); current plus five exact prior contiguous rows only",
+    "feature_fingerprint": "797fefa4fa68c69f65a5e9e277144a7b748b4e3b439579c1372a09d5d04d5740"
+  },
+  "formulas": {
+    "close": "C_t",
+    "log_return_1m": "ln(C_t/C_{t-1})",
+    "log_return_5m": "ln(C_t/C_{t-5})",
+    "log_volume": "ln(1+V_t)",
+    "range_pct": "(H_t-L_t)/C_t",
+    "target_return": "ln(C_{t+5}/C_t)"
+  },
+  "labels": {
+    "count": 0,
+    "future_lineage": "target fingerprint and target_refs are separate from feature input_refs",
+    "label_fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "outcome_counts": {
+      "gap": 2
+    }
+  },
+  "lightgbm": {
+    "reason": "small gappy offline fixture does not justify a new dependency",
+    "status": "deferred"
+  },
+  "next_milestone": "U3/B3 controlled Jev incremental-value benchmark",
+  "persistence": {
+    "artifact_count": 8,
+    "artifact_kinds": [
+      "config",
+      "features",
+      "labels",
+      "splits",
+      "predictions",
+      "metrics",
+      "calibration",
+      "lineage"
+    ],
+    "lineage": "dataset revision -> feature/label fingerprints -> persisted artifacts",
+    "replay_fingerprint": "b738d6a3ff24ef25110111e1222e9ea2863cdbee4ce33ade043ab341b176d8be"
+  },
+  "schema": "market-os.u3-b2.btc-features-baselines.v1",
+  "scope": "U3/B2 only; BTCUSDT Spot closed 1m B1 local dataset; 5m labels; numerical baselines; paper-only research",
+  "source_boundary": {
+    "canonical_fingerprint": "49b70e7dcbfac660e8636dc0871a0623273d4dafadce93d50ba6b143656cf70c",
+    "dataset_revision": "btc-history-49b70e7dcbfac660e863",
+    "network_requests": 0,
+    "source": "existing local B1 synthetic fixture"
+  },
+  "status": "implemented-and-locally-verified-offline",
+  "verification": {
+    "cli_api_smoke": "passed",
+    "compileall": "passed",
+    "diff_check": "passed",
+    "evidence_validation": "passed",
+    "focused_tests": "32 passed",
+    "full_suite": "203 passed, 0 failed, 1 skipped",
+    "pip_check": "No broken requirements found",
+    "replay_fingerprint": "passed",
+    "secret_scan": "passed"
+  },
+  "versions": {
+    "api": "market-os.btc-b2.v1",
+    "feature": "btc.b2.features.v1",
+    "target": "btc.b2.close-return-5m.v1"
+  }
+}

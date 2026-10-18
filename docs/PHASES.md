@@ -17,7 +17,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 | U0 — Foundation and ownership | M0–M1 | Product boundary, repository ownership, contracts, orchestration, persistence, recovery, and paper-only enforcement | Complete |
 | U1 — Research platform | M2, including M2.1–M2.9 | Cited research, retrieval, backtesting adapters, model boundary, quality gates, and offline CI | Built; M2.9 live smoke remains blocked and isolated |
 | U2 — Quantitative data foundation | B0–B1 | BTCUSDT closed-candle contracts, historical dataset storage, manifests, lineage, gaps, deduplication, and deterministic replay | Complete offline |
-| U3 — Quantitative evaluation | B2–B3; selected M5 controls | Deterministic features and labels, numerical baselines, calibration, walk-forward evaluation, and controlled Jev comparison | Next |
+| U3 — Quantitative evaluation | B2–B3; selected M5 controls | Deterministic features and labels, numerical baselines, calibration, walk-forward evaluation, and controlled Jev comparison | B2 complete offline; B3 next |
 | U4 — Paper portfolio | M3 + B4 | Shared virtual broker, portfolio ledger, costs, fills, risk policy, approvals, and paper-only shadow mode | Planned |
 | U5 — Web operations | M4 web + B5 | Web deployment of the existing API with BTC data, experiment, report, and paper-portfolio views | Planned |
 | U6 — CLI and app surfaces | B6–B7 + M4 CLI/app | One versioned CLI and thin desktop/mobile shells using the shared API | Planned |
@@ -39,7 +39,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 - U0 is complete.
 - U1 is built through offline M2.8 preparation; M2.9 remains blocked by the missing approved credential and is not a dependency for BTC work.
 - U2 is complete with B1's network transport still disabled.
-- U3 starts with B2: deterministic feature/label materialization and chronological numerical baselines.
+- U3 starts with B2: deterministic feature/label materialization and chronological numerical baselines. B2 is complete offline; B3 is the next gate.
 
 ## Exit gates
 
