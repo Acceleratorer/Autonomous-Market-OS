@@ -24,9 +24,13 @@
   },
   "live_probe_policy": {
     "explicit_flag": "--allow-live-probe",
+    "binance_max_attempts": 1,
+    "binance_retry_policy": "none for the live probe; injected adapter retry tests remain offline-only",
     "jev_max_requests": 1,
     "jev_retries": 0,
     "jev_max_spend_usd": 0.05,
+    "jev_cost_limit_kind": "estimate-only; provider billing cannot be guaranteed locally",
+    "jev_reservation": "durable exclusive reservation file under the selected connectivity store root",
     "jev_credential": "TYPESAFE_API_KEY",
     "paper_only_required": true,
     "raw_secret_persistence": false
@@ -38,12 +42,23 @@
     "semantic_boundary": "descriptive_experimental_assessment_not_calibrated_btc_return_probability"
   },
   "verification": {
-    "focused_connectivity_tests": "39 passed",
+    "focused_connectivity_tests": "41 passed",
     "b0_b1_b2_b3_regression_tests": "40 passed",
     "baseline_before_changes": "211 passed, 1 skipped",
-    "full_suite": "250 passed, 1 skipped",
+    "full_suite": "252 passed, 1 skipped",
     "live_provider_requests": 0,
     "trade_or_execution_requests": 0
+  },
+  "preflight": {
+    "typesafe_api_key_present": false,
+    "live_binance_request_made": false,
+    "live_jev_request_made": false,
+    "official_typesafe_docs_retrieved": "2026-10-19",
+    "official_binance_source_repository_retrieved": "2026-10-19",
+    "official_binance_docs_direct_page": "HTTP 202 WAF challenge from current environment",
+    "provider_reported_usage_observed": false,
+    "provider_billed_cost_observed": false,
+    "preflight_status": "ready-for-review; Binance source/legal gate unresolved; no live request made"
   },
   "risks": [
     "Binance regional availability, legal terms, and retention remain unresolved",

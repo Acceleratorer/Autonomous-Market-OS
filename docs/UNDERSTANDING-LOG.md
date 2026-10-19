@@ -463,6 +463,29 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   the U3/API report, and machine-readable evidence. Jev remains descriptive
   experimental assessment only and cannot create orders, fills, portfolio
   mutations, risk overrides, or execution authority.
-- Focused connectivity tests pass: 39 tests; B0/B1/B2/B3 regression tests pass:
-  40; full suite passes: 250 with one existing skipped test. U4/B4 and U5/B5
+- Focused connectivity tests pass: 41 tests; B0/B1/B2/B3 regression tests pass:
+  40; full suite passes: 252 with one existing skipped test. U4/B4 and U5/B5
   remain untouched.
+
+## 2026-10-19 — U3/API live-test preflight
+
+- Re-audited the actual Binance and TypeSafe provider call paths before any
+  live request. The Binance CLI path now forces exactly one HTTP attempt with
+  no retries, including on transient failure; offline adapter tests retain
+  bounded retry coverage.
+- Added a durable exclusive Jev reservation file under the selected
+  connectivity store root. A fresh process, rerun, crash-recovery path, or
+  concurrent invocation cannot issue a second reserved request.
+- Corrected offline Jev metadata so latency, usage, and cost remain unknown.
+  Live cost is estimate-only from provider-reported input tokens and the
+  published `$0.042/Mtok` price; the local payload heuristic is not a hard
+  billing guarantee.
+- Current `TYPESAFE_API_KEY` status is absent from process/user environment;
+  no credential value was printed or requested in chat. No Binance or Jev live
+  request was made. Official TypeSafe docs and the Binance official source
+  repository were rechecked on 2026-10-19; direct Binance docs returned an
+  HTTP 202 WAF challenge.
+- Current preflight verification: 41 focused connectivity tests, 40 B0/B1/B2/B3
+  regression tests, and 252 full-suite tests with one skipped test. Exact
+  commands are in the connectivity report;
+  separate explicit approval remains required before any live request.

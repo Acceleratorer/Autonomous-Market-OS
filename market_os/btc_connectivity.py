@@ -41,6 +41,7 @@ JEV_MODEL_VERSIONS = frozenset({"jev-1.14.0", "jev-1.13.0"})
 MAX_BINANCE_RESPONSE_BYTES = 256 * 1024
 MAX_TYPESAFE_RESPONSE_BYTES = 256 * 1024
 MAX_BINANCE_ATTEMPTS = 3
+MAX_BINANCE_LIVE_ATTEMPTS = 1
 MAX_RETRY_AFTER_SECONDS = 60.0
 JEV_MAX_SPEND_USD = 0.05
 JEV_INPUT_COST_PER_MILLION = 0.042
@@ -348,6 +349,7 @@ class JevAssessment:
     abstention: bool
     semantic_boundary: str = JEV_SEMANTIC_BOUNDARY
     failure: dict[str, str] | None = None
+    cost_status: str = "unknown-not-observed-offline"
 
     def __post_init__(self) -> None:
         if self.provider != TYPESAFE_PROVIDER or self.question_version != JEV_QUESTION_VERSION:
@@ -595,6 +597,7 @@ def _request_with_retries(
         if 200 <= response.status < 300:
             return response, attempt + 1
         error = classify_provider_status(provider, response.status, response.headers)
+        error.attempts = attempt + 1
         last_error = error
         if not error.retryable or attempt + 1 >= attempts:
             raise error
@@ -629,7 +632,7 @@ class BinancePublicAdapter:
             raise ConnectivityError("invalid_request", "Binance adapter supports 1m klines only", provider=BINANCE_PROVIDER)
         return f"{BINANCE_BASE_URL}{path}?{urlencode(params)}"
 
-    def ticker(self) -> tuple[BinanceTicker, int]:
+    def ticker(self, *, max_attempts: int = MAX_BINANCE_ATTEMPTS) -> tuple[BinanceTicker, int]:
         url = self._url(BINANCE_TICKER_PATH, {"symbol": BTC_SYMBOL})
         response, attempts = _request_with_retries(
             self.transport,
@@ -640,12 +643,12 @@ class BinancePublicAdapter:
             body=None,
             timeout=self.timeout,
             max_bytes=MAX_BINANCE_RESPONSE_BYTES,
-            attempts=MAX_BINANCE_ATTEMPTS,
+            attempts=max_attempts,
             wait=self.wait,
         )
         return parse_ticker_payload(response.body, received_at=response.received_at), attempts
 
-    def klines(self, *, limit: int = 100) -> tuple[BinanceKlineResult, int]:
+    def klines(self, *, limit: int = 100, max_attempts: int = MAX_BINANCE_ATTEMPTS) -> tuple[BinanceKlineResult, int]:
         if not 1 <= limit <= 1000:
             raise ConnectivityError("invalid_request", "kline limit must be between 1 and 1000", provider=BINANCE_PROVIDER)
         url = self._url(BINANCE_KLINE_PATH, {"symbol": BTC_SYMBOL, "interval": "1m", "limit": str(limit)})
@@ -658,7 +661,7 @@ class BinancePublicAdapter:
             body=None,
             timeout=self.timeout,
             max_bytes=MAX_BINANCE_RESPONSE_BYTES,
-            attempts=MAX_BINANCE_ATTEMPTS,
+            attempts=max_attempts,
             wait=self.wait,
         )
         return parse_kline_payload(response.body, received_at=response.received_at), attempts
@@ -711,7 +714,8 @@ class FixtureConnectivityAdapter:
         return parse_kline_payload(self.kline_payload, received_at="2026-01-01T00:03:00+00:00")
 
     def jev(self) -> JevAssessment:
-        return parse_jev_response(self.jev_response, build_jev_request(), received_at="2026-01-01T00:04:00+00:00")
+        response = parse_jev_response(self.jev_response, build_jev_request(), received_at="2026-01-01T00:04:00+00:00")
+        return replace(response, usage={"input_tokens": None, "output_tokens": None}, latency_ms=None, cost_usd=None)
 
     def evaluate_jev(self, case_id: str) -> JevAssessment:
         case = self.recorded_cases.get(case_id)
@@ -775,14 +779,35 @@ class JevLiveBudget:
     max_spend_usd: float = JEV_MAX_SPEND_USD
     requests: int = 0
     reserved_spend_usd: float = 0.0
+    reservation_path: str | Path | None = None
 
-    def reserve(self, payload: bytes) -> None:
+    def reserve(self, payload: bytes) -> float:
         if self.max_requests != 1 or self.requests >= self.max_requests:
             raise ConnectivityError("request_budget_exhausted", "Jev probe permits exactly one request", provider=TYPESAFE_PROVIDER)
         estimated = len(payload) / 4 * JEV_INPUT_COST_PER_MILLION / 1_000_000
         if not math.isfinite(estimated) or estimated > self.max_spend_usd or estimated > JEV_MAX_SPEND_USD:
-            raise ConnectivityError("budget_exceeded", "Jev request exceeds the strict spend ceiling", provider=TYPESAFE_PROVIDER)
+            raise ConnectivityError("budget_exceeded", "estimated Jev request cost exceeds the configured ceiling", provider=TYPESAFE_PROVIDER)
         self.reserved_spend_usd = estimated
+        if self.reservation_path is not None:
+            path = Path(self.reservation_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                with path.open("x", encoding="utf-8") as handle:
+                    json.dump(
+                        {
+                            "schema": "market-os.u3-api-jev-reservation.v1",
+                            "reserved_at": _iso_now(),
+                            "request_fingerprint": _sha_bytes(payload),
+                            "estimated_cost_usd": estimated,
+                            "max_spend_usd": self.max_spend_usd,
+                            "request_count": 1,
+                        },
+                        handle,
+                        sort_keys=True,
+                    )
+            except FileExistsError as exc:
+                raise ConnectivityError("request_budget_exhausted", "durable Jev probe reservation already exists", provider=TYPESAFE_PROVIDER) from exc
+        return estimated
 
 
 class TypeSafeHttpAdapter:
@@ -796,10 +821,10 @@ class TypeSafeHttpAdapter:
             raise ConnectivityError("live_probe_required", "Jev live probe requires --allow-live-probe", provider=TYPESAFE_PROVIDER)
         if not paper_only:
             raise ConnectivityError("paper_only_required", "Jev live probe requires paper-only mode", provider=TYPESAFE_PROVIDER)
-        if not isinstance(api_key, str) or not api_key.strip():
+        if not isinstance(api_key, str) or not api_key.strip() or api_key.strip().lower() in {"placeholder", "your-api-key", "replace-me", "test-key"}:
             raise ConnectivityError("missing_credential", "TYPESAFE_API_KEY is required for the live Jev probe", provider=TYPESAFE_PROVIDER)
         payload = _json(request.payload)
-        self.budget.reserve(payload)
+        estimated_cost = self.budget.reserve(payload)
         self.budget.requests += 1
         started_at = _iso_now()
         response, attempts = _request_with_retries(
@@ -816,15 +841,16 @@ class TypeSafeHttpAdapter:
         )
         received_at = response.received_at
         latency_ms = max(0, int((_utc(received_at, "response_received_at") - _utc(started_at, "request_started_at")).total_seconds() * 1000))
-        return parse_jev_response(
+        return replace(parse_jev_response(
             _load_json(response.body, "Jev"),
             request,
             request_started_at=started_at,
             received_at=received_at,
             latency_ms=latency_ms,
             estimate_cost=True,
+            cost_usd=estimated_cost,
             raw_bytes=response.body,
-        ), attempts
+        ), cost_status="estimated-from-provider-input-tokens-not-billing"), attempts
 
 
 @dataclass(frozen=True)
@@ -959,11 +985,11 @@ def binance_probe(adapter: BinancePublicAdapter, operation: str) -> ProbeRecord:
     started = _iso_now()
     try:
         if operation == "ticker":
-            result, attempts = adapter.ticker()
+            result, attempts = adapter.ticker(max_attempts=MAX_BINANCE_LIVE_ATTEMPTS)
             normalized = result.to_dict()
             response_fp = result.response_fingerprint
         else:
-            result, attempts = adapter.klines()
+            result, attempts = adapter.klines(max_attempts=MAX_BINANCE_LIVE_ATTEMPTS)
             normalized = result.to_dict()
             response_fp = result.response_fingerprint
         finished = _iso_now()
@@ -977,21 +1003,33 @@ def binance_probe(adapter: BinancePublicAdapter, operation: str) -> ProbeRecord:
         return ProbeRecord(_probe_id("binance-public", operation, request_fp), "binance-public", BINANCE_PROVIDER, operation, endpoint, "failed", started, finished, max(1, exc.attempts), max(0, exc.attempts - 1), request_fp, None, None, {"code": exc.code, "message": str(exc), "status": exc.status, "retryable": exc.retryable, "retry_after": exc.retry_after}, "not-required", "not-applicable-public-read", True)
 
 
-def jev_probe(adapter: TypeSafeHttpAdapter, *, model: str, api_key: str | None, allow_live_probe: bool, paper_only: bool, max_spend_usd: float) -> ProbeRecord:
+def jev_probe(
+    adapter: TypeSafeHttpAdapter,
+    *,
+    model: str,
+    api_key: str | None,
+    allow_live_probe: bool,
+    paper_only: bool,
+    max_spend_usd: float,
+    reservation_path: str | Path | None = None,
+) -> ProbeRecord:
     if max_spend_usd != JEV_MAX_SPEND_USD:
         raise ConnectivityError("budget_required", f"Jev probe requires exact max spend ${JEV_MAX_SPEND_USD:.2f}", provider=TYPESAFE_PROVIDER)
     if not allow_live_probe:
         raise ConnectivityError("live_probe_required", "Jev live probe requires --allow-live-probe", provider=TYPESAFE_PROVIDER)
     if not paper_only:
         raise ConnectivityError("paper_only_required", "Jev live probe requires paper-only mode", provider=TYPESAFE_PROVIDER)
-    if not api_key or not api_key.strip():
+    if not api_key or not api_key.strip() or api_key.strip().lower() in {"placeholder", "your-api-key", "replace-me", "test-key"}:
         raise ConnectivityError("missing_credential", "TYPESAFE_API_KEY is required for the live Jev probe", provider=TYPESAFE_PROVIDER)
+    adapter.budget.reservation_path = reservation_path
     request = build_jev_request(model=model)
     started = _iso_now()
     try:
         assessment, attempts = adapter.assess(api_key=api_key or "", request=request, allow_live_probe=allow_live_probe, paper_only=paper_only)
         finished = _iso_now()
-        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "valid", started, finished, attempts, 0, request.fingerprint, assessment.response_fingerprint, {**assessment.to_dict(), "execution": {"action": "none", "paper_only": True}}, None, "present", f"reserved-up-to-${max_spend_usd:.2f}", True)
+        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "valid", started, finished, attempts, 0, request.fingerprint, assessment.response_fingerprint, {**assessment.to_dict(), "execution": {"action": "none", "paper_only": True}}, None, "present", "estimated-from-provider-input-tokens-not-billing", True)
     except ConnectivityError as exc:
+        if exc.code == "request_budget_exhausted":
+            raise
         finished = _iso_now()
-        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "failed", started, finished, adapter.budget.requests, 0, request.fingerprint, None, None, {"code": exc.code, "message": str(exc), "status": exc.status, "retryable": exc.retryable, "retry_after": exc.retry_after}, "present" if api_key else "missing", f"capped-at-${max_spend_usd:.2f}", True)
+        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "failed", started, finished, adapter.budget.requests, 0, request.fingerprint, None, None, {"code": exc.code, "message": str(exc), "status": exc.status, "retryable": exc.retryable, "retry_after": exc.retry_after}, "present" if api_key else "missing", "estimated-from-provider-input-tokens-not-billing", True)

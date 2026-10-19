@@ -24,6 +24,8 @@ from market_os.btc_connectivity import (
     UrllibTransport,
     TypeSafeHttpAdapter,
     TimeoutConfig,
+    binance_probe,
+    jev_probe,
     JEV_QUESTION_VERSION,
     SYNTHETIC_JEV_REQUEST,
     ConnectivityError,
@@ -286,6 +288,15 @@ def test_binance_timeout_is_bounded_and_categorized() -> None:
     assert waits == [0.5, 1.0]
 
 
+def test_binance_live_probe_is_one_attempt_even_for_transient_failure() -> None:
+    transport = FakeTransport([_http(503, b"{}"), _http(200, json.dumps(TICKER).encode())])
+    record = binance_probe(BinancePublicAdapter(transport=transport), "ticker")
+    assert record.status == "failed"
+    assert record.request_count == 1
+    assert record.retry_count == 0
+    assert len(transport.calls) == 1
+
+
 def test_endpoint_allowlist_rejects_private_and_unapproved_hosts_without_network() -> None:
     transport = UrllibTransport()
     with pytest.raises(ConnectivityError, match="path"):
@@ -304,6 +315,34 @@ def test_jev_budget_refuses_before_transport_and_uses_exact_ceiling() -> None:
     assert adapter.budget.requests == 0
     assert not transport.calls
     assert JEV_MAX_SPEND_USD == 0.05
+
+
+def test_jev_reservation_survives_fresh_adapter_and_refuses_second_process(tmp_path: Path) -> None:
+    reservation = tmp_path / "jev-live.reservation.json"
+    first_transport = FakeTransport([_http(200, json.dumps(_response()).encode())])
+    first = jev_probe(
+        TypeSafeHttpAdapter(transport=first_transport),
+        model="jev-1.14.0",
+        api_key="secret",
+        allow_live_probe=True,
+        paper_only=True,
+        max_spend_usd=0.05,
+        reservation_path=reservation,
+    )
+    assert first.status == "valid"
+    assert reservation.is_file()
+    second_transport = FakeTransport([_http(200, json.dumps(_response()).encode())])
+    with pytest.raises(ConnectivityError, match="reservation"):
+        jev_probe(
+            TypeSafeHttpAdapter(transport=second_transport),
+            model="jev-1.14.0",
+            api_key="secret",
+            allow_live_probe=True,
+            paper_only=True,
+            max_spend_usd=0.05,
+            reservation_path=reservation,
+        )
+    assert not second_transport.calls
 
 
 def test_jev_live_probe_requires_flag_key_paper_mode_and_one_request() -> None:

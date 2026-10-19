@@ -217,7 +217,15 @@ def main(argv: list[str] | None = None) -> int:
                 result = binance_probe(BinancePublicAdapter(), args.operation)
                 print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
                 return 0
-            result = jev_probe(TypeSafeHttpAdapter(), model=args.model_version, api_key=os.environ.get("TYPESAFE_API_KEY"), allow_live_probe=args.allow_live_probe, paper_only=args.paper_only, max_spend_usd=args.max_spend_usd)
+            result = jev_probe(
+                TypeSafeHttpAdapter(),
+                model=args.model_version,
+                api_key=os.environ.get("TYPESAFE_API_KEY"),
+                allow_live_probe=args.allow_live_probe,
+                paper_only=args.paper_only,
+                max_spend_usd=args.max_spend_usd,
+                reservation_path=Path(args.store_root) / "jev-live.reservation.json",
+            )
             print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
             return 0
         store = HistoryStore(args.store_root)
