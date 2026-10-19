@@ -85,6 +85,30 @@ Preflight verification after safety fixes: 41 focused connectivity tests, 40
 B0/B1/B2/B3 regressions, and 252 full-suite tests with one skipped test. No
 live provider request was made.
 
+## Actual approved Jev attempt
+
+The approved Jev command was executed exactly once on 2026-10-19. The User
+environment contained a non-placeholder `TYPESAFE_API_KEY`; its value was not
+printed or persisted. The request used pinned model `jev-1.14.0`, the committed
+synthetic payload, paper-only mode, one request, and zero retries.
+
+Observed result:
+
+- Request count: `1`
+- Retry count: `0`
+- Status: failed safely during local response validation
+- Failure: the returned Score `context_score` was rejected as inconsistent
+  under the preflight parser's exact floating-point check
+- No trade, order, exchange-account access, portfolio mutation, or execution
+  occurred.
+
+The response was not retried. The follow-up offline fix accepts the bounded
+decimal rounding documented by TypeSafe's Score semantics: the Score is the
+probability-weighted mean of level numbers and may be fractional. Future
+approved attempts must still use the durable reservation and one-request
+policy; this failed attempt consumed the reservation and must not be repeated
+without new approval.
+
 ## Prepared live commands — not executed
 
 Binance public one-shot ticker probe:

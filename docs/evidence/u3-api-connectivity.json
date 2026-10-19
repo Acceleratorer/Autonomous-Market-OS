@@ -58,7 +58,16 @@
     "official_binance_docs_direct_page": "HTTP 202 WAF challenge from current environment",
     "provider_reported_usage_observed": false,
     "provider_billed_cost_observed": false,
-    "preflight_status": "ready-for-review; Binance source/legal gate unresolved; no live request made"
+    "preflight_status": "Jev one-shot executed once and failed safely during validation; Binance source/legal gate unresolved",
+    "jev_live_result": {
+      "request_count": 1,
+      "retry_count": 0,
+      "status": "failed",
+      "failure_code": "invalid_jev_response",
+      "failure_reason": "score answer context_score was inconsistent under the preflight validator before rounding tolerance was corrected",
+      "no_retry_or_repeat": true,
+      "trade_or_execution": false
+    }
   },
   "risks": [
     "Binance regional availability, legal terms, and retention remain unresolved",

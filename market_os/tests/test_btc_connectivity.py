@@ -183,6 +183,13 @@ def test_official_jev_wire_response_parses_all_documented_answer_types() -> None
     assert assessment.semantic_boundary == "descriptive_experimental_assessment"
 
 
+def test_score_parser_accepts_bounded_documented_decimal_rounding() -> None:
+    value = _response()
+    value["answers"]["context_score"]["score"] = 1.105
+    assessment = parse_jev_response(value, build_jev_request())
+    assert assessment.answers["context_score"]["score"] == 1.105
+
+
 @pytest.mark.parametrize(
     "mutator, message",
     [
@@ -263,6 +270,18 @@ def test_jev_http_error_categories_are_safe_and_bounded(status: int, code: str) 
         adapter.assess(api_key="secret", request=build_jev_request(), allow_live_probe=True, paper_only=True)
     assert failure.value.code == code
     assert len(transport.calls) == 1
+
+
+def test_failed_jev_validation_preserves_only_redacted_response_metadata() -> None:
+    value = _response()
+    value["answers"]["context_score"]["score"] = 9.0
+    transport = FakeTransport([_http(200, json.dumps(value).encode())])
+    adapter = TypeSafeHttpAdapter(transport=transport)
+    with pytest.raises(ConnectivityError, match="outside its levels"):
+        adapter.assess(api_key="secret", request=build_jev_request(), allow_live_probe=True, paper_only=True)
+    assert adapter.last_response_fingerprint
+    assert adapter.last_response_received_at
+    assert adapter.last_response_usage == {"input_tokens": 300, "output_tokens": 40}
 
 
 def test_binance_retries_429_and_5xx_with_bounded_retry_after() -> None:

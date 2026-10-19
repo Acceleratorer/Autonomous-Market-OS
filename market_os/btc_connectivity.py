@@ -45,6 +45,7 @@ MAX_BINANCE_LIVE_ATTEMPTS = 1
 MAX_RETRY_AFTER_SECONDS = 60.0
 JEV_MAX_SPEND_USD = 0.05
 JEV_INPUT_COST_PER_MILLION = 0.042
+SCORE_ROUNDING_TOLERANCE = 0.011
 
 
 def _json(value: Any) -> bytes:
@@ -462,7 +463,7 @@ def _answer(value: Any, question: str, *, allowed_options: set[str] | None = Non
     if sorted(level_values) != list(range(len(level_values))) or not min(level_values) <= score <= max(level_values):
         raise ConnectivityError("invalid_jev_response", f"score answer {question} is outside its levels")
     expected_score = sum(level * probabilities[str(level)] for level in level_values)
-    if not math.isclose(score, expected_score, abs_tol=1e-6):
+    if not math.isclose(score, expected_score, abs_tol=SCORE_ROUNDING_TOLERANCE):
         raise ConnectivityError("invalid_jev_response", f"score answer {question} is inconsistent")
     return {"type": kind, "score": score, "confidence": confidence, "legend": value["legend"], "probabilities": probabilities}
 
@@ -815,6 +816,9 @@ class TypeSafeHttpAdapter:
         self.transport = transport or UrllibTransport()
         self.timeout = timeout
         self.budget = budget or JevLiveBudget()
+        self.last_response_fingerprint: str | None = None
+        self.last_response_received_at: str | None = None
+        self.last_response_usage: dict[str, int | None] | None = None
 
     def assess(self, *, api_key: str, request: JevRequest, allow_live_probe: bool, paper_only: bool) -> tuple[JevAssessment, int]:
         if not allow_live_probe:
@@ -841,6 +845,9 @@ class TypeSafeHttpAdapter:
         )
         received_at = response.received_at
         latency_ms = max(0, int((_utc(received_at, "response_received_at") - _utc(started_at, "request_started_at")).total_seconds() * 1000))
+        self.last_response_fingerprint = _sha_bytes(response.body)
+        self.last_response_received_at = received_at
+        self.last_response_usage = _observed_usage(_load_json(response.body, "Jev"))
         return replace(parse_jev_response(
             _load_json(response.body, "Jev"),
             request,
@@ -851,6 +858,20 @@ class TypeSafeHttpAdapter:
             cost_usd=estimated_cost,
             raw_bytes=response.body,
         ), cost_status="estimated-from-provider-input-tokens-not-billing"), attempts
+
+
+def _observed_usage(payload: Any) -> dict[str, int | None] | None:
+    if not isinstance(payload, dict) or not isinstance(payload.get("usage"), dict):
+        return None
+    usage = payload["usage"]
+    result: dict[str, int | None] = {}
+    for name in ("input_tokens", "output_tokens"):
+        value = usage.get(name)
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            result[name] = value
+        else:
+            result[name] = None
+    return result
 
 
 @dataclass(frozen=True)
@@ -1032,4 +1053,9 @@ def jev_probe(
         if exc.code == "request_budget_exhausted":
             raise
         finished = _iso_now()
-        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "failed", started, finished, adapter.budget.requests, 0, request.fingerprint, None, None, {"code": exc.code, "message": str(exc), "status": exc.status, "retryable": exc.retryable, "retry_after": exc.retry_after}, "present" if api_key else "missing", "estimated-from-provider-input-tokens-not-billing", True)
+        observed = {
+            "response_received_at": adapter.last_response_received_at,
+            "response_usage": adapter.last_response_usage,
+            "response_fingerprint": adapter.last_response_fingerprint,
+        }
+        return ProbeRecord(_probe_id("jev-live", "systemone", request.fingerprint), "jev-live", TYPESAFE_PROVIDER, "systemone", f"{TYPESAFE_BASE_URL}{TYPESAFE_SYSTEM_ONE_PATH}", "failed", started, finished, adapter.budget.requests, 0, request.fingerprint, adapter.last_response_fingerprint, {"response_metadata": observed, "execution": {"action": "none", "paper_only": True}}, {"code": exc.code, "message": str(exc), "status": exc.status, "retryable": exc.retryable, "retry_after": exc.retry_after}, "present" if api_key else "missing", "estimated-from-provider-input-tokens-not-billing", True)
