@@ -82,9 +82,10 @@ provider/model drift, response latency, and lack of BTC-target calibration.
 No Binance live request was made during implementation, preflight, or
 verification. No trade or exchange execution occurred.
 
-Preflight verification after safety fixes: 41 focused connectivity tests, 40
-B0/B1/B2/B3 regressions, and 252 full-suite tests with one skipped test. No
-live provider request was made.
+Offline and regression verification after safety fixes: 41 focused connectivity
+tests, 40 B0/B1/B2/B3 regressions, and 252 full-suite tests with one skipped
+test. The separately approved Jev attempt below is the only live provider
+request; no Binance request was made.
 
 ## Actual approved Jev attempt
 

@@ -489,3 +489,17 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   regression tests, and 252 full-suite tests with one skipped test. Exact
   commands are in the connectivity report;
   separate explicit approval remains required before any live request.
+
+## 2026-10-19 — Approved Jev one-shot result
+
+- The user explicitly approved the pinned `jev-1.14.0` synthetic one-shot with
+  one request, zero retries, paper-only mode, and estimate-only cost handling.
+- The User-scope `TYPESAFE_API_KEY` was present and non-placeholder; its value
+  was never printed, persisted, or included in evidence. The request executed
+  exactly once, with zero retries, and no Binance request was made.
+- The provider response failed safely during local Score validation because the
+  returned `context_score` did not match the parser's then-exact floating-point
+  consistency check. No order, trade, portfolio mutation, or execution occurred.
+- The durable Jev reservation is consumed. The response was not retried. A
+  subsequent run requires new explicit approval; the parser now accepts the
+  bounded decimal rounding documented by TypeSafe Score semantics offline.
