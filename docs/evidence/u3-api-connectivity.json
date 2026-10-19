@@ -50,9 +50,10 @@
     "trade_or_execution_requests": 0
   },
   "preflight": {
-    "typesafe_api_key_present": false,
+    "typesafe_api_key_present_before_approved_run": false,
+    "typesafe_api_key_present_for_approved_run": true,
     "live_binance_request_made": false,
-    "live_jev_request_made": false,
+    "live_jev_request_made": true,
     "official_typesafe_docs_retrieved": "2026-10-19",
     "official_binance_source_repository_retrieved": "2026-10-19",
     "official_binance_docs_direct_page": "HTTP 202 WAF challenge from current environment",

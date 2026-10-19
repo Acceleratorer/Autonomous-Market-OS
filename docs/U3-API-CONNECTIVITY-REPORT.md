@@ -41,9 +41,10 @@ fails closed when the configured estimate exceeds `$0.05`, reports live cost as
 `estimated-from-provider-input-tokens-not-billing`, and does not claim that the
 provider cannot charge more than the estimate.
 
-Offline Jev latency, usage, and cost remain unknown rather than zero. The
-current environment does not contain `TYPESAFE_API_KEY`; no live request was
-attempted.
+Offline Jev latency, usage, and cost remain unknown rather than zero. Before
+the approved run, `TYPESAFE_API_KEY` was absent from the active process and was
+then confirmed present/non-placeholder in the local User environment without
+printing its value.
 
 ## Evidence and risks
 
@@ -78,7 +79,7 @@ Unresolved risks include Binance regional availability and terms, retention and
 redistribution policy, TypeSafe regional/account entitlement, pricing drift,
 provider/model drift, response latency, and lack of BTC-target calibration.
 
-No paid Jev request or Binance live request was made during implementation or
+No Binance live request was made during implementation, preflight, or
 verification. No trade or exchange execution occurred.
 
 Preflight verification after safety fixes: 41 focused connectivity tests, 40
@@ -97,8 +98,8 @@ Observed result:
 - Request count: `1`
 - Retry count: `0`
 - Status: failed safely during local response validation
-- Failure: the returned Score `context_score` was rejected as inconsistent
-  under the preflight parser's exact floating-point check
+- Failure: the returned Score `context_score` was initially rejected as
+  inconsistent under the preflight parser's exact floating-point check
 - No trade, order, exchange-account access, portfolio mutation, or execution
   occurred.
 
@@ -146,6 +147,7 @@ python -m market_os.cli btc-paper connectivity jev --allow-live-probe --model-ve
   request/response fingerprints, timestamps, latency, provider usage when
   returned, estimate-only cost status, validation, abstention, and `action: none`.
 
-The Jev command requires the key in the local environment only. Current
-preflight status: `TYPESAFE_API_KEY` is absent; its value was not printed or
-requested in chat. No paid request was attempted.
+The Jev command requires the key in the local environment only. The approved
+request used a present/non-placeholder User-scope key without printing its
+value. The request is consumed; the durable reservation prevents repetition
+without new approval. No Binance request has been approved or attempted.
