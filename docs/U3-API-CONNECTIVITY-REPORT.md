@@ -79,8 +79,9 @@ Unresolved risks include Binance regional availability and terms, retention and
 redistribution policy, TypeSafe regional/account entitlement, pricing drift,
 provider/model drift, response latency, and lack of BTC-target calibration.
 
-No Binance live request was made during implementation, preflight, or
-verification. No trade or exchange execution occurred.
+No Binance live request was made during implementation or offline verification.
+The separately approved one-shot ticker request is recorded below. No trade or
+exchange execution occurred.
 
 Offline and regression verification after safety fixes: 41 focused connectivity
 tests, 40 B0/B1/B2/B3 regressions, and 252 full-suite tests with one skipped
@@ -110,6 +111,34 @@ probability-weighted mean of level numbers and may be fractional. Future
 approved attempts must still use the durable reservation and one-request
 policy; this failed attempt consumed the reservation and must not be repeated
 without new approval.
+
+## Actual approved Binance ticker attempt
+
+The approved equivalent command was executed exactly once because the
+`market-os` executable was not on PATH but `python -m market_os.cli` passed the
+offline help check:
+
+```text
+python -m market_os.cli btc-paper connectivity binance --operation ticker --allow-live-probe
+```
+
+Observed result:
+
+- Endpoint: `https://data-api.binance.vision/api/v3/ticker/price`
+- Operation: public BTCUSDT ticker
+- HTTP request count: `1`
+- Retry count: `0`
+- Status: successful and validated
+- Symbol: `BTCUSDT`
+- Price: `83063.15000000`
+- Response fingerprint: `4d637e86a20e5f74b357af1df458645720e2bd0cb5e109b237f4acacf4f44a79`
+- Latency: `626 ms` from recorded request start to response receipt
+- Regional/rate-limit/error status: no error; no 4xx/429/451/5xx was observed
+- HTTP status: not separately persisted by the pre-existing probe manifest
+- Stored evidence: `.market_os/btc-connectivity/runs/connectivity-83fe6abe14f27cf21f79/`
+- Replay: passed with zero new network/provider requests
+- Credentials/account/order/balance/withdrawal/futures/margin/WebSocket: none
+- Trade/order/fill/portfolio mutation: none
 
 ## Prepared live commands — not executed
 

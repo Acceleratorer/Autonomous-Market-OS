@@ -503,3 +503,18 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The durable Jev reservation is consumed. The response was not retried. A
   subsequent run requires new explicit approval; the parser now accepts the
   bounded decimal rounding documented by TypeSafe Score semantics offline.
+
+## 2026-10-19 — Approved Binance public ticker result
+
+- The `market-os` executable was absent from PATH, so the already-approved
+  equivalent `python -m market_os.cli` invocation was verified offline with
+  `--help` and then executed once.
+- The public ticker request succeeded at
+  `https://data-api.binance.vision/api/v3/ticker/price` for BTCUSDT with one
+  request, zero retries, validated price `83063.15000000`, response fingerprint
+  `4d637e86a20e5f74b357af1df458645720e2bd0cb5e109b237f4acacf4f44a79`, and
+  recorded latency of 626 ms.
+- Replay passed with zero new requests. No Binance credential, account access,
+  order, balance, withdrawal, futures, margin, WebSocket, trade, fill, or
+  portfolio mutation occurred. HTTP status was not separately persisted by
+  the existing probe manifest; success and absence of error were observed.

@@ -47,21 +47,21 @@
     "baseline_before_changes": "211 passed, 1 skipped",
     "full_suite": "252 passed, 1 skipped",
     "live_provider_requests": 1,
-    "live_binance_requests": 0,
+    "live_binance_requests": 1,
     "live_jev_requests": 1,
     "trade_or_execution_requests": 0
   },
   "preflight": {
     "typesafe_api_key_present_before_approved_run": false,
     "typesafe_api_key_present_for_approved_run": true,
-    "live_binance_request_made": false,
+    "live_binance_request_made": true,
     "live_jev_request_made": true,
     "official_typesafe_docs_retrieved": "2026-10-19",
     "official_binance_source_repository_retrieved": "2026-10-19",
     "official_binance_docs_direct_page": "HTTP 202 WAF challenge from current environment",
     "provider_reported_usage_observed": false,
     "provider_billed_cost_observed": false,
-    "preflight_status": "Jev one-shot executed once and failed safely during validation; Binance source/legal gate unresolved",
+    "preflight_status": "Jev one-shot failed safely once; Binance ticker one-shot succeeded; Binance source/legal gate remains unresolved",
     "jev_live_result": {
       "request_count": 1,
       "retry_count": 0,
@@ -69,6 +69,20 @@
       "failure_code": "invalid_jev_response",
       "failure_reason": "score answer context_score was inconsistent under the preflight validator before rounding tolerance was corrected",
       "no_retry_or_repeat": true,
+      "trade_or_execution": false
+    },
+    "binance_live_result": {
+      "request_count": 1,
+      "retry_count": 0,
+      "status": "valid",
+      "endpoint": "https://data-api.binance.vision/api/v3/ticker/price",
+      "operation": "ticker",
+      "symbol": "BTCUSDT",
+      "response_fingerprint": "4d637e86a20e5f74b357af1df458645720e2bd0cb5e109b237f4acacf4f44a79",
+      "price": "83063.15000000",
+      "latency_ms": 626,
+      "http_status": "not-persisted-by-existing-manifest",
+      "regional_or_rate_limit_error": false,
       "trade_or_execution": false
     }
   },
