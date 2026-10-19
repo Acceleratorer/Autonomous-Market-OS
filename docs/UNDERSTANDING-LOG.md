@@ -518,3 +518,30 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   order, balance, withdrawal, futures, margin, WebSocket, trade, fill, or
   portfolio mutation occurred. HTTP status was not separately persisted by
   the existing probe manifest; success and absence of error were observed.
+
+## 2026-10-19 — U3/B1 historical-data authorization and dataset readiness
+
+- Rechecked official Binance primary materials for the market-data-only host,
+  `/api/v3/klines`, UTC millisecond timestamp/range behavior, chronological
+  kline ordering, 1,000-row maximum page size, used-weight headers, 429/418
+  handling, and 403/WAF behavior. The Binance terms page returned an HTTP 202
+  challenge from this environment, so terms, regional eligibility, retention,
+  and redistribution rights remain unresolved.
+- Added ADR-0021 and a versioned offline readiness contract in
+  `market_os/btc_history.py`. It reuses the existing B1 `HistoryStore`,
+  checkpoint, raw-page, Parquet/DuckDB, manifest, lineage, and replay seams.
+- The proposal is BTCUSDT Spot `1m`, the half-open 30-day range before an
+  explicit UTC minute cutoff, 43,200 expected rows, 44 pages, 44 maximum
+  HTTP requests, one attempt per page, 900-second runtime cap, and 256 KiB
+  response cap. The candle opening at the cutoff is excluded.
+- Historical acquisition now requires `--allow-historical-ingest`, a matching
+  versioned authorization policy, exact requested caps/range, and verified
+  terms/region/retention flags before transport. The Binance transport remains
+  hard-disabled; readiness and inspection paths perform zero provider requests.
+- Added offline CLI/API readiness inspection, focused budget/response-size/
+  approval/refusal tests, and a machine-readable readiness evidence record.
+  No historical Binance request, Jev request, credential use, trade, order,
+  fill, or portfolio mutation occurred. U4/B4 and U5/B5 remain unstarted.
+- Exact future approval phrase is recorded in
+  `docs/U3-B1-HISTORICAL-READINESS-REPORT.md` and
+  `docs/evidence/u3-b1-btc-historical-readiness.json`.

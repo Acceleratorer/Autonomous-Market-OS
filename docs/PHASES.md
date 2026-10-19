@@ -16,7 +16,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 |---|---|---|---|
 | U0 — Foundation and ownership | M0–M1 | Product boundary, repository ownership, contracts, orchestration, persistence, recovery, and paper-only enforcement | Complete |
 | U1 — Research platform | M2, including M2.1–M2.9 | Cited research, retrieval, backtesting adapters, model boundary, quality gates, and offline CI | Built; M2.9 live smoke remains blocked and isolated |
-| U2 — Quantitative data foundation | B0–B1 | BTCUSDT closed-candle contracts, historical dataset storage, manifests, lineage, gaps, deduplication, and deterministic replay | Complete offline |
+| U2 — Quantitative data foundation | B0–B1 | BTCUSDT closed-candle contracts, historical dataset storage, manifests, lineage, gaps, deduplication, deterministic replay, and source-readiness authorization | Complete offline; network authorization pending |
 | U3 — Quantitative evaluation | B2–B3; selected M5 controls; API connectivity | Deterministic features and labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded read-only provider connectivity | B2/B3/U3-API implemented offline; B3 not promoted |
 | U4 — Paper portfolio | M3 + B4 | Shared virtual broker, portfolio ledger, costs, fills, risk policy, approvals, and paper-only shadow mode | Planned |
 | U5 — Web operations | M4 web + B5 | Web deployment of the existing API with BTC data, experiment, report, and paper-portfolio views | Planned |
@@ -38,7 +38,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 
 - U0 is complete.
 - U1 is built through offline M2.8 preparation; M2.9 remains blocked by the missing approved credential and is not a dependency for BTC work.
-- U2 is complete with B1's network transport still disabled.
+- U2 is complete offline with B1's network transport still disabled. The U3/B1 readiness gate defines a 30-day, 44-page proposal but does not authorize historical requests.
 - U3 includes deterministic B2/B3 evaluation and the bounded U3/API connectivity slice. B2/B3/U3-API are implemented offline; B3 is not promoted because the shipped fixture has no leakage-safe labels. U4/B4 and U5/B5 have not started.
 
 ## Exit gates
@@ -46,7 +46,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 - U0: contracts, ownership, recovery, and paper-only tests pass.
 - U1: cited research and adapter workflows replay with evidence and CI checks.
 - U2: canonical BTC data replays identically with explicit quality outcomes.
-- U3: frozen chronological evaluation, leakage checks, calibration, and baseline reports exist.
+- U3: frozen chronological evaluation, leakage checks, calibration, baseline reports, bounded provider connectivity, and the historical-data readiness decision exist.
 - U4: virtual fills, accounting, costs, and risk replay identically with no live path.
 - U5: deployment, auth boundary, observability, recovery, and paper-only behavior are verified.
 - U6: CLI and app use the same API/contracts and own no domain or risk logic.

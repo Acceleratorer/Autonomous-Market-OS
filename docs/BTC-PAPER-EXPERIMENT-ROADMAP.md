@@ -5,10 +5,11 @@
 U5; and B6/B7 map to U6. Use `docs/ROADMAP.md`, `docs/PHASES.md`, and
 `docs/decisions/ADR-0017-unified-roadmap.md` for the forward sequence.
 
-**Safety status:** B0 and B1 are complete offline. Public market-data transport
-remains disabled until source/legal review and explicit approval. This roadmap
-does not authorize a market-data network connection, a Jev request, a model
-credential, or a real exchange action.
+**Safety status:** B0 and B1 are complete offline. The U3/B1 readiness gate
+defines a bounded 30-day proposal, but public market-data transport remains
+disabled until source/legal/region/retention review and separate explicit
+approval. This roadmap does not authorize a market-data network connection, a
+Jev request, a model credential, or a real exchange action.
 ## Product boundary
 
 The experiment studies BTCUSDT Spot with a five-minute horizon using closed
@@ -46,7 +47,8 @@ deferred until its contracts stabilize.
 
 B1 adds fixture-backed `btc-paper ingest` plus read-only manifest, candle,
 outcome, provenance, gap, and stored-replay inspection. The candidate public
-transport is isolated and disabled.
+transport is isolated and disabled. `btc-paper historical-readiness` calculates
+the explicit 30-day/44-page proposal; it performs zero network requests.
 
 ## B0: data contract and replay foundation
 
@@ -139,7 +141,11 @@ no network/model/broker code;
 the implementation and tests use only the standard library and existing
 pytest.
 
-## B2 implementation result and next milestone
+The readiness decision is in `docs/U3-B1-HISTORICAL-READINESS-REPORT.md`,
+ADR-0021, and `docs/evidence/u3-b1-btc-historical-readiness.json`. The exact
+future approval phrase is recorded there; no historical request was made.
+
+## B2 implementation result
 
 **B2 — deterministic feature/label materialization and chronological numerical
 baselines** is implemented offline. The code persists versioned features,
@@ -151,9 +157,8 @@ unavailable. See `docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and
 `docs/evidence/u3-b2-btc-features-baselines.json`.
 
 LightGBM is deferred: the small offline B2 result does not justify a new model
-dependency. B1 historical transport remains disabled until source/legal review
-and explicit approval resolve the network gate. The exact next milestone is
-**U3/B3 — controlled Jev incremental-value benchmark**.
+dependency. B1 historical transport remains disabled until source/legal/region/
+retention review and explicit bounded-run approval resolve the network gate.
 
 ## B3 implementation result
 
@@ -173,5 +178,6 @@ predictive and calibration metrics are unavailable; the promotion decision is
 **not promoted**. See `docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md`,
 ADR-0019, and `docs/evidence/u3-b3-jev-incremental.json`.
 
-The exact next unified milestone is **U4/B4 — shared paper portfolio and
-virtual broker**, subject to its separate paper-only gate.
+The exact next gate is a separate review of the U3/B1 historical authorization
+decision. U4/B4 remains unstarted and must not begin until the data-readiness
+evidence is reviewed; U5/B5 remains unstarted.

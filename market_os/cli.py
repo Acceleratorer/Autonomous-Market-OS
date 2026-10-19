@@ -65,7 +65,18 @@ def build_parser() -> argparse.ArgumentParser:
     btc_acquire = btc_commands.add_parser("acquire")
     btc_acquire.add_argument("--start-ms", type=int, required=True)
     btc_acquire.add_argument("--end-ms", type=int, required=True)
+    btc_acquire.add_argument("--page-size", type=int, default=1000)
+    btc_acquire.add_argument("--max-pages", type=int, default=44)
+    btc_acquire.add_argument("--max-requests", type=int, default=44)
+    btc_acquire.add_argument("--max-rows", type=int, default=43_200)
+    btc_acquire.add_argument("--max-runtime-seconds", type=int, default=900)
+    btc_acquire.add_argument("--max-attempts", type=int, default=1)
+    btc_acquire.add_argument("--allow-historical-ingest", action="store_true")
+    btc_acquire.add_argument("--authorization-file")
+    btc_acquire.add_argument("--no-resume", action="store_true")
     btc_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_readiness = btc_commands.add_parser("historical-readiness")
+    btc_readiness.add_argument("--cutoff-ms", type=int, required=True)
     btc_inspect = btc_commands.add_parser("inspect")
     btc_inspect.add_argument("dataset_id")
     btc_inspect.add_argument("--resource", choices=("manifest", "candles", "outcomes", "provenance", "gaps", "replay"), default="manifest")
@@ -144,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "btc-paper":
         from dataclasses import asdict
         from pathlib import Path
-        from .btc_history import HistoryStore
+        from .btc_history import HistoryStore, plan_historical_readiness
         from .btc_paper import replay_fixture
 
         if args.btc_command == "replay":
@@ -165,9 +176,32 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
             return 0
         if args.btc_command == "acquire":
+            if not args.allow_historical_ingest:
+                raise SystemExit("historical acquisition requires --allow-historical-ingest")
+            if not args.authorization_file:
+                raise SystemExit("historical acquisition requires --authorization-file")
+            try:
+                authorization = json.loads(Path(args.authorization_file).read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise SystemExit(f"cannot read historical authorization: {exc}") from exc
             store = HistoryStore(args.store_root)
-            result = store.acquire(args.start_ms, args.end_ms)
+            result = store.acquire(
+                args.start_ms,
+                args.end_ms,
+                page_size=args.page_size,
+                max_pages=args.max_pages,
+                max_requests=args.max_requests,
+                max_rows=args.max_rows,
+                max_runtime_seconds=args.max_runtime_seconds,
+                max_attempts=args.max_attempts,
+                allow_historical_ingest=True,
+                authorization=authorization,
+                resume=not args.no_resume,
+            )
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
+            return 0
+        if args.btc_command == "historical-readiness":
+            print(json.dumps(plan_historical_readiness(args.cutoff_ms), indent=2, sort_keys=True))
             return 0
         if args.btc_command == "b2":
             from .btc_b2 import B2Config, B2Store, run_b2

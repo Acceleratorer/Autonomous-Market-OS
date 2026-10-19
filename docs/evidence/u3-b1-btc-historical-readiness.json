@@ -1,0 +1,88 @@
+{
+  "schema": "market-os.u3-b1.btc-historical-readiness.v1",
+  "status": "readiness-proposal-blocked-pending-authorization",
+  "date": "2026-10-19",
+  "repository": "Autonomous-Market-OS",
+  "source": {
+    "host": "data-api.binance.vision",
+    "method": "GET",
+    "path": "/api/v3/klines",
+    "security": "NONE",
+    "request_weight": 2,
+    "symbol": "BTCUSDT",
+    "interval": "1m",
+    "websocket": false,
+    "authenticated": false,
+    "account_access": false,
+    "orders": false,
+    "trading": false
+  },
+  "purpose": "local BTC quantitative research and paper-only simulation",
+  "proposal": {
+    "range_semantics": "UTC minute-aligned half-open [start,end)",
+    "start": "2026-09-19T00:00:00Z",
+    "end_exclusive": "2026-10-19T00:00:00Z",
+    "excluded_final_candle_open": "2026-10-19T00:00:00Z",
+    "expected_rows": 43200,
+    "page_size": 1000,
+    "max_pages": 44,
+    "max_requests": 44,
+    "max_attempts_per_page": 1,
+    "max_runtime_seconds": 900,
+    "max_response_bytes": 262144
+  },
+  "authorization": {
+    "ingestion_allowed": false,
+    "explicit_runtime_flag": "--allow-historical-ingest",
+    "authorization_file_schema": "market-os.btc-history-authorization.v1",
+    "terms_verified": false,
+    "regional_eligibility_verified": false,
+    "retention_rights_verified": false,
+    "refusal_reason": "source terms, regional eligibility, retention rights, and separate operator approval remain unresolved"
+  },
+  "storage": {
+    "raw_pages": "immutable SHA-256 JSON pages",
+    "canonical": "Parquet with DuckDB catalog",
+    "lineage": "manifest -> raw pages -> source rows -> canonical fingerprints",
+    "retention": "local-only-until-explicit-deletion",
+    "backup": "none by default",
+    "redistribution": "disabled",
+    "access": "local operator only"
+  },
+  "failure_policy": {
+    "timeouts": "bounded connect/read timeout; stop",
+    "429": "record Retry-After and stop; no initial-run retry",
+    "403": "stop; no WAF bypass or host fallback",
+    "418": "stop; no retry",
+    "451": "stop; regional/legal refusal",
+    "5xx": "stop; no initial-run retry",
+    "checkpoint": "persist completed immutable pages; resume requires fresh matching approval",
+    "validation": "closed candles, OHLCV, ordering, duplicates, conflicts, gaps, response-size, and budgets are explicit"
+  },
+  "verification": {
+    "focused_readiness_and_b1_tests": "18 passed",
+    "b0_b1_b2_b3_api_regression_tests": "90 passed",
+    "full_suite": "261 passed, 1 skipped",
+    "compileall": "passed",
+    "evidence_validation": "passed; 22 JSON files",
+    "secret_scan": "passed",
+    "dependency_check": "pip check: No broken requirements found",
+    "offline_cli_api_smoke": "passed",
+    "replay_fingerprint_checks": "passed",
+    "diff_check": "passed",
+    "historical_binance_requests": 0,
+    "jev_requests": 0,
+    "credential_use": false,
+    "trades": 0,
+    "network_requests_in_readiness_path": 0,
+    "transport_status": "hard-disabled"
+  },
+  "primary_sources": [
+    "https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#ip-limits",
+    "https://www.binance.com/en/terms"
+  ],
+  "next_approval_phrase": "APPROVE B1 HISTORICAL INGEST: BTCUSDT Spot 1m, proposed 30 UTC days, 44 pages, 44 maximum HTTP requests, 1000 rows/page, 900-second runtime cap, local-only retention, no retry after failure, no authenticated Binance access"
+}

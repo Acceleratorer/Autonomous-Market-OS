@@ -27,14 +27,26 @@ from .contracts import ContractError, _timestamp
 
 HISTORY_VERSION = "market-os.btc-history.v1"
 FIXTURE_SCHEMA = "market-os.btc-history-fixture.v1"
+READINESS_VERSION = "market-os.btc-history-readiness.v1"
+AUTHORIZATION_VERSION = "market-os.btc-history-authorization.v1"
 SOURCE_ID = "binance.spot.rest.klines"
 SOURCE_HOST = "data-api.binance.vision"
+SOURCE_PATH = "/api/v3/klines"
+SOURCE_METHOD = "GET"
+SOURCE_INTERVAL = "1m"
+SOURCE_REQUEST_WEIGHT = 2
 MAX_PAGE_SIZE = 1000
 DEFAULT_PAGE_SIZE = 1000
 MAX_PAGES = 100
 MAX_CANDLES = 100_000
 MAX_ATTEMPTS = 3
 MAX_RETRY_AFTER_SECONDS = 60
+HISTORY_MAX_RESPONSE_BYTES = 256 * 1024
+READINESS_DAYS = 30
+READINESS_MAX_PAGES = 44
+READINESS_MAX_ROWS = 43_200
+READINESS_MAX_REQUESTS = 44
+READINESS_MAX_RUNTIME_SECONDS = 900
 _DATASET_ID_RE = re.compile(r"^(?:btc-history-[0-9a-f]{20}|btc-history-manifest-[0-9a-f]{20})$")
 
 
@@ -43,6 +55,160 @@ class HistoryError(ValueError):
         self.code = code
         self.retry_after = retry_after
         super().__init__(message)
+
+
+def _require_int(value: Any, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise HistoryError("invalid_range", f"{field} must be an integer")
+    return value
+
+
+def validate_historical_budget(
+    start_time_ms: int,
+    end_time_ms_exclusive: int,
+    *,
+    page_size: int,
+    max_pages: int,
+    max_requests: int,
+    max_rows: int,
+    max_runtime_seconds: int,
+    max_attempts: int,
+) -> dict[str, int]:
+    """Validate the bounded first run without opening a transport."""
+    for name, value in {
+        "page_size": page_size,
+        "max_pages": max_pages,
+        "max_requests": max_requests,
+        "max_rows": max_rows,
+        "max_runtime_seconds": max_runtime_seconds,
+        "max_attempts": max_attempts,
+    }.items():
+        _require_int(value, name)
+    requests = plan_pages(start_time_ms, end_time_ms_exclusive, page_size=page_size, max_pages=max_pages)
+    expected_rows = (end_time_ms_exclusive - start_time_ms) // 60_000
+    expected_pages = len(requests)
+    expected_requests = expected_pages * max_attempts
+    if expected_rows > max_rows or expected_requests > max_requests:
+        raise HistoryError("request_budget", "requested range exceeds the configured request budget")
+    if max_pages > READINESS_MAX_PAGES or max_rows > READINESS_MAX_ROWS or max_requests > READINESS_MAX_REQUESTS:
+        raise HistoryError("request_budget", "historical caps exceed the readiness proposal")
+    if max_runtime_seconds <= 0 or max_runtime_seconds > READINESS_MAX_RUNTIME_SECONDS:
+        raise HistoryError("runtime_cap", "historical runtime cap must be between 1 and 900 seconds")
+    if max_attempts != 1:
+        raise HistoryError("retry_policy", "the bounded historical run permits exactly one attempt per page")
+    return {
+        "expected_rows": expected_rows,
+        "expected_pages": expected_pages,
+        "expected_requests": expected_requests,
+        "page_size": page_size,
+        "max_pages": max_pages,
+        "max_requests": max_requests,
+        "max_rows": max_rows,
+        "max_runtime_seconds": max_runtime_seconds,
+        "max_attempts": max_attempts,
+    }
+
+
+def plan_historical_readiness(cutoff_ms: int) -> dict[str, Any]:
+    """Return the offline proposal for the first separately approved run.
+
+    ``cutoff_ms`` is the explicit UTC minute boundary for the first excluded
+    candle. The half-open range therefore contains exactly the preceding 30
+    days and never treats the current/open candle as finalized data.
+    """
+    cutoff_ms = _require_int(cutoff_ms, "cutoff_ms")
+    if cutoff_ms <= 0 or cutoff_ms % 60_000:
+        raise HistoryError("invalid_range", "cutoff_ms must be a positive minute-aligned UTC timestamp")
+    end_ms = cutoff_ms
+    start_ms = end_ms - READINESS_DAYS * 24 * 60 * 60 * 1000
+    budget = validate_historical_budget(
+        start_ms,
+        end_ms,
+        page_size=DEFAULT_PAGE_SIZE,
+        max_pages=READINESS_MAX_PAGES,
+        max_requests=READINESS_MAX_REQUESTS,
+        max_rows=READINESS_MAX_ROWS,
+        max_runtime_seconds=READINESS_MAX_RUNTIME_SECONDS,
+        max_attempts=1,
+    )
+    return {
+        "schema": READINESS_VERSION,
+        "status": "proposal-blocked-pending-authorization",
+        "ingestion_allowed": False,
+        "network_requests": 0,
+        "provider_requests": 0,
+        "credentials_used": False,
+        "instrument": {"venue": "BINANCE_SPOT", "symbol": BTC_SYMBOL, "interval": SOURCE_INTERVAL},
+        "source": {"host": SOURCE_HOST, "method": SOURCE_METHOD, "path": SOURCE_PATH, "security": "NONE", "request_weight": SOURCE_REQUEST_WEIGHT},
+        "requested_start_ms": start_ms,
+        "requested_end_ms_exclusive": end_ms,
+        "cutoff_ms": cutoff_ms,
+        "excluded_final_candle_open_ms": cutoff_ms,
+        "max_response_bytes": HISTORY_MAX_RESPONSE_BYTES,
+        "authorization": {
+            "explicit_runtime_flag": "--allow-historical-ingest",
+            "authorization_file_required": True,
+            "terms_verified": False,
+            "regional_eligibility_verified": False,
+            "retention_rights_verified": False,
+            "refusal_reason": "source terms, regional eligibility, and retention rights are unresolved",
+        },
+        "purpose": "local BTC quantitative research and paper-only simulation",
+        "storage": {
+            "root": "user-selected B1 HistoryStore root",
+            "raw_pages": "immutable SHA-256 JSON pages",
+            "raw_page_retention": "local-only-until-explicit-deletion",
+            "canonical": "Parquet snapshot with DuckDB catalog and manifest lineage",
+            "retention": "local-only-until-explicit-deletion",
+            "backup": "none by default",
+            "access": "local operator only; no upload or redistribution",
+        },
+        "retry_policy": {
+            "max_attempts_per_page": 1,
+            "retry_after": "record and stop on 429/418; no automatic retry in initial run",
+            "timeouts": "bounded transport connect/read timeouts",
+            "checkpoint": "persist completed raw pages before each next page; resume requires fresh approval",
+        },
+        "safety": {
+            "websocket": False,
+            "credentials": False,
+            "authenticated_endpoints": False,
+            "orders": False,
+            "account_access": False,
+            "trading": False,
+        },
+        **budget,
+    }
+
+
+def validate_historical_authorization(
+    value: dict[str, Any] | None,
+    *,
+    requested: dict[str, int] | None = None,
+) -> None:
+    if not isinstance(value, dict) or value.get("schema") != AUTHORIZATION_VERSION:
+        raise HistoryError("source_not_authorized", "a matching historical authorization record is required")
+    expected = {
+        "explicit_approval": True,
+        "terms_verified": True,
+        "regional_eligibility_verified": True,
+        "retention_rights_verified": True,
+        "host": SOURCE_HOST,
+        "method": SOURCE_METHOD,
+        "path": SOURCE_PATH,
+        "symbol": BTC_SYMBOL,
+        "interval": SOURCE_INTERVAL,
+        "request_weight": SOURCE_REQUEST_WEIGHT,
+        "authenticated": False,
+        "trading": False,
+        "purpose": "local BTC quantitative research and paper-only simulation",
+        "retention": "local-only-until-explicit-deletion",
+    }
+    if any(value.get(key) != expected_value for key, expected_value in expected.items()):
+        raise HistoryError("source_not_authorized", "historical authorization does not match the bounded source policy")
+    for key, expected_value in (requested or {}).items():
+        if value.get(key) != expected_value:
+            raise HistoryError("source_not_authorized", f"historical authorization does not match requested {key}")
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -387,15 +553,47 @@ class HistoryStore:
         transport: HistoricalTransport | None = None,
         resume: bool = True,
         page_size: int = DEFAULT_PAGE_SIZE,
-        max_pages: int = MAX_PAGES,
+        max_pages: int = READINESS_MAX_PAGES,
+        max_requests: int = READINESS_MAX_REQUESTS,
+        max_rows: int = READINESS_MAX_ROWS,
+        max_runtime_seconds: int = READINESS_MAX_RUNTIME_SECONDS,
+        max_attempts: int = 1,
+        allow_historical_ingest: bool = False,
+        authorization: dict[str, Any] | None = None,
         wait: Callable[[float], None] = time.sleep,
     ) -> IngestResult:
+        if not allow_historical_ingest:
+            raise HistoryError("source_not_approved", "source/legal review is incomplete; --allow-historical-ingest is required before historical acquisition")
+        validate_historical_authorization(
+            authorization,
+            requested={
+                "requested_start_ms": start_time_ms,
+                "requested_end_ms_exclusive": end_time_ms_exclusive,
+                "page_size": page_size,
+                "max_pages": max_pages,
+                "max_requests": max_requests,
+                "max_rows": max_rows,
+                "max_runtime_seconds": max_runtime_seconds,
+                "max_attempts": max_attempts,
+            },
+        )
         transport = transport or BinanceHistoricalTransport()
         if not getattr(transport, "approved", False):
             raise HistoryError("source_not_approved", "source/legal review and explicit user approval are required before transport")
         requests = plan_pages(start_time_ms, end_time_ms_exclusive, page_size=page_size, max_pages=max_pages)
+        validate_historical_budget(
+            start_time_ms,
+            end_time_ms_exclusive,
+            page_size=page_size,
+            max_pages=max_pages,
+            max_requests=max_requests,
+            max_rows=max_rows,
+            max_runtime_seconds=max_runtime_seconds,
+            max_attempts=max_attempts,
+        )
         as_of_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
-        checkpoint_id = _sha(_json_bytes({"source": SOURCE_ID, "start": start_time_ms, "end": end_time_ms_exclusive, "page_size": page_size, "max_pages": max_pages}))
+        deadline = time.monotonic() + max_runtime_seconds
+        checkpoint_id = _sha(_json_bytes({"source": SOURCE_ID, "start": start_time_ms, "end": end_time_ms_exclusive, "page_size": page_size, "max_pages": max_pages, "max_requests": max_requests, "max_rows": max_rows, "max_attempts": max_attempts}))
         checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.json"
         checkpoint = self._read_checkpoint(checkpoint_path, checkpoint_id, requests, page_size) if resume else self._new_checkpoint(checkpoint_id, requests, page_size)
         if checkpoint["status"] == "complete":
@@ -410,8 +608,27 @@ class HistoryStore:
                 network_requests=0,
             )
         completed = checkpoint["pages"]
+        if len(completed) * max_attempts > max_requests:
+            raise HistoryError("request_budget", "checkpoint exceeds the configured request budget")
+        fetched_rows = 0
+        for page in completed:
+            try:
+                fetched_rows += len(json.loads((self.raw_dir / f"{page['sha256']}.json").read_bytes()))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise HistoryError("invalid_checkpoint", "checkpoint raw page is unreadable") from exc
+        if fetched_rows > max_rows:
+            raise HistoryError("row_budget", "checkpoint exceeds the configured row budget")
         for request in requests[len(completed):]:
-            response = self._fetch_page(transport, request, wait=wait)
+            if time.monotonic() > deadline:
+                raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
+            response = self._fetch_page(
+                transport,
+                request,
+                wait=wait,
+                max_attempts=max_attempts,
+                max_response_bytes=HISTORY_MAX_RESPONSE_BYTES,
+                deadline=deadline,
+            )
             try:
                 rows = json.loads(response.body)
             except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -420,10 +637,15 @@ class HistoryStore:
                 raise HistoryError("invalid_response", "kline page must be a JSON array")
             if len(rows) > request.limit:
                 raise HistoryError("invalid_response", "source returned more rows than the requested page limit")
+            fetched_rows += len(rows)
+            if fetched_rows > max_rows:
+                raise HistoryError("row_budget", "historical response exceeds the configured row budget")
             page_hash = self._write_raw_page(response.body)
             completed.append({"page_index": request.page_index, "sha256": page_hash, "captured_at": response.received_at})
             checkpoint["pages"] = completed
             self._write_json_atomic(checkpoint_path, checkpoint)
+        if time.monotonic() > deadline:
+            raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
         page_rows = []
         for item in completed:
             raw = (self.raw_dir / f"{item['sha256']}.json").read_bytes()
@@ -464,22 +686,38 @@ class HistoryStore:
         return value
 
     @staticmethod
-    def _fetch_page(transport: HistoricalTransport, request: PageRequest, *, wait: Callable[[float], None]) -> HttpResponse:
-        for attempt in range(MAX_ATTEMPTS):
+    def _fetch_page(
+        transport: HistoricalTransport,
+        request: PageRequest,
+        *,
+        wait: Callable[[float], None],
+        max_attempts: int = MAX_ATTEMPTS,
+        max_response_bytes: int = HISTORY_MAX_RESPONSE_BYTES,
+        deadline: float | None = None,
+    ) -> HttpResponse:
+        for attempt in range(max_attempts):
+            if deadline is not None and time.monotonic() > deadline:
+                raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
             try:
                 response = transport.fetch_page(request)
             except (TimeoutError, OSError) as exc:
-                if attempt + 1 == MAX_ATTEMPTS:
+                if attempt + 1 == max_attempts:
                     raise HistoryError("retry_exhausted", "historical page retry limit exhausted") from exc
                 continue
+            if len(response.body) > max_response_bytes:
+                raise HistoryError("response_too_large", "historical response exceeds the bounded byte limit")
             if 200 <= response.status < 300:
                 _parse_utc(response.received_at, "received_at")
                 return response
             error = classify_http_failure(response.status, response.headers)
             if error.code == "ip_banned" or error.code == "source_rejected":
                 raise error
-            if attempt + 1 == MAX_ATTEMPTS:
-                raise HistoryError("retry_exhausted", f"historical page retry limit exhausted after {error.code}")
+            if attempt + 1 == max_attempts:
+                raise HistoryError(
+                    "retry_exhausted",
+                    f"historical page retry limit exhausted after {error.code}",
+                    retry_after=error.retry_after,
+                ) from error
             if error.code == "rate_limited":
                 if error.retry_after is None or error.retry_after > MAX_RETRY_AFTER_SECONDS:
                     raise HistoryError("retry_after_exceeds_policy", "Retry-After missing or exceeds 60-second local cap", retry_after=error.retry_after)

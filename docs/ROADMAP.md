@@ -10,7 +10,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 |---|---|---|---|
 | U0 | M0–M1 | Foundation, contracts, Market OS orchestration ownership, persistence, recovery, and paper-only boundaries | Complete |
 | U1 | M2 | Cited research, Vibe-Trading and LightRAG adapters, model-summary gate, quality benchmark, CI/CD | Built offline; M2.9 blocked on credential boundary |
-| U2 | B0–B1 | BTCUSDT data contracts, fixture replay, canonical Parquet/DuckDB dataset, provenance, gaps, and stored replay | Complete offline |
+| U2 | B0–B1 | BTCUSDT data contracts, fixture replay, canonical Parquet/DuckDB dataset, provenance, gaps, stored replay, and historical-data readiness gate | Complete offline; historical source authorization pending |
 | U3 | B2–B3 + M5 controls + API connectivity | Features, labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded provider connectivity | B2/B3/U3-API implemented offline; B3 not promoted |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | Planned |
 | U5 | M4 web + B5 | Web deployment and operator views over the shared API | Planned |
@@ -32,7 +32,7 @@ U0 foundation
   -> U8 separate live-readiness decision
 ```
 
-U3/B2 is complete offline. It remained local, deterministic, and offline, reused the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions, and did not wait for M2.9. U3/B3 is implemented as an offline controlled Jev-shaped benchmark and is not promoted because the shipped fixture has no leakage-safe labels. U3/API adds fixture-first public Binance and optional Jev connectivity with explicit live probes; it does not start U4/B4 or U5/B5.
+U3/B2 is complete offline. It remained local, deterministic, and offline, reused the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions, and did not wait for M2.9. U3/B3 is implemented as an offline controlled Jev-shaped benchmark and is not promoted because the shipped fixture has no leakage-safe labels. U3/API adds fixture-first public Binance and optional Jev connectivity with explicit live probes; the U3/B1 readiness gate now defines the bounded historical proposal but does not authorize or execute ingestion. U4/B4 and U5/B5 remain unstarted.
 
 ## U3/B2 implementation result
 
@@ -66,7 +66,7 @@ The web, CLI, and app must consume the same versioned backend contracts. They mu
 
 | Decision | Needed before |
 |---|---|
-| B1 public source terms, region, and retention authorization | Any network historical ingestion |
+| B1 public source terms, region, retention, and explicit bounded-run approval | Any network historical ingestion |
 | Feature/label and evaluation configuration freeze | U3 final benchmark |
 | Jev access, cost, semantics, and contamination treatment | U3/B3 adapter |
 | Paper wallet, fees, slippage, and latency assumptions | U4 paper portfolio |

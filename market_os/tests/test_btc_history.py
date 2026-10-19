@@ -11,13 +11,16 @@ import urllib.parse
 
 from market_os.btc_history import (
     BinanceHistoricalTransport,
+    HISTORY_MAX_RESPONSE_BYTES,
     HistoryError,
     HistoryStore,
     HttpResponse,
     classify_http_failure,
     fetch_pages,
+    plan_historical_readiness,
     plan_pages,
     parse_kline_row,
+    validate_historical_budget,
 )
 from market_os.api import make_handler
 from market_os.store import RunStore
@@ -26,6 +29,28 @@ from market_os.workflow import MarketWorkflow
 FIXTURE = Path(__file__).parent / "fixtures" / "btc_paper" / "history.json"
 MINUTE = 60_000
 START = 1_767_225_600_000
+
+
+def authorized(**overrides):
+    value = {
+        "schema": "market-os.btc-history-authorization.v1",
+        "explicit_approval": True,
+        "terms_verified": True,
+        "regional_eligibility_verified": True,
+        "retention_rights_verified": True,
+        "host": "data-api.binance.vision",
+        "method": "GET",
+        "path": "/api/v3/klines",
+        "symbol": "BTCUSDT",
+        "interval": "1m",
+        "request_weight": 2,
+        "authenticated": False,
+        "trading": False,
+        "purpose": "local BTC quantitative research and paper-only simulation",
+        "retention": "local-only-until-explicit-deletion",
+    }
+    value.update(overrides)
+    return value
 
 
 def test_kline_parser_normalizes_closed_row_and_preserves_raw_fingerprint() -> None:
@@ -65,12 +90,207 @@ def test_page_planner_is_bounded_and_uses_exclusive_end() -> None:
         plan_pages(START, START + 101 * MINUTE, page_size=100, max_pages=1)
 
 
+def test_historical_readiness_calculates_conservative_30_day_range_and_caps() -> None:
+    cutoff = START + 31 * 24 * 60 * MINUTE
+    readiness = plan_historical_readiness(cutoff)
+
+    assert readiness["ingestion_allowed"] is False
+    assert readiness["requested_end_ms_exclusive"] == cutoff
+    assert readiness["excluded_final_candle_open_ms"] == cutoff
+    assert readiness["expected_rows"] == 30 * 24 * 60
+    assert readiness["expected_pages"] == 44
+    assert readiness["max_requests"] == 44
+    assert readiness["max_runtime_seconds"] == 900
+    assert readiness["storage"]["raw_page_retention"] == "local-only-until-explicit-deletion"
+    assert readiness["authorization"]["terms_verified"] is False
+
+
+def test_historical_budget_rejects_unbounded_or_mismatched_caps() -> None:
+    end = START + 30 * 24 * 60 * MINUTE
+    plan = validate_historical_budget(
+        START,
+        end,
+        page_size=1000,
+        max_pages=44,
+        max_requests=44,
+        max_rows=43_200,
+        max_runtime_seconds=900,
+        max_attempts=1,
+    )
+    assert plan["expected_pages"] == 44
+    assert plan["expected_requests"] == 44
+    with pytest.raises(HistoryError, match="request budget"):
+        validate_historical_budget(
+            START,
+            end,
+            page_size=1000,
+            max_pages=44,
+            max_requests=43,
+            max_rows=43_200,
+            max_runtime_seconds=900,
+            max_attempts=1,
+        )
+    with pytest.raises(HistoryError, match="runtime cap"):
+        validate_historical_budget(
+            START,
+            end,
+            page_size=1000,
+            max_pages=44,
+            max_requests=44,
+            max_rows=43_200,
+            max_runtime_seconds=901,
+            max_attempts=1,
+        )
+
+
+def test_historical_acquisition_requires_runtime_approval_before_transport(tmp_path: Path) -> None:
+    class CountingTransport:
+        approved = True
+        calls = 0
+
+        def fetch_page(self, _request):
+            self.calls += 1
+            raise AssertionError("transport must not be called without approval")
+
+    transport = CountingTransport()
+    with pytest.raises(HistoryError, match="allow-historical-ingest"):
+        HistoryStore(tmp_path).acquire(START, START + MINUTE, transport=transport)
+    assert transport.calls == 0
+
+
+def test_historical_acquisition_refuses_unverified_source_policy_before_transport(tmp_path: Path) -> None:
+    class CountingTransport:
+        approved = True
+        calls = 0
+
+        def fetch_page(self, _request):
+            self.calls += 1
+            raise AssertionError("transport must not be called with an unverified policy")
+
+    transport = CountingTransport()
+    with pytest.raises(HistoryError, match="authorization"):
+        HistoryStore(tmp_path).acquire(
+            START,
+            START + MINUTE,
+            transport=transport,
+            allow_historical_ingest=True,
+            authorization=authorized(
+                requested_start_ms=START,
+                requested_end_ms_exclusive=START + MINUTE,
+                page_size=1000,
+                max_pages=44,
+                max_requests=1,
+                max_rows=1,
+                max_runtime_seconds=900,
+                max_attempts=1,
+                terms_verified=False,
+            ),
+            max_requests=1,
+            max_rows=1,
+            max_runtime_seconds=900,
+            max_attempts=1,
+        )
+    assert transport.calls == 0
+
+
+def test_historical_acquisition_enforces_response_size_and_runtime_request_caps(tmp_path: Path) -> None:
+    request = plan_pages(START, START + MINUTE)[0]
+
+    class Oversized:
+        approved = True
+
+        def fetch_page(self, _request):
+            return HttpResponse(200, {}, b"x" * (HISTORY_MAX_RESPONSE_BYTES + 1), "2026-01-01T00:30:00+00:00")
+
+    with pytest.raises(HistoryError, match="response exceeds"):
+        HistoryStore(tmp_path / "oversized").acquire(
+            START,
+            START + MINUTE,
+            transport=Oversized(),
+            allow_historical_ingest=True,
+            authorization=authorized(
+                requested_start_ms=START,
+                requested_end_ms_exclusive=START + MINUTE,
+                page_size=1000,
+                max_pages=44,
+                max_requests=1,
+                max_rows=1,
+                max_runtime_seconds=900,
+                max_attempts=1,
+            ),
+            max_requests=1,
+            max_rows=1,
+            max_runtime_seconds=900,
+            max_attempts=1,
+        )
+
+    with pytest.raises(HistoryError, match="request budget"):
+        HistoryStore(tmp_path / "budget").acquire(
+            START,
+            START + MINUTE,
+            transport=Oversized(),
+            allow_historical_ingest=True,
+            authorization=authorized(
+                requested_start_ms=START,
+                requested_end_ms_exclusive=START + MINUTE,
+                page_size=1000,
+                max_pages=44,
+                max_requests=0,
+                max_rows=1,
+                max_runtime_seconds=900,
+                max_attempts=1,
+            ),
+            max_requests=0,
+            max_rows=1,
+            max_runtime_seconds=900,
+            max_attempts=1,
+        )
+
+
 def test_rate_limit_and_timeout_errors_classify_without_transport() -> None:
     assert classify_http_failure(429, {"Retry-After": "3"}).code == "rate_limited"
     assert classify_http_failure(418, {"Retry-After": "60"}).code == "ip_banned"
     assert classify_http_failure(503, {}).code == "server_error"
     with pytest.raises(HistoryError, match="disabled pending explicit approval"):
         BinanceHistoricalTransport().fetch_page(plan_pages(START, START + MINUTE)[0])
+
+
+def test_bounded_historical_run_stops_on_rate_limit_without_retry_or_wait(tmp_path: Path) -> None:
+    class RateLimited:
+        approved = True
+        calls = 0
+
+        def fetch_page(self, _request):
+            self.calls += 1
+            return HttpResponse(429, {"Retry-After": "2"}, b"{}", "2026-01-01T00:30:00+00:00")
+
+    transport = RateLimited()
+    waits: list[float] = []
+    with pytest.raises(HistoryError, match="retry limit exhausted") as failure:
+        HistoryStore(tmp_path).acquire(
+            START,
+            START + MINUTE,
+            transport=transport,
+            allow_historical_ingest=True,
+            authorization=authorized(
+                requested_start_ms=START,
+                requested_end_ms_exclusive=START + MINUTE,
+                page_size=1000,
+                max_pages=44,
+                max_requests=1,
+                max_rows=1,
+                max_runtime_seconds=900,
+                max_attempts=1,
+            ),
+            max_requests=1,
+            max_rows=1,
+            max_runtime_seconds=900,
+            max_attempts=1,
+            wait=waits.append,
+        )
+    assert failure.value.retry_after == 2.0
+    assert transport.calls == 1
+    assert waits == []
 
 
 def test_injected_transport_retries_5xx_and_rate_limits_but_stops_at_retry_cap() -> None:
@@ -175,11 +395,11 @@ def test_injected_acquisition_checkpoints_and_resumes_without_refetching_complet
     transport = Flaky()
     store = HistoryStore(tmp_path)
     with pytest.raises(HistoryError) as failure:
-        store.acquire(start, end, transport=transport, page_size=5)
+        store.acquire(start, end, transport=transport, page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorized(requested_start_ms=start, requested_end_ms_exclusive=end, page_size=5, max_pages=44, max_requests=44, max_rows=43_200, max_runtime_seconds=900, max_attempts=1))
     assert failure.value.code == "retry_exhausted"
-    assert transport.calls[:4] == [0, 1, 1, 1]
+    assert transport.calls == [0, 1]
     transport.fail_page_once = False
-    result = store.acquire(start, end, transport=transport, page_size=5)
+    result = store.acquire(start, end, transport=transport, page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorized(requested_start_ms=start, requested_end_ms_exclusive=end, page_size=5, max_pages=44, max_requests=44, max_rows=43_200, max_runtime_seconds=900, max_attempts=1))
     assert result.canonical_count == 10
     assert transport.calls.count(0) == 1
     assert store.replay(result.dataset_revision)["network_requests"] == 0
@@ -210,6 +430,31 @@ def test_fixture_ingest_cli_and_api_inspection_are_read_only(tmp_path: Path, cap
         response = json.loads(urllib.request.urlopen(request, timeout=2).read())
         inspected = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/v1/btc/history/{response['dataset_revision']}/replay?store_root={urllib.parse.quote(str(tmp_path / 'api'))}", timeout=2).read())
         assert inspected["replayed"] is True
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+def test_historical_readiness_cli_and_api_are_offline_and_block_ingest(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    cutoff = START + 31 * 24 * 60 * MINUTE
+    assert main(["btc-paper", "historical-readiness", "--cutoff-ms", str(cutoff)]) == 0
+    readiness = json.loads(capsys.readouterr().out)
+    assert readiness["schema"] == "market-os.btc-history-readiness.v1"
+    assert readiness["ingestion_allowed"] is False
+    assert readiness["network_requests"] == 0
+
+    with pytest.raises(SystemExit, match="allow-historical-ingest"):
+        main(["btc-paper", "acquire", "--start-ms", str(START), "--end-ms", str(START + MINUTE), "--store-root", str(tmp_path)])
+    assert capsys.readouterr().out == ""
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(tmp_path / "workflow"))))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        url = f"http://127.0.0.1:{server.server_port}/v1/btc/history/readiness?cutoff-ms={cutoff}"
+        response = json.loads(urllib.request.urlopen(url, timeout=2).read())
+        assert response["expected_pages"] == 44
+        assert response["ingestion_allowed"] is False
     finally:
         server.shutdown()
         thread.join(timeout=2)

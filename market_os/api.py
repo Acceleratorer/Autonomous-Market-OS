@@ -193,6 +193,23 @@ def make_handler(
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
                 return
+            if urllib.parse.urlsplit(self.path).path == "/v1/btc/history/readiness":
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    query = urllib.parse.parse_qs(parsed.query)
+                    from .btc_history import plan_historical_readiness
+
+                    result = plan_historical_readiness(int(query["cutoff-ms"][0]))
+                    self._send(200, result)
+                except (KeyError, TypeError, ValueError) as exc:
+                    status = 400
+                    error_type = type(exc).__name__
+                    self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.btc-history-readiness.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
+                return
             btc_prefix = "/v1/btc/history/"
             if self.path.startswith(btc_prefix):
                 status = 200

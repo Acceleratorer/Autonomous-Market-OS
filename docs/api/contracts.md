@@ -137,12 +137,35 @@ approval. The CLI surfaces are:
 
 ```text
 market-os btc-paper ingest --fixture <path> --store-root <path>
-market-os btc-paper acquire --start-ms <ms> --end-ms <ms> --store-root <path>
+market-os btc-paper historical-readiness --cutoff-ms <UTC-minute-ms>
+market-os btc-paper acquire --start-ms <ms> --end-ms <exclusive-ms> \
+  --page-size 1000 --max-pages 44 --max-requests 44 --max-rows 43200 \
+  --max-runtime-seconds 900 --max-attempts 1 \
+  --allow-historical-ingest --authorization-file <approved-policy.json> \
+  --store-root <path>
 market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outcomes|provenance|gaps|replay --store-root <path>
 ```
 
+`historical-readiness` is offline and returns the versioned
+`market-os.btc-history-readiness.v1` proposal. It defaults to a blocked
+30-UTC-day BTCUSDT/1m range ending at the explicit cutoff, with 43,200 rows,
+44 pages/requests, one attempt per page, a 900-second runtime cap, and a
+256 KiB page bound. The candle opening at the cutoff is excluded.
+
+`acquire` remains refused unless the explicit runtime flag and a matching
+`market-os.btc-history-authorization.v1` policy file are supplied. The policy
+must verify source terms, regional eligibility, and retention rights and must
+match the requested range and caps. The current Binance transport is still
+hard-disabled, so no command in this readiness milestone can make a network
+request. The exact future approval phrase is recorded in
+`docs/U3-B1-HISTORICAL-READINESS-REPORT.md`.
+
 The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local
 `store_root` and fixture object. Read-only resources are:
+
+```text
+GET /v1/btc/history/readiness?cutoff-ms=<UTC-minute-ms>
+```
 
 ```text
 GET /v1/btc/history/<dataset-revision>/manifest
