@@ -18,6 +18,11 @@ calibration outputs are `unavailable`. This is an explicit data-quality result,
 not a zero or fabricated score. The focused synthetic materializer and split
 tests also cover positive formula and baseline paths.
 
+The current defect-closure regeneration uses B1 dataset revision
+`btc-history-77e4548a5394b078adee` and canonical fingerprint
+`77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6`.
+Earlier `btc-history-49b70e...` evidence is stale and has been superseded.
+
 ## Formulas and availability
 
 Feature version `btc.b2.features.v1` uses the smallest hand-checkable set:
@@ -94,7 +99,8 @@ GET /v1/btc/b2/<run-id>/<resource>?store_root=<b2-root>
 
 ## Verification
 
-- Focused B2, B0, and B1 tests: **32 passed**.
+- Focused B2, B0, and B1 tests: **7 B2, 12 B0, and 22 B1 passed** in the
+  readiness defect-closure run.
 - `python -m compileall -q market_os`: **passed**.
 - `python scripts/ci_checks.py validate-evidence`: **passed**.
 - `python scripts/ci_checks.py secret-scan`: **passed**.
@@ -102,6 +108,7 @@ GET /v1/btc/b2/<run-id>/<resource>?store_root=<b2-root>
 - CLI/API smoke, formula, availability, no-look-ahead, split leakage,
   calibration boundary, persistence, and replay tests: **passed**.
 - `git diff --check`: **passed** at the verification checkpoint.
+- Full regression suite after B1 closure: **265 passed, 1 skipped**.
 
 Machine-readable evidence is in
 `docs/evidence/u3-b2-btc-features-baselines.json`.

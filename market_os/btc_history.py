@@ -403,6 +403,9 @@ def parse_kline_row(
         "open_time": _iso_ms(open_ms), "close_time": close_time,
         "open": float(opened), "high": float(high), "low": float(low),
         "close": float(closed), "volume": float(volume),
+        "open_decimal": str(open_raw), "high_decimal": str(high_raw),
+        "low_decimal": str(low_raw), "close_decimal": str(close_raw),
+        "volume_decimal": str(volume_raw),
     }
     canonical_fp = _sha(_json_bytes(candle_values))
     candle = ClosedCandle(
@@ -413,6 +416,10 @@ def parse_kline_row(
         canonical_fp,
     )
     ancillary = {
+        "decimal_values": {
+            "open": str(open_raw), "high": str(high_raw), "low": str(low_raw),
+            "close": str(close_raw), "volume": str(volume_raw),
+        },
         "quote_volume": str(_decimal(row[7], "quote_volume", minimum=Decimal(0))),
         "trade_count": _parse_trade_count(row[8]),
         "taker_buy_base_volume": str(_decimal(row[9], "taker_buy_base_volume", minimum=Decimal(0))),
@@ -595,7 +602,17 @@ class HistoryStore:
         deadline = time.monotonic() + max_runtime_seconds
         checkpoint_id = _sha(_json_bytes({"source": SOURCE_ID, "start": start_time_ms, "end": end_time_ms_exclusive, "page_size": page_size, "max_pages": max_pages, "max_requests": max_requests, "max_rows": max_rows, "max_attempts": max_attempts}))
         checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.json"
-        checkpoint = self._read_checkpoint(checkpoint_path, checkpoint_id, requests, page_size) if resume else self._new_checkpoint(checkpoint_id, requests, page_size)
+        checkpoint_args = {
+            "max_pages": max_pages,
+            "max_requests": max_requests,
+            "max_rows": max_rows,
+            "max_attempts": max_attempts,
+        }
+        checkpoint = (
+            self._read_checkpoint(checkpoint_path, checkpoint_id, requests, page_size, **checkpoint_args)
+            if resume
+            else self._new_checkpoint(checkpoint_id, requests, page_size, **checkpoint_args)
+        )
         if checkpoint["status"] == "complete":
             pages = []
             for page in checkpoint["pages"]:
@@ -641,7 +658,15 @@ class HistoryStore:
             if fetched_rows > max_rows:
                 raise HistoryError("row_budget", "historical response exceeds the configured row budget")
             page_hash = self._write_raw_page(response.body)
-            completed.append({"page_index": request.page_index, "sha256": page_hash, "captured_at": response.received_at})
+            completed.append({
+                "page_index": request.page_index,
+                "start_time_ms": request.start_time_ms,
+                "end_time_ms": request.end_time_ms,
+                "limit": request.limit,
+                "sha256": page_hash,
+                "captured_at": response.received_at,
+                "row_count": len(rows),
+            })
             checkpoint["pages"] = completed
             self._write_json_atomic(checkpoint_path, checkpoint)
         if time.monotonic() > deadline:
@@ -660,29 +685,107 @@ class HistoryStore:
         self._write_json_atomic(checkpoint_path, checkpoint)
         return result
 
-    def _new_checkpoint(self, checkpoint_id: str, requests: tuple[PageRequest, ...], page_size: int) -> dict[str, Any]:
+    def _new_checkpoint(
+        self,
+        checkpoint_id: str,
+        requests: tuple[PageRequest, ...],
+        page_size: int,
+        *,
+        max_pages: int,
+        max_requests: int,
+        max_rows: int,
+        max_attempts: int,
+    ) -> dict[str, Any]:
         return {
             "schema": "market-os.btc-history-checkpoint.v1",
             "checkpoint_id": checkpoint_id,
+            "source_identity": SOURCE_ID,
+            "symbol": BTC_SYMBOL,
+            "venue": "BINANCE_SPOT",
+            "interval": SOURCE_INTERVAL,
+            "contract_version": BTC_API_VERSION,
+            "dataset_contract": HISTORY_VERSION,
             "requested_start_ms": requests[0].start_time_ms,
             "requested_end_ms_exclusive": requests[-1].end_time_ms + 1,
             "page_size": page_size,
+            "max_pages": max_pages,
+            "max_requests": max_requests,
+            "max_rows": max_rows,
+            "max_attempts": max_attempts,
             "pages": [],
             "status": "in_progress",
         }
 
-    def _read_checkpoint(self, path: Path, checkpoint_id: str, requests: tuple[PageRequest, ...], page_size: int) -> dict[str, Any]:
+    def _read_checkpoint(
+        self,
+        path: Path,
+        checkpoint_id: str,
+        requests: tuple[PageRequest, ...],
+        page_size: int,
+        *,
+        max_pages: int,
+        max_requests: int,
+        max_rows: int,
+        max_attempts: int,
+    ) -> dict[str, Any]:
         if not path.exists():
-            return self._new_checkpoint(checkpoint_id, requests, page_size)
+            return self._new_checkpoint(
+                checkpoint_id,
+                requests,
+                page_size,
+                max_pages=max_pages,
+                max_requests=max_requests,
+                max_rows=max_rows,
+                max_attempts=max_attempts,
+            )
         value = json.loads(path.read_text(encoding="utf-8"))
-        expected = self._new_checkpoint(checkpoint_id, requests, page_size)
-        if value.get("checkpoint_id") != checkpoint_id or value.get("requested_start_ms") != expected["requested_start_ms"] or value.get("requested_end_ms_exclusive") != expected["requested_end_ms_exclusive"] or value.get("page_size") != page_size:
+        expected = self._new_checkpoint(
+            checkpoint_id,
+            requests,
+            page_size,
+            max_pages=max_pages,
+            max_requests=max_requests,
+            max_rows=max_rows,
+            max_attempts=max_attempts,
+        )
+        identity_fields = (
+            "schema", "checkpoint_id", "source_identity", "symbol", "venue", "interval",
+            "contract_version", "dataset_contract", "requested_start_ms", "requested_end_ms_exclusive", "page_size",
+            "max_pages", "max_requests", "max_rows", "max_attempts",
+        )
+        if any(value.get(field) != expected.get(field) for field in identity_fields):
             raise HistoryError("checkpoint_mismatch", "checkpoint does not match requested range")
         if value.get("status") not in {"in_progress", "complete"} or not isinstance(value.get("pages"), list) or len(value["pages"]) > len(requests):
             raise HistoryError("invalid_checkpoint", "checkpoint content is invalid")
-        for page in value["pages"]:
-            if not (self.raw_dir / f"{page['sha256']}.json").is_file():
+        for index, page in enumerate(value["pages"]):
+            if not isinstance(page, dict) or page.get("page_index") != index:
+                raise HistoryError("invalid_checkpoint", "checkpoint page order is invalid")
+            request = requests[index]
+            if any(page.get(field) != expected_value for field, expected_value in {
+                "start_time_ms": request.start_time_ms,
+                "end_time_ms": request.end_time_ms,
+                "limit": request.limit,
+            }.items()):
+                raise HistoryError("invalid_checkpoint", "checkpoint page request identity is invalid")
+            digest = page.get("sha256")
+            if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+                raise HistoryError("invalid_checkpoint", "checkpoint page hash is invalid")
+            raw_path = self.raw_dir / f"{digest}.json"
+            if not raw_path.is_file():
                 raise HistoryError("invalid_checkpoint", "checkpoint references a missing raw page")
+            raw = raw_path.read_bytes()
+            if _sha(raw) != digest:
+                raise HistoryError("invalid_checkpoint", "checkpoint raw page hash mismatch")
+            try:
+                rows = json.loads(raw)
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise HistoryError("invalid_checkpoint", "checkpoint raw page is not UTF-8 JSON") from exc
+            if not isinstance(rows, list) or len(rows) != page.get("row_count") or len(rows) > request.limit:
+                raise HistoryError("invalid_checkpoint", "checkpoint raw page row count is invalid")
+            try:
+                _parse_utc(page.get("captured_at"), "checkpoint captured_at")
+            except (ContractError, TypeError) as exc:
+                raise HistoryError("invalid_checkpoint", "checkpoint page capture timestamp is invalid") from exc
         return value
 
     @staticmethod
@@ -784,9 +887,22 @@ class HistoryStore:
         if existing is not None:
             canonical_fingerprint = existing["canonical_fingerprint"]
             dataset_revision = existing["dataset_revision"]
-            canonical = [{"candle": _candle_from_row(row), "open_time_ms": row["open_time_ms"], "record_fingerprint": row["canonical_fingerprint"], "page_sha256": "existing"} for row in self.inspect_candles(dataset_revision)]
+            canonical = [{
+                "candle": _candle_from_row(row),
+                "open_time_ms": row["open_time_ms"],
+                "record_fingerprint": row["canonical_fingerprint"],
+                "page_sha256": "existing",
+                "ancillary": {"decimal_values": {
+                    "open": row["open_decimal"], "high": row["high_decimal"],
+                    "low": row["low_decimal"], "close": row["close_decimal"],
+                    "volume": row["volume_decimal"],
+                }},
+            } for row in self.inspect_candles(dataset_revision)]
         else:
-            canonical_fingerprint = _sha(_json_bytes([_canonical_content(item["candle"]) for item in canonical]))
+            canonical_fingerprint = _sha(_json_bytes([
+                _canonical_content(item["candle"], item.get("ancillary", {}).get("decimal_values"))
+                for item in canonical
+            ]))
             dataset_revision = f"btc-history-{canonical_fingerprint[:20]}"
         run_raw_fingerprint = _sha(_json_bytes(sorted(item["sha256"] for item in page_refs)))
         outcome_fingerprint = _sha(_json_bytes(outcomes))
@@ -825,7 +941,7 @@ class HistoryStore:
             "requested_start_ms": requested_start_ms,
             "requested_end_ms_exclusive": requested_end_ms,
             "observed_start_ms": first_open,
-            "observed_end_ms_exclusive": last_close + 1 if last_close is not None else None,
+            "observed_end_ms_exclusive": last_close if last_close is not None else None,
             "source_timestamp_min": min((item["candle"].source_timestamp for item in canonical), default=None),
             "source_timestamp_max": max((item["candle"].source_timestamp for item in canonical), default=None),
             "receipt_timestamp_min": min((item["received_at"] for item in rows_for_classification), default=None),
@@ -938,7 +1054,13 @@ class HistoryStore:
             raise HistoryError("dataset_integrity_error", "Parquet path is missing or outside dataset storage")
         if _sha(path.read_bytes()) != dataset["parquet_sha256"]:
             raise HistoryError("dataset_integrity_error", "Parquet file hash mismatch")
-        query = "SELECT open_time_ms, close_time_ms, open, high, low, close, volume, source_timestamp, received_at, availability_timestamp, canonical_fingerprint FROM read_parquet(?) WHERE 1=1"
+        parquet_schema = pq.read_schema(path)
+        decimal_columns = {"open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal"}
+        if decimal_columns.issubset(set(parquet_schema.names)):
+            decimal_select = "open_decimal, high_decimal, low_decimal, close_decimal, volume_decimal"
+        else:
+            decimal_select = "NULL::VARCHAR AS open_decimal, NULL::VARCHAR AS high_decimal, NULL::VARCHAR AS low_decimal, NULL::VARCHAR AS close_decimal, NULL::VARCHAR AS volume_decimal"
+        query = f"SELECT open_time_ms, close_time_ms, open, high, low, close, volume, {decimal_select}, source_timestamp, received_at, availability_timestamp, canonical_fingerprint FROM read_parquet(?) WHERE 1=1"
         parquet_params: list[Any] = [str(path)]
         if start_time_ms is not None:
             query += " AND open_time_ms >= ?"
@@ -949,7 +1071,7 @@ class HistoryStore:
         query += " ORDER BY open_time_ms"
         with self._connect() as db:
             rows = db.execute(query, parquet_params).fetchall()
-        fields = ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume", "source_timestamp", "received_at", "availability_timestamp", "canonical_fingerprint")
+        fields = ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume", "open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal", "source_timestamp", "received_at", "availability_timestamp", "canonical_fingerprint")
         return [dict(zip(fields, row)) for row in rows]
 
     def inspect_outcomes(self, dataset_or_manifest_id: str) -> list[dict[str, Any]]:
@@ -976,8 +1098,15 @@ class HistoryStore:
         path = self.root / dataset["parquet_path"]
         if _sha(path.read_bytes()) != dataset["parquet_sha256"]:
             raise HistoryError("dataset_integrity_error", "Parquet file hash mismatch")
-        rows = pq.read_table(path).to_pylist()
-        canonical_fp = _sha(_json_bytes([_canonical_from_parquet(row) for row in rows]))
+        table = pq.read_table(path)
+        rows = table.to_pylist()
+        if {"open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal"}.issubset(set(table.column_names)):
+            canonical_fp = _sha(_json_bytes([_canonical_from_parquet(row) for row in rows]))
+        else:
+            canonical_fp = _sha(_json_bytes([{
+                key: row[key]
+                for key in ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume")
+            } for row in rows]))
         if canonical_fp != dataset["canonical_fingerprint"]:
             raise HistoryError("dataset_integrity_error", "canonical replay fingerprint mismatch")
         return {"dataset_revision": dataset_revision, "canonical_fingerprint": canonical_fp, "candle_count": len(rows), "replayed": True, "network_requests": 0}
@@ -1015,7 +1144,10 @@ class HistoryStore:
     def _find_superset_dataset(self, canonical: list[dict[str, Any]]) -> dict[str, Any] | None:
         if not canonical:
             return None
-        requested = {item["open_time_ms"]: _canonical_content(item["candle"]) for item in canonical}
+        requested = {
+            item["open_time_ms"]: _canonical_content(item["candle"], item.get("ancillary", {}).get("decimal_values"))
+            for item in canonical
+        }
         for dataset in self.inspect_datasets():
             try:
                 stored = {row["open_time_ms"]: _canonical_from_parquet(row) for row in self.inspect_candles(dataset["dataset_revision"])}
@@ -1092,12 +1224,18 @@ def _row_open_ms(row: Any) -> int | None:
     return None
 
 
-def _canonical_dict(candle: ClosedCandle) -> dict[str, Any]:
+def _canonical_dict(candle: ClosedCandle, decimal_values: dict[str, str] | None = None) -> dict[str, Any]:
+    decimal_values = decimal_values or {}
     return {
         "open_time_ms": _epoch_ms(candle.open_time),
         "close_time_ms": _epoch_ms(candle.close_time),
         "open": candle.open, "high": candle.high, "low": candle.low,
         "close": candle.close, "volume": candle.volume,
+        "open_decimal": decimal_values.get("open"),
+        "high_decimal": decimal_values.get("high"),
+        "low_decimal": decimal_values.get("low"),
+        "close_decimal": decimal_values.get("close"),
+        "volume_decimal": decimal_values.get("volume"),
         "source_timestamp": candle.source_timestamp,
         "received_at": candle.received_at,
         "availability_timestamp": candle.availability_timestamp,
@@ -1105,13 +1243,25 @@ def _canonical_dict(candle: ClosedCandle) -> dict[str, Any]:
     }
 
 
-def _canonical_content(candle: ClosedCandle) -> dict[str, Any]:
-    value = _canonical_dict(candle)
-    return {key: value[key] for key in ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume")}
+def _canonical_content(candle: ClosedCandle, decimal_values: dict[str, str] | None = None) -> dict[str, Any]:
+    value = _canonical_dict(candle, decimal_values)
+    return {
+        key: value[key]
+        for key in (
+            "open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume",
+            "open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal",
+        )
+    }
 
 
 def _canonical_from_parquet(row: dict[str, Any]) -> dict[str, Any]:
-    return {key: row[key] for key in ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume")}
+    return {
+        key: row[key]
+        for key in (
+            "open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume",
+            "open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal",
+        )
+    }
 
 
 def _candle_from_row(row: dict[str, Any]) -> ClosedCandle:
@@ -1124,11 +1274,14 @@ def _candle_from_row(row: dict[str, Any]) -> ClosedCandle:
 
 
 def _parquet_table(canonical: list[dict[str, Any]]) -> pa.Table:
-    rows = [_canonical_dict(item["candle"]) for item in canonical]
+    rows = [_canonical_dict(item["candle"], item.get("ancillary", {}).get("decimal_values")) for item in canonical]
     schema = pa.schema([
         ("open_time_ms", pa.int64()), ("close_time_ms", pa.int64()),
         ("open", pa.float64()), ("high", pa.float64()), ("low", pa.float64()),
         ("close", pa.float64()), ("volume", pa.float64()),
+        ("open_decimal", pa.string()), ("high_decimal", pa.string()),
+        ("low_decimal", pa.string()), ("close_decimal", pa.string()),
+        ("volume_decimal", pa.string()),
         ("source_timestamp", pa.string()), ("received_at", pa.string()),
         ("availability_timestamp", pa.string()), ("canonical_fingerprint", pa.string()),
     ])

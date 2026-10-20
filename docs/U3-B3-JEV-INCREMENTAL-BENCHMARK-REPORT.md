@@ -15,6 +15,11 @@ The adapter is intentionally fixture-backed. It performs zero network or
 provider requests and has no TypeSafe SDK, credential, HTTP, socket, retry, or
 live transport path.
 
+The current defect-closure regeneration is tied to B1 revision
+`btc-history-77e4548a5394b078adee` with canonical fingerprint
+`77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6`.
+The previous `btc-history-49b70e...` identity was stale evidence.
+
 ## Exact matched-control protocol
 
 1. Materialize the frozen B2 `btc.b2.features.v1` and
@@ -87,8 +92,9 @@ fingerprints without invoking a provider.
   abstaining behavior, timestamp/input-fingerprint validation, no-look-ahead,
   frozen splits, calibration isolation, matched controls, deterministic replay,
   CLI/API inspection, and no-real-transport proof: **passed** in focused tests.
-- Focused B3 plus B0/B1/B2 regression tests: **40 passed**.
-- Full suite: **211 passed, 1 skipped**.
+- Focused defect-closure regressions: **B1 22, B0 12, B2 7, B3 8,
+  connectivity 43, and CLI 2 passed**.
+- Full suite after B1 closure: **265 passed, 1 skipped**.
 - `compileall`, evidence JSON validation, dependency check, secret scan, replay/
   fingerprint checks, CLI/API smoke, and `git diff --check`: **passed**.
 

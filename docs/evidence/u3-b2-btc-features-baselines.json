@@ -78,11 +78,11 @@
     },
     "replay": {
       "network_requests": 0,
-      "replay_fingerprint": "b738d6a3ff24ef25110111e1222e9ea2863cdbee4ce33ade043ab341b176d8be",
+      "replay_fingerprint": "29eecc86c54b716b318738d1bb01ca8047a9a0eb00d9644c32f5c7dfade5d86a",
       "replayed": true,
-      "run_id": "btc-b2-f165f28380ed8413cebe"
+      "run_id": "btc-b2-2e39e4a1f73b4c958795"
     },
-    "run_id": "btc-b2-f165f28380ed8413cebe",
+    "run_id": "btc-b2-2e39e4a1f73b4c958795",
     "sample_count": 0,
     "splits": {
       "boundaries": {},
@@ -114,7 +114,7 @@
       "warm_up": 7
     },
     "eligibility": "decision_eligible_at=max(close_time,availability_timestamp); current plus five exact prior contiguous rows only",
-    "feature_fingerprint": "797fefa4fa68c69f65a5e9e277144a7b748b4e3b439579c1372a09d5d04d5740"
+    "feature_fingerprint": "428b05d103f579e4000cf02b98e8d36631b4619fc7aaf8bc8fb5d8d015cd72e7"
   },
   "formulas": {
     "close": "C_t",
@@ -150,13 +150,13 @@
       "lineage"
     ],
     "lineage": "dataset revision -> feature/label fingerprints -> persisted artifacts",
-    "replay_fingerprint": "b738d6a3ff24ef25110111e1222e9ea2863cdbee4ce33ade043ab341b176d8be"
+    "replay_fingerprint": "29eecc86c54b716b318738d1bb01ca8047a9a0eb00d9644c32f5c7dfade5d86a"
   },
   "schema": "market-os.u3-b2.btc-features-baselines.v1",
   "scope": "U3/B2 only; BTCUSDT Spot closed 1m B1 local dataset; 5m labels; numerical baselines; paper-only research",
   "source_boundary": {
-    "canonical_fingerprint": "49b70e7dcbfac660e8636dc0871a0623273d4dafadce93d50ba6b143656cf70c",
-    "dataset_revision": "btc-history-49b70e7dcbfac660e863",
+    "canonical_fingerprint": "77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6",
+    "dataset_revision": "btc-history-77e4548a5394b078adee",
     "network_requests": 0,
     "source": "existing local B1 synthetic fixture"
   },
@@ -166,8 +166,8 @@
     "compileall": "passed",
     "diff_check": "passed",
     "evidence_validation": "passed",
-    "focused_tests": "32 passed",
-    "full_suite": "203 passed, 0 failed, 1 skipped",
+    "focused_tests": "7 passed",
+    "full_suite": "265 passed, 1 skipped in B1 readiness defect-closure verification",
     "pip_check": "No broken requirements found",
     "replay_fingerprint": "passed",
     "secret_scan": "passed"

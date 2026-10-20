@@ -34,7 +34,13 @@ citations are in `docs/decisions/ADR-0016-btc-b1-source-storage-policy.md`.
   duplicate/conflict/invalid outcomes, parent revisions, package versions,
   Parquet hash/path, and network request count.
 - Checkpoint files are bounded and resumable for a future approved transport;
-  the current transport cannot create them because approval is absent.
+  recovery now verifies checkpoint schema/source/dataset identity, requested
+  range and caps, contiguous page order, page request identity, raw-page
+  SHA-256, row count, and capture timestamp before reuse.
+- Canonical Parquet retains numeric `float64` columns for analytical consumers
+  plus exact source decimal lexemes for OHLCV. Decimal lexemes participate in
+  canonical content and replay fingerprints, so precision differences cannot
+  silently collapse into one dataset revision.
 - CLI commands support fixture ingestion and read-only manifest/candle/outcome/
   provenance/gap/replay inspection. The existing API has matching read-only
   inspection and fixture-ingest routes.
@@ -45,9 +51,13 @@ The B1 fixture contains 13 source rows, including an identical duplicate, a
 conflicting same-open-time row, a malformed OHLC row, and missing intervals.
 It produces 10 canonical candles, one duplicate outcome, one conflict, one
 invalid record, and two visible gaps.
-The deterministic synthetic dataset revision is
-`btc-history-7e910cbf4c3484a34249` with canonical fingerprint
-`7e910cbf4c3484a34249d59901b284069a2fae23ea10e7fde38951070327f866`.
+The current implementation regenerates the deterministic synthetic dataset as
+revision `btc-history-77e4548a5394b078adee` with canonical fingerprint
+`77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6`.
+The earlier `7e910cbf...` value is stale evidence from the pre-closure
+canonicalization and is not treated as a current identity. The current
+manifest reports `observed_end_ms_exclusive=1767226320000`, matching the
+exclusive one-minute boundary rather than adding one millisecond.
 No historical data range or live dataset fingerprint was acquired. The stored
 fixture dataset is synthetic and exists only in test temporary directories.
 
@@ -58,6 +68,20 @@ requested Parquet format and DuckDB catalog are not provided by Python's
 standard library or the existing environment. No Polars, pandas, LightGBM,
 MLflow, Kafka, Redis, Ray, Docker, web framework, or model dependency was added.
 
-The next milestone is **B2: deterministic feature/label materialization and
-chronological numerical baselines**, with calibration and walk-forward evidence;
-Jev, model calls, backtests, and virtual brokerage remain out of B1.
+## Defect-closure result
+
+- Hard-disabled Binance transport: **intentional boundary**, retained. A
+  separately reviewed enablement boundary is still required; this milestone
+  does not enable or exercise it.
+- Fingerprint mismatch: **stale documentation/evidence**, reconciled to the
+  current implementation above and in the machine-readable U3/B2/U3/B3
+  records.
+- `observed_end_ms_exclusive` off by one: **confirmed and fixed**.
+- Checkpoint integrity: **confirmed and fixed** with identity, ordering, hash,
+  row-count, and lineage checks.
+- Float64 precision loss: **confirmed and fixed** by preserving exact source
+  decimal lexemes in B1 storage and fingerprints while retaining float64
+  analytical columns.
+
+No historical data was acquired. Jev, model calls, backtests, and virtual
+brokerage remain out of B1.

@@ -60,9 +60,9 @@
     "validation": "closed candles, OHLCV, ordering, duplicates, conflicts, gaps, response-size, and budgets are explicit"
   },
   "verification": {
-    "focused_readiness_and_b1_tests": "18 passed",
-    "b0_b1_b2_b3_api_regression_tests": "90 passed",
-    "full_suite": "261 passed, 1 skipped",
+    "focused_readiness_and_b1_tests": "22 passed",
+    "b0_b1_b2_b3_api_regression_tests": "94 passed across B0/B1/B2/B3/connectivity/CLI modules",
+    "full_suite": "265 passed, 1 skipped",
     "compileall": "passed",
     "evidence_validation": "passed; 22 JSON files",
     "secret_scan": "passed",

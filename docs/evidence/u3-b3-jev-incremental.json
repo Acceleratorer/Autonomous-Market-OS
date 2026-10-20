@@ -14,9 +14,9 @@
     "semantic_boundary": "experimental typed assessment; not BUY, SELL, order, risk override, execution authority, or calibrated five-minute BTC return probability"
   },
   "source_boundary": {
-    "dataset_revision": "btc-history-49b70e7dcbfac660e863",
-    "canonical_fingerprint": "49b70e7dcbfac660e8636dc0871a0623273d4dafadce93d50ba6b143656cf70c",
-    "feature_fingerprint": "797fefa4fa68c69f65a5e9e277144a7b748b4e3b439579c1372a09d5d04d5740",
+    "dataset_revision": "btc-history-77e4548a5394b078adee",
+    "canonical_fingerprint": "77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6",
+    "feature_fingerprint": "428b05d103f579e4000cf02b98e8d36631b4619fc7aaf8bc8fb5d8d015cd72e7",
     "fixture_id": "btc-b3-response-cases.v1",
     "network_requests": 0,
     "provider_requests": 0,
@@ -25,13 +25,13 @@
     "context_input_z": false
   },
   "run": {
-    "run_id": "btc-b3-4f262abcfd1e66c79440",
+    "run_id": "btc-b3-b52ddb1e9bf4b83d558b",
     "fixture_fingerprint": "ec50b638b9ffc85bc08eaa9bedab0b3b989d3a92ac920197c6280dbec65b3be5",
-    "request_fingerprint": "99f3bd30ae2dda40523c3275dc6a366de376ff61e8873e8a4d51baaf5dad20c9",
-    "response_fingerprint": "4c5f7cfab45bf06337efe906faede0bd29444e4202cdd269f9851b472ab83a2d",
+    "request_fingerprint": "4de7b0565929b47afec82c0a595d3c07cc18968c5f39b98c31f5750fc5759d31",
+    "response_fingerprint": "965d789ae645b64ca3e4328d173a656fd5b5cd5e3cbdf31ffd3c5811987887a2",
     "split_fingerprint": "54efeb082248e3a9f4ab000d99bec34e8ecef1fa291a0938c4e5678422b8807d",
     "calibration_fingerprint": "6bdc6317406a7e4f91437fe69613c286a32b1d43f13244650236a4795812a1cd",
-    "replay_fingerprint": "665ad195bd3a4091074106db1bac9f9ca4db2acc7dc4c1c9355f22198993042a",
+    "replay_fingerprint": "1b8770306dc2113e03452ca01f03ccbc80e4af20ce8e3a73e0a4af8f0a81a86d",
     "artifact_count": 11,
     "sample_count": 0
   },
@@ -83,14 +83,14 @@
   },
   "verification": {
     "focused_b3_tests": "8 passed",
-    "focused_b0_b1_b2_regression_tests": "40 passed",
+    "focused_b0_b1_b2_regression_tests": "B1 22, B0 12, B2 7, B3 8, connectivity 43, CLI 2 passed",
     "compileall": "passed",
     "evidence_validation": "passed",
     "dependency_check": "passed",
     "secret_scan": "passed",
     "replay_fingerprint": "passed in focused tests",
     "cli_api_smoke": "passed in focused tests",
-    "full_suite": "211 passed, 1 skipped",
+    "full_suite": "265 passed, 1 skipped",
     "diff_check": "passed"
   },
   "next_unified_milestone": "U4/B4 shared paper portfolio and virtual broker, only after U3/B3 evidence is accepted"

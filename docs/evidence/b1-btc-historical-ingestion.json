@@ -38,8 +38,9 @@
   "fixture_summary": {
     "source_rows": 13,
     "canonical_candles": 10,
-    "dataset_revision": "btc-history-7e910cbf4c3484a34249",
-    "canonical_fingerprint": "7e910cbf4c3484a34249d59901b284069a2fae23ea10e7fde38951070327f866",
+    "dataset_revision": "btc-history-77e4548a5394b078adee",
+    "canonical_fingerprint": "77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6",
+    "observed_end_ms_exclusive": 1767226320000,
     "duplicate_outcomes": 1,
     "conflict_outcomes": 1,
     "invalid_outcomes": 1,
@@ -53,9 +54,9 @@
     "reason": "explicit Parquet and DuckDB requirements are not met by the standard library or existing environment"
   },
   "verification": {
-    "focused_b1": "11 passed",
-    "focused_b0": "14 passed",
-    "full_suite": "196 passed, 0 failed, 1 skipped",
+    "focused_b1": "22 passed",
+    "focused_b0": "12 passed",
+    "full_suite": "265 passed, 1 skipped",
     "integration_suite": "5 passed",
     "compileall": "passed",
     "evidence_validation": "passed; 18 JSON files",
@@ -68,7 +69,15 @@
   "remaining_risks": [
     "Terms, regional access, retention, and redistribution rights remain unresolved.",
     "No transport runtime evidence exists because public fetch approval was not provided.",
-    "B1 does not train models, generate predictions, backtest, or create paper orders."
+    "B1 does not train models, generate predictions, backtest, or create paper orders.",
+    "Historical transport remains intentionally hard-disabled pending a separate enablement review."
   ],
+  "defect_closure": {
+    "observed_end_exclusive_off_by_one": "fixed",
+    "checkpoint_identity_and_raw_hash_validation": "fixed",
+    "exact_source_decimal_lexemes": "fixed; retained alongside float64 columns",
+    "fingerprint_reconciliation": "fixed; regenerated current identity is authoritative",
+    "transport_enablement": "intentional_separate_review_boundary"
+  },
   "next_milestone": "B2: deterministic feature/label materialization and chronological numerical baselines with calibration and walk-forward evidence."
 }

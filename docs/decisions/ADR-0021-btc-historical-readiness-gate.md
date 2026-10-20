@@ -20,6 +20,12 @@ The current `BinanceHistoricalTransport` remains hard-disabled, so this
 milestone cannot perform historical ingestion even if a caller supplies a
 synthetic authorization object in tests.
 
+The hard-disable is an intentional enablement boundary, not an unfinished
+network implementation. Any future enablement must be reviewed separately
+against the authorization contract, current source policy, host/path allowlist,
+and the bounded transport controls; this defect-closure milestone does not
+enable or exercise that transport.
+
 ## Bounded proposal
 
 The first separately reviewed run is limited to:
@@ -101,9 +107,15 @@ approved run must:
   caps;
 - persist a completed page before proceeding to the next page;
 - resume only with a new explicit approval using a matching checkpoint and
-  bounded policy; and
+  bounded policy. Checkpoint recovery must verify source/dataset identity,
+  requested range and caps, contiguous page order, each page's request bounds,
+  raw-page SHA-256, row count, and capture timestamp; and
 - stop on timeout, 403, 418, 451, malformed response, unexpected source
   behavior, or a missing/over-limit `Retry-After` rather than switching hosts.
+
+The current offline fixture closure also corrected the manifest's exclusive
+observed-end semantics and preserves exact source OHLCV decimal lexemes in the
+B1 canonical representation and fingerprints alongside numeric columns.
 
 ## Conditions preventing ingestion
 

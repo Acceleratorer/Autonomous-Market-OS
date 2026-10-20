@@ -484,7 +484,8 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   no credential value was printed or requested in chat. No Binance or Jev live
   request was made. Official TypeSafe docs and the Binance official source
   repository were rechecked on 2026-10-19; direct Binance docs returned an
-  HTTP 202 WAF challenge.
+  HTTP 202 WAF challenge. At this preflight point, no live provider request
+  had been made.
 - Current preflight verification: 41 focused connectivity tests, 40 B0/B1/B2/B3
   regression tests, and 252 full-suite tests with one skipped test. Exact
   commands are in the connectivity report;
@@ -496,7 +497,8 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   one request, zero retries, paper-only mode, and estimate-only cost handling.
 - The User-scope `TYPESAFE_API_KEY` was present and non-placeholder; its value
   was never printed, persisted, or included in evidence. The request executed
-  exactly once, with zero retries, and no Binance request was made.
+  exactly once, with zero retries. Binance had not yet been executed at that
+  earlier log point.
 - The provider response failed safely during local Score validation because the
   returned `context_score` did not match the parser's then-exact floating-point
   consistency check. No order, trade, portfolio mutation, or execution occurred.
@@ -545,3 +547,22 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Exact future approval phrase is recorded in
   `docs/U3-B1-HISTORICAL-READINESS-REPORT.md` and
   `docs/evidence/u3-b1-btc-historical-readiness.json`.
+
+## 2026-10-21 — B1 readiness defect closure
+
+- Reproduced the five reported B1 issues entirely offline. The hard-disabled
+  Binance historical transport is intentional and remains a separate reviewed
+  enablement boundary; it was not enabled or called.
+- Fixed the manifest's `observed_end_ms_exclusive` one-millisecond error.
+- Hardened checkpoint recovery with source/dataset identity, requested range
+  and cap matching, contiguous page identity/order, request bounds, raw-page
+  SHA-256, row-count, and capture-timestamp validation.
+- Preserved exact source OHLCV decimal lexemes in B1 Parquet and canonical
+  fingerprints alongside numeric float64 columns.
+- Regenerated current synthetic B1/B2/B3 identities. The authoritative B1
+  fixture revision is `btc-history-77e4548a5394b078adee` with canonical
+  fingerprint `77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6`.
+  Older `7e910cbf...` and `49b70e...` identities are stale documentation.
+- Offline verification recorded zero Binance requests, zero Jev requests, zero
+  trades, and no authorization-record changes. U4/B4 and U5/B5 remain
+  untouched.

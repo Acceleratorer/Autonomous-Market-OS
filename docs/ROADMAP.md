@@ -34,6 +34,8 @@ U0 foundation
 
 U3/B2 is complete offline. It remained local, deterministic, and offline, reused the B1 dataset and existing Market OS artifact, lineage, persistence, CLI, and API conventions, and did not wait for M2.9. U3/B3 is implemented as an offline controlled Jev-shaped benchmark and is not promoted because the shipped fixture has no leakage-safe labels. U3/API adds fixture-first public Binance and optional Jev connectivity with explicit live probes; the U3/B1 readiness gate now defines the bounded historical proposal but does not authorize or execute ingestion. U4/B4 and U5/B5 remain unstarted.
 
+The B1 readiness defect-closure milestone confirmed and fixed exclusive observed-end semantics, checkpoint identity/hash/lineage validation, and exact source-decimal retention in B1 canonical storage. The Binance historical transport remains intentionally hard-disabled behind a separate enablement review; no B1 acquisition was performed. Current regenerated synthetic identities are authoritative in the B1/B2/B3 evidence records.
+
 ## U3/B2 implementation result
 
 1. Materialized deterministic point-in-time features and separate five-minute labels from hash-checked B1 canonical rows.

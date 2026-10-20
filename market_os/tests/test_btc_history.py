@@ -341,6 +341,31 @@ def test_fixture_ingestion_persists_parquet_raw_pages_catalog_and_manifest(tmp_p
     assert store.inspect_outcomes(result.dataset_revision)
     assert len(store.inspect_candles(result.dataset_revision)) == 10
     assert store.replay(result.dataset_revision)["canonical_fingerprint"] == manifest["canonical_fingerprint"]
+    assert manifest["observed_end_ms_exclusive"] == START + 12 * MINUTE
+    assert store.inspect_candles(result.dataset_revision)[0]["open_decimal"] == "100"
+
+
+def test_canonical_storage_preserves_source_decimal_lexemes(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    baseline = HistoryStore(tmp_path / "baseline").ingest_fixture(fixture)
+    row = fixture["pages"][0][0]
+    row[1:6] = [
+        "1.0000000000000001",
+        "1.0000000000000002",
+        "0.9999999999999999",
+        "1.0000000000000001",
+        "0.0000000000000001",
+    ]
+    store = HistoryStore(tmp_path)
+    result = store.ingest_fixture(fixture)
+    candle = store.inspect_candles(result.dataset_revision)[0]
+    assert candle["open_decimal"] == "1.0000000000000001"
+    assert candle["high_decimal"] == "1.0000000000000002"
+    assert candle["low_decimal"] == "0.9999999999999999"
+    assert candle["close_decimal"] == "1.0000000000000001"
+    assert candle["volume_decimal"] == "0.0000000000000001"
+    assert result.canonical_fingerprint != baseline.canonical_fingerprint
+    assert store.replay(result.dataset_revision)["replayed"] is True
 
 
 def test_reingest_and_overlapping_page_are_idempotent_and_keep_raw_immutable(tmp_path: Path) -> None:
@@ -370,6 +395,14 @@ def test_inspection_range_and_no_network_replay(tmp_path: Path) -> None:
     before = list(tmp_path.rglob("*"))
     assert store.replay(result.dataset_revision)["replayed"] is True
     assert list(tmp_path.rglob("*")) == before
+
+
+def test_pre_closure_parquet_without_decimal_columns_remains_readable() -> None:
+    store = HistoryStore(".tmp-b3-inspect-history")
+    candles = store.inspect_candles("btc-history-49b70e7dcbfac660e863")
+    assert candles
+    assert candles[0]["open_decimal"] is None
+    assert store.replay("btc-history-49b70e7dcbfac660e863")["replayed"] is True
 
 
 def test_injected_acquisition_checkpoints_and_resumes_without_refetching_completed_pages(tmp_path: Path) -> None:
@@ -403,6 +436,63 @@ def test_injected_acquisition_checkpoints_and_resumes_without_refetching_complet
     assert result.canonical_count == 10
     assert transport.calls.count(0) == 1
     assert store.replay(result.dataset_revision)["network_requests"] == 0
+
+
+def test_checkpoint_recovery_rejects_raw_hash_tampering(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    rows = fixture["pages"][0]
+    start = fixture["requested_start_ms"]
+    end = fixture["requested_end_ms_exclusive"]
+
+    class Flaky:
+        approved = True
+
+        def __init__(self):
+            self.fail_page_once = True
+
+        def fetch_page(self, request):
+            if request.page_index == 1 and self.fail_page_once:
+                raise TimeoutError("synthetic timeout")
+            page = [row for row in rows if request.start_time_ms <= row[0] <= request.end_time_ms][:request.limit]
+            return HttpResponse(200, {}, json.dumps(page).encode(), "2026-01-01T00:30:01+00:00")
+
+    transport = Flaky()
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError):
+        store.acquire(start, end, transport=transport, page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorized(requested_start_ms=start, requested_end_ms_exclusive=end, page_size=5, max_pages=44, max_requests=44, max_rows=43_200, max_runtime_seconds=900, max_attempts=1))
+    checkpoint = next((tmp_path / "checkpoints").glob("*.json"))
+    checkpoint_payload = json.loads(checkpoint.read_text(encoding="utf-8"))
+    raw_path = tmp_path / "raw" / f"{checkpoint_payload['pages'][0]['sha256']}.json"
+    raw_path.write_bytes(b"[]")
+    with pytest.raises(HistoryError, match="hash"):
+        store.acquire(start, end, transport=transport, page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorized(requested_start_ms=start, requested_end_ms_exclusive=end, page_size=5, max_pages=44, max_requests=44, max_rows=43_200, max_runtime_seconds=900, max_attempts=1))
+
+
+def test_checkpoint_recovery_rejects_page_identity_and_lineage_changes(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    rows = fixture["pages"][0]
+    start = fixture["requested_start_ms"]
+    end = fixture["requested_end_ms_exclusive"]
+
+    class Flaky:
+        approved = True
+
+        def fetch_page(self, request):
+            if request.page_index == 1:
+                raise TimeoutError("synthetic timeout")
+            page = [row for row in rows if request.start_time_ms <= row[0] <= request.end_time_ms][:request.limit]
+            return HttpResponse(200, {}, json.dumps(page).encode(), "2026-01-01T00:30:01+00:00")
+
+    authorization = authorized(requested_start_ms=start, requested_end_ms_exclusive=end, page_size=5, max_pages=44, max_requests=44, max_rows=43_200, max_runtime_seconds=900, max_attempts=1)
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError):
+        store.acquire(start, end, transport=Flaky(), page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorization)
+    checkpoint = next((tmp_path / "checkpoints").glob("*.json"))
+    payload = json.loads(checkpoint.read_text(encoding="utf-8"))
+    payload["pages"][0]["page_index"] = 1
+    checkpoint.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(HistoryError, match="page"):
+        store.acquire(start, end, transport=Flaky(), page_size=5, max_pages=44, max_attempts=1, max_requests=44, max_rows=43_200, allow_historical_ingest=True, authorization=authorization)
 
 
 def test_disabled_acquisition_cannot_make_a_network_request(tmp_path: Path) -> None:
