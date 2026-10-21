@@ -60,9 +60,9 @@
     "validation": "closed candles, OHLCV, ordering, duplicates, conflicts, gaps, response-size, and budgets are explicit"
   },
   "verification": {
-    "focused_readiness_and_b1_tests": "22 passed",
-    "b0_b1_b2_b3_api_regression_tests": "94 passed across B0/B1/B2/B3/connectivity/CLI modules",
-    "full_suite": "265 passed, 1 skipped",
+    "focused_readiness_and_b1_tests": "27 passed",
+    "b0_b1_b2_b3_api_regression_tests": "99 passed across B0/B1/B2/B3/connectivity/CLI modules",
+    "full_suite": "270 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
     "compileall": "passed",
     "evidence_validation": "passed; 22 JSON files",
     "secret_scan": "passed",
@@ -75,7 +75,10 @@
     "credential_use": false,
     "trades": 0,
     "network_requests_in_readiness_path": 0,
-    "transport_status": "hard-disabled"
+    "transport_status": "hard-disabled",
+    "authorization_file_path": "approved-policy.json",
+    "authorization_file_present": false,
+    "execution_approval_present": false
   },
   "primary_sources": [
     "https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md",

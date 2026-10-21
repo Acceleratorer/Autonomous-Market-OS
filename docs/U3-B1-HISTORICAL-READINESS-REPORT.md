@@ -6,8 +6,8 @@ dataset proposal only. Jev, U4/B4, U5/B5, and trading are out of scope.
 
 ## Decision
 
-**Do not ingest yet.** The existing B1 transport remains disabled. The new
-readiness contract makes the future request range, row/page/request/runtime
+**Do not ingest yet.** The existing B1 transport remains disabled. The readiness
+contract makes the future request range, row/page/request/runtime
 caps, retention metadata, and approval prerequisites inspectable without
 network access. Binance public market-data availability is not treated as
 permission to retain or redistribute data.
@@ -104,17 +104,17 @@ exclusion, exact page/request/row/runtime budgets, response-size rejection,
 approval-flag refusal before transport, checkpoint/resume behavior, existing
 duplicate/conflict/gap/out-of-order handling, closed-candle validation, and
 zero-network CLI/API readiness inspection. Existing B0/B1 tests remain green;
-the focused readiness/B1 suite is 18 tests after the final transport-boundary
+the focused readiness/B1 suite is 27 tests after the final transport-boundary
 hardening.
 
 ## Verification
 
 Verified locally without provider access:
 
-- `python -m pytest market_os/tests/test_btc_history.py -q`: **18 passed**.
-- `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **32 passed**.
-- `python -m pytest market_os/tests/test_btc_b2.py market_os/tests/test_btc_b3.py market_os/tests/test_btc_connectivity.py -q`: **58 passed**.
-- `python -m pytest -q`: **261 passed, 1 skipped**.
+- `python -m pytest market_os/tests/test_btc_history.py -q`: **27 passed**.
+- `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **41 passed**.
+- `python -m pytest market_os/tests/test_btc_b2.py market_os/tests/test_btc_b3.py market_os/tests/test_btc_connectivity.py -q`: **58 passed** with `TYPESAFE_API_KEY` unset.
+- `python -m pytest -q`: **270 passed, 0 failed, 1 skipped** with `TYPESAFE_API_KEY` unset.
 - `python -m compileall -q market_os`: passed.
 - `python scripts/ci_checks.py validate-evidence`: passed for 22 evidence JSON files.
 - `python scripts/ci_checks.py secret-scan`: passed.

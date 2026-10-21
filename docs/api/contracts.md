@@ -157,7 +157,8 @@ market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outco
 must verify source terms, regional eligibility, and retention rights and must
 match the requested range and caps. The current Binance transport is still
 hard-disabled, so no command in this readiness milestone can make a network
-request. The exact future approval phrase is recorded in
+request. A future enablement also requires a separate exact execution approval;
+the phrase is recorded in
 `docs/U3-B1-HISTORICAL-READINESS-REPORT.md`.
 
 The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local

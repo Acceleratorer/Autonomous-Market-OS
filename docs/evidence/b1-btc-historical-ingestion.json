@@ -11,7 +11,10 @@
     "legal_terms_verified": false,
     "regional_eligibility_verified": false,
     "retention_rights_verified": false,
-    "transport_status": "disabled; raises source_not_approved before connection"
+    "transport_status": "disabled; raises source_not_approved before connection",
+    "authorization_file": "approved-policy.json",
+    "authorization_file_present": false,
+    "execution_approval_present": false
   },
   "primary_sources": [
     "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data",
@@ -54,12 +57,12 @@
     "reason": "explicit Parquet and DuckDB requirements are not met by the standard library or existing environment"
   },
   "verification": {
-    "focused_b1": "22 passed",
+    "focused_b1": "27 passed",
     "focused_b0": "12 passed",
-    "full_suite": "265 passed, 1 skipped",
+    "full_suite": "270 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
     "integration_suite": "5 passed",
     "compileall": "passed",
-    "evidence_validation": "passed; 18 JSON files",
+    "evidence_validation": "passed; 22 JSON files",
     "secret_scan": "passed",
     "pip_check": "No broken requirements found",
     "diff_check": "passed"

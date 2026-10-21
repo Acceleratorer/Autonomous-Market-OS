@@ -23,8 +23,8 @@ synthetic authorization object in tests.
 The hard-disable is an intentional enablement boundary, not an unfinished
 network implementation. Any future enablement must be reviewed separately
 against the authorization contract, current source policy, host/path allowlist,
-and the bounded transport controls; this defect-closure milestone does not
-enable or exercise that transport.
+bounded transport controls, and a separate exact execution approval. This
+defect-closure milestone does not enable or exercise that transport.
 
 ## Bounded proposal
 

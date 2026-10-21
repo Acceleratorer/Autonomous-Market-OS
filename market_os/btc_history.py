@@ -47,6 +47,11 @@ READINESS_MAX_PAGES = 44
 READINESS_MAX_ROWS = 43_200
 READINESS_MAX_REQUESTS = 44
 READINESS_MAX_RUNTIME_SECONDS = 900
+_REQUESTED_AUTHORIZATION_FIELDS = frozenset({
+    "requested_start_ms", "requested_end_ms_exclusive", "page_size",
+    "max_pages", "max_requests", "max_rows",
+    "max_runtime_seconds", "max_attempts",
+})
 _DATASET_ID_RE = re.compile(r"^(?:btc-history-[0-9a-f]{20}|btc-history-manifest-[0-9a-f]{20})$")
 
 
@@ -204,6 +209,9 @@ def validate_historical_authorization(
         "purpose": "local BTC quantitative research and paper-only simulation",
         "retention": "local-only-until-explicit-deletion",
     }
+    allowed = {"schema"} | set(expected) | _REQUESTED_AUTHORIZATION_FIELDS
+    if set(value) - allowed:
+        raise HistoryError("source_not_authorized", "historical authorization contains unsupported fields")
     if any(value.get(key) != expected_value for key, expected_value in expected.items()):
         raise HistoryError("source_not_authorized", "historical authorization does not match the bounded source policy")
     for key, expected_value in (requested or {}).items():
@@ -571,19 +579,17 @@ class HistoryStore:
     ) -> IngestResult:
         if not allow_historical_ingest:
             raise HistoryError("source_not_approved", "source/legal review is incomplete; --allow-historical-ingest is required before historical acquisition")
-        validate_historical_authorization(
-            authorization,
-            requested={
-                "requested_start_ms": start_time_ms,
-                "requested_end_ms_exclusive": end_time_ms_exclusive,
-                "page_size": page_size,
-                "max_pages": max_pages,
-                "max_requests": max_requests,
-                "max_rows": max_rows,
-                "max_runtime_seconds": max_runtime_seconds,
-                "max_attempts": max_attempts,
-            },
-        )
+        requested = {
+            "requested_start_ms": start_time_ms,
+            "requested_end_ms_exclusive": end_time_ms_exclusive,
+            "page_size": page_size,
+            "max_pages": max_pages,
+            "max_requests": max_requests,
+            "max_rows": max_rows,
+            "max_runtime_seconds": max_runtime_seconds,
+            "max_attempts": max_attempts,
+        }
+        validate_historical_authorization(authorization, requested=requested)
         transport = transport or BinanceHistoricalTransport()
         if not getattr(transport, "approved", False):
             raise HistoryError("source_not_approved", "source/legal review and explicit user approval are required before transport")

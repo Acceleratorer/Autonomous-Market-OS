@@ -20,6 +20,7 @@ from market_os.btc_history import (
     plan_historical_readiness,
     plan_pages,
     parse_kline_row,
+    validate_historical_authorization,
     validate_historical_budget,
 )
 from market_os.api import make_handler
@@ -191,6 +192,47 @@ def test_historical_acquisition_refuses_unverified_source_policy_before_transpor
             max_attempts=1,
         )
     assert transport.calls == 0
+
+
+def test_valid_policy_is_accepted_without_network() -> None:
+    requested = {
+        "requested_start_ms": START,
+        "requested_end_ms_exclusive": START + MINUTE,
+        "page_size": 1000,
+        "max_pages": 44,
+        "max_requests": 1,
+        "max_rows": 1,
+        "max_runtime_seconds": 900,
+        "max_attempts": 1,
+    }
+    validate_historical_authorization(authorized(**requested), requested=requested)
+
+
+def test_valid_policy_still_cannot_enable_default_transport(tmp_path: Path) -> None:
+    requested = {
+        "requested_start_ms": START,
+        "requested_end_ms_exclusive": START + MINUTE,
+        "page_size": 1000,
+        "max_pages": 44,
+        "max_requests": 1,
+        "max_rows": 1,
+        "max_runtime_seconds": 900,
+        "max_attempts": 1,
+    }
+    with pytest.raises(HistoryError, match="source/legal review"):
+        HistoryStore(tmp_path).acquire(
+            START,
+            START + MINUTE,
+            allow_historical_ingest=True,
+            authorization=authorized(**requested),
+            max_requests=1,
+            max_rows=1,
+        )
+
+
+def test_authorization_rejects_unsupported_fields() -> None:
+    with pytest.raises(HistoryError, match="unsupported"):
+        validate_historical_authorization(authorized(unexpected="value"))
 
 
 def test_historical_acquisition_enforces_response_size_and_runtime_request_caps(tmp_path: Path) -> None:
@@ -548,3 +590,40 @@ def test_historical_readiness_cli_and_api_are_offline_and_block_ingest(tmp_path:
     finally:
         server.shutdown()
         thread.join(timeout=2)
+
+
+def test_missing_and_invalid_policy_refuse_before_transport(tmp_path: Path) -> None:
+    class CountingTransport:
+        approved = True
+        calls = 0
+
+        def fetch_page(self, _request):
+            self.calls += 1
+            raise AssertionError("transport must not be called")
+
+    transport = CountingTransport()
+    with pytest.raises(HistoryError, match="authorization"):
+        HistoryStore(tmp_path / "missing").acquire(
+            START, START + MINUTE, transport=transport,
+            allow_historical_ingest=True, authorization=None,
+            max_requests=1, max_rows=1,
+        )
+    with pytest.raises(HistoryError, match="authorization"):
+        HistoryStore(tmp_path / "invalid").acquire(
+            START, START + MINUTE, transport=transport,
+            allow_historical_ingest=True, authorization={"schema": "wrong"},
+            max_requests=1, max_rows=1,
+        )
+    assert transport.calls == 0
+
+
+def test_acquire_cli_requires_exact_approved_policy_path(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    with pytest.raises(SystemExit, match="approved-policy.json"):
+        main([
+            "btc-paper", "acquire", "--start-ms", str(START), "--end-ms", str(START + MINUTE),
+            "--allow-historical-ingest", "--authorization-file", str(tmp_path / "other.json"),
+            "--store-root", str(tmp_path / "store"),
+        ])
+    assert capsys.readouterr().out == ""

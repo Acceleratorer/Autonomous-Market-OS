@@ -180,8 +180,12 @@ def main(argv: list[str] | None = None) -> int:
                 raise SystemExit("historical acquisition requires --allow-historical-ingest")
             if not args.authorization_file:
                 raise SystemExit("historical acquisition requires --authorization-file")
+            authorization_path = Path(args.authorization_file).resolve()
+            required_authorization_path = (Path(__file__).resolve().parent.parent / "approved-policy.json").resolve()
+            if authorization_path != required_authorization_path:
+                raise SystemExit("historical acquisition requires the repository approved-policy.json")
             try:
-                authorization = json.loads(Path(args.authorization_file).read_text(encoding="utf-8"))
+                authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 raise SystemExit(f"cannot read historical authorization: {exc}") from exc
             store = HistoryStore(args.store_root)
