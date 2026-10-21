@@ -1,9 +1,4 @@
-"""Offline-capable BTC history ingestion, Parquet snapshots, and DuckDB catalog.
-
-The Binance transport is intentionally disabled until source/legal review and
-explicit user authorization are complete. All other layers accept fixture or
-injected transport pages and perform no network I/O themselves.
-"""
+"""BTC history ingestion, bounded opt-in transport, and local replay storage."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -17,6 +12,9 @@ import re
 import tempfile
 import time
 from typing import Any, Callable, Protocol
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 import duckdb
 import pyarrow as pa
@@ -33,6 +31,12 @@ SOURCE_ID = "binance.spot.rest.klines"
 SOURCE_HOST = "data-api.binance.vision"
 SOURCE_PATH = "/api/v3/klines"
 SOURCE_METHOD = "GET"
+SOURCE_USER_AGENT = "MarketOS-BTC-Paper/0.1"
+EXECUTION_APPROVAL_PHRASE = (
+    "APPROVE B1 HISTORICAL INGEST: BTCUSDT Spot 1m, proposed 30 UTC days, "
+    "44 pages, 44 maximum HTTP requests, 1000 rows/page, 900-second runtime cap, "
+    "local-only retention, no retry after failure, no authenticated Binance access"
+)
 SOURCE_INTERVAL = "1m"
 SOURCE_REQUEST_WEIGHT = 2
 MAX_PAGE_SIZE = 1000
@@ -138,7 +142,7 @@ def plan_historical_readiness(cutoff_ms: int) -> dict[str, Any]:
     )
     return {
         "schema": READINESS_VERSION,
-        "status": "proposal-blocked-pending-authorization",
+        "status": "reviewed-opt-in-transport-blocked-pending-authorization",
         "ingestion_allowed": False,
         "network_requests": 0,
         "provider_requests": 0,
@@ -153,6 +157,9 @@ def plan_historical_readiness(cutoff_ms: int) -> dict[str, Any]:
         "authorization": {
             "explicit_runtime_flag": "--allow-historical-ingest",
             "authorization_file_required": True,
+            "authorization_file_path": "approved-policy.json",
+            "authorization_requires_expires_at": True,
+            "execution_approval_required": True,
             "terms_verified": False,
             "regional_eligibility_verified": False,
             "retention_rights_verified": False,
@@ -190,6 +197,7 @@ def validate_historical_authorization(
     value: dict[str, Any] | None,
     *,
     requested: dict[str, int] | None = None,
+    now: datetime | None = None,
 ) -> None:
     if not isinstance(value, dict) or value.get("schema") != AUTHORIZATION_VERSION:
         raise HistoryError("source_not_authorized", "a matching historical authorization record is required")
@@ -206,14 +214,44 @@ def validate_historical_authorization(
         "request_weight": SOURCE_REQUEST_WEIGHT,
         "authenticated": False,
         "trading": False,
+        "websocket": False,
+        "account_access": False,
+        "orders": False,
+        "futures": False,
+        "margin": False,
+        "credentials": False,
+        "max_response_bytes": HISTORY_MAX_RESPONSE_BYTES,
         "purpose": "local BTC quantitative research and paper-only simulation",
         "retention": "local-only-until-explicit-deletion",
     }
-    allowed = {"schema"} | set(expected) | _REQUESTED_AUTHORIZATION_FIELDS
+    allowed = {"schema", "expires_at"} | set(expected) | _REQUESTED_AUTHORIZATION_FIELDS
     if set(value) - allowed:
         raise HistoryError("source_not_authorized", "historical authorization contains unsupported fields")
     if any(value.get(key) != expected_value for key, expected_value in expected.items()):
         raise HistoryError("source_not_authorized", "historical authorization does not match the bounded source policy")
+    missing_requested = _REQUESTED_AUTHORIZATION_FIELDS - value.keys()
+    if missing_requested:
+        raise HistoryError("source_not_authorized", "historical authorization is missing bounded request values")
+    try:
+        validate_historical_budget(
+            value["requested_start_ms"],
+            value["requested_end_ms_exclusive"],
+            page_size=value["page_size"],
+            max_pages=value["max_pages"],
+            max_requests=value["max_requests"],
+            max_rows=value["max_rows"],
+            max_runtime_seconds=value["max_runtime_seconds"],
+            max_attempts=value["max_attempts"],
+        )
+    except (HistoryError, KeyError, TypeError) as exc:
+        raise HistoryError("source_not_authorized", "historical authorization contains invalid bounded request values") from exc
+    try:
+        expires_at = _parse_utc(value.get("expires_at"), "expires_at")
+    except (ContractError, TypeError, ValueError) as exc:
+        raise HistoryError("source_not_authorized", "historical authorization requires a valid UTC expires_at") from exc
+    current_time = now or datetime.now(timezone.utc)
+    if expires_at <= current_time:
+        raise HistoryError("source_not_authorized", "historical authorization expires_at has passed")
     for key, expected_value in (requested or {}).items():
         if value.get(key) != expected_value:
             raise HistoryError("source_not_authorized", f"historical authorization does not match requested {key}")
@@ -277,15 +315,84 @@ class HistoricalTransport(Protocol):
     def fetch_page(self, request: PageRequest) -> HttpResponse: ...
 
 
-class BinanceHistoricalTransport:
-    """Disabled public transport seam. This class intentionally opens no sockets."""
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        raise HistoryError("redirect_rejected", "historical transport rejects redirects")
 
-    approved = False
+
+class BinanceHistoricalTransport:
+    """Bounded, unauthenticated public kline transport."""
+
     host = SOURCE_HOST
-    path = "/api/v3/klines"
+    path = SOURCE_PATH
+    method = SOURCE_METHOD
+    approved = False
+
+    def __init__(
+        self,
+        authorization: dict[str, Any],
+        execution_approval: str,
+        *,
+        timeout: float = 10.0,
+        now: datetime | None = None,
+    ) -> None:
+        validate_historical_authorization(authorization, now=now)
+        if execution_approval != EXECUTION_APPROVAL_PHRASE:
+            raise HistoryError("execution_not_approved", "exact B1 historical execution approval is required before transport")
+        self.authorization = authorization
+        self.approved = True
+        self.timeout = timeout
+        self.request_count = 0
+        self.start_time_ms = authorization["requested_start_ms"]
+        self.end_time_ms_exclusive = authorization["requested_end_ms_exclusive"]
+        self.page_size = authorization["page_size"]
+        self.max_pages = authorization["max_pages"]
+        self.max_requests = authorization["max_requests"]
+
+    def build_request(self, request: PageRequest) -> Request:
+        if request.page_index < 0 or request.page_index >= self.max_pages:
+            raise HistoryError("request_budget", "historical page index exceeds the approved page cap")
+        if request.limit != self.page_size or request.limit > MAX_PAGE_SIZE:
+            raise HistoryError("request_budget", "historical page size does not match the approved cap")
+        if request.start_time_ms < self.start_time_ms or request.end_time_ms >= self.end_time_ms_exclusive:
+            raise HistoryError("source_not_authorized", "historical page range exceeds the approved range")
+        if self.request_count >= self.max_requests:
+            raise HistoryError("request_budget", "historical request count exceeds the approved cap")
+        query = urlencode({
+            "symbol": BTC_SYMBOL,
+            "interval": SOURCE_INTERVAL,
+            "startTime": request.start_time_ms,
+            "endTime": request.end_time_ms,
+            "limit": request.limit,
+        })
+        if self.method != SOURCE_METHOD:
+            raise HistoryError("endpoint_not_allowed", "historical method is outside the approved allowlist")
+        url = f"https://{self.host}{self.path}?{query}"
+        parsed = urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != SOURCE_HOST or parsed.path != SOURCE_PATH:
+            raise HistoryError("endpoint_not_allowed", "historical endpoint is outside the approved allowlist")
+        return Request(url, headers={"User-Agent": SOURCE_USER_AGENT}, method=self.method)
 
     def fetch_page(self, request: PageRequest) -> HttpResponse:
-        raise HistoryError("source_not_approved", "public Binance market-data transport is disabled pending explicit approval")
+        outbound = self.build_request(request)
+        self.request_count += 1
+        try:
+            with build_opener(_NoRedirect()).open(outbound, timeout=self.timeout) as response:
+                status = int(response.status)
+                headers = dict(response.headers.items())
+                body = response.read(HISTORY_MAX_RESPONSE_BYTES + 1)
+                received_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+                return HttpResponse(status, headers, body, received_at)
+        except HTTPError as exc:
+            try:
+                body = exc.read(HISTORY_MAX_RESPONSE_BYTES + 1)
+                headers = dict(exc.headers.items()) if exc.headers else {}
+                received_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+                return HttpResponse(int(exc.code), headers, body, received_at)
+            finally:
+                exc.close()
+        except (URLError, TimeoutError, OSError):
+            raise
 
 
 def plan_pages(
@@ -575,6 +682,7 @@ class HistoryStore:
         max_attempts: int = 1,
         allow_historical_ingest: bool = False,
         authorization: dict[str, Any] | None = None,
+        execution_approval: str | None = None,
         wait: Callable[[float], None] = time.sleep,
     ) -> IngestResult:
         if not allow_historical_ingest:
@@ -590,7 +698,14 @@ class HistoryStore:
             "max_attempts": max_attempts,
         }
         validate_historical_authorization(authorization, requested=requested)
-        transport = transport or BinanceHistoricalTransport()
+        if transport is None:
+            if execution_approval != EXECUTION_APPROVAL_PHRASE:
+                raise HistoryError("execution_not_approved", "exact B1 historical execution approval is required before transport")
+            transport = BinanceHistoricalTransport(
+                authorization,
+                execution_approval,
+                now=datetime.now(timezone.utc),
+            )
         if not getattr(transport, "approved", False):
             raise HistoryError("source_not_approved", "source/legal review and explicit user approval are required before transport")
         requests = plan_pages(start_time_ms, end_time_ms_exclusive, page_size=page_size, max_pages=max_pages)

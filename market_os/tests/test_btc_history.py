@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ import urllib.parse
 
 from market_os.btc_history import (
     BinanceHistoricalTransport,
+    EXECUTION_APPROVAL_PHRASE,
     HISTORY_MAX_RESPONSE_BYTES,
     HistoryError,
     HistoryStore,
@@ -47,8 +49,16 @@ def authorized(**overrides):
         "request_weight": 2,
         "authenticated": False,
         "trading": False,
+        "websocket": False,
+        "account_access": False,
+        "orders": False,
+        "futures": False,
+        "margin": False,
+        "credentials": False,
+        "max_response_bytes": 256 * 1024,
         "purpose": "local BTC quantitative research and paper-only simulation",
         "retention": "local-only-until-explicit-deletion",
+        "expires_at": "2099-01-01T00:00:00+00:00",
     }
     value.update(overrides)
     return value
@@ -208,7 +218,7 @@ def test_valid_policy_is_accepted_without_network() -> None:
     validate_historical_authorization(authorized(**requested), requested=requested)
 
 
-def test_valid_policy_still_cannot_enable_default_transport(tmp_path: Path) -> None:
+def test_valid_policy_creates_approved_transport_without_network(tmp_path: Path) -> None:
     requested = {
         "requested_start_ms": START,
         "requested_end_ms_exclusive": START + MINUTE,
@@ -219,12 +229,43 @@ def test_valid_policy_still_cannot_enable_default_transport(tmp_path: Path) -> N
         "max_runtime_seconds": 900,
         "max_attempts": 1,
     }
-    with pytest.raises(HistoryError, match="source/legal review"):
+    transport = BinanceHistoricalTransport(
+        authorized(**requested),
+        EXECUTION_APPROVAL_PHRASE,
+        now=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    )
+    assert transport.approved is True
+    assert transport.request_count == 0
+
+    with pytest.raises(HistoryError, match="exact B1 historical execution approval"):
+        BinanceHistoricalTransport(authorized(**requested), "wrong approval", now=datetime(2026, 1, 1, tzinfo=timezone.utc))
+
+
+def test_default_transport_requires_exact_execution_approval(tmp_path: Path) -> None:
+    requested = {
+        "requested_start_ms": START,
+        "requested_end_ms_exclusive": START + MINUTE,
+        "page_size": 1000,
+        "max_pages": 44,
+        "max_requests": 1,
+        "max_rows": 1,
+        "max_runtime_seconds": 900,
+        "max_attempts": 1,
+    }
+    with pytest.raises(HistoryError, match="exact B1 historical execution approval"):
         HistoryStore(tmp_path).acquire(
-            START,
-            START + MINUTE,
+            START, START + MINUTE,
             allow_historical_ingest=True,
             authorization=authorized(**requested),
+            max_requests=1,
+            max_rows=1,
+        )
+    with pytest.raises(HistoryError, match="exact B1 historical execution approval"):
+        HistoryStore(tmp_path).acquire(
+            START, START + MINUTE,
+            allow_historical_ingest=True,
+            authorization=authorized(**requested),
+            execution_approval=EXECUTION_APPROVAL_PHRASE + " ",
             max_requests=1,
             max_rows=1,
         )
@@ -266,7 +307,7 @@ def test_historical_acquisition_enforces_response_size_and_runtime_request_caps(
             max_attempts=1,
         )
 
-    with pytest.raises(HistoryError, match="request budget"):
+    with pytest.raises(HistoryError, match="authorization"):
         HistoryStore(tmp_path / "budget").acquire(
             START,
             START + MINUTE,
@@ -289,12 +330,62 @@ def test_historical_acquisition_enforces_response_size_and_runtime_request_caps(
         )
 
 
+def test_authorization_requires_future_expiry() -> None:
+    with pytest.raises(HistoryError, match="passed|authorization"):
+        validate_historical_authorization(authorized(expires_at="2020-01-01T00:00:00+00:00"), now=datetime(2026, 1, 1, tzinfo=timezone.utc))
+    with pytest.raises(HistoryError, match="authorization"):
+        validate_historical_authorization({"schema": "market-os.btc-history-authorization.v1"})
+
+
+def test_transport_builds_only_allowlisted_public_kline_requests() -> None:
+    transport = BinanceHistoricalTransport(
+        authorized(
+            requested_start_ms=START,
+            requested_end_ms_exclusive=START + MINUTE,
+            page_size=1000,
+            max_pages=44,
+            max_requests=1,
+            max_rows=1,
+            max_runtime_seconds=900,
+            max_attempts=1,
+        ),
+        EXECUTION_APPROVAL_PHRASE,
+        now=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    )
+    request = transport.build_request(plan_pages(START, START + MINUTE)[0])
+    assert request.method == "GET"
+    assert request.full_url == (
+        "https://data-api.binance.vision/api/v3/klines?"
+        "symbol=BTCUSDT&interval=1m&startTime=1767225600000&endTime=1767225659999&limit=1000"
+    )
+    assert all("authorization" not in key.lower() for key in request.headers)
+
+    for attribute, value in (("host", "api.binance.com"), ("path", "/api/v3/ticker/price"), ("method", "POST")):
+        altered = BinanceHistoricalTransport(
+            authorized(
+                requested_start_ms=START,
+                requested_end_ms_exclusive=START + MINUTE,
+                page_size=1000,
+                max_pages=44,
+                max_requests=1,
+                max_rows=1,
+                max_runtime_seconds=900,
+                max_attempts=1,
+            ),
+            EXECUTION_APPROVAL_PHRASE,
+            now=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        )
+        setattr(altered, attribute, value)
+        with pytest.raises(HistoryError, match="allowlist"):
+            altered.build_request(plan_pages(START, START + MINUTE)[0])
+
+
 def test_rate_limit_and_timeout_errors_classify_without_transport() -> None:
     assert classify_http_failure(429, {"Retry-After": "3"}).code == "rate_limited"
     assert classify_http_failure(418, {"Retry-After": "60"}).code == "ip_banned"
     assert classify_http_failure(503, {}).code == "server_error"
-    with pytest.raises(HistoryError, match="disabled pending explicit approval"):
-        BinanceHistoricalTransport().fetch_page(plan_pages(START, START + MINUTE)[0])
+    with pytest.raises(HistoryError, match="authorization"):
+        BinanceHistoricalTransport({"schema": "market-os.btc-history-authorization.v1"}, EXECUTION_APPROVAL_PHRASE)
 
 
 def test_bounded_historical_run_stops_on_rate_limit_without_retry_or_wait(tmp_path: Path) -> None:

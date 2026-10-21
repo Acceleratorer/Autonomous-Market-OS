@@ -1,30 +1,27 @@
 # ADR-0021: BTC historical-data authorization and readiness gate
 
-- **Status:** Accepted as a readiness proposal; historical transport remains disabled
-- **Date:** 2026-10-19
+- **Status:** Accepted as a reviewed opt-in design; historical transport remains disabled by default
+- **Date:** 2026-10-22
 - **Scope:** BTCUSDT Spot one-minute historical candles before any B1 network ingest
 
 ## Decision
 
-Keep Binance historical ingestion refused by default and add a versioned,
-offline readiness contract around the existing B1 `HistoryStore` seam. The
-contract does not authorize a request by itself. A future run must provide all
-of the following:
+Keep Binance historical ingestion refused by default and add a reviewed,
+bounded transport behind the existing B1 `HistoryStore` seam. A future run
+must provide all of the following:
 
 - an explicit `--allow-historical-ingest` runtime flag;
 - a matching `market-os.btc-history-authorization.v1` policy file;
 - verified source terms, regional eligibility, and retention rights; and
-- the bounded range and caps recorded in that policy file.
+- the bounded range and caps recorded in that policy file;
+- a future `expires_at` in the policy; and
+- the exact separate B1 execution approval phrase.
 
-The current `BinanceHistoricalTransport` remains hard-disabled, so this
-milestone cannot perform historical ingestion even if a caller supplies a
-synthetic authorization object in tests.
-
-The hard-disable is an intentional enablement boundary, not an unfinished
-network implementation. Any future enablement must be reviewed separately
-against the authorization contract, current source policy, host/path allowlist,
-bounded transport controls, and a separate exact execution approval. This
-defect-closure milestone does not enable or exercise that transport.
+The default transport instance remains refused unless the exact execution
+phrase matches. The reviewed transport permits only unauthenticated HTTPS GET
+requests to the literal Binance market-data host and kline path, with the
+bounded query, response, request, and runtime controls below. This milestone
+does not execute an acquisition.
 
 ## Bounded proposal
 

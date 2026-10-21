@@ -1,7 +1,7 @@
 {
   "schema": "market-os.u3-b1.btc-historical-readiness.v1",
-  "status": "readiness-proposal-blocked-pending-authorization",
-  "date": "2026-10-19",
+  "status": "reviewed-opt-in-transport-blocked-pending-authorization",
+  "date": "2026-10-22",
   "repository": "Autonomous-Market-OS",
   "source": {
     "host": "data-api.binance.vision",
@@ -35,6 +35,9 @@
     "ingestion_allowed": false,
     "explicit_runtime_flag": "--allow-historical-ingest",
     "authorization_file_schema": "market-os.btc-history-authorization.v1",
+    "authorization_file_path": "approved-policy.json",
+    "authorization_requires_expires_at": true,
+    "execution_approval_required": true,
     "terms_verified": false,
     "regional_eligibility_verified": false,
     "retention_rights_verified": false,
@@ -60,9 +63,9 @@
     "validation": "closed candles, OHLCV, ordering, duplicates, conflicts, gaps, response-size, and budgets are explicit"
   },
   "verification": {
-    "focused_readiness_and_b1_tests": "27 passed",
-    "b0_b1_b2_b3_api_regression_tests": "99 passed across B0/B1/B2/B3/connectivity/CLI modules",
-    "full_suite": "270 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
+    "focused_readiness_and_b1_tests": "30 passed",
+    "b0_b1_b2_b3_api_regression_tests": "102 passed across B0/B1/B2/B3/connectivity/CLI modules",
+    "full_suite": "273 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
     "compileall": "passed",
     "evidence_validation": "passed; 22 JSON files",
     "secret_scan": "passed",
@@ -75,10 +78,10 @@
     "credential_use": false,
     "trades": 0,
     "network_requests_in_readiness_path": 0,
-    "transport_status": "hard-disabled",
-    "authorization_file_path": "approved-policy.json",
+    "transport_status": "disabled-by-default-reviewed-opt-in",
     "authorization_file_present": false,
-    "execution_approval_present": false
+    "execution_approval_present": false,
+    "transport_requests_in_review": 0
   },
   "primary_sources": [
     "https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md",

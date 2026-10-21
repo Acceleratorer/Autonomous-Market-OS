@@ -131,9 +131,9 @@ security checks, measured cost/usage/latency, and human approval. See the
 
 ## B1 BTC historical dataset inspection
 
-B1 adds offline fixture ingestion and read-only dataset inspection. Public
-Binance transport is disabled pending ADR-0016 source/legal review and explicit
-approval. The CLI surfaces are:
+B1 adds offline fixture ingestion and read-only dataset inspection. The reviewed
+Binance transport is disabled by default and can only be selected by the exact
+policy, runtime flag, and separate execution approval. The CLI surfaces are:
 
 ```text
 market-os btc-paper ingest --fixture <path> --store-root <path>
@@ -142,6 +142,7 @@ market-os btc-paper acquire --start-ms <ms> --end-ms <exclusive-ms> \
   --page-size 1000 --max-pages 44 --max-requests 44 --max-rows 43200 \
   --max-runtime-seconds 900 --max-attempts 1 \
   --allow-historical-ingest --authorization-file <approved-policy.json> \
+  --execution-approval "<exact B1 approval phrase>" \
   --store-root <path>
 market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outcomes|provenance|gaps|replay --store-root <path>
 ```
@@ -152,13 +153,13 @@ market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outco
 44 pages/requests, one attempt per page, a 900-second runtime cap, and a
 256 KiB page bound. The candle opening at the cutoff is excluded.
 
-`acquire` remains refused unless the explicit runtime flag and a matching
+`acquire` remains refused unless the explicit runtime flag, the exact
+repository-root `approved-policy.json`, and a matching
 `market-os.btc-history-authorization.v1` policy file are supplied. The policy
-must verify source terms, regional eligibility, and retention rights and must
-match the requested range and caps. The current Binance transport is still
-hard-disabled, so no command in this readiness milestone can make a network
-request. A future enablement also requires a separate exact execution approval;
-the phrase is recorded in
+must verify source terms, regional eligibility, retention rights, a future
+`expires_at`, and the requested range and caps. The default Binance transport
+remains disabled; the reviewed opt-in path additionally requires a separate
+exact execution approval phrase. The phrase is recorded in
 `docs/U3-B1-HISTORICAL-READINESS-REPORT.md`.
 
 The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local

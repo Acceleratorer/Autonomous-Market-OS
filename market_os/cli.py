@@ -73,6 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
     btc_acquire.add_argument("--max-attempts", type=int, default=1)
     btc_acquire.add_argument("--allow-historical-ingest", action="store_true")
     btc_acquire.add_argument("--authorization-file")
+    btc_acquire.add_argument("--execution-approval")
     btc_acquire.add_argument("--no-resume", action="store_true")
     btc_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     btc_readiness = btc_commands.add_parser("historical-readiness")
@@ -200,6 +201,7 @@ def main(argv: list[str] | None = None) -> int:
                 max_attempts=args.max_attempts,
                 allow_historical_ingest=True,
                 authorization=authorization,
+                execution_approval=args.execution_approval,
                 resume=not args.no_resume,
             )
             print(json.dumps(asdict(result), indent=2, sort_keys=True))

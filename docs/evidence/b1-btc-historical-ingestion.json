@@ -1,7 +1,7 @@
 {
   "schema": "market-os.b1.btc-historical-ingestion.v1",
-  "date": "2026-10-18",
-  "status": "offline-implemented-transport-disabled",
+  "date": "2026-10-22",
+  "status": "offline-reviewed-opt-in-transport-not-executed",
   "source_decision": {
     "candidate_source": "Binance Spot REST GET /api/v3/klines",
     "market_data_host": "data-api.binance.vision",
@@ -11,10 +11,11 @@
     "legal_terms_verified": false,
     "regional_eligibility_verified": false,
     "retention_rights_verified": false,
-    "transport_status": "disabled; raises source_not_approved before connection",
+    "transport_status": "disabled by default; exact policy and execution approval required",
     "authorization_file": "approved-policy.json",
     "authorization_file_present": false,
-    "execution_approval_present": false
+    "execution_approval_present": false,
+    "transport_requests_in_review": 0
   },
   "primary_sources": [
     "https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data",
@@ -57,9 +58,9 @@
     "reason": "explicit Parquet and DuckDB requirements are not met by the standard library or existing environment"
   },
   "verification": {
-    "focused_b1": "27 passed",
+    "focused_b1": "30 passed",
     "focused_b0": "12 passed",
-    "full_suite": "270 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
+    "full_suite": "273 passed, 0 failed, 1 skipped with TYPESAFE_API_KEY unset",
     "integration_suite": "5 passed",
     "compileall": "passed",
     "evidence_validation": "passed; 22 JSON files",
@@ -73,14 +74,14 @@
     "Terms, regional access, retention, and redistribution rights remain unresolved.",
     "No transport runtime evidence exists because public fetch approval was not provided.",
     "B1 does not train models, generate predictions, backtest, or create paper orders.",
-    "Historical transport remains intentionally hard-disabled pending a separate enablement review."
+    "Historical transport remains disabled by default pending separate execution approval."
   ],
   "defect_closure": {
     "observed_end_exclusive_off_by_one": "fixed",
     "checkpoint_identity_and_raw_hash_validation": "fixed",
     "exact_source_decimal_lexemes": "fixed; retained alongside float64 columns",
     "fingerprint_reconciliation": "fixed; regenerated current identity is authoritative",
-    "transport_enablement": "intentional_separate_review_boundary"
+    "transport_enablement": "reviewed_opt_in_separate_execution_gate"
   },
   "next_milestone": "B2: deterministic feature/label materialization and chronological numerical baselines with calibration and walk-forward evidence."
 }

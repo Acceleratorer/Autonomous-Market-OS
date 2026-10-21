@@ -1,20 +1,22 @@
 # U3/B1 BTC historical-data authorization and dataset-readiness report
 
-**Status:** Readiness gate implemented offline; historical ingestion not
+**Status:** Reviewed opt-in transport implemented; historical ingestion not
 authorized or executed. **Scope:** Binance BTCUSDT Spot 1-minute closed-candle
 dataset proposal only. Jev, U4/B4, U5/B5, and trading are out of scope.
 
 ## Decision
 
-**Do not ingest yet.** The existing B1 transport remains disabled. The readiness
-contract makes the future request range, row/page/request/runtime
-caps, retention metadata, and approval prerequisites inspectable without
-network access. Binance public market-data availability is not treated as
-permission to retain or redistribute data.
+**Do not ingest yet.** The B1 transport remains disabled by default. A future
+acquisition requires the exact repository-root policy, the explicit runtime
+flag, and the separate exact execution approval phrase. The readiness contract
+makes the future request range, row/page/request/runtime caps, retention
+metadata, and approval prerequisites inspectable without network access.
+Binance public market-data availability is not treated as permission to retain
+or redistribute data.
 
 ## Official source re-check
 
-Official Binance materials rechecked on 2026-10-19:
+Official Binance materials rechecked on 2026-10-22:
 
 - [Market Data Only URLs](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md)
   identifies `https://data-api.binance.vision` and public
@@ -60,10 +62,11 @@ requested, and no final/open candle is accepted by the existing
 
 ## Reused implementation and persistence
 
-No second ingestion framework was created. The readiness gate extends
+No second ingestion framework was created. The reviewed opt-in transport and
+readiness gate extend
 `market_os/btc_history.py` and reuses:
 
-- `HistoryStore`, `PageRequest`, `HistoricalTransport`, and the disabled
+- `HistoryStore`, `PageRequest`, `HistoricalTransport`, and the bounded
   `BinanceHistoricalTransport`;
 - B0 `ClosedCandle` validation and B1 duplicate/conflict/gap/out-of-order
   classification;
@@ -84,12 +87,14 @@ python -m market_os.cli btc-paper acquire \
   --page-size 1000 --max-pages 44 --max-requests 44 \
   --max-rows 43200 --max-runtime-seconds 900 --max-attempts 1 \
   --allow-historical-ingest --authorization-file <approved-policy.json> \
+  --execution-approval "<exact B1 approval phrase>" \
   --store-root <local-b1-root>
 ```
 
 The second command is a future command shape, not an instruction or an
-authorization for this milestone. With the current disabled transport it still
-fails closed before any Binance connection.
+authorization for this milestone. It fails closed unless the policy is valid,
+unexpired, exactly bounded, and the separate execution phrase matches byte for
+byte. No acquisition was run in this review.
 
 The read-only API inspection surface is:
 
@@ -101,20 +106,20 @@ GET /v1/btc/history/readiness?cutoff-ms=<UTC-minute-ms>
 
 Offline tests cover explicit cutoff/date-range calculation, final-candle
 exclusion, exact page/request/row/runtime budgets, response-size rejection,
-approval-flag refusal before transport, checkpoint/resume behavior, existing
+approval-flag and execution-approval refusal before transport, checkpoint/resume behavior, existing
 duplicate/conflict/gap/out-of-order handling, closed-candle validation, and
 zero-network CLI/API readiness inspection. Existing B0/B1 tests remain green;
-the focused readiness/B1 suite is 27 tests after the final transport-boundary
+the focused readiness/B1 suite is 30 tests after the final transport-boundary
 hardening.
 
 ## Verification
 
 Verified locally without provider access:
 
-- `python -m pytest market_os/tests/test_btc_history.py -q`: **27 passed**.
-- `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **41 passed**.
+- `python -m pytest market_os/tests/test_btc_history.py -q`: **30 passed**.
+- `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **44 passed**.
 - `python -m pytest market_os/tests/test_btc_b2.py market_os/tests/test_btc_b3.py market_os/tests/test_btc_connectivity.py -q`: **58 passed** with `TYPESAFE_API_KEY` unset.
-- `python -m pytest -q`: **270 passed, 0 failed, 1 skipped** with `TYPESAFE_API_KEY` unset.
+- `python -m pytest -q`: **273 passed, 0 failed, 1 skipped** with `TYPESAFE_API_KEY` unset.
 - `python -m compileall -q market_os`: passed.
 - `python scripts/ci_checks.py validate-evidence`: passed for 22 evidence JSON files.
 - `python scripts/ci_checks.py secret-scan`: passed.
@@ -123,7 +128,8 @@ Verified locally without provider access:
 - Readiness CLI/API offline smoke, replay/fingerprint checks, and `git diff --check`: passed.
 
 No historical Binance request, Jev request, credential use, or trade occurred
-during this milestone.
+during this milestone. The opt-in transport was exercised only through local
+request-construction and policy-validation tests.
 
 ## Unresolved risks
 
