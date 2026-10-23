@@ -70,7 +70,7 @@ The web, CLI, and app must consume the same versioned backend contracts. They mu
 |---|---|
 | B1 public source terms, region, retention, and explicit bounded-run approval | Any network historical ingestion |
 | Feature/label and evaluation configuration freeze | U3 final benchmark |
-| Jev access, cost, semantics, and contamination treatment | U3/B3 adapter |
+| Jev provider access, cost, retention, and privacy policy | Any future B3.1 provider integration or context egress; requires separate approval |
 | Paper wallet, fees, slippage, and latency assumptions | U4 paper portfolio |
 | Deployment/auth/observability policy | U5 web operations |
 | App framework and supported platforms | U6 app shell |

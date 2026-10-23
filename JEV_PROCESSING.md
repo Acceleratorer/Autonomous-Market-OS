@@ -1,12 +1,13 @@
 # JEV_PROCESSING.md — Jev probabilistic evidence evaluator design
 
-**Status:** Proposed architecture for review. This document authorizes no
-provider request, credential use, data acquisition, execution path, or code
-change.
+**Status:** B3.1 decision freeze recorded in [ADR-0022](docs/decisions/ADR-0022-b3-1-decision-freeze.md).
+This architecture authorizes no provider request, credential use, data
+acquisition, execution path, B3.1 implementation, or study.
 
-**Scope:** BTCUSDT Spot research using the existing five-minute target and the
-existing B1/B2/B3 lineage. B3 remains an offline recorded-response benchmark
-and is not promoted.
+**Scope:** BTCUSDT Spot research using B2's existing five-minute log-return
+definition and B1/B2/B3 lineage. B3 remains an offline recorded-response
+benchmark and is not promoted. B3.1 remains fixture-only; its decision freeze
+does not authorize implementation or evaluation.
 
 ## 1. Architectural role
 
@@ -18,8 +19,16 @@ well-formed while its claim is wrong, so evaluation must preserve that distincti
 Deterministic technical-analysis, mathematical,
 statistical, numerical-model, and code-validation engines first produce
 structured candidate hypotheses and tagged candidate values. Jev then evaluates
-the supplied packet for agreement, contradiction, consistency, uncertainty,
-freshness, evidence quality, ranking, and abstention.
+the supplied packet for semantic evidence support, agreement or contradiction,
+and abstention under the frozen B3.1 questions. Any broader assessment
+dimensions below are not additional Jev questions in B3.1.
+
+For the frozen B3.1 question taxonomy, Jev remains advisory and the initial
+versioned questions cover evidence support, agreement versus contradiction,
+and abstention. Consistency, freshness, provenance, and evidence-quality gates
+remain deterministic Market OS responsibilities. Regime questions and additional
+context are deferred. The contract's broader dimensions do not expand this
+initial question set.
 
 The intended path is:
 
@@ -86,6 +95,10 @@ The packet artifact schema is `market-os.evidence-packet.v1` under the
 application artifact, not a TypeSafe wire version. Market OS creates the packet
 only after validating source data and computing deterministic fields. It then
 serializes, hashes, and persists the immutable packet before optional inference.
+The JSON blocks in Sections 3.1, 3.2, and 4 are schema sketches: angle-bracket
+values, empty collections, and null alternative fields are placeholders, not
+complete valid instances. The invariants and typed meanings below define the
+valid instances.
 
 ### 3.1 Required packet shape
 
@@ -96,15 +109,19 @@ serializes, hashes, and persists the immutable packet before optional inference.
   "task": {
     "question_id": "btc_evidence_assessment.v1",
     "question_version": "<pinned-question-version>",
-    "assessment_target": "evidence_support|agreement|contradiction|regime",
+    "assessment_configuration_id": "<pinned-configuration-id>",
+    "assessment_configuration_version": "<pinned-configuration-version>",
+    "assessment_target": "evidence_support|agreement_contradiction|abstention",
     "outcome_horizon_seconds": 300
   },
   "market": {"venue": "binance", "market_type": "spot", "symbol": "BTCUSDT", "interval": "1m"},
   "decision_eligible_at_ms": 0,
   "packet_available_at_ms": 0,
+  "packet_ready_at_ms": 0,
   "fresh_until_ms": 0,
   "dataset_revision": "<B1-revision>",
   "feature_version": "btc.b2.features.v1",
+  "target_definition_id": "<pinned-target-definition-id>",
   "target_version": "btc.b2.close-return-5m.v1",
   "input_fingerprint": "<sha256>",
   "candidates": [],
@@ -127,19 +144,32 @@ serializes, hashes, and persists the immutable packet before optional inference.
 
 Required invariants:
 
-1. decision_eligible_at_ms is the B2/B3 decision_eligible_at clock at which the
-   packet passed its point-in-time and quality gates. Every required item has
-   available_at_ms no later than decision_eligible_at_ms.
-2. packet_available_at_ms is the latest required source availability and is no
-   later than decision_eligible_at_ms. fresh_until_ms is explicit and is not
-   inferred from a response timestamp.
-3. Future candles, labels, future returns, fills, account state, and target-
-   derived fields are absent. B2/B3 keep labels in the offline evaluation
-   store, outside the online packet boundary. Target version and fingerprint
-   may be recorded for lineage; target values remain absent.
-4. input_fingerprint covers the canonical packet, question version, target
-   version, and assessment configuration. A cache hit is valid only when all
-   identities and freshness fields match.
+1. `decision_eligible_at_ms` is the existing B2/B3 source/feature eligibility
+   clock at which point-in-time and quality gates pass. Every required source or
+   feature has availability no later than this time.
+2. `packet_available_at_ms` is the latest required source, feature, or context
+   availability. `packet_ready_at_ms` is at or after that time: it is recorded
+   only after all required candidate computations, candidate validation, canonical
+   serialization, and packet fingerprint hashing complete. Every source and
+   candidate availability and `decision_eligible_at_ms` are `<=
+   packet_ready_at_ms`, and `packet_ready_at_ms` is `<= request_started_at_ms`.
+   `fresh_until_ms` is explicit and is not inferred from a response timestamp.
+3. Target-definition identity may be present for point-in-time lineage through
+   `target_definition_id` and `target_version`. Realized labels, future target
+   references, future returns, fills, account state, target-derived fields, and
+   B2's future-derived `target_fingerprint` are prohibited in the packet and in
+   the provider request projection. B2/B3 join the packet to those outcomes only
+   in a separate offline evaluation artifact after the outcome becomes
+   available; the immutable packet is never amended with the outcome.
+4. `input_fingerprint` is the packet fingerprint. It is the SHA-256 of the
+   deterministic canonical serialization of a fingerprint projection that
+   excludes the `input_fingerprint` field itself and all realized or future
+   target fields. The projection includes the packet schema identity, packet
+   contents and source/candidate/context identities, question ID and version,
+   target-definition ID and version, and assessment-configuration ID and
+   version. Replay of the same projection uses the same canonical bytes and
+   fingerprint; cache reuse additionally requires matching identity and
+   freshness fields.
 5. Each source reference records a dataset or document ID, content hash,
    publication or event time, first-observed time, retrieval or ingestion time,
    availability time, optional expiry or maximum age, and the transformation
@@ -151,8 +181,9 @@ Required invariants:
 7. Context is optional and separately identified. Missing context is an
    experimental condition, not permission to substitute later material or
    unrecorded provider memory.
-8. Packet order, serialization, and hashing are deterministic. Canonical bytes
-   and their hash are persisted before any provider boundary.
+8. Packet order, serialization, and hashing are deterministic. Canonical bytes,
+   the projection, and the resulting fingerprint are persisted before any
+   provider boundary.
 
 ### 3.2 Candidate hypothesis record
 
@@ -161,26 +192,26 @@ Required invariants:
   "hypothesis_id": "<stable-id>",
   "type": "technical_analysis|mathematical|statistical_forecast|numerical_model|code_validation|data_quality|contextual_evidence",
   "claim": "<bounded, testable statement>",
-  "target": "return_5m_positive|return_5m_negative|regime|data_valid|context_support",
-  "outcome_space": ["negative", "positive"],
+  "target": "return_5m_positive|return_5m_non_positive|regime|data_valid|context_support",
+  "outcome_space": ["non_positive", "positive"],
   "direction": "up|down|flat|support|contradict|unknown",
   "value_kind": "calibrated_probability_distribution|uncalibrated_score|empirical_frequency|validation_result",
-  "calibrated_probability_distribution": {"probability_distribution": {"negative": 0.48, "positive": 0.52}},
+  "calibrated_probability_distribution": {"probability_distribution": {"non_positive": 0.48, "positive": 0.52}},
   "uncalibrated_score": null,
   "empirical_frequency": null,
   "validation_result": null,
   "event_definition": "return_5m > 0",
   "conditioning_set": [],
-  "calibration_id": "<pinned-calibrator-or-null>",
-  "calibration_status": "calibrated|uncalibrated",
+  "calibration_id": "<pinned-calibrator>",
+  "calibration_status": "calibrated",
   "horizon_seconds": 300,
   "as_of_ms": 0,
   "available_at_ms": 0,
   "fresh_until_ms": 0,
   "estimator_or_model_id": "<pinned-estimator-or-model>",
   "training_range": {"start_ms": 0, "end_ms": 0},
-  "source_lineage": [],
-  "feature_lineage": [],
+  "source_lineage": ["<source-ref>"],
+  "feature_lineage": ["<feature-ref>"],
   "engine_id": "<pinned-engine>",
   "engine_version": "<pinned-version>",
   "evidence_refs": ["<source-ref>"],
@@ -243,19 +274,24 @@ timestamp vocabulary. They have this ordering and these uses:
 | Concept | Canonical field and exact meaning | Ordering and use |
 |---|---|---|
 | Source availability | B2 `availability_timestamp` (with canonical `_ms` form in this artifact) on each source, feature, or context reference: the first time that item was available to Market OS for the observation | Every required item is `<= decision_eligible_at_ms`; use for point-in-time leakage checks and the packet's `packet_available_at_ms` maximum. |
-| Decision eligibility | `decision_eligible_at` / `decision_eligible_at_ms`: the point-in-time clock after all required inputs pass availability and quality checks | Every required source/feature availability is `<=` this time. Use for point-in-time leakage checks and signal eligibility. |
-| Packet availability | `packet_available_at_ms`: the maximum `available_at_ms` of required packet items | `packet_available_at_ms <= decision_eligible_at_ms`. Use for packet freshness and leakage evidence. |
-| Request start | `request_started_at` / `request_started_at_ms`: when an optional provider request begins | `request_started_at_ms >= decision_eligible_at_ms`. Use the interval to response receipt for provider latency. |
+| Decision eligibility | `decision_eligible_at` / `decision_eligible_at_ms`: the existing B2/B3 point-in-time source/feature eligibility clock | Every required source/feature availability is `<=` this time. Use for point-in-time leakage checks and signal eligibility. |
+| Packet availability | `packet_available_at_ms`: the maximum availability of required packet inputs before candidate computation | `packet_available_at_ms <= decision_eligible_at_ms <= packet_ready_at_ms`. Use for input freshness and leakage evidence. |
+| Packet ready | `packet_ready_at_ms`: after candidate computation, validation, canonical serialization, and packet hashing complete | `packet_ready_at_ms <= request_started_at_ms`. Use as the provider-boundary gate and packet cache point. |
+| Request start | `request_started_at` / `request_started_at_ms`: when an optional provider request begins | `request_started_at_ms >= packet_ready_at_ms`. Use the interval to response receipt for provider latency. |
 | Response received | `response_received_at` / `response_received_at_ms`: when provider response bytes are received | `response_received_at_ms >= request_started_at_ms`. Use with request start for provider latency. |
-| Response available after validation | `available_at` / `available_at_ms`: when the normalized assessment is available after schema, identity, provenance, and freshness validation | `available_at_ms >= response_received_at_ms`; B3 recorded fixtures set `available_at == response_received_at`. Use for assessment freshness. |
+| Response available after validation | `available_at` / `available_at_ms`: when the normalized assessment is available after schema, identity, provenance, and freshness validation | `available_at_ms >= response_received_at_ms`; B3 recorded fixtures set `available_at == response_received_at`. Use for end-to-end latency and assessment freshness. |
 | Freshness deadline or expiry | `fresh_until_ms` for packet input and `expires_at_ms` for the assessment: the explicit latest permitted use time | The relevant available time must be `<=` its deadline. Use for freshness and signal eligibility; never infer it from receipt time. B3's `response_deadline_ms` remains a duration budget, not a freshness timestamp. |
 
 The packet and assessment are signal-eligible only when their decision,
-availability, validity, and freshness checks pass. No timestamp is a proxy for a
-future label or outcome. Cache reuse requires matching packet/response
-fingerprints, provider/model/question identities, schema versions, and the
-relevant freshness fields; a newer response does not make older packet inputs
-fresh.
+availability, validity, and freshness checks pass at the actual use time. No
+timestamp is a proxy for a future label or outcome. Cache reuse requires
+matching packet/response fingerprints, provider/model/question identities,
+schema versions, and the relevant freshness fields; a newer response does not
+make older packet inputs fresh. Provider latency is measured from request start
+to receipt; end-to-end latency is measured from B2/B3 decision eligibility to
+validated assessment availability. The assessment inherits
+`decision_eligible_at_ms` from its referenced packet through `observation_id` and
+`packet_fingerprint`; it does not create a second eligibility clock.
 
 ## 4. Typed Jev output contract
 
@@ -278,22 +314,26 @@ spend ceiling. This design does not authorize that gate or a live request.
   "question_version": "<same-as-packet>",
   "request_fingerprint": "<sha256>",
   "packet_fingerprint": "<sha256>",
+  "packet_ready_at_ms": null,
   "response_fingerprint": "<sha256-or-null>",
   "request_started_at_ms": null,
   "response_received_at_ms": null,
   "available_at_ms": null,
   "expires_at_ms": null,
   "assessment": {
+    "selected_label": null,
     "per_hypothesis": [
       {
         "hypothesis_id": "<packet-hypothesis-id>",
         "support": {"label": "supported|mixed|unsupported|unknown", "probability": 0.0, "evidence_refs": []},
         "agreement": {"label": "strong|moderate|mixed|none|unknown", "evidence_refs": []},
         "contradiction": {"label": "strong|moderate|mixed|none|unknown", "conflicting_hypothesis_ids": []},
-        "consistency": {"label": "consistent|inconsistent|unknown", "reason_codes": []},
-        "uncertainty": {"label": "low|medium|high|unknown", "reason_codes": []},
-        "freshness": {"label": "fresh|aging|stale|unknown", "reason_codes": []},
-        "evidence_quality": {"label": "high|medium|low|unknown", "evidence_refs": []}
+        "market_os_gates": {
+          "consistency": {"label": "consistent|inconsistent|unknown", "reason_codes": []},
+          "freshness": {"label": "fresh|aging|stale|unknown", "reason_codes": []},
+          "provenance": {"label": "complete|incomplete|unknown", "reason_codes": []},
+          "evidence_quality": {"label": "high|medium|low|unknown", "evidence_refs": []}
+        }
       }
     ],
     "ranked_hypotheses": [],
@@ -315,10 +355,20 @@ spend ceiling. This design does not authorize that gate or a live request.
 }
 ~~~
 
+`request_started_at_ms` must be at or after `packet_ready_at_ms` when a request
+is made. `response_received_at_ms` must be at or after request start, and
+`available_at_ms` must be at or after response receipt after validation. The
+provider latency is `response_received_at_ms - request_started_at_ms`; the
+end-to-end latency is `available_at_ms - decision_eligible_at_ms`. Freshness is
+evaluated at the actual use time against the relevant explicit expiry, not only
+at response receipt. B3 recorded fixtures preserve `available_at ==
+response_received_at`.
+
 `status` is the terminal response status for the normalized artifact. Its
 taxonomy and precedence are defined in Section 14; it is separate from the
-assessment dimensions `agreement`, `evidence_disagreement`, `contradiction`,
-`consistency`, `uncertainty`, `freshness`, `evidence_quality`, and `ranking`.
+Jev question results `support`, `agreement`, `contradiction`, and abstention,
+plus `evidence_disagreement` and `ranking`. `market_os_gates` are computed and
+owned deterministically by Market OS and are not answers supplied by Jev.
 `choice_confidence` and `concentration` are diagnostic fields only. A valid
 concentrated Choice or Score response remains `usable` and records
 concentration separately. Only a separately versioned and calibrated Market OS
@@ -340,8 +390,13 @@ and no free-form ranking content may influence calibration, fusion, signal,
 sizing, risk, or execution paths.
 
 `assessment_probabilities` is a distribution over labels in the declared
-question, and `support.probability` (when present) is the same typed question
-probability, never a market-outcome probability or an uncalibrated score. It must
+question. A coherent assessment instance includes an explicit
+`selected_label` (or equivalent primitive answer) alongside that distribution;
+`support.probability` (when present) is the same typed question probability,
+meaning `P(label = supported | supplied packet, hypothesis)` when the support
+question uses the `supported` label (and analogously for another explicitly
+declared label). It is never a market-outcome probability or an uncalibrated
+score. It must
 be finite, bounded, sum to one within the contract tolerance,
 and have a selected label consistent with the distribution when required by the
 primitive. It is not p_up, p_down, expected return, or a risk limit. Any
@@ -362,18 +417,22 @@ hash. Typed shape is not truth.
 
 ## 5. Evaluator dimension semantics
 
-The dimensions remain separate. A packet can be fresh but contradictory,
+The concepts remain separate. A packet can be fresh but contradictory,
 consistent but weakly supported, or high quality but insufficient to answer.
+Under ADR-0022, B3.1 asks Jev only for semantic evidence support, agreement or
+contradiction, and abstention. Consistency, freshness, provenance, and evidence
+quality are deterministic Market OS gates; uncertainty is not an additional
+frozen Jev question.
 
 | Dimension | Meaning | Required basis |
 |---|---|---|
 | **Agreement** | Degree to which independent candidates support the same stated claim. | Normalized target, direction, horizon, and source identity. Correlated duplicate engines do not count as independent support. |
 | **Contradiction** | Degree to which candidates make incompatible claims for the same event and horizon. | Same event, direction, units, and time window. Different targets are disagreement, not automatically contradiction. |
-| **Consistency** | Whether claims, probabilities, timestamps, units, and provenance satisfy cross-field rules. | Deterministic schema and invariant checks. |
-| **Uncertainty** | Remaining uncertainty from incomplete evidence, disagreement, unknown calibration, or temporal risk. | Reason-coded components; never Choice concentration alone. |
-| **Freshness** | Whether required evidence remains within its explicit window at decision time. | packet_available_at_ms, available_at_ms, fresh_until_ms, expires_at_ms, and decision_eligible_at_ms. |
+| **Consistency** | Whether claims, probabilities, timestamps, units, and provenance satisfy cross-field rules. | Deterministic Market OS schema and invariant checks. |
+| **Uncertainty** | Remaining uncertainty from incomplete evidence, disagreement, unknown calibration, or temporal risk. | A separate Market OS or later study measure; never Choice concentration alone. |
+| **Freshness** | Whether required evidence remains within its explicit window at decision time. | Deterministic Market OS gate using packet_available_at_ms, available_at_ms, fresh_until_ms, expires_at_ms, and decision_eligible_at_ms. |
 | **Abstention** | Deliberate refusal when the question is not answerable or is unsafe to use. | Terminal status and reason code; no silent neutral probability. |
-| **Evidence quality** | Completeness, provenance, temporal validity, independence, and validation status. | Deterministic quality checks and source references. |
+| **Evidence quality** | Completeness, provenance, temporal validity, independence, and validation status. | Deterministic Market OS quality checks and source references. |
 | **Ranking** | Ordered candidates by support for the declared assessment. | Stable IDs, direction, ties, and unavailable states are explicit; explanations are non-operative. |
 
 Agreement is not accuracy. Contradiction detection is not proof that either
@@ -385,24 +444,31 @@ probability.
 
 The following objects stay separate in storage, reports, and code:
 
-1. P(agreement | supplied packet) answers whether candidates support one
+1. `P(agreement | supplied packet)` answers whether candidates support one
    another under the Jev question.
-2. P(supporting claim | supplied evidence) answers a semantic evidence
-   question.
-3. P(Y=1 | X_t) is a market-outcome probability for a defined target such as
-   Y = 1[ln(C_{t+5}/C_t) > 0].
-4. P(net executable return > 0 | state, fees, delay) includes execution
-   assumptions and is a separate target.
+2. `P(supported | supplied evidence)` answers the initial semantic evidence
+   support question; agreement versus contradiction and abstention are separate
+   questions.
+3. The primary market classification target is positive versus non-positive
+   five-minute log return under B2's existing return definition. Its event is
+   `Y = 1[ln(C[t+5]/C[t]) > 0]`; zero return is in the non-positive class.
+4. `P(net executable return > 0 | state, post-decision price, delay, fees,
+   slippage)` is a separate economic-evaluation target and is not the primary
+   classification target.
 
-Only the third or fourth object, after target-specific chronological
-calibration, may enter a market signal policy. A Jev assessment may be a
-feature to a downstream calibrator or fusion model, but the mapping must be
-learned from outcomes unavailable to the packet and recorded with a calibration
-fingerprint. No provider confidence field authorizes relabeling it as P(Y=1).
+Only a Market OS probability calibrated for the matching target using a
+chronologically valid procedure may be evaluated for a corresponding policy.
+A Jev assessment probability is over its declared question labels. It is never
+relabeled as a market-return probability. A Jev assessment may be a feature to a
+downstream calibrator or fusion model, but that mapping must be learned from
+outcomes unavailable to the packet and recorded with a calibration fingerprint.
+No provider confidence field authorizes relabeling it as `P(Y=1)`.
 
 ## 7. Baseline and incremental experiments
 
-The new arms must not overwrite B3's existing E1/E2 meanings.
+The new arms must not overwrite B3's existing E1/E2 meanings. C2 and
+C2-control require additional context, which is deferred by ADR-0022; they are
+future conceptual arms and are not part of the frozen B3.1 protocol.
 
 | Arm | Inputs | Purpose |
 |---|---|---|
@@ -496,24 +562,24 @@ match. An unrecorded provider version is unavailable for the frozen arm.
 
 ## 10. Calibration and fusion
 
-Calibration is a Market OS responsibility. Candidate methods are:
-
-- Platt/logistic calibration for a binary score;
-- isotonic calibration when the calibration sample is large enough;
-- temperature or Dirichlet calibration for multiclass distributions; and
-- empirical or one-bin calibration as a weak baseline when data is small, as
-  in the current B3 contract.
+Calibration is a Market OS responsibility. For the frozen binary primary
+target, B3.1's primary method is binary logistic (Platt) calibration. The
+existing one-bin empirical method remains a weak baseline. Isotonic calibration
+is unavailable unless a later preregistered sample threshold explicitly permits
+it. Multiclass calibration is outside the frozen primary target.
 
 Persist method, hyperparameters, fit range, sample count, target definition,
 calibrator fingerprint, and fallback behavior. Reject calibration when labels
-are unavailable or score and target semantics do not match.
+are unavailable or score and target semantics do not match; when calibration
+cannot be fit, mark it unavailable instead of silently substituting another
+method.
 
-Fusion is deterministic application code. Candidate methods include a
-regularized logistic stacker, a constrained weighted probability average, or a
-log-odds combination with training-range-fitted weights. Account for correlated
-candidates, missing Jev output, regime change, and base-rate drift. Missing or
-abstaining assessment is not assigned a neutral probability unless that
-treatment is preregistered and separately evaluated.
+Fusion is deterministic Market OS code. The frozen primary method is a
+regularized logistic model, fitted only on permitted training-range data with
+properly separated base predictions. Missing or abstaining Jev results remain
+explicit missing/abstaining inputs; they are never silently replaced with a
+neutral probability. Any alternative method, treatment, threshold, and regime
+or drift handling requires a separately preregistered decision.
 
 ## 11. Deterministic conversion from probability to signal
 
@@ -726,23 +792,51 @@ not primary market forecaster; it does not rewrite that accepted record or
 change B3. A later implementation milestone should update the decision record
 if this role is adopted.
 
-## 18. Unresolved human decisions
+## 18. Frozen decisions and deferred choices
 
-1. Which evidence domains and source classes may leave the local machine, and
-   which require local-only processing?
-2. Which Jev question set and assessment taxonomy will be approved for B3.1?
-3. Which target is primary: raw five-minute direction, cost-aware direction,
-   net executable return, or a multi-target report?
-4. What dataset length, regime coverage, and sample count are required before
-   calibration and promotion are meaningful?
-5. Which calibrator, fusion method, thresholds, and uncertainty policy are
-   preregistered?
-6. What provider version, request budget, latency ceiling, retention period,
-   and redaction policy are acceptable for a separately approved request?
-7. What prospective shadow period and human review are required before fused
-   outputs can feed a paper policy?
-8. Are futures/perpetuals permanently out of scope, or will a separate
-   simulator be commissioned after Spot evidence?
+ADR-0022 freezes the B3.1 decisions below. The freeze does not authorize an
+implementation, provider request, acquisition, or study.
+
+- Jev is an advisory typed evidence evaluator. Initial questions cover evidence
+  support, agreement versus contradiction, and abstention. Consistency,
+  freshness, provenance, and evidence-quality gates stay deterministic in
+  Market OS. Regime questions and additional context are deferred.
+- Preserve B2's five-minute log-return definition. The primary classification
+  is positive versus non-positive return. Executable net return after
+  post-decision pricing, delay, fees, and slippage is a separate economic
+  target. Jev assessment probabilities are never market-return probabilities.
+- Use binary logistic/Platt calibration and regularized logistic fusion as the
+  primary methods. One-bin calibration is a weak baseline. Isotonic is
+  unavailable unless a later preregistered sample threshold permits it. Missing
+  and abstaining Jev results stay explicit.
+- B3.1 implementation and evaluation are recorded-fixture-only. No new Jev or
+  TypeSafe request, credential, provider adapter activation, or context egress
+  is authorized. Provider budget, version, retention, redaction, and latency
+  require separate approval.
+- B3.1 scope is BTCUSDT Spot-only: no short inventory, margin, leverage,
+  futures, perpetuals, funding, or x50/x100 assumptions. Derivative work needs
+  a new contract, ledger, risk gate, and human decision.
+- A 90-day prospective shadow period is only a future proposal. It requires a
+  sufficient approved dataset, preregistered power/sample and regime-coverage
+  rules, frozen costs and latency assumptions, and separate approval; it is
+  not an active or approved study.
+
+The following remain deferred to any separately approved implementation or
+study decision:
+
+1. Exact packet, assessment, question, and configuration version identifiers;
+   exact question wording and any provider-specific primitive mapping.
+2. Dataset sufficiency, power/sample thresholds, regime coverage, and a numeric
+   sample threshold that could permit isotonic calibration.
+3. Fusion features and missingness encoding, thresholds, uncertainty policy,
+   and other preregistered evaluation details.
+4. Provider/model version and capability verification, request budget, cost,
+   latency ceiling, permitted source classes, redaction, retention, and deletion
+   policy.
+5. Whether and when to propose a prospective shadow study, plus its duration,
+   acceptance criteria, frozen cost/latency assumptions, and human review.
+6. Whether derivatives are permanently excluded or merit a separate future
+   contract and simulator.
 
 ## 19. Proposed contract version
 
@@ -754,15 +848,18 @@ Normalized assessment artifact: `market-os.jev-assessment.v1`
 These are proposed internal Market OS contracts. They are not TypeSafe wire
 versions and do not authorize a network request.
 
-## 20. Proposed B3.1 evaluation milestone
+## 20. Future B3.1 study proposal
 
-**B3.1 — chronological probabilistic evidence-evaluator study.** Using a
-larger, continuous, separately approved local dataset, B3.1 should freeze the
-packet and question contract; run N0, J1, C2, C2-control, and F3; retain B3's
-purge/embargo and lineage rules; fit calibration and fusion only on permitted
-ranges; measure evaluator quality, calibration, abstention, operations, and
-post-cost paper utility; and perform a prospective shadow period before any
-paper-policy consideration. A negative or inconclusive result is valid.
+B3.1 is a frozen offline protocol decision, not an approved implementation,
+dataset acquisition, or active study. A separately approved successor study may
+propose the N0 and J1 arms; C2 and C2-control would additionally require
+separate approval for timestamped context and its egress. Such a study must
+preserve B3's purge/embargo and lineage rules and fit calibration and fusion
+only on permitted ranges. It requires a sufficient approved dataset and a
+separately approved plan. A 90-day prospective shadow period is only a future
+proposal and requires preregistered power/sample and regime-coverage rules,
+frozen costs and latency assumptions, and separate approval. A negative or
+inconclusive result remains a valid research outcome.
 
 ## 21. Migration notes: existing B3 remains valid
 
@@ -783,10 +880,11 @@ paper-policy consideration. A negative or inconclusive result is valid.
   the proposed normalized record only with an explicit mapping and new
   fingerprints. No migration changes execution authority.
 
-## 22. Acceptance criteria for implementation readiness
+## 22. Acceptance criteria for separately approved work
 
-Implementation is ready for a separately reviewed B3.1 ticket only when all
-of the following are true:
+The current B3.1 freeze authorizes no implementation or evaluation. A future
+implementation ticket or successor-study proposal requires separate approval.
+For any offline implementation review, require:
 
 - packet schema, candidate taxonomy, question versions, and output schema are
   approved by a human owner;
@@ -806,7 +904,9 @@ of the following are true:
   provider transport is called;
 - chronological train/calibration/test splits, target-overlap purge, and
   embargo are frozen and replay-checked;
-- N0, J1, C2, C2-control, and F3 are defined before test data is inspected;
+- N0 and J1 are defined before test data is inspected. C2 and C2-control remain
+  deferred because they require additional context and separate egress approval;
+  include them only in a separately approved successor protocol;
 - calibration, fusion, signal thresholds, fees, slippage, latency, and
   uncertainty rules are fitted only on permitted ranges;
 - signal, position sizing, leverage, risk approval, and paper execution remain
@@ -820,5 +920,7 @@ of the following are true:
 - no live provider request, credential, Binance acquisition, OpenAI request,
   trade, or approved-policy.json change is required to pass the offline gate.
 
-Completion of these criteria authorizes an implementation review, not a live
-request or a trading deployment.
+Completion of these criteria authorizes only a separately reviewed offline
+implementation proposal. C2/context egress and any prospective study require
+their own approval; no criterion authorizes a provider request, acquisition,
+or trading deployment.
