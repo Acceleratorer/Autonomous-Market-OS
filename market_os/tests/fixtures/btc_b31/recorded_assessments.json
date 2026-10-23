@@ -1,0 +1,1236 @@
+{
+  "schema": "market-os.b3-1.recorded-fixtures@v1",
+  "fixture_id": "btc-b31-recorded-synthetic-v1",
+  "cases": [
+    {
+      "case_id": "valid-complete",
+      "kind": "valid",
+      "expected_status": "usable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1",
+          "h2"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ],
+          "h2": [
+            "group-h2"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [
+            "h2"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "comparison_hypothesis_ids": [
+            "h1"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "malformed",
+      "kind": "malformed",
+      "expected_status": "schema_invalid",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1"
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "unsupported",
+      "kind": "unsupported",
+      "expected_status": "unsupported",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v9",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v9"
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "inconsistent",
+      "kind": "inconsistent",
+      "expected_status": "internally_inconsistent",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "mixed",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "stale",
+      "kind": "stale",
+      "expected_status": "stale",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 119,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 119
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 119
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120,
+        "fresh_until_ms": 119
+      }
+    },
+    {
+      "case_id": "late",
+      "kind": "late",
+      "expected_status": "unavailable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 115,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 5
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "unavailable",
+      "kind": "unavailable",
+      "expected_status": "unavailable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": null,
+          "probabilities": null,
+          "status": "unavailable",
+          "reason": "recorded response unavailable"
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": null,
+        "probabilities": null,
+        "status": "unavailable",
+        "reason": "recorded response unavailable"
+      }
+    },
+    {
+      "case_id": "explicit-abstention",
+      "kind": "abstaining",
+      "expected_status": "abstained",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": null,
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "status": "abstained",
+          "reason": "explicit_refusal"
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "valid-disagreement",
+      "kind": "disagreement",
+      "expected_status": "usable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1",
+          "h2"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ],
+          "h2": [
+            "group-h2"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [
+            "h2"
+          ],
+          "selected_label": "contradiction",
+          "probabilities": {
+            "agreement": 0.01,
+            "mixed": 0.01,
+            "contradiction": 0.97,
+            "unknown": 0.01
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "comparison_hypothesis_ids": [
+            "h1"
+          ],
+          "selected_label": "contradiction",
+          "probabilities": {
+            "agreement": 0.01,
+            "mixed": 0.01,
+            "contradiction": 0.97,
+            "unknown": 0.01
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "concentrated-valid",
+      "kind": "concentrated_valid",
+      "expected_status": "usable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.99,
+            "mixed": 0.005,
+            "unknown": 0.003,
+            "unsupported": 0.002
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "partial",
+      "kind": "partial",
+      "expected_status": "unavailable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1",
+          "h2"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ],
+          "h2": [
+            "group-h2"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [
+            "h2"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "cardinality-zero",
+      "kind": "cardinality",
+      "expected_status": "abstained",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {}
+      },
+      "support_results": [],
+      "agreement_results": [],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "abstain",
+        "probabilities": {
+          "answerable": 0.2,
+          "abstain": 0.8
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "cardinality-one",
+      "kind": "cardinality",
+      "expected_status": "usable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    },
+    {
+      "case_id": "cardinality-many",
+      "kind": "cardinality",
+      "expected_status": "usable",
+      "packet": {
+        "schema_id": "market-os.b3-1.evidence-packet-profile",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "stable_hypothesis_ids": [
+          "h1",
+          "h2",
+          "h3"
+        ],
+        "timestamps": {
+          "decision_eligible_at_ms": 100,
+          "packet_available_at_ms": 100,
+          "packet_ready_at_ms": 110,
+          "request_started_at_ms": 110,
+          "response_deadline_at_ms": 150,
+          "response_received_at_ms": 120,
+          "available_at_ms": 120,
+          "fresh_until_ms": 200,
+          "declared_assessment_use_time_ms": 120,
+          "max_response_latency_ms": 40
+        },
+        "hypothesis_evidence_groups": {
+          "h1": [
+            "group-h1"
+          ],
+          "h2": [
+            "group-h2"
+          ],
+          "h3": [
+            "group-h3"
+          ]
+        }
+      },
+      "support_results": [
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.evidence-support",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h3",
+          "selected_label": "supported",
+          "probabilities": {
+            "supported": 0.7,
+            "mixed": 0.1,
+            "unknown": 0.1,
+            "unsupported": 0.1
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "agreement_results": [
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h1",
+          "comparison_hypothesis_ids": [
+            "h2"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h2",
+          "comparison_hypothesis_ids": [
+            "h1"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        },
+        {
+          "schema_id": "market-os.b3-1.question.agreement-contradiction",
+          "version": "v1",
+          "observation_id": "obs-1",
+          "packet_fingerprint": "packet-1",
+          "hypothesis_id": "h3",
+          "comparison_hypothesis_ids": [
+            "h1"
+          ],
+          "selected_label": "unknown",
+          "probabilities": {
+            "agreement": 0.1,
+            "mixed": 0.1,
+            "contradiction": 0.1,
+            "unknown": 0.7
+          },
+          "response_received_at_ms": 120,
+          "available_at_ms": 120
+        }
+      ],
+      "abstention_result": {
+        "schema_id": "market-os.b3-1.question.abstention",
+        "version": "v1",
+        "observation_id": "obs-1",
+        "packet_fingerprint": "packet-1",
+        "selected_label": "answerable",
+        "probabilities": {
+          "answerable": 0.8,
+          "abstain": 0.2
+        },
+        "response_received_at_ms": 120,
+        "available_at_ms": 120
+      }
+    }
+  ]
+}
