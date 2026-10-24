@@ -40,6 +40,10 @@ from market_os.b31_offline import (
     EvaluationFoldPlan,
     OfflineEvaluationPlan,
     recommended_evaluation_folds,
+    compile_synthetic_evaluation_plan,
+    materialize_synthetic_evaluation_plan,
+    B31_SYNTHETIC_PLAN_SCHEMA,
+    B31_SYNTHETIC_MATERIALIZATION_SCHEMA,
 )
 
 
@@ -278,3 +282,61 @@ def test_recommended_folds_use_symbolic_expanding_blocks() -> None:
     assert folds[0].train_blocks == (1, 2, 3, 4)
     assert folds[-1].test_block == 9
     assert 10 not in {block for fold in folds for block in (fold.validation_block, fold.calibration_block, fold.test_block)}
+
+
+def _synthetic_rows(start_ms: int, block_duration_ms: int) -> list[DatasetRow]:
+    rows: list[DatasetRow] = []
+    # Two labelled rows per block give every used split both binary labels.
+    for block_id in range(1, 11):
+        block_start = start_ms + (block_id - 1) * block_duration_ms
+        rows.extend((
+            DatasetRow(block_start + 360_000, f"{block_id * 2:064x}", block_start + 660_000, True),
+            DatasetRow(block_start + 420_000, f"{block_id * 2 + 1:064x}", block_start + 720_000, False),
+        ))
+    return rows
+
+
+def test_synthetic_plan_compiler_maps_frozen_blocks_without_real_dataset() -> None:
+    plan = OfflineEvaluationPlan()
+    compiled = compile_synthetic_evaluation_plan(plan, synthetic_start_ms=0, block_duration_ms=1_200_000)
+    repeat = compile_synthetic_evaluation_plan(plan, synthetic_start_ms=0, block_duration_ms=1_200_000)
+    assert compiled.to_dict()["schema_id"] == B31_SYNTHETIC_PLAN_SCHEMA
+    assert compiled.fingerprint == repeat.fingerprint
+    assert len(compiled.blocks) == 10
+    assert compiled.blocks[0].start_ms == 0
+    assert compiled.blocks[-1].end_ms == 12_000_000
+    assert compiled.fold_specs[0].train == (0, 4_800_000)
+    assert compiled.fold_specs[0].validation == (4_800_000, 6_000_000)
+    assert compiled.fold_specs[0].calibration == (6_000_000, 7_200_000)
+    assert compiled.fold_specs[0].test == (7_200_000, 8_400_000)
+    with pytest.raises(ValueError, match="minute-aligned"):
+        compile_synthetic_evaluation_plan(plan, synthetic_start_ms=1, block_duration_ms=1_200_000)
+    with pytest.raises(ValueError, match="real dataset binding"):
+        compile_synthetic_evaluation_plan(OfflineEvaluationPlan(dataset_revision="not-allowed"), synthetic_start_ms=0, block_duration_ms=1_200_000)
+
+
+def test_synthetic_materializer_preserves_b10_and_target_unavailability() -> None:
+    compiled = compile_synthetic_evaluation_plan(OfflineEvaluationPlan(), synthetic_start_ms=0, block_duration_ms=1_200_000)
+    rows = _synthetic_rows(0, 1_200_000)
+    unavailable = DatasetRow(120_000, f"{999:064x}", None, None)
+    materialized = materialize_synthetic_evaluation_plan(compiled, rows + [unavailable])
+    replay = materialize_synthetic_evaluation_plan(compiled, list(reversed(rows + [unavailable])))
+    assert materialized.to_dict()["schema_id"] == B31_SYNTHETIC_MATERIALIZATION_SCHEMA
+    assert materialized.replay_fingerprint == replay.replay_fingerprint
+    assert materialized.status == "materialized"
+    assert materialized.status_counts["untouched"] == 2
+    assert materialized.status_counts["target_unavailable"] == 1
+    assert all(item.row_fingerprint != f"{20:064x}" for fold in materialized.fold_set.folds for item in fold.assignments)
+    assert materialized.fold_label_counts["F1"]["test"] == {"positive": 1, "non_positive": 1}
+
+
+def test_synthetic_materializer_reports_insufficient_support_and_rejects_out_of_plan_rows() -> None:
+    compiled = compile_synthetic_evaluation_plan(OfflineEvaluationPlan(), synthetic_start_ms=0, block_duration_ms=1_200_000)
+    positive_only = [
+        DatasetRow((block_id - 1) * 1_200_000 + 600_000, f"{block_id:064x}", (block_id - 1) * 1_200_000 + 900_000, True)
+        for block_id in range(1, 10)
+    ]
+    result = materialize_synthetic_evaluation_plan(compiled, positive_only)
+    assert result.status == "unavailable_insufficient_label_support"
+    with pytest.raises(ValueError, match="outside B1-B10"):
+        materialize_synthetic_evaluation_plan(compiled, [DatasetRow(12_000_000, "f" * 64, 12_300_000, True)])

@@ -85,6 +85,8 @@ class EvaluationGate(str, Enum):
 B31_TARGET_VERSION = "btc.b2.close-return-5m.v1"
 UNKNOWN_NOT_OBSERVED_OFFLINE = "unknown_not_observed_offline"
 B31_EVALUATION_PLAN_SCHEMA = "market-os.b3-1.offline-evaluation-plan@v1"
+B31_SYNTHETIC_PLAN_SCHEMA = "market-os.b3-1.synthetic-evaluation-plan@v1"
+B31_SYNTHETIC_MATERIALIZATION_SCHEMA = "market-os.b3-1.synthetic-materialization@v1"
 _BLOCK_IDS = tuple(range(1, 11))
 _RECOMMENDED_LAMBDA_GRID = (0.01, 0.1, 1.0, 10.0)
 
@@ -944,3 +946,242 @@ class OfflineEvaluationPlan:
         if gate is EvaluationGate.IMPLEMENTATION:
             return "eligible_synthetic_only"
         return "blocked_dataset_unbound"
+
+
+@dataclass(frozen=True)
+class SyntheticBlock:
+    """One synthetic, minute-aligned B1--B10 block with no dataset binding."""
+
+    block_id: int
+    start_ms: int
+    end_ms: int
+
+    def __post_init__(self) -> None:
+        if self.block_id not in _BLOCK_IDS:
+            raise ValueError("synthetic block_id must be between 1 and 10")
+        if self.start_ms < 0 or self.end_ms <= self.start_ms:
+            raise ValueError("synthetic block bounds must be positive and ordered")
+        if self.start_ms % _MINUTE_MS or self.end_ms % _MINUTE_MS:
+            raise ValueError("synthetic block bounds must be minute aligned")
+
+    def to_dict(self) -> dict[str, int]:
+        return {"block_id": self.block_id, "start_ms": self.start_ms, "end_ms": self.end_ms}
+
+
+@dataclass(frozen=True)
+class SyntheticPlanCompilation:
+    """The frozen symbolic plan compiled into synthetic UTC ranges only."""
+
+    plan_fingerprint: str
+    synthetic_start_ms: int
+    block_duration_ms: int
+    blocks: tuple[SyntheticBlock, ...]
+    fold_specs: tuple[FoldSpec, ...]
+    fingerprint: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": B31_SYNTHETIC_PLAN_SCHEMA,
+            "plan_fingerprint": self.plan_fingerprint,
+            "synthetic_start_ms": self.synthetic_start_ms,
+            "block_duration_ms": self.block_duration_ms,
+            "blocks": [block.to_dict() for block in self.blocks],
+            "fold_specs": [
+                {
+                    "fold_id": spec.fold_id,
+                    "train": list(spec.train),
+                    "validation": list(spec.validation) if spec.validation else None,
+                    "calibration": list(spec.calibration),
+                    "test": list(spec.test),
+                }
+                for spec in self.fold_specs
+            ],
+            "fingerprint": self.fingerprint,
+        }
+
+
+def _require_frozen_synthetic_plan(plan: OfflineEvaluationPlan) -> None:
+    if plan.status is not EvaluationPlanStatus.DATASET_UNBOUND:
+        raise ValueError("synthetic compilation requires a dataset-unbound frozen plan")
+    if plan.dataset_revision is not None or plan.dataset_start_ms is not None or plan.dataset_end_ms is not None:
+        raise ValueError("synthetic compilation cannot bind a real dataset")
+    if plan.dataset_class is not DatasetClass.SMOKE:
+        raise ValueError("synthetic compilation requires a smoke-only plan")
+    if plan.folds != recommended_evaluation_folds():
+        raise ValueError("synthetic compilation requires the frozen F1-F3 block mapping")
+    used = {
+        block
+        for fold in plan.folds
+        for block in (*fold.train_blocks, fold.validation_block, fold.calibration_block, fold.test_block)
+        if block is not None
+    }
+    if 10 in used:
+        raise ValueError("B10 must remain untouched by the frozen evaluation folds")
+
+
+def compile_synthetic_evaluation_plan(
+    plan: OfflineEvaluationPlan,
+    *,
+    synthetic_start_ms: int,
+    block_duration_ms: int,
+) -> SyntheticPlanCompilation:
+    """Compile frozen B1--B10 symbols into deterministic synthetic UTC ranges."""
+    _require_frozen_synthetic_plan(plan)
+    if isinstance(synthetic_start_ms, bool) or synthetic_start_ms < 0 or synthetic_start_ms % _MINUTE_MS:
+        raise ValueError("synthetic_start_ms must be a minute-aligned UTC timestamp")
+    if isinstance(block_duration_ms, bool) or block_duration_ms <= 0 or block_duration_ms % _MINUTE_MS:
+        raise ValueError("block_duration_ms must be a positive minute-aligned duration")
+    blocks = tuple(
+        SyntheticBlock(
+            block_id,
+            synthetic_start_ms + (block_id - 1) * block_duration_ms,
+            synthetic_start_ms + block_id * block_duration_ms,
+        )
+        for block_id in _BLOCK_IDS
+    )
+    by_id = {block.block_id: block for block in blocks}
+    specs = tuple(
+        FoldSpec(
+            fold.fold_id,
+            (by_id[fold.train_blocks[0]].start_ms, by_id[fold.train_blocks[-1]].end_ms),
+            (by_id[fold.validation_block].start_ms, by_id[fold.validation_block].end_ms)
+            if fold.validation_block is not None
+            else None,
+            (by_id[fold.calibration_block].start_ms, by_id[fold.calibration_block].end_ms),
+            (by_id[fold.test_block].start_ms, by_id[fold.test_block].end_ms),
+        )
+        for fold in plan.folds
+    )
+    identity = {
+        "schema_id": B31_SYNTHETIC_PLAN_SCHEMA,
+        "plan_fingerprint": plan.fingerprint,
+        "synthetic_start_ms": synthetic_start_ms,
+        "block_duration_ms": block_duration_ms,
+        "blocks": [block.to_dict() for block in blocks],
+        "fold_specs": [
+            {"fold_id": spec.fold_id, "train": spec.train, "validation": spec.validation,
+             "calibration": spec.calibration, "test": spec.test}
+            for spec in specs
+        ],
+    }
+    return SyntheticPlanCompilation(plan.fingerprint, synthetic_start_ms, block_duration_ms, blocks, specs, _fingerprint(identity))
+
+
+@dataclass(frozen=True)
+class SyntheticRowExclusion:
+    row_fingerprint: str
+    status: str
+    reason: str
+
+    def __post_init__(self) -> None:
+        _digest(self.row_fingerprint, "row_fingerprint")
+        if self.status not in {"target_unavailable", "untouched"}:
+            raise ValueError("unsupported synthetic row exclusion status")
+
+    def to_dict(self) -> dict[str, str]:
+        return {"row_fingerprint": self.row_fingerprint, "status": self.status, "reason": self.reason}
+
+
+@dataclass(frozen=True)
+class SyntheticMaterialization:
+    """Replayable assignments for local synthetic rows; never an evaluation result."""
+
+    compilation_fingerprint: str
+    fold_set: FoldSet
+    exclusions: tuple[SyntheticRowExclusion, ...]
+    fold_label_counts: dict[str, dict[str, dict[str, int]]]
+    status_counts: dict[str, int]
+    status: str
+    replay_fingerprint: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": B31_SYNTHETIC_MATERIALIZATION_SCHEMA,
+            "compilation_fingerprint": self.compilation_fingerprint,
+            "fold_set": self.fold_set.to_dict(),
+            "exclusions": [item.to_dict() for item in self.exclusions],
+            "fold_label_counts": self.fold_label_counts,
+            "status_counts": self.status_counts,
+            "status": self.status,
+            "replay_fingerprint": self.replay_fingerprint,
+        }
+
+
+def _block_for_time(compilation: SyntheticPlanCompilation, open_time_ms: int) -> int | None:
+    for block in compilation.blocks:
+        if block.start_ms <= open_time_ms < block.end_ms:
+            return block.block_id
+    return None
+
+
+def _label_counts_by_fold(fold_set: FoldSet, rows: Sequence[DatasetRow]) -> dict[str, dict[str, dict[str, int]]]:
+    labels = {row.row_fingerprint: row.label for row in rows}
+    result: dict[str, dict[str, dict[str, int]]] = {}
+    for fold in fold_set.folds:
+        splits: dict[str, dict[str, int]] = {}
+        for assignment in fold.assignments:
+            if assignment.split not in {"train", "validation", "calibration", "test"}:
+                continue
+            label = labels[assignment.row_fingerprint]
+            if label is None:
+                continue
+            counts = splits.setdefault(assignment.split, {"positive": 0, "non_positive": 0})
+            counts["positive" if label else "non_positive"] += 1
+        result[fold.fold_id] = dict(sorted(splits.items()))
+    return result
+
+
+def materialize_synthetic_evaluation_plan(
+    compilation: SyntheticPlanCompilation,
+    rows: Sequence[DatasetRow],
+) -> SyntheticMaterialization:
+    """Assign only target-safe synthetic rows and report unavailable evidence."""
+    row_times = [row.open_time_ms for row in rows]
+    row_fingerprints = [row.row_fingerprint for row in rows]
+    if len(row_times) != len(set(row_times)):
+        raise ValueError("synthetic materialization rows contain duplicate timestamps")
+    if len(row_fingerprints) != len(set(row_fingerprints)):
+        raise ValueError("synthetic materialization rows contain duplicate fingerprints")
+    eligible: list[DatasetRow] = []
+    exclusions: list[SyntheticRowExclusion] = []
+    for row in sorted(rows, key=lambda item: item.open_time_ms):
+        block_id = _block_for_time(compilation, row.open_time_ms)
+        if block_id is None:
+            raise ValueError("synthetic materialization row is outside B1-B10")
+        if block_id == 10:
+            exclusions.append(SyntheticRowExclusion(row.row_fingerprint, "untouched", "B10 is reserved and untouched"))
+            continue
+        if row.label is None:
+            exclusions.append(SyntheticRowExclusion(row.row_fingerprint, "target_unavailable", "realized target label is unavailable"))
+            continue
+        if row.target_end_ms is None:
+            raise ValueError("labeled synthetic row requires a five-minute target end")
+        eligible.append(row)
+    fold_set = build_chronological_folds(eligible, compilation.fold_specs)
+    label_counts = _label_counts_by_fold(fold_set, eligible)
+    insufficient = any(
+        not counts.get(split, {}).get("positive") or not counts.get(split, {}).get("non_positive")
+        for counts in label_counts.values()
+        for split in ("calibration", "test")
+    )
+    status_counts = dict(fold_set.status_counts)
+    for exclusion in exclusions:
+        status_counts[exclusion.status] = status_counts.get(exclusion.status, 0) + 1
+    status = "unavailable_insufficient_label_support" if insufficient else "materialized"
+    canonical = {
+        "compilation_fingerprint": compilation.fingerprint,
+        "fold_set": fold_set.to_dict(),
+        "exclusions": [item.to_dict() for item in exclusions],
+        "fold_label_counts": label_counts,
+        "status_counts": dict(sorted(status_counts.items())),
+        "status": status,
+    }
+    return SyntheticMaterialization(
+        compilation.fingerprint,
+        fold_set,
+        tuple(exclusions),
+        label_counts,
+        dict(sorted(status_counts.items())),
+        status,
+        _fingerprint(canonical),
+    )
