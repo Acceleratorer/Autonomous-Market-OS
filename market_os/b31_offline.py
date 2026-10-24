@@ -68,8 +68,25 @@ class CalibrationMethod(str, Enum):
     ISOTONIC = "isotonic"
 
 
+class EvaluationPlanStatus(str, Enum):
+    """Lifecycle status for the synthetic-only evaluation plan."""
+
+    SYNTHETIC_ONLY = "synthetic_only"
+    DATASET_UNBOUND = "dataset_unbound"
+
+
+class EvaluationGate(str, Enum):
+    IMPLEMENTATION = "implementation"
+    OFFLINE_EVALUATION = "offline_evaluation"
+    PREDICTIVE_EVIDENCE = "predictive_evidence"
+    SHADOW = "shadow"
+
+
 B31_TARGET_VERSION = "btc.b2.close-return-5m.v1"
 UNKNOWN_NOT_OBSERVED_OFFLINE = "unknown_not_observed_offline"
+B31_EVALUATION_PLAN_SCHEMA = "market-os.b3-1.offline-evaluation-plan@v1"
+_BLOCK_IDS = tuple(range(1, 11))
+_RECOMMENDED_LAMBDA_GRID = (0.01, 0.1, 1.0, 10.0)
 
 
 @dataclass(frozen=True)
@@ -774,3 +791,156 @@ def matched_row_accounting(left_ids: Iterable[str], right_ids: Iterable[str]) ->
 def replay_fingerprint(*artifacts: Mapping[str, Any]) -> str:
     canonical_artifacts = [dict(sorted(artifact.items())) for artifact in artifacts]
     return _fingerprint({"artifacts": sorted(canonical_artifacts, key=_canonical)})
+
+
+@dataclass(frozen=True)
+class EvaluationFoldPlan:
+    """Relative, synthetic fold coordinates; no real UTC dates are bound."""
+
+    fold_id: str
+    train_blocks: tuple[int, ...]
+    validation_block: int | None
+    calibration_block: int
+    test_block: int
+
+    def __post_init__(self) -> None:
+        if not self.fold_id.strip():
+            raise ValueError("fold_id is required")
+        if not self.train_blocks or tuple(sorted(self.train_blocks)) != self.train_blocks:
+            raise ValueError("train_blocks must be non-empty and ordered")
+        if len(set(self.train_blocks)) != len(self.train_blocks):
+            raise ValueError("train_blocks must be unique")
+        all_blocks = set(_BLOCK_IDS)
+        used = set(self.train_blocks) | {self.calibration_block, self.test_block}
+        if self.validation_block is not None:
+            used.add(self.validation_block)
+        if not used <= all_blocks or min(used) < 1:
+            raise ValueError("fold blocks must use symbolic blocks 1 through 10")
+        sequence = list(self.train_blocks)
+        if self.validation_block is not None:
+            sequence.append(self.validation_block)
+        sequence.extend((self.calibration_block, self.test_block))
+        if sequence != sorted(sequence) or len(sequence) != len(set(sequence)):
+            raise ValueError("fold blocks must be chronological and non-overlapping")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "fold_id": self.fold_id,
+            "train_blocks": list(self.train_blocks),
+            "validation_block": self.validation_block,
+            "calibration_block": self.calibration_block,
+            "test_block": self.test_block,
+        }
+
+
+def recommended_evaluation_folds() -> tuple[EvaluationFoldPlan, ...]:
+    """Return the approved worksheet's symbolic expanding-fold proposal."""
+    return tuple(
+        EvaluationFoldPlan(f"F{index}", tuple(range(1, index + 4)), index + 4, index + 5, index + 6)
+        for index in range(1, 4)
+    )
+
+
+@dataclass(frozen=True)
+class OfflineEvaluationPlan:
+    """Synthetic-only plan freeze; deliberately unbound to a real dataset."""
+
+    dataset_revision: str | None = None
+    dataset_start_ms: int | None = None
+    dataset_end_ms: int | None = None
+    dataset_class: DatasetClass = DatasetClass.SMOKE
+    purge_ms: int = _HORIZON_MS
+    embargo_ms: int = _HORIZON_MS
+    folds: tuple[EvaluationFoldPlan, ...] = field(default_factory=recommended_evaluation_folds)
+    minimum_rows: int = 10_000
+    minimum_calibration_rows: int = 1_000
+    minimum_test_rows_per_fold: int = 1_000
+    minimum_label_fraction: float = 0.30
+    power: float = 0.80
+    alpha: float = 0.05
+    relative_improvement: float = 0.05
+    calibration_method: CalibrationMethod = CalibrationMethod.PLATT
+    one_bin_baseline: bool = True
+    isotonic_min_rows: int = 2_000
+    l2_lambda_grid: tuple[float, ...] = _RECOMMENDED_LAMBDA_GRID
+    regime_count: int = 3
+    regime_min_fraction: float = 0.10
+    regime_min_rows: int = 200
+    coverage_stop_fraction: float = 0.80
+    ece_stop: float = 0.05
+    psi_stop: float = 0.20
+    latency: str = UNKNOWN_NOT_OBSERVED_OFFLINE
+    fee_bps_per_side: float = 10.0
+    spread_bps_per_side: float = 5.0
+    slippage_bps_per_side: float = 5.0
+    shadow_proposed: bool = False
+    status: EvaluationPlanStatus = EvaluationPlanStatus.SYNTHETIC_ONLY
+
+    def __post_init__(self) -> None:
+        try:
+            dataset_class = DatasetClass(self.dataset_class)
+        except ValueError as exc:
+            raise ValueError("unsupported dataset class") from exc
+        object.__setattr__(self, "dataset_class", dataset_class)
+        try:
+            calibration_method = CalibrationMethod(self.calibration_method)
+        except ValueError as exc:
+            raise ValueError("unsupported calibration method") from exc
+        object.__setattr__(self, "calibration_method", calibration_method)
+        try:
+            folds = tuple(self.folds)
+        except TypeError as exc:
+            raise ValueError("folds must be iterable") from exc
+        object.__setattr__(self, "folds", folds)
+        if self.dataset_revision is not None or self.dataset_start_ms is not None or self.dataset_end_ms is not None:
+            raise ValueError("real dataset binding is forbidden in the foundation plan milestone")
+        if self.dataset_class is not DatasetClass.SMOKE:
+            raise ValueError("evaluation plan accepts synthetic smoke fixtures only")
+        if self.purge_ms != _HORIZON_MS or self.embargo_ms != _HORIZON_MS:
+            raise ValueError("purge and embargo must each be five minutes")
+        if not self.folds:
+            raise ValueError("at least one symbolic fold is required")
+        if self.minimum_rows <= 0 or self.minimum_calibration_rows <= 0 or self.minimum_test_rows_per_fold <= 0:
+            raise ValueError("sample thresholds must be positive")
+        for name, value in (("minimum_label_fraction", self.minimum_label_fraction), ("power", self.power), ("alpha", self.alpha), ("relative_improvement", self.relative_improvement), ("regime_min_fraction", self.regime_min_fraction), ("coverage_stop_fraction", self.coverage_stop_fraction), ("ece_stop", self.ece_stop), ("psi_stop", self.psi_stop)):
+            _finite(value, name)
+        if not 0 < self.minimum_label_fraction <= 0.5 or not 0 < self.power <= 1 or not 0 < self.alpha < 1 or not 0 < self.relative_improvement < 1:
+            raise ValueError("invalid sample/power thresholds")
+        if not 0 < self.regime_min_fraction <= 1 or not 0 < self.coverage_stop_fraction <= 1 or self.regime_count != 3:
+            raise ValueError("invalid regime or coverage thresholds")
+        if self.regime_min_rows <= 0 or self.isotonic_min_rows <= 0:
+            raise ValueError("row thresholds must be positive")
+        if self.calibration_method is not CalibrationMethod.PLATT:
+            raise ValueError("the frozen working plan uses Platt/logistic calibration")
+        if tuple(sorted(self.l2_lambda_grid)) != self.l2_lambda_grid or tuple(self.l2_lambda_grid) != _RECOMMENDED_LAMBDA_GRID:
+            raise ValueError("l2 lambda grid must match the recommended working plan")
+        for value in (self.fee_bps_per_side, self.spread_bps_per_side, self.slippage_bps_per_side):
+            if _finite(value, "cost") < 0:
+                raise ValueError("cost assumptions must be non-negative")
+        object.__setattr__(self, "status", EvaluationPlanStatus.DATASET_UNBOUND)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": B31_EVALUATION_PLAN_SCHEMA,
+            "dataset": {"revision": self.dataset_revision, "start_ms": self.dataset_start_ms, "end_ms": self.dataset_end_ms, "class": self.dataset_class.value},
+            "purge_ms": self.purge_ms,
+            "embargo_ms": self.embargo_ms,
+            "folds": [fold.to_dict() for fold in self.folds],
+            "sample": {"minimum_rows": self.minimum_rows, "minimum_calibration_rows": self.minimum_calibration_rows, "minimum_test_rows_per_fold": self.minimum_test_rows_per_fold, "minimum_label_fraction": self.minimum_label_fraction, "power": self.power, "alpha": self.alpha, "relative_improvement": self.relative_improvement},
+            "calibration": {"method": self.calibration_method.value, "one_bin_baseline": self.one_bin_baseline, "isotonic_min_rows": self.isotonic_min_rows},
+            "fusion": {"l2_lambda_grid": list(self.l2_lambda_grid)},
+            "regimes": {"count": self.regime_count, "minimum_fraction": self.regime_min_fraction, "minimum_rows": self.regime_min_rows},
+            "stability": {"coverage_stop_fraction": self.coverage_stop_fraction, "ece_stop": self.ece_stop, "psi_stop": self.psi_stop},
+            "cost": {"latency": self.latency, "fee_bps_per_side": self.fee_bps_per_side, "spread_bps_per_side": self.spread_bps_per_side, "slippage_bps_per_side": self.slippage_bps_per_side},
+            "shadow_proposed": self.shadow_proposed,
+            "status": self.status.value,
+        }
+
+    @property
+    def fingerprint(self) -> str:
+        return _fingerprint(self.to_dict())
+
+    def gate_status(self, gate: EvaluationGate) -> str:
+        if gate is EvaluationGate.IMPLEMENTATION:
+            return "eligible_synthetic_only"
+        return "blocked_dataset_unbound"

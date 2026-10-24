@@ -34,6 +34,12 @@ from market_os.b31_offline import (
     calibration_bins,
     matched_row_accounting,
     replay_fingerprint,
+    B31_EVALUATION_PLAN_SCHEMA,
+    EvaluationGate,
+    EvaluationPlanStatus,
+    EvaluationFoldPlan,
+    OfflineEvaluationPlan,
+    recommended_evaluation_folds,
 )
 
 
@@ -237,3 +243,38 @@ def test_artifact_replay_fingerprint_is_stable() -> None:
     first = replay_fingerprint(identity.to_dict(), {"latency": "unknown_not_observed_offline"})
     second = replay_fingerprint({"latency": "unknown_not_observed_offline"}, identity.to_dict())
     assert first == second
+
+
+def test_synthetic_evaluation_plan_is_deterministic_and_dataset_unbound() -> None:
+    plan = OfflineEvaluationPlan()
+    assert plan.status is EvaluationPlanStatus.DATASET_UNBOUND
+    assert plan.to_dict()["schema_id"] == B31_EVALUATION_PLAN_SCHEMA
+    assert plan.fingerprint == OfflineEvaluationPlan().fingerprint
+    assert plan.gate_status(EvaluationGate.IMPLEMENTATION) == "eligible_synthetic_only"
+    assert plan.gate_status(EvaluationGate.OFFLINE_EVALUATION) == "blocked_dataset_unbound"
+    assert tuple(fold.fold_id for fold in plan.folds) == ("F1", "F2", "F3")
+    assert plan.purge_ms == plan.embargo_ms == 300_000
+    assert plan.folds[0].train_blocks == (1, 2, 3, 4)
+    assert plan.folds[0].validation_block == 5
+    assert plan.folds[0].calibration_block == 6
+    assert plan.folds[0].test_block == 7
+    assert plan.folds[1].train_blocks == (1, 2, 3, 4, 5)
+    assert plan.folds[1].test_block == 8
+    assert plan.folds[2].train_blocks == (1, 2, 3, 4, 5, 6)
+    assert plan.folds[2].test_block == 9
+
+
+def test_evaluation_plan_rejects_real_binding_and_non_chronological_folds() -> None:
+    with pytest.raises(ValueError, match="real dataset binding"):
+        OfflineEvaluationPlan(dataset_revision="real-revision")
+    with pytest.raises(ValueError, match="chronological"):
+        EvaluationFoldPlan("bad", (1, 3), 2, 4, 5)
+    with pytest.raises(ValueError, match="shuffle"):
+        build_chronological_folds(_rows(), (FoldSpec("f", (0, 600_000), None, (600_000, 900_000), (900_000, 1_200_000)),), shuffle=True)
+
+
+def test_recommended_folds_use_symbolic_expanding_blocks() -> None:
+    folds = recommended_evaluation_folds()
+    assert folds[0].train_blocks == (1, 2, 3, 4)
+    assert folds[-1].test_block == 9
+    assert 10 not in {block for fold in folds for block in (fold.validation_block, fold.calibration_block, fold.test_block)}
