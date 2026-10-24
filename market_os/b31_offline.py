@@ -83,8 +83,13 @@ class DatasetRow:
         if isinstance(self.open_time_ms, bool) or self.open_time_ms < 0 or self.open_time_ms % _MINUTE_MS:
             raise ValueError("row time must be an aligned UTC millisecond timestamp")
         _digest(self.row_fingerprint, "row_fingerprint")
-        if self.target_end_ms is not None and self.target_end_ms <= self.open_time_ms:
-            raise ValueError("target_end_ms must follow row time")
+        if self.label is not None and type(self.label) is not bool:
+            raise ValueError("label must be bool when present")
+        if self.target_end_ms is not None:
+            if self.target_end_ms != self.open_time_ms + _HORIZON_MS:
+                raise ValueError("target_end_ms must be exactly five minutes after row time")
+            if self.target_end_ms % _MINUTE_MS:
+                raise ValueError("target_end_ms must be minute aligned")
 
 
 @dataclass(frozen=True)
@@ -390,6 +395,18 @@ def build_chronological_folds(
         raise ValueError("B3.1 foundation purge and embargo are fixed at five minutes")
     if not specs:
         raise ValueError("at least one FoldSpec is required")
+    row_times = [row.open_time_ms for row in rows]
+    row_fingerprints = [row.row_fingerprint for row in rows]
+    if len(row_times) != len(set(row_times)):
+        raise ValueError("fold rows contain duplicate timestamps")
+    if len(row_fingerprints) != len(set(row_fingerprints)):
+        raise ValueError("fold rows contain duplicate fingerprints")
+    configured_ranges = [interval for spec in specs for interval in (
+        [spec.train] + ([spec.validation] if spec.validation else []) + [spec.calibration, spec.test]
+    )]
+    for row in rows:
+        if not any(start <= row.open_time_ms < end for start, end in configured_ranges):
+            raise ValueError("fold row is outside configured ranges")
     results: list[FoldResult] = []
     for spec in specs:
         assignments: list[FoldAssignment] = []
@@ -441,7 +458,12 @@ class CalibrationConfig:
     isotonic_approved: bool = False
 
     def __post_init__(self) -> None:
-        if self.method is CalibrationMethod.ISOTONIC and (
+        try:
+            method = CalibrationMethod(self.method)
+        except ValueError as exc:
+            raise ValueError("unsupported calibration method") from exc
+        object.__setattr__(self, "method", method)
+        if method is CalibrationMethod.ISOTONIC and (
             not self.isotonic_approved or self.isotonic_min_rows is None or self.isotonic_min_rows <= 0
         ):
             raise ValueError("isotonic calibration requires an approved positive threshold")
@@ -491,6 +513,8 @@ def fit_calibrator(
 ) -> CalibrationArtifact:
     calibration_ids = tuple(calibration_row_ids)
     test_ids = tuple(test_row_ids)
+    if len(calibration_ids) != len(set(calibration_ids)) or len(test_ids) != len(set(test_ids)):
+        raise ValueError("calibration and test row IDs must be unique")
     if set(calibration_ids) & set(test_ids):
         raise ValueError("calibration and test rows overlap")
     if config.method is CalibrationMethod.ISOTONIC:
@@ -520,6 +544,8 @@ class FusionInput:
         except ValueError as exc:
             raise ValueError("unsupported fusion input state") from exc
         object.__setattr__(self, "state", state)
+        if state is not EvidenceState.USABLE and (self.value is not None or self.dimensions):
+            raise ValueError("non-usable fusion input cannot carry numeric values or dimensions")
         if self.value is not None:
             _finite(self.value, f"{self.name}.value")
         for key, value in self.dimensions.items():
@@ -546,6 +572,9 @@ class EncodedFusionInputs:
 def encode_fusion_inputs(inputs: Iterable[FusionInput]) -> EncodedFusionInputs:
     values: dict[str, float] = {}
     for item in inputs:
+        item_keys = {item.name, f"{item.name}__missing", *(f"{item.name}__{key}" for key in item.dimensions)}
+        if len(item_keys) != len(item.dimensions) + 2 or item_keys & values.keys():
+            raise ValueError("fusion input encoded names must be unique")
         if item.value is not None:
             values[item.name] = float(item.value)
         else:
@@ -604,6 +633,8 @@ def fit_regularized_logistic_fusion(
     train_ids = tuple(train_row_ids)
     validation_ids = tuple(validation_row_ids)
     test_ids = tuple(test_row_ids)
+    if any(len(ids) != len(set(ids)) for ids in (train_ids, validation_ids, test_ids)):
+        raise ValueError("fusion row IDs must be unique within each split")
     if set(train_ids) & (set(validation_ids) | set(test_ids)) or set(validation_ids) & set(test_ids):
         raise ValueError("fusion fit and evaluation rows overlap")
     return FusionFitArtifact(
@@ -646,9 +677,13 @@ def _metric_inputs(
 ) -> tuple[list[float], list[bool]] | MetricResult:
     if len(probabilities) != len(labels):
         raise ValueError("probabilities and labels must have equal length")
+    if any(type(label) is not bool for label in labels):
+        raise ValueError("labels must be bool")
+    values = [_finite(value, "probability") for value in probabilities]
+    if any(value < 0.0 or value > 1.0 for value in values):
+        raise ValueError("probabilities must be within [0, 1]")
     if len(probabilities) < minimum or len(set(labels)) < 2:
         return MetricResult("metric", "unavailable", None, len(labels), "insufficient rows or label support")
-    values = [min(1.0 - 1e-15, max(1e-15, _finite(value, "probability"))) for value in probabilities]
     return values, list(labels)
 
 
@@ -657,7 +692,8 @@ def log_loss(probabilities: Sequence[float], labels: Sequence[bool]) -> MetricRe
     if isinstance(prepared, MetricResult):
         return MetricResult("log_loss", prepared.status, prepared.value, prepared.n, prepared.reason)
     values, truth = prepared
-    value = sum(-math.log(p if actual else 1.0 - p) for p, actual in zip(values, truth)) / len(truth)
+    safe = [min(1.0 - 1e-15, max(1e-15, p)) for p in values]
+    value = sum(-math.log(p if actual else 1.0 - p) for p, actual in zip(safe, truth)) / len(truth)
     return MetricResult("log_loss", "measured", value, len(truth))
 
 

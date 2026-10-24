@@ -159,6 +159,12 @@ def test_chronological_folds_order_purge_embargo_and_fingerprint() -> None:
     assert first.status_counts["train"] > 0
     with pytest.raises(ValueError, match="shuffle"):
         build_chronological_folds(_rows(), specs, shuffle=True)
+    with pytest.raises(ValueError, match="duplicate timestamps"):
+        build_chronological_folds(_rows() + [_rows()[0]], specs)
+    with pytest.raises(ValueError, match="outside configured"):
+        build_chronological_folds(_rows() + [DatasetRow(1_800_000, "e" * 64, target_end_ms=2_100_000)], specs)
+    with pytest.raises(ValueError, match="target_end_ms"):
+        DatasetRow(0, "f" * 64, target_end_ms=6 * 60_000)
 
 
 def test_calibration_enforces_test_separation_and_isotonic_approval() -> None:
@@ -167,33 +173,43 @@ def test_calibration_enforces_test_separation_and_isotonic_approval() -> None:
     artifact = fit_calibrator(scores, labels, CalibrationConfig(CalibrationMethod.ONE_BIN), calibration_row_ids=("0", "1", "2"), test_row_ids=("3", "4", "5"))
     assert artifact.status == "measured"
     assert 0.0 <= artifact.predict(0.0) <= 1.0
+    assert CalibrationConfig("one_bin").to_dict()["method"] == "one_bin"
+    with pytest.raises(ValueError, match="unsupported calibration method"):
+        CalibrationConfig("unknown")
     with pytest.raises(ValueError, match="overlap"):
         fit_calibrator(scores, labels, CalibrationConfig(CalibrationMethod.ONE_BIN), calibration_row_ids=("0", "1"), test_row_ids=("1", "2"))
+    with pytest.raises(ValueError, match="unique"):
+        fit_calibrator(scores, labels, CalibrationConfig(CalibrationMethod.ONE_BIN), calibration_row_ids=("0", "0"), test_row_ids=("1", "2"))
     with pytest.raises(ValueError, match="approved"):
         CalibrationConfig(CalibrationMethod.ISOTONIC)
     assert CalibrationConfig(CalibrationMethod.ISOTONIC, isotonic_min_rows=100, isotonic_approved=True).to_dict()["isotonic_approved"] is True
 
 
 def test_fusion_encoding_keeps_explicit_missingness_without_neutral_probability() -> None:
-    assert FusionInput("string-state", "test", 0.1, "abstained").to_dict()["state"] == "abstained"
+    assert FusionInput("string-state", "test", None, "abstained").to_dict()["state"] == "abstained"
     with pytest.raises(ValueError, match="unsupported fusion input state"):
         FusionInput("invalid-state", "test", 0.1, "not-a-state")
     encoded = encode_fusion_inputs([
         FusionInput("score", "numerical_score", 0.2, EvidenceState.USABLE),
-        FusionInput("jev", "jev_semantic", None, EvidenceState.ABSTAINED, dimensions={"support": 0.9}),
+        FusionInput("jev", "jev_semantic", None, EvidenceState.ABSTAINED),
         FusionInput("probability", "calibrated_probability", None, EvidenceState.MISSING),
     ])
     assert encoded.values["score"] == 0.2
-    assert encoded.values["jev__support"] == 0.9
     assert encoded.values["probability__missing"] == 1.0
     assert encoded.values["probability"] == 0.0
     assert encoded.values["probability"] != 0.5
+    with pytest.raises(ValueError, match="cannot carry"):
+        FusionInput("stale", "jev_semantic", None, EvidenceState.STALE, dimensions={"support": 0.9})
+    with pytest.raises(ValueError, match="unique"):
+        encode_fusion_inputs([FusionInput("dup", "a", 0.1, EvidenceState.USABLE), FusionInput("dup", "b", 0.2, EvidenceState.USABLE)])
     config = RegularizedLogisticFusionConfig(l2_lambda=0.1)
     assert config.to_dict()["l2_lambda"] == 0.1
     fusion = fit_regularized_logistic_fusion(config, train_row_ids=("a",), test_row_ids=("b",))
     assert fusion.status == "unavailable"
     with pytest.raises(ValueError, match="overlap"):
         fit_regularized_logistic_fusion(config, train_row_ids=("a",), test_row_ids=("a",))
+    with pytest.raises(ValueError, match="unique"):
+        fit_regularized_logistic_fusion(config, train_row_ids=("a", "a"), test_row_ids=("b",))
 
 
 def test_metrics_report_unavailable_support_and_deterministic_values() -> None:
@@ -201,6 +217,12 @@ def test_metrics_report_unavailable_support_and_deterministic_values() -> None:
     assert brier_score((0.9, 0.1), (True, False)).value == pytest.approx(0.01)
     assert balanced_accuracy((0.9, 0.1), (True, False)).value == pytest.approx(1.0)
     assert log_loss((0.9,), (True,)).status == "unavailable"
+    with pytest.raises(ValueError, match="labels must be bool"):
+        log_loss((0.9, 0.1), (1, False))
+    with pytest.raises(ValueError, match=r"\[0, 1\]"):
+        brier_score((1.1, 0.1), (True, False))
+    with pytest.raises(ValueError, match="finite"):
+        brier_score((float("nan"), 0.1), (True, False))
     bins = calibration_bins((0.9, 0.1), (True, False), bin_count=2)
     assert bins.status == "measured"
     assert expected_calibration_error((0.9, 0.1), (True, False), bin_count=2).name == "ece"
