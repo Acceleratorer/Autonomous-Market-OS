@@ -132,6 +132,10 @@ def build_parser() -> argparse.ArgumentParser:
     synthetic_run = synthetic_commands.add_parser("run")
     synthetic_run.add_argument("--fixture", required=True)
     synthetic_run.add_argument("--output", required=True)
+    synthetic_serve = synthetic_commands.add_parser("serve")
+    synthetic_serve.add_argument("--store-root", required=True)
+    synthetic_serve.add_argument("--host", default="127.0.0.1")
+    synthetic_serve.add_argument("--port", type=int, default=8790)
     synthetic_inspect = synthetic_commands.add_parser("inspect")
     synthetic_inspect.add_argument("--replay-report", required=True)
     synthetic_inspect.add_argument("--resource", choices=("replay", "accounting"), default="accounting")
@@ -166,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
         from .b35_strategy_replay import StrategyReplayReport
         from .b36_accounting import build_synthetic_accounting_report
         from .b38_synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
+        from .b310_synthetic_server import serve_synthetic
 
         if args.synthetic_command == "run":
             try:
@@ -173,6 +178,12 @@ def main(argv: list[str] | None = None) -> int:
             except (OSError, TypeError, ValueError) as exc:
                 raise SystemExit(f"synthetic session failed: {exc}") from exc
             print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
+        if args.synthetic_command == "serve":
+            try:
+                serve_synthetic(args.store_root, args.host, args.port)
+            except (OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic server failed: {exc}") from exc
             return 0
 
         try:

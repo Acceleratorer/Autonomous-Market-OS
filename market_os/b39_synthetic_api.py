@@ -112,6 +112,15 @@ class SyntheticSessionStore:
             return {"schema": API_VERSION, "session_id": session_id, "manifest": manifest, "accounting": accounting}
         raise KeyError("synthetic session resource not found")
 
+    def list_sessions(self) -> tuple[str, ...]:
+        if not self.root.is_dir():
+            return ()
+        return tuple(sorted(
+            path.name
+            for path in self.root.iterdir()
+            if path.is_dir() and SESSION_ID.fullmatch(path.name) and (path / "manifest.json").is_file()
+        ))
+
     def dashboard_html(self, session_id: str) -> str:
         manifest, replay, accounting = self._validated(session_id)
         metrics = _object(accounting.get("accounting"), "accounting summary")
