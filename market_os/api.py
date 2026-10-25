@@ -52,6 +52,14 @@ def make_handler(
             self.end_headers()
             self.wfile.write(raw)
 
+        def _send_html(self, status: int, body: str) -> None:
+            raw = body.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+
         def do_POST(self) -> None:  # noqa: N802
             if self.path == "/v1/btc/history/ingest":
                 status = 500
@@ -207,6 +215,35 @@ def make_handler(
                     status = 400
                     error_type = type(exc).__name__
                     self._send(400, {"error": {"code": "invalid_request", "message": str(exc), "api_version": "market-os.btc-history-readiness.v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
+                return
+            synthetic_prefix = "/v1/synthetic/sessions/"
+            if urllib.parse.urlsplit(self.path).path.startswith(synthetic_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    parts = parsed.path[len(synthetic_prefix):].split("/")
+                    if len(parts) != 2:
+                        raise KeyError("synthetic session resource")
+                    from .b39_synthetic_api import SyntheticSessionStore
+
+                    query = urllib.parse.parse_qs(parsed.query)
+                    store = SyntheticSessionStore(query.get("store_root", [str(workflow.store.root / "synthetic")])[0])
+                    session_id, resource = parts
+                    if resource == "dashboard":
+                        self._send_html(200, store.dashboard_html(session_id))
+                    else:
+                        self._send(200, store.inspect(session_id, resource))
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "synthetic session or resource not found", "api_version": "market-os.b3-9.synthetic-api.v1"})
+                except ValueError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "synthetic_integrity_error", "message": str(exc), "api_version": "market-os.b3-9.synthetic-api.v1"}})
                 finally:
                     self._audit(status, error_type=error_type)
                 return
