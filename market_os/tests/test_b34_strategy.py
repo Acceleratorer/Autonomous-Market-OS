@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import replace
 import pytest
 from market_os.paper_venue import SyntheticMarketEvent, VenueConfig, VirtualPaperVenue
-from market_os.b34_strategy import NormalizedNumericalSignal, StrategyConfig, StrategyError, decide
+from market_os.b34_strategy import NormalizedNumericalSignal, StrategyConfig, StrategyError, SyntheticStrategyAdapter, decide
 
 def ev(t=1000): return SyntheticMarketEvent("synthetic-event", "BTCUSDT", t, 100.0, 101.0, 100.5, 1.0, "a"*64)
 def snap(btc=0.0): return VirtualPaperVenue(VenueConfig(initial_btc_quantity=btc, initial_average_entry_price=90.0 if btc else 0.0)).snapshot()
@@ -36,3 +36,13 @@ def test_deterministic_decisions_and_timestamp_guard():
 def test_finite_and_no_derivative_fields():
     with pytest.raises(StrategyError): sig(float("nan"))
     d=decide(sig(),ev(),snap()); assert not hasattr(d,"leverage") and not hasattr(d,"futures")
+
+def test_adapter_duplicate_and_chronology_guards():
+    adapter = SyntheticStrategyAdapter()
+    assert adapter.decide(sig(), ev(), snap()).action == "buy"
+    assert adapter.decide(sig(), ev(), snap()).action == "reject"
+    older = NormalizedNumericalSignal("synthetic-older", "BTCUSDT", 999, "calibrated_probability", .6, "usable", "b" * 64)
+    assert adapter.decide(older, ev(999), snap()).action == "reject"
+
+def test_sell_to_flat_rejects_excess_notional():
+    assert decide(sig(.4), ev(), snap(1), StrategyConfig(max_order_notional_usdt=50)).action == "reject"
