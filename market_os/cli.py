@@ -127,6 +127,11 @@ def build_parser() -> argparse.ArgumentParser:
     connectivity_inspect.add_argument("probe_id")
     connectivity_inspect.add_argument("--resource", choices=("manifest", "result", "fingerprints", "replay"), default="manifest")
     connectivity_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    synthetic = commands.add_parser("synthetic")
+    synthetic_commands = synthetic.add_subparsers(dest="synthetic_command", required=True)
+    synthetic_inspect = synthetic_commands.add_parser("inspect")
+    synthetic_inspect.add_argument("--replay-report", required=True)
+    synthetic_inspect.add_argument("--resource", choices=("replay", "accounting"), default="accounting")
     return parser
 
 
@@ -151,6 +156,26 @@ def main(argv: list[str] | None = None) -> int:
             result = run_quality_benchmark(args.store_root, args.fixture)
         else:
             result = BenchmarkStore(args.store_root).inspect(args.benchmark_id, args.resource, args.item_id)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "synthetic":
+        from pathlib import Path
+        from .b35_strategy_replay import StrategyReplayReport
+        from .b36_accounting import build_synthetic_accounting_report
+
+        try:
+            payload = json.loads(Path(args.replay_report).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise SystemExit(f"cannot read synthetic replay report: {exc}") from exc
+        if not isinstance(payload, dict) or not isinstance(payload.get("fingerprint"), str):
+            raise SystemExit("synthetic replay report must contain a top-level fingerprint")
+        fingerprint = payload.pop("fingerprint")
+        try:
+            canonical_payload = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+            replay_report = StrategyReplayReport(canonical_payload, fingerprint)
+            result = replay_report.to_dict() if args.resource == "replay" else build_synthetic_accounting_report(replay_report).to_dict()
+        except (TypeError, ValueError) as exc:
+            raise SystemExit(f"invalid synthetic replay report: {exc}") from exc
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.command == "btc-paper":
