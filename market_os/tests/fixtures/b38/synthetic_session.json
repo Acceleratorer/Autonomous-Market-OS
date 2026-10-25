@@ -1,0 +1,103 @@
+{
+  "events": [
+    {
+      "ask": 101.0,
+      "bid": 100.0,
+      "event_fingerprint": "fa2e1e8dc6b0c8bfbf094ccd6c6ac506e36cba62b02143867d998b1f00190ab1",
+      "event_id": "e1",
+      "event_time_ms": 1000,
+      "last": 100.5,
+      "schema": "market-os.b3-2.synthetic-market-event@v1",
+      "source_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "symbol": "BTCUSDT",
+      "synthetic_only": true,
+      "volume": 1.0
+    },
+    {
+      "ask": 103.0,
+      "bid": 102.0,
+      "event_fingerprint": "7bdf6e2ea27697dac510a098530deb1af15581bc0ec67ea6b0294843b5cffc88",
+      "event_id": "e2",
+      "event_time_ms": 2000,
+      "last": 102.5,
+      "schema": "market-os.b3-2.synthetic-market-event@v1",
+      "source_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "symbol": "BTCUSDT",
+      "synthetic_only": true,
+      "volume": 1.0
+    },
+    {
+      "ask": 100.0,
+      "bid": 99.0,
+      "event_fingerprint": "f2565c5ff071e8323026d75a51f5a1572003f8a8e6361fa9c39a6191c2fabbc4",
+      "event_id": "e3",
+      "event_time_ms": 3000,
+      "last": 99.5,
+      "schema": "market-os.b3-2.synthetic-market-event@v1",
+      "source_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "symbol": "BTCUSDT",
+      "synthetic_only": true,
+      "volume": 1.0
+    }
+  ],
+  "fingerprint": "60036b1d078d55dd11ec5285176bd3b4a2b1399947f023a4db2b50a537e1c102",
+  "interpretation": "synthetic session fixture only; no predictive evidence, profitability claim, or promotion approval",
+  "schema": "market-os.b3-8.synthetic-session-fixture@v1",
+  "signals": [
+    {
+      "event_id": "e1",
+      "signal": {
+        "event_time_ms": 1000,
+        "fingerprint": "9c59d5108b1f06a155d399afd975da7a0d00d2ef03d26bc4de6ba1cb420c45a2",
+        "horizon_ms": 300000,
+        "schema": "market-os.b3-4.normalized-numerical-signal@v1",
+        "signal_id": "s1",
+        "source_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "usable",
+        "symbol": "BTCUSDT",
+        "synthetic_only": true,
+        "value": 0.9,
+        "value_kind": "calibrated_probability"
+      }
+    },
+    {
+      "event_id": "e2",
+      "signal": {
+        "event_time_ms": 2000,
+        "fingerprint": "5bd43fa98b85b299b52a0f53aa67c84827a34c2b5c95242b9d79ccce442bd2f3",
+        "horizon_ms": 300000,
+        "schema": "market-os.b3-4.normalized-numerical-signal@v1",
+        "signal_id": "s2",
+        "source_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "status": "usable",
+        "symbol": "BTCUSDT",
+        "synthetic_only": true,
+        "value": 0.1,
+        "value_kind": "calibrated_probability"
+      }
+    }
+  ],
+  "strategy_config": {
+    "allocation_fraction": 0.5,
+    "buy_threshold": 0.55,
+    "fingerprint": "83c09a244181a46de5c25887fb507de932495513f6dc9852f2172397a81aaecc",
+    "freshness_window_ms": 300000,
+    "max_order_notional_usdt": 1000.0,
+    "schema": "market-os.b3-4.synthetic-strategy@v1",
+    "sell_threshold": 0.45,
+    "strategy_version": "v1"
+  },
+  "synthetic_only": true,
+  "venue_config": {
+    "fee_bps_per_side": 10.0,
+    "fingerprint": "1c25bc0ee5b0ea8e2b7a74994e5381e844097c309bfa17670d85d61b154bea64",
+    "initial_average_entry_price": 0.0,
+    "initial_btc_quantity": 0.0,
+    "initial_cash_usdt": 10000.0,
+    "max_order_notional_usdt": 1000.0,
+    "schema": "market-os.b3-2.virtual-paper-venue@v1",
+    "slippage_bps_per_side": 0.5,
+    "spread_bps_per_side": 1.0,
+    "venue_version": "v1"
+  }
+}

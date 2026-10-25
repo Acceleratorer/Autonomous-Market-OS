@@ -129,6 +129,9 @@ def build_parser() -> argparse.ArgumentParser:
     connectivity_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
     synthetic = commands.add_parser("synthetic")
     synthetic_commands = synthetic.add_subparsers(dest="synthetic_command", required=True)
+    synthetic_run = synthetic_commands.add_parser("run")
+    synthetic_run.add_argument("--fixture", required=True)
+    synthetic_run.add_argument("--output", required=True)
     synthetic_inspect = synthetic_commands.add_parser("inspect")
     synthetic_inspect.add_argument("--replay-report", required=True)
     synthetic_inspect.add_argument("--resource", choices=("replay", "accounting"), default="accounting")
@@ -162,6 +165,15 @@ def main(argv: list[str] | None = None) -> int:
         from pathlib import Path
         from .b35_strategy_replay import StrategyReplayReport
         from .b36_accounting import build_synthetic_accounting_report
+        from .b38_synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
+
+        if args.synthetic_command == "run":
+            try:
+                result = write_synthetic_session_run(run_synthetic_fixture(load_synthetic_fixture(args.fixture)), args.output)
+            except (OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic session failed: {exc}") from exc
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
 
         try:
             payload = json.loads(Path(args.replay_report).read_text(encoding="utf-8"))
