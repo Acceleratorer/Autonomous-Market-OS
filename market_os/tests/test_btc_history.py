@@ -530,12 +530,44 @@ def test_inspection_range_and_no_network_replay(tmp_path: Path) -> None:
     assert list(tmp_path.rglob("*")) == before
 
 
-def test_pre_closure_parquet_without_decimal_columns_remains_readable() -> None:
-    store = HistoryStore(".tmp-b3-inspect-history")
-    candles = store.inspect_candles("btc-history-49b70e7dcbfac660e863")
+def test_pre_closure_parquet_without_decimal_columns_remains_readable(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    store = HistoryStore(tmp_path)
+    ingested = store.ingest_fixture(fixture)
+    import hashlib
+    import pyarrow.parquet as pq
+    from market_os.btc_history import _canonical_from_parquet
+
+    dataset = store._dataset_row(ingested.dataset_revision)
+    parquet_path = store.root / dataset["parquet_path"]
+    table = pq.read_table(parquet_path).drop_columns(
+        ["open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal"]
+    )
+    pq.write_table(table, parquet_path)
+    rows = table.to_pylist()
+    canonical = hashlib.sha256(
+        json.dumps(
+            [
+                {
+                    key: row[key]
+                    for key in ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume")
+                }
+                for row in rows
+            ],
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    parquet_sha256 = hashlib.sha256(parquet_path.read_bytes()).hexdigest()
+    with store._connect() as db:
+        db.execute(
+            "UPDATE datasets SET canonical_fingerprint=?, parquet_sha256=? WHERE dataset_revision=?",
+            [canonical, parquet_sha256, ingested.dataset_revision],
+        )
+    candles = store.inspect_candles(ingested.dataset_revision)
     assert candles
     assert candles[0]["open_decimal"] is None
-    assert store.replay("btc-history-49b70e7dcbfac660e863")["replayed"] is True
+    assert store.replay(ingested.dataset_revision)["replayed"] is True
 
 
 def test_injected_acquisition_checkpoints_and_resumes_without_refetching_completed_pages(tmp_path: Path) -> None:
