@@ -39,6 +39,8 @@ jobs:
           market_os/tests/test_m2_openai_summary.py::test_default_selection_does_not_import_or_call_openai
       - name: Diff check
         run: git diff --check
+      - name: TypeScript dashboard contract test
+        run: npx --yes tsx tests/market-os-readonly-dashboard.test.ts
 
   package-readonly-dashboard:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
