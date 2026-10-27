@@ -127,6 +127,13 @@ def build_parser() -> argparse.ArgumentParser:
     connectivity_inspect.add_argument("probe_id")
     connectivity_inspect.add_argument("--resource", choices=("manifest", "result", "fingerprints", "replay"), default="manifest")
     connectivity_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    b4 = commands.add_parser("b4-paper")
+    b4_commands = b4.add_subparsers(dest="b4_command", required=True)
+    b4_inspect = b4_commands.add_parser("inspect")
+    b4_inspect.add_argument("portfolio_id")
+    b4_inspect.add_argument("--resource", choices=("summary", "snapshot", "orders", "fills", "ledger", "risk", "approvals", "fingerprints", "replay", "policy", "genesis"), default="summary")
+    b4_inspect.add_argument("--id", dest="item_id")
+    b4_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_B4_STORE_ROOT", ".market_os/b4-paper"))
     synthetic = commands.add_parser("synthetic")
     synthetic_commands = synthetic.add_subparsers(dest="synthetic_command", required=True)
     synthetic_run = synthetic_commands.add_parser("run")
@@ -139,6 +146,12 @@ def build_parser() -> argparse.ArgumentParser:
     synthetic_inspect = synthetic_commands.add_parser("inspect")
     synthetic_inspect.add_argument("--replay-report", required=True)
     synthetic_inspect.add_argument("--resource", choices=("replay", "accounting"), default="accounting")
+    synthetic_catalog = synthetic_commands.add_parser("catalog")
+    synthetic_catalog.add_argument("--store-root", required=True)
+    synthetic_compare = synthetic_commands.add_parser("compare")
+    synthetic_compare.add_argument("--store-root", required=True)
+    synthetic_compare.add_argument("--left", required=True)
+    synthetic_compare.add_argument("--right", required=True)
     return parser
 
 
@@ -165,10 +178,21 @@ def main(argv: list[str] | None = None) -> int:
             result = BenchmarkStore(args.store_root).inspect(args.benchmark_id, args.resource, args.item_id)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
+    if args.command == "b4-paper":
+        from .b41_broker import B41Broker
+
+        try:
+            result = B41Broker.open(args.store_root, args.portfolio_id).inspect_jsonable(args.resource, args.item_id)
+        except (KeyError, OSError, TypeError, ValueError) as exc:
+            raise SystemExit(f"B4 portfolio inspection failed: {exc}") from exc
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
     if args.command == "synthetic":
         from pathlib import Path
         from .b35_strategy_replay import StrategyReplayReport
         from .b36_accounting import build_synthetic_accounting_report
+        from .b311_synthetic_catalog import catalog_sessions, compare_sessions
+        from .b39_synthetic_api import SyntheticSessionStore
         from .b38_synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
         from .b310_synthetic_server import serve_synthetic
 
@@ -184,6 +208,20 @@ def main(argv: list[str] | None = None) -> int:
                 serve_synthetic(args.store_root, args.host, args.port)
             except (OSError, TypeError, ValueError) as exc:
                 raise SystemExit(f"synthetic server failed: {exc}") from exc
+            return 0
+        if args.synthetic_command == "catalog":
+            try:
+                result = catalog_sessions(SyntheticSessionStore(args.store_root))
+            except (KeyError, OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic catalog failed: {exc}") from exc
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
+        if args.synthetic_command == "compare":
+            try:
+                result = compare_sessions(SyntheticSessionStore(args.store_root), args.left, args.right)
+            except (KeyError, OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic comparison failed: {exc}") from exc
+            print(json.dumps(result, indent=2, sort_keys=True))
             return 0
 
         try:

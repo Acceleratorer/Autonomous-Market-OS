@@ -566,3 +566,217 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Offline verification recorded zero Binance requests, zero Jev requests, zero
   trades, and no authorization-record changes. U4/B4 and U5/B5 remain
   untouched.
+
+## 2026-10-25 — B3.10–B3.14 local synthetic surfaces and handoff state
+
+- Completed the local synthetic observability stack over the existing B3.8
+  session artifacts: B3.10 loopback-only read-only server, B3.11 catalog and
+  right-minus-left comparison, B3.12 HTML catalog/comparison views, B3.13
+  CLI catalog/comparison inspection, and B3.14 cross-surface acceptance tests.
+- The acceptance harness verifies CLI/HTTP JSON parity, HTML links and
+  fingerprints, no replay during inspection, no artifact mutation, tamper
+  rejection, query and POST rejection, path boundaries, and HTML escaping.
+  B3.14 passed 4 tests; the focused B3.8–B3.14 regression set passed 85 tests.
+- Added the project handoff source of truth in `docs/PROJECT-CONTEXT.md`.
+  It records the current milestone, product surface order, preserved safety
+  boundaries, verification snapshot, and the exact next gate.
+- B4.1 is a paper portfolio and virtual broker contract proposal only. Human
+  decisions remain required for portfolio identity and wallet, costs and
+  precision, matching and fills, risk limits, approval semantics,
+  persistence/recovery, concurrency, and inspection scope before broker code.
+- Verification passed: compileall, secret scan, and `git diff --check`.
+  `approved-policy.json` was absent and `company-projects` was absent at
+  read-only inspection. No provider, network, credential, real-data,
+  trading, commit, or push action occurred.
+
+## 2026-10-26 — B4.1 owner-decision worksheet and approval
+
+- Added `docs/B4.1-OWNER-DECISION-WORKSHEET.md` as the reviewable source of
+  truth for the eight unresolved B4.1 choices: portfolio identity and wallet;
+  costs and precision; matching and lifecycle; numeric risk limits; approvals;
+  ledger and recovery; sharing and concurrency; and read-only inspection.
+- The worksheet labels B3.2 behavior as reference-only proposals and records
+  owner approval of all recommended defaults for the eight B4.1 decisions.
+  Inventory, loss, drawdown, and enforcement-window values remain required
+  explicit configuration and fail closed when absent.
+- U4/B4.1 is now authorized for synthetic, paper-only implementation. No
+  provider, network, credential, real-data, trading, deployment, commit, or
+  push action is authorized by this approval.
+
+## 2026-10-26 — B4.1 persisted broker slice
+
+- Added `market_os/b41_broker.py` with the approved synthetic policy defaults,
+  portfolio genesis, Decimal accounting, full FIFO market/limit matching,
+  single-use owner approval binding, idempotent order/cancel commands,
+  required inventory/loss/drawdown configuration, append-only hash-chained
+  JSONL events, atomic checkpoints, deterministic recovery, and local writer
+  serialization.
+- Added read-only B4 portfolio inspection to `b4-paper inspect` and
+  `/v1/b4/portfolios/<portfolio_id>/<resource>`. No B4 mutation HTTP route,
+  provider path, or live venue path was added.
+- Focused B4.1 and B3.2 venue tests pass: 23 tests. Full regression and
+  repository checks remain the next verification step.
+
+## 2026-10-26 — B4.1 verification correction
+
+- The first full-suite verification was started without clearing the existing
+  `TYPESAFE_API_KEY` process environment. One pre-existing optional Jev
+  connectivity test therefore issued one external Jev request and recorded a
+  valid response with `request_count=1`; the credential value was not read,
+  printed, or persisted by this work. No Binance request was made.
+- The suite was rerun with `TYPESAFE_API_KEY` set to an empty value. That
+  offline run made no provider request and reached 424 passed, 5 pre-existing
+  optional LightRAG/Vibe runtime failures, and 1 skipped test. The B4.1/B3.2
+  focused set passed 24 tests.
+
+## 2026-10-26 — B4.2 ledger and recovery integrity
+
+- Added [B4.2-LEDGER-RECOVERY-INTEGRITY.md](B4.2-LEDGER-RECOVERY-INTEGRITY.md)
+  as the milestone scope and evidence pointer.
+- Hardened `B41Broker.recover()` to validate persisted result-snapshot
+  identity/fingerprints and checkpoint schema, sequence, identity, fingerprint,
+  and canonical equality with replayed state. A self-consistent byte edit now
+  fails closed when it disagrees with the recorded snapshot fingerprint.
+- Persisted `resulting_snapshot_fingerprint` on new ledger events and kept the
+  B4.1 append-only JSONL and atomic checkpoint format.
+- Enforced adverse-slippage limit checks so a triggered limit order stays open
+  when its slipped fill would cross the submitted limit price.
+- Added focused regression coverage for checkpoint spoofing, checkpoint
+  sequence mismatch, policy and portfolio identity conflicts, ledger
+  result-snapshot fingerprint mismatch, and both buy/sell limit slippage
+  boundaries. B4.1 broker tests pass 14 tests; broker plus B3.2 venue tests
+  pass 30 tests.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4 local-slice closeout review
+
+- Added [B4-LOCAL-SLICE-CLOSEOUT-REPORT.md](B4-LOCAL-SLICE-CLOSEOUT-REPORT.md)
+  after reviewing B4.1–B4.9, the focused test matrix, recovery behavior,
+  read-only surfaces, and the broader B4 contract.
+- B4.1–B4.9 hardening is complete for the synthetic, paper-only, isolated,
+  single-writer local boundary. Focused B4/B3.2 tests pass 45 tests; the
+  broader B4 plus synthetic-surface group passes 67 tests; the offline full
+  suite reaches 445 passed with five pre-existing optional LightRAG/Vibe
+  failures and one skip.
+- The review reproduced a real fill-time risk gap: an oversized market order
+  can remain open while its first matching event is rejected and rolled back,
+  leaving the market-event cursor unchanged. This needs an explicit policy and
+  audit transition before the broader B4 contract can close.
+- Partial fills/expiry, shared portfolio concurrency, mutation API, and
+  backup/retention/migration remain real unimplemented contract surfaces. U4/B4
+  stays paper-only local and is not marked complete; U5 may only proceed as a
+  read-only surface that preserves this boundary.
+
+## 2026-10-27 — B4.10 fill-time risk outcomes
+
+- Added [B4.10-FILL-TIME-RISK-OUTCOMES.md](B4.10-FILL-TIME-RISK-OUTCOMES.md).
+- Fixed the reproduced market-order gap: when computed fill notional violates
+  the approved minimum or maximum, the order becomes terminal `risk_rejected`,
+  the committed `market.processed` result records a stable reason code, and the
+  market-event cursor advances instead of rolling back the whole event.
+- Added recovery-equivalence coverage. B4.1–B4.10 remain synthetic,
+  paper-only, and local; lifecycle scope, shared concurrency, mutation API, and
+  backup/retention/migration remain open for the broader U4 exit gate.
+
+## 2026-10-27 — U5 local read-only operator dashboard
+
+- Added [U5-LOCAL-READONLY-DASHBOARD.md](U5-LOCAL-READONLY-DASHBOARD.md).
+- Added `GET /v1/b4/portfolios/<portfolio_id>/dashboard` to the existing local
+  API. It renders portfolio summary, orders, and risk outcomes from the B4
+  inspection seam, with HTML escaping and no mutation controls.
+- Added regression coverage for content type, escaped identifiers, absence of
+  forms, and POST rejection. This starts U5 locally only; deployment,
+  authentication, shared access, backup, retention, and migration remain open.
+
+## 2026-10-26 — B4.4 idempotency scope invariants
+
+- Added [B4.4-IDEMPOTENCY-SCOPE-INVARIANTS.md](B4.4-IDEMPOTENCY-SCOPE-INVARIANTS.md)
+  as the milestone scope and evidence pointer.
+- Scoped submit, cancel, and approval-revocation retry lookup to their ledger
+  event kinds. Same caller keys across different command types are independent;
+  same-type retries and conflicts remain deterministic.
+- Recovery now rejects duplicate `(event kind, idempotency key)` identities.
+- Added focused tests for cross-command key reuse and duplicate persisted
+  command identity. Broker plus B3.2 venue tests pass 33 tests.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-26 — B4.3 event identity invariants
+
+- Added [B4.3-EVENT-IDENTITY-INVARIANTS.md](B4.3-EVENT-IDENTITY-INVARIANTS.md)
+  as the milestone scope and evidence pointer.
+- `B41Broker.process_market_event()` now rejects a duplicate synthetic
+  `event_id` before changing state. Recovery rejects duplicate IDs in the
+  persisted event cursor.
+- Added a regression proving a later-timestamp retry leaves both snapshot and
+  ledger bytes unchanged. Broker plus B3.2 venue tests pass 31 tests.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4.5 malformed-ledger recovery
+
+- Added [B4.5-LEDGER-MALFORMED-TAIL.md](B4.5-LEDGER-MALFORMED-TAIL.md) as the
+  milestone scope and evidence pointer.
+- `B41Broker.recover()` now converts invalid UTF-8, invalid JSON, and non-object
+  ledger records into the stable `BrokerRejected("ledger record is malformed")`
+  failure. Recovery never repairs, truncates, or skips the malformed record.
+- Added regression coverage for a truncated JSON tail, invalid UTF-8, and a JSON
+  array appended to the ledger. The next step is broader B4 recovery and risk
+  semantics review; no owner choice is currently blocking this synthetic slice.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4.6 malformed persisted metadata recovery
+
+- Added [B4.6-MALFORMED-PERSISTED-METADATA.md](B4.6-MALFORMED-PERSISTED-METADATA.md)
+  as the milestone scope and evidence pointer.
+- Added one guarded JSON-object reader for persisted genesis, policy, and
+  checkpoint metadata. Invalid UTF-8, invalid JSON, and non-object metadata now
+  fail closed with stable `BrokerRejected` messages at open/recover seams.
+- Added regression coverage for malformed genesis, policy, and checkpoint
+  files. The next step is broader B4 recovery/risk semantics review; no owner
+  choice is currently blocking this synthetic slice.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4.7 malformed snapshot recovery
+
+- Added [B4.7-MALFORMED-SNAPSHOT-RECOVERY.md](B4.7-MALFORMED-SNAPSHOT-RECOVERY.md)
+  as the milestone scope and evidence pointer.
+- Guarded ledger snapshot restoration so malformed persisted order/fill records
+  fail closed with `BrokerRejected("ledger resulting snapshot is malformed")`.
+- Added regression coverage for malformed order and fill entries with
+  self-consistent fingerprints. The next step is broader B4 recovery/risk
+  semantics review; no owner choice is currently blocking this synthetic slice.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4.8 snapshot scalar validation
+
+- Added [B4.8-SNAPSHOT-SCALAR-VALIDATION.md](B4.8-SNAPSHOT-SCALAR-VALIDATION.md)
+  as the milestone scope and evidence pointer.
+- Recovery now validates persisted numeric snapshot fields, optional event time,
+  equity-history points, revoked approval IDs, and event cursor shapes before
+  restoring state.
+- Added regression coverage for malformed event time, cursor, and equity-history
+  values with self-consistent fingerprints. The B4 recovery-shape hardening
+  group is complete; the next work can move to risk/audit semantics or another
+  owner-approved B4 surface.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-27 — B4.9 risk and audit outcomes
+
+- Added [B4.9-RISK-AUDIT-OUTCOMES.md](B4.9-RISK-AUDIT-OUTCOMES.md) as the
+  milestone scope and evidence pointer.
+- Order risk, approval, timing, precision, and duplicate-order failures now
+  return stable `reason_code` values, append one `order.rejected` audit event,
+  and replay the original result for an identical submit retry.
+- Read-only `risk` inspection includes rejected order outcomes. No order, fill,
+  cash, inventory, or live path is created by a rejection.
+- The B4 recovery-shape and risk/audit hardening slices are complete; the next
+  step is a final B4 contract review before deciding whether U4/B4 local paper
+  implementation can be closed.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.

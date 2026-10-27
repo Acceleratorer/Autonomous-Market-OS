@@ -17,9 +17,10 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 | U0 — Foundation and ownership | M0–M1 | Product boundary, repository ownership, contracts, orchestration, persistence, recovery, and paper-only enforcement | Complete |
 | U1 — Research platform | M2, including M2.1–M2.9 | Cited research, retrieval, backtesting adapters, model boundary, quality gates, and offline CI | Built; M2.9 live smoke remains blocked and isolated |
 | U2 — Quantitative data foundation | B0–B1 | BTCUSDT closed-candle contracts, historical dataset storage, manifests, lineage, gaps, deduplication, deterministic replay, and source-readiness authorization | Complete offline; network authorization pending |
-| U3 — Quantitative evaluation | B2–B3; selected M5 controls; API connectivity | Deterministic features and labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded read-only provider connectivity | B2/B3/U3-API implemented offline; B3 not promoted |
-| U4 — Paper portfolio | M3 + B4 | Shared virtual broker, portfolio ledger, costs, fills, risk policy, approvals, and paper-only shadow mode | Planned |
-| U5 — Web operations | M4 web + B5 | Web deployment of the existing API with BTC data, experiment, report, and paper-portfolio views | Planned |
+| U3 — Quantitative evaluation | B2–B3; selected M5 controls; API connectivity | Deterministic features and labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded read-only provider connectivity | Implemented offline; B3 not promoted |
+| U3 synthetic surfaces | B3.8–B3.14 | Synthetic session artifacts, local API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
+| U4 — Paper portfolio | M3 + B4 | Shared virtual broker, portfolio ledger, costs, fills, risk policy, approvals, and paper-only shadow mode | B4.1–B4.10 local hardening complete; exit gate remains open for lifecycle scope, shared concurrency, mutation API, and backup/retention/migration |
+| U5 — Web operations | M4 web + B5 | Web deployment of the existing API with BTC data, experiment, report, and paper-portfolio views | Local GET-only B4 operator dashboard started; deployment/auth/backup gates remain open |
 | U6 — CLI and app surfaces | B6–B7 + M4 CLI/app | One versioned CLI and thin desktop/mobile shells using the shared API | Planned |
 | U7 — Evaluation and artifact products | M5 + selected M7 | Cost/quality reports, education, slides, media, and tool integrations that consume stable artifacts | Planned, selective |
 | U8 — Live readiness or permanent paper mode | M6 | A separate security, compliance, broker, reconciliation, and approval gate; paper mode may remain the permanent decision | Deferred; never automatic |
@@ -39,7 +40,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 - U0 is complete.
 - U1 is built through offline M2.8 preparation; M2.9 remains blocked by the missing approved credential and is not a dependency for BTC work.
 - U2 is complete offline with B1's network transport still disabled. The U3/B1 readiness gate defines a 30-day, 44-page proposal but does not authorize historical requests.
-- U3 includes deterministic B2/B3 evaluation and the bounded U3/API connectivity slice. B2/B3/U3-API are implemented offline; B3 is not promoted because the shipped fixture has no leakage-safe labels. U4/B4 and U5/B5 have not started.
+- U3 includes deterministic B2/B3 evaluation, the bounded U3/API connectivity slice, and the B3.8–B3.14 local synthetic surfaces. B2/B3/U3-API and the synthetic acceptance stack are implemented offline; B3 is not promoted because the shipped fixture has no leakage-safe labels. B4.1–B4.10 local hardening slices are implemented and reviewed; B4.10 closes the reproduced market-order fill-time risk gap. U4/B4 remains open for lifecycle scope, shared concurrency, mutation API, and backup/retention/migration. Keep U4/B4 paper-only local until its exit gate is resolved.
 
 ## Exit gates
 

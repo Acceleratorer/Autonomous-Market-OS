@@ -11,3 +11,5 @@ build/
 .env
 .env.*
 !.env.example
+# Original HKUDS repositories stay independent Git projects.
+/company-projects/

@@ -60,6 +60,39 @@ def make_handler(
             self.end_headers()
             self.wfile.write(raw)
 
+        @staticmethod
+        def _b4_cell(value: Any) -> str:
+            import html
+
+            return html.escape(str(value), quote=True)
+
+        def _b4_dashboard(self, broker: Any) -> str:
+            snapshot = broker.snapshot()
+            summary = broker.inspect("summary")
+            risk = broker.inspect("risk")["records"]
+            orders = snapshot["orders"]
+            rows = "".join(
+                "<tr>"
+                + "".join(f"<td>{self._b4_cell(order.get(key))}</td>" for key in ("order_id", "side", "order_type", "quantity", "state"))
+                + "</tr>"
+                for order in orders
+            )
+            risk_rows = "".join(
+                f"<li>{self._b4_cell(record.get('kind'))}: {self._b4_cell(record.get('result', {}).get('reason_code') or record.get('result', {}).get('risk_rejections', [{}])[0].get('reason_code', ''))}</li>"
+                for record in risk
+            )
+            return (
+                "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                "<title>Market OS paper portfolio</title></head><body><main>"
+                "<h1>Market OS paper portfolio</h1><p>synthetic-only · paper-only · read-only</p>"
+                f"<p>Portfolio: {self._b4_cell(summary['portfolio_id'])}</p>"
+                f"<p>Cash USDT: {self._b4_cell(summary['cash_usdt'])} · BTC: {self._b4_cell(summary['btc_quantity'])} · Mark: {self._b4_cell(summary['mark_price'])}</p>"
+                f"<p>Events: {self._b4_cell(len(summary['event_cursor']))}</p>"
+                "<h2>Orders</h2><table><thead><tr><th>Order</th><th>Side</th><th>Type</th><th>Quantity</th><th>State</th></tr></thead>"
+                f"<tbody>{rows}</tbody></table><h2>Risk outcomes</h2><ul>{risk_rows}</ul></main></body></html>"
+            )
+
         def do_POST(self) -> None:  # noqa: N802
             if self.path == "/v1/btc/history/ingest":
                 status = 500
@@ -200,6 +233,40 @@ def make_handler(
             if self.path == "/readyz":
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
+                return
+            b4_prefix = "/v1/b4/portfolios/"
+            if urllib.parse.urlsplit(self.path).path.startswith(b4_prefix):
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    parts = parsed.path[len(b4_prefix):].split("/")
+                    if len(parts) not in (1, 2) or not parts[0]:
+                        raise KeyError("B4 portfolio resource")
+                    resource = parts[1] if len(parts) == 2 else "summary"
+                    query = urllib.parse.parse_qs(parsed.query, strict_parsing=True)
+                    if set(query) - {"id"} or any(len(values) != 1 for values in query.values()):
+                        raise ValueError("unsupported B4 inspection query")
+                    from .b41_broker import B41Broker
+
+                    broker = B41Broker.open(workflow.store.root / "b4-paper", parts[0])
+                    if resource == "dashboard":
+                        if query:
+                            raise ValueError("dashboard does not accept query parameters")
+                        self._send_html(200, self._b4_dashboard(broker))
+                    else:
+                        result = broker.inspect_jsonable(resource, query.get("id", [None])[0])
+                        self._send(200, result)
+                except KeyError:
+                    status = 404
+                    error_type = "KeyError"
+                    self._send(404, {"error": "B4 portfolio or resource not found", "api_version": "market-os.b4-1.paper-broker@v1"})
+                except (OSError, TypeError, ValueError) as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "b4_inspection_error", "message": str(exc), "api_version": "market-os.b4-1.paper-broker@v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
                 return
             if urllib.parse.urlsplit(self.path).path == "/v1/btc/history/readiness":
                 status = 200

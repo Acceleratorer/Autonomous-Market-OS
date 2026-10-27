@@ -1,5 +1,32 @@
 # Autonomous Market OS
 
+## Workspace layout
+
+This repository is the separate fusion project. The original HKUDS repositories live under `company-projects/` and remain independent Git repositories with their own histories, branches, dependencies, and working changes.
+
+```text
+HKUDS/
+├── company-projects/        # Original repositories; do not merge into this Git history
+│   ├── AI-Trader/
+│   ├── ClawWork/
+│   ├── CLI-Anything/
+│   ├── DeepCode/
+│   ├── DeepTutor/
+│   ├── LightRAG/
+│   ├── MiniRAG/
+│   ├── nanobot/
+│   ├── OpenHarness/
+│   ├── Paper2Slides/
+│   ├── RAG-Anything/
+│   ├── Vibe-Trading/
+│   └── ViMax/
+├── market_os/               # Fusion product implementation
+├── docs/                    # Fusion plans, decisions, and evidence
+└── pyproject.toml
+```
+
+The fusion project consumes the original repositories through adapters and documented contracts. It does not own their source trees.
+
 This is a personal project for market research, reproducible backtesting, paper trading, and later controlled execution.
 
 This repository owns the shared contracts, workflow orchestration boundary, persistence model, CLI, and service API. The source projects remain independent repositories and are connected through narrow adapters:
