@@ -1,0 +1,10 @@
+Market OS static preview
+
+Target: public_html/market-os/
+This artifact is static HTML only. It contains no Python app, portfolio state,
+API endpoints, user data, credentials, or mutation controls. The local Python
+API and paper broker are not deployed or exposed by this slice.
+
+GitHub Actions packages the same files as the market-os-readonly-dashboard
+artifact on each successful push to main. Upload the artifact folder contents
+to DirectAdmin's public_html/market-os/ path to update the URL.

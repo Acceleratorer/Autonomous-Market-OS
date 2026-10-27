@@ -39,3 +39,24 @@ jobs:
           market_os/tests/test_m2_openai_summary.py::test_default_selection_does_not_import_or_call_openai
       - name: Diff check
         run: git diff --check
+
+  package-readonly-dashboard:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: offline-tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage paper-only read-only dashboard
+        run: |
+          mkdir -p site/market-os
+          cp docs/hosting/market-os/index.html site/market-os/index.html
+          cp docs/hosting/market-os/.htaccess site/market-os/.htaccess
+          cp docs/hosting/market-os/DEPLOYMENT.txt site/market-os/DEPLOYMENT.txt
+      - name: Upload dashboard artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-os-readonly-dashboard
+          path: site/market-os
+          if-no-files-found: error
