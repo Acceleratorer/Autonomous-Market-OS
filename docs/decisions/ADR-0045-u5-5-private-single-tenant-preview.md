@@ -42,3 +42,11 @@ and mutation remain outside this decision. The proposed single-tenant storage
 and authorization boundary is captured in
 [`U5.5 connected web options`](../research/u5-5-connected-web-options-2026-10-29.md)
 and requires review against the chosen target before implementation.
+
+## Owner clarification (2026-10-29)
+
+Keep the Next.js operator loopback-only for now. DirectAdmin deployment is
+limited to the disconnected static preview selected in
+[ADR-0046](ADR-0046-directadmin-static-market-os-deployment.md). Revisit
+Tailscale Serve or Cloudflare Tunnel only after the hosting runtime, identity,
+authorization, and portfolio isolation are defined.

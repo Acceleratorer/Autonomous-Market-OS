@@ -688,6 +688,26 @@ def test_fixture_ingest_cli_and_api_inspection_are_read_only(tmp_path: Path, cap
     finally:
         server.shutdown()
         thread.join(timeout=2)
+
+
+def test_history_api_missing_store_read_does_not_create_files(tmp_path: Path) -> None:
+    missing_root = tmp_path / "missing-history"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(tmp_path / "workflow"))))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        url = (
+            f"http://127.0.0.1:{server.server_port}/v1/btc/history/btc-history-missing/manifest"
+            f"?store_root={urllib.parse.quote(str(missing_root))}"
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(url, timeout=2)
+        assert response.value.code == 404
+        assert not missing_root.exists()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
 def test_historical_readiness_cli_and_api_are_offline_and_block_ingest(tmp_path: Path, capsys) -> None:
     from market_os.cli import main
 

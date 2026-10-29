@@ -18,7 +18,7 @@ class MigrationRejected(ValueError):
 def preflight_portfolio(store_root: str | Path, portfolio_id: str) -> dict[str, Any]:
     """Classify one portfolio without changing any persisted bytes."""
     try:
-        broker = B41Broker.open(store_root, portfolio_id)
+        broker = B41Broker.open(store_root, portfolio_id, read_only=True)
     except (BrokerRejected, OSError, TypeError, ValueError) as exc:
         raise MigrationRejected("portfolio schema is unsupported or recovery failed") from exc
     return {

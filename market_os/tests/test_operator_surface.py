@@ -409,6 +409,29 @@ def test_portfolio_catalog_pages_are_bounded_and_exclusive(tmp_path: Path) -> No
         thread.join(timeout=2)
 
 
+def test_portfolio_catalog_does_not_provision_a_missing_writer_lock(tmp_path: Path) -> None:
+    workflow_root = tmp_path / "workflow"
+    portfolio_root = workflow_root / "b4-paper"
+    portfolio = genesis()
+    broker = B41Broker(portfolio_root, portfolio, policy())
+    lock_path = broker.lock_path
+    lock_path.unlink()
+    persisted_files = {path.name: path.read_bytes() for path in broker.root.iterdir() if path.is_file()}
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(workflow_root))))
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        payload = json.loads(urlopen(f"http://127.0.0.1:{server.server_port}/v1/b4/portfolios?limit=100", timeout=2).read())
+        assert payload["portfolios"] == []
+        assert payload["page"]["skipped_count"] == 1
+        assert not lock_path.exists()
+        assert {path.name: path.read_bytes() for path in broker.root.iterdir() if path.is_file()} == persisted_files
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
 def test_btc_dataset_catalog_is_bounded_read_only_and_does_not_initialize_empty_store(tmp_path: Path) -> None:
     workflow_root = tmp_path / "workflow"
     history_root = workflow_root / "btc-history"

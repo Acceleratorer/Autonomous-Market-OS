@@ -1337,3 +1337,28 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Commit `a10d594` pushed the U5.23 closeout. CI offline tests and security/package
   checks passed; the static preview artifact build passed. Production deployment
   was skipped after DirectAdmin secret validation failed, so no deployment ran.
+
+## 2026-10-29 — U5.5 access deferral and static preview deployment
+
+- The owner confirmed that the Next.js operator stays loopback-only. Revisit
+  Tailscale Serve or Cloudflare Tunnel after the hosting runtime, identity,
+  authorization, and portfolio isolation are defined. DirectAdmin applies only
+  to the disconnected static preview (see ADR-0045 and ADR-0046).
+- Workflow run
+  [40853177838](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40853177838)
+  passed the static contract, source parity, and artifact build/upload. It then
+  failed validation because the DirectAdmin Actions secrets were unavailable;
+  the deployment step was skipped, so no site files changed.
+- Deployment is deferred while local milestones are closed. The workflow now
+  requires manual dispatch on `main`; pushes do not deploy. Secret values must
+  stay out of source, logs, and chat.
+
+## 2026-10-29 — Local-first exit gate audit
+
+- Read `docs/PROJECT-CONTEXT.md` first and continued from the active U5.23/local boundary.
+- Preserved the existing uncommitted code, documents, scratch directories, Playwright artifacts, and output files.
+- Verified the current local fixes for bounded POST bodies, same-origin browser POSTs, non-creating read-only BTC stores, explicit B2/B3 insufficient-sample outcomes, and non-mutating portfolio inspection locks.
+- Full verification passed: 546 tests passed, 0 failed, 7 skipped with provider credentials cleared; compileall, `pip check`, Next.js typecheck/build, the TypeScript static contract, artifact parity, secret scan, M2.8 and evidence validation, and `git diff --check` passed. `npm ci` reported zero vulnerabilities.
+- Added `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json` as the current local completion record.
+- Final security review found no actionable defects in the new read-only CLI/store paths, B4.1 inspection locks, or bounded POST handling. No DirectAdmin deployment was run; push cannot publish the static preview.
+- Connected web, public deployment, authenticated mutation, partial-fill/expiry expansion, retention deletion, schema transformation, distributed ownership, providers, credentials, and live trading remain deferred gates.

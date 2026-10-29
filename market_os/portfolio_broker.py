@@ -158,10 +158,13 @@ def _is_reparse_point(path: Path) -> bool:
     )
 
 
-def _open_lock_file(path: Path):
+def _open_lock_file(path: Path, *, create: bool = True):
     """Open the local writer lock without following a link at its leaf."""
-    path.parent.mkdir(parents=True, exist_ok=True)
+    if create:
+        path.parent.mkdir(parents=True, exist_ok=True)
     parent = path.parent
+    if not create and not parent.is_dir():
+        raise FileNotFoundError(path)
     if _is_reparse_point(parent) or parent.resolve(strict=True) != parent:
         raise BrokerRejected("portfolio lock directory must remain inside its store")
 
@@ -171,22 +174,32 @@ def _open_lock_file(path: Path):
         if os.name != "nt" and os.open in getattr(os, "supports_dir_fd", set()):
             parent_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
             parent_fd = os.open(parent, parent_flags)
-            try:
-                descriptor = os.open(path.name, flags | os.O_CREAT | os.O_EXCL, 0o600, dir_fd=parent_fd)
-            except (FileExistsError, FileNotFoundError):
+            if create:
+                try:
+                    descriptor = os.open(path.name, flags | os.O_CREAT | os.O_EXCL, 0o600, dir_fd=parent_fd)
+                except (FileExistsError, FileNotFoundError):
+                    if _is_reparse_point(path):
+                        raise BrokerRejected("portfolio lock file must be local to its store")
+                    if not path.exists():
+                        raise
+                    descriptor = os.open(path.name, flags, dir_fd=parent_fd)
+            else:
                 if _is_reparse_point(path):
                     raise BrokerRejected("portfolio lock file must be local to its store")
-                if not path.exists():
-                    raise
                 descriptor = os.open(path.name, flags, dir_fd=parent_fd)
         else:
-            try:
-                descriptor = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o600)
-            except (FileExistsError, FileNotFoundError):
+            if create:
+                try:
+                    descriptor = os.open(path, flags | os.O_CREAT | os.O_EXCL, 0o600)
+                except (FileExistsError, FileNotFoundError):
+                    if _is_reparse_point(path):
+                        raise BrokerRejected("portfolio lock file must be local to its store")
+                    if not path.exists():
+                        raise
+                    descriptor = os.open(path, flags)
+            else:
                 if _is_reparse_point(path):
                     raise BrokerRejected("portfolio lock file must be local to its store")
-                if not path.exists():
-                    raise
                 descriptor = os.open(path, flags)
 
         try:
@@ -250,18 +263,13 @@ def _restore_snapshot_or_reject(broker: "B41Broker", snapshot: Mapping[str, Any]
 
 
 @contextmanager
-def _process_lock(path: Path):
+def _process_lock(path: Path, *, create: bool = True):
     """Lock one portfolio across threads and local processes."""
     # ponytail: serialize each local portfolio; use a transactional store if distributed writers are required.
-    with _open_lock_file(path) as handle:
+    with _open_lock_file(path, create=create) as handle:
         if os.name == "nt":
             import msvcrt
 
-            handle.seek(0)
-            if handle.read(1) == b"":
-                handle.seek(0)
-                handle.write(b"0")
-                handle.flush()
             handle.seek(0)
             msvcrt.locking(handle.fileno(), msvcrt.LK_LOCK, 1)
             try:
@@ -282,7 +290,9 @@ def _process_lock(path: Path):
 def _portfolio_write(method):
     @wraps(method)
     def guarded(self, *args, **kwargs):
-        with self._lock, _process_lock(self.lock_path):
+        if getattr(self, "read_only", False):
+            raise BrokerRejected("portfolio is read-only")
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before writing")
             return method(self, *args, **kwargs)
@@ -522,6 +532,7 @@ class B41Approval:
 class B41Broker:
     def __init__(self, root: str | Path, genesis: B41Genesis, policy: B41Policy) -> None:
         directory = Path(root).resolve() / genesis.portfolio_id
+        self.read_only = False
         with _LOCKS_GUARD:
             lock = _LOCKS.setdefault(str(directory), threading.RLock())
         with lock, _process_lock(directory / ".writer.lock"):
@@ -643,6 +654,7 @@ class B41Broker:
         broker.ledger_path = directory / "ledger.jsonl"
         broker.checkpoint_path = directory / "checkpoint.json"
         broker.lock_path = directory / ".writer.lock"
+        broker.read_only = False
         with _LOCKS_GUARD:
             broker._lock = _LOCKS.setdefault(str(directory), threading.RLock())
         broker._orders = []
@@ -732,7 +744,7 @@ class B41Broker:
         return broker
 
     @classmethod
-    def open(cls, root: str | Path, portfolio_id: str) -> "B41Broker":
+    def open(cls, root: str | Path, portfolio_id: str, *, read_only: bool = False) -> "B41Broker":
         _identifier(portfolio_id, "portfolio_id")
         store_root, directory = cls._store_directory(root, portfolio_id)
         policy_path = directory / "policy.json"
@@ -744,18 +756,23 @@ class B41Broker:
             raise BrokerRejected("portfolio policy must remain inside its store")
         with _LOCKS_GUARD:
             lock = _LOCKS.setdefault(str(directory), threading.RLock())
-        with lock, _process_lock(directory / ".writer.lock"):
+        with lock, _process_lock(directory / ".writer.lock", create=not read_only):
             policy_path = directory / "policy.json"
             if _is_reparse_point(policy_path) or not policy_path.is_file():
                 raise BrokerRejected("missing portfolio policy")
             if policy_path.resolve(strict=True).parent != directory:
                 raise BrokerRejected("portfolio policy must remain inside its store")
-            return cls._recover_locked(
+            broker = cls._recover_locked(
                 store_root,
                 portfolio_id,
                 B41Policy.from_dict(_read_json_object(policy_path, "policy")),
                 portfolio_directory=directory,
             )
+            broker.read_only = read_only
+            return broker
+
+    def _process_guard(self):
+        return _process_lock(self.lock_path, create=not self.read_only)
 
     @property
     def open_orders(self) -> tuple[B41Order, ...]:
@@ -806,7 +823,7 @@ class B41Broker:
 
     def export_backup_files(self) -> dict[str, bytes]:
         """Read a consistent, validated copy of the persisted portfolio files."""
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before backup")
             return {
@@ -821,7 +838,7 @@ class B41Broker:
             }
 
     def inspect(self, resource: str, item_id: str | None = None) -> dict[str, Any]:
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             return self._inspect_locked(resource, item_id)
@@ -867,7 +884,7 @@ class B41Broker:
         return snapshot
 
     def inspect_summary_compact(self) -> dict[str, Any]:
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerStale("stale portfolio snapshot; reload before inspection")
             return {
@@ -885,7 +902,7 @@ class B41Broker:
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 100:
             raise ValueError("equity history page limit must be an integer between 1 and 100")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerStale("stale portfolio snapshot; reload before inspection")
             selected = self._equity_history[-limit:]
@@ -911,7 +928,7 @@ class B41Broker:
             }
 
     def inspect_genesis_compact(self) -> dict[str, Any]:
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerStale("stale portfolio snapshot; reload before inspection")
             return json.loads(_canonical(self.genesis.to_dict(include_member_strategy_ids=False)))
@@ -925,7 +942,7 @@ class B41Broker:
         ):
             raise ValueError("member page cursor must be a stable strategy ID")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             strategy_ids = self.genesis.member_strategy_ids or (self.genesis.strategy_id,)
@@ -961,7 +978,7 @@ class B41Broker:
         ):
             raise ValueError("reservation page cursor must be a bounded order ID")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             recent: deque[dict[str, str]] = deque(maxlen=limit + 1)
@@ -1026,7 +1043,7 @@ class B41Broker:
         ):
             raise ValueError("order page cursor must be a bounded order ID")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             end = len(self._orders)
@@ -1078,7 +1095,7 @@ class B41Broker:
         ):
             raise ValueError("risk page cursor must be a positive integer")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             recent: deque[dict[str, Any]] = deque(maxlen=limit + 1)
             cursor_found = before_sequence is None
             ledger_head = "0" * 64
@@ -1155,7 +1172,7 @@ class B41Broker:
         ):
             raise ValueError("event page item ID must be a bounded non-empty string")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             recent: deque[dict[str, Any]] = deque(maxlen=limit + 1)
             cursor_found = before_sequence is None
             total_count = 0
@@ -1219,7 +1236,7 @@ class B41Broker:
         ):
             raise ValueError("fill page cursor must be a bounded fill ID")
 
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             end = len(self._fills)
@@ -1253,7 +1270,7 @@ class B41Broker:
             raise ValueError("item inspection supports orders or fills")
         if not isinstance(item_id, str) or not item_id or len(item_id) > 160 or any(ord(character) < 32 for character in item_id):
             raise ValueError("item ID must be a bounded non-empty string")
-        with self._lock, _process_lock(self.lock_path):
+        with self._lock, self._process_guard():
             if self._ledger_head() != self._last_ledger_fingerprint:
                 raise BrokerRejected("stale portfolio snapshot; reload before inspection")
             if resource == "orders":

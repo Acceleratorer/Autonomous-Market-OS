@@ -195,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
 
         try:
             if args.b4_command == "inspect":
-                result = B41Broker.open(args.store_root, args.portfolio_id).inspect_jsonable(args.resource, args.item_id)
+                result = B41Broker.open(args.store_root, args.portfolio_id, read_only=True).inspect_jsonable(args.resource, args.item_id)
             elif args.b4_command == "backup":
                 result = {"archive": str(backup_portfolio(args.store_root, args.portfolio_id, args.archive))}
             elif args.b4_command == "restore":
@@ -317,9 +317,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.btc_command == "b2":
             from .btc_features import B2Config, B2Store, run_b2
 
-            b2_store = B2Store(args.store_root)
+            b2_store = B2Store(args.store_root, read_only=args.b2_command == "inspect")
             if args.b2_command == "run":
-                history = HistoryStore(args.history_store_root)
+                history = HistoryStore(args.history_store_root, read_only=True)
                 result = run_b2(history, args.dataset_revision, b2_store, B2Config(args.experiment_id))
             else:
                 result = b2_store.inspect(args.run_id, args.resource, args.item_id)
@@ -328,9 +328,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.btc_command == "b3":
             from .btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
 
-            b3_store = B3Store(args.store_root)
+            b3_store = B3Store(args.store_root, read_only=args.b3_command == "inspect")
             if args.b3_command == "run":
-                history = HistoryStore(args.history_store_root)
+                history = HistoryStore(args.history_store_root, read_only=True)
                 result = run_b3(history, args.dataset_revision, RecordedJevAdapter.from_path(args.fixture), b3_store, experiment_id=args.experiment_id)
             else:
                 result = b3_store.inspect(args.run_id, args.resource, args.item_id)
@@ -346,7 +346,7 @@ def main(argv: list[str] | None = None) -> int:
                 jev_probe,
                 offline_probe,
             )
-            store = ConnectivityStore(args.store_root)
+            store = ConnectivityStore(args.store_root, read_only=args.connectivity_command == "inspect")
             fixture_root = Path(__file__).parent / "tests" / "fixtures" / "btc_connectivity"
             if args.connectivity_command == "offline":
                 result = offline_probe(FixtureConnectivityAdapter.from_paths(fixture_root / "ticker.json", fixture_root / "klines.json", fixture_root / "jev_response.json"))
@@ -373,7 +373,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
             return 0
-        store = HistoryStore(args.store_root)
+        store = HistoryStore(args.store_root, read_only=True)
         resource = args.resource
         if resource == "manifest":
             result = store.inspect_manifest(args.dataset_id)

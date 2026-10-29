@@ -20,6 +20,8 @@ from .workflow import MarketWorkflow
 
 
 OPERATOR_ROOT = Path(__file__).resolve().parents[1] / "apps" / "web" / "operator"
+MAX_POST_BODY_BYTES = 1_048_576
+MAX_HISTORY_INGEST_BODY_BYTES = 32_768_000
 
 
 class _B4QueryError(ValueError):
@@ -48,6 +50,16 @@ class _BtcManifestRecordsQueryError(ValueError):
 
 class _BtcResearchQueryError(ValueError):
     """A malformed bounded BTC research-run query."""
+
+
+class _PostBodyError(ValueError):
+    """A malformed or oversized local API request body."""
+
+    def __init__(self, status: int, code: str, message: str) -> None:
+        super().__init__(message)
+        self.status = status
+        self.code = code
+        self.message = message
 
 
 def _parse_page_limit(query: dict[str, list[str]], name: str, default: str = "25") -> int:
@@ -404,6 +416,69 @@ def make_handler(
             self._audit(403, error_type="UntrustedHost")
             return True
 
+        def _reject_cross_origin_post(self) -> bool:
+            fetch_site = self.headers.get("Sec-Fetch-Site")
+            if fetch_site is not None and fetch_site.lower() != "same-origin":
+                self._send(403, {"error": "same-origin POST required", "api_version": "market-os.v1"})
+                self._audit(403, error_type="CrossOriginPost")
+                return True
+
+            origin = self.headers.get("Origin")
+            if origin is None:
+                return False
+
+            try:
+                parsed_origin = urllib.parse.urlsplit(origin)
+                parsed_host = urllib.parse.urlsplit(f"//{self.headers.get('Host', '')}")
+                origin_port = parsed_origin.port
+                if origin_port is None:
+                    origin_port = 80 if parsed_origin.scheme.lower() == "http" else 443
+                host_port = parsed_host.port if parsed_host.port is not None else 80
+                trusted = (
+                    parsed_origin.scheme.lower() == "http"
+                    and parsed_origin.hostname is not None
+                    and parsed_host.hostname is not None
+                    and parsed_origin.hostname.lower() == parsed_host.hostname.lower()
+                    and origin_port == host_port
+                    and parsed_origin.username is None
+                    and parsed_origin.password is None
+                    and not parsed_origin.path
+                    and not parsed_origin.query
+                    and not parsed_origin.fragment
+                )
+            except ValueError:
+                trusted = False
+            if trusted:
+                return False
+            self._send(403, {"error": "same-origin POST required", "api_version": "market-os.v1"})
+            self._audit(403, error_type="CrossOriginPost")
+            return True
+
+        def _read_json_object(self, max_bytes: int = MAX_POST_BODY_BYTES) -> dict[str, Any]:
+            if self.headers.get("Transfer-Encoding") is not None:
+                raise _PostBodyError(400, "invalid_request_body", "transfer-encoded request bodies are not supported")
+            lengths = self.headers.get_all("Content-Length", [])
+            if (
+                len(lengths) != 1
+                or not lengths[0].isascii()
+                or not lengths[0].isdecimal()
+                or len(lengths[0]) > 10
+            ):
+                raise _PostBodyError(400, "invalid_request_body", "a single non-negative Content-Length is required")
+            size = int(lengths[0])
+            if size > max_bytes:
+                raise _PostBodyError(413, "payload_too_large", "request body exceeds the local API limit")
+            raw = self.rfile.read(size)
+            if len(raw) != size:
+                raise _PostBodyError(400, "invalid_request_body", "request body is incomplete")
+            try:
+                value = json.loads(raw)
+            except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
+                raise _PostBodyError(400, "invalid_request_body", "request body must be a JSON object") from exc
+            if not isinstance(value, dict):
+                raise _PostBodyError(400, "invalid_request_body", "request body must be a JSON object")
+            return value
+
         def _audit(self, status: int, *, run_id: str | None = None, error_type: str | None = None) -> None:
             if service_log_path is None:
                 return
@@ -607,7 +682,7 @@ def make_handler(
                 ):
                     raise _B4QueryError("after_portfolio_id is not in this portfolio catalog")
                 try:
-                    cursor_broker = B41Broker.open(root, after_portfolio_id)
+                    cursor_broker = B41Broker.open(root, after_portfolio_id, read_only=True)
                     cursor_broker.inspect_summary_compact()
                 except BrokerStale as exc:
                     raise _B4CatalogConflict("portfolio state changed during catalog inspection; retry") from exc
@@ -627,7 +702,7 @@ def make_handler(
             skipped_count = 0
             for directory in directories:
                 try:
-                    broker = B41Broker.open(root, directory.name)
+                    broker = B41Broker.open(root, directory.name, read_only=True)
                     genesis = broker.genesis
                     summary = broker.inspect_summary_compact()
                     if len(portfolios) == limit:
@@ -655,13 +730,34 @@ def make_handler(
             }}
 
         def do_POST(self) -> None:  # noqa: N802
+            # Rejected POSTs may leave request bytes unread. Do not let the
+            # HTTP server reuse that connection for another parsed request.
+            self.close_connection = True
             if self._reject_untrusted_host():
+                return
+            post_routes = {
+                "/v1/btc/history/ingest",
+                "/v1/btc/b2/runs",
+                "/v1/btc/b3/runs",
+                "/v1/benchmarks",
+                "/v1/tasks",
+            }
+            if self.path not in post_routes:
+                self._send(404, {"error": "not found"})
+                self._audit(404)
+                return
+            if self._reject_cross_origin_post():
+                return
+            try:
+                max_bytes = MAX_HISTORY_INGEST_BODY_BYTES if self.path == "/v1/btc/history/ingest" else MAX_POST_BODY_BYTES
+                body = self._read_json_object(max_bytes)
+            except _PostBodyError as exc:
+                self._send(exc.status, {"error": {"code": exc.code, "message": exc.message, "api_version": "market-os.v1"}})
+                self._audit(exc.status, error_type=type(exc).__name__)
                 return
             if self.path == "/v1/btc/history/ingest":
                 status = 500
                 try:
-                    size = int(self.headers.get("Content-Length", "0"))
-                    body = json.loads(self.rfile.read(size))
                     from .btc_history import HistoryStore
 
                     result = HistoryStore(body["store_root"]).ingest_fixture(body["fixture"])
@@ -678,13 +774,11 @@ def make_handler(
             if self.path == "/v1/btc/b2/runs":
                 status = 500
                 try:
-                    size = int(self.headers.get("Content-Length", "0"))
-                    body = json.loads(self.rfile.read(size))
                     from .btc_features import B2Config, B2Store, run_b2
                     from .btc_history import HistoryStore
 
                     result = run_b2(
-                        HistoryStore(body["history_store_root"]),
+                        HistoryStore(body["history_store_root"], read_only=True),
                         body["dataset_revision"],
                         B2Store(body.get("store_root", str(workflow.store.root / "btc-b2"))),
                         B2Config(body.get("experiment_id", "btc-b2-offline"), body.get("as_of")),
@@ -702,13 +796,11 @@ def make_handler(
             if self.path == "/v1/btc/b3/runs":
                 status = 500
                 try:
-                    size = int(self.headers.get("Content-Length", "0"))
-                    body = json.loads(self.rfile.read(size))
                     from .btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
                     from .btc_history import HistoryStore
 
                     result = run_b3(
-                        HistoryStore(body["history_store_root"]),
+                        HistoryStore(body["history_store_root"], read_only=True),
                         body["dataset_revision"],
                         RecordedJevAdapter.from_path(body["fixture"]),
                         B3Store(body.get("store_root", str(workflow.store.root / "btc-b3"))),
@@ -727,8 +819,6 @@ def make_handler(
             if self.path == "/v1/benchmarks":
                 status = 500
                 try:
-                    size = int(self.headers.get("Content-Length", "0"))
-                    body = json.loads(self.rfile.read(size))
                     from .quality_benchmark import run_quality_benchmark
 
                     result = run_quality_benchmark(workflow.store.root, body.get("fixture"))
@@ -742,16 +832,10 @@ def make_handler(
                 finally:
                     self._audit(status)
                 return
-            if self.path != "/v1/tasks":
-                self._send(404, {"error": "not found"})
-                self._audit(404)
-                return
             status = 500
             run_id = None
             error_type = None
             try:
-                size = int(self.headers.get("Content-Length", "0"))
-                body = json.loads(self.rfile.read(size))
                 selected = workflow
                 if body.get("provider") or body.get("backtest_provider") or body.get("summary_provider"):
                     from .provider_selection import selected_workflow
@@ -881,7 +965,7 @@ def make_handler(
                         legacy_limit, legacy_cursor, legacy_item_id = _legacy_resource_page_query(query, resource)
                     from .portfolio_broker import B41Broker, InspectionCursorError
 
-                    broker = B41Broker.open(workflow.store.root / "b4-paper", parts[0])
+                    broker = B41Broker.open(workflow.store.root / "b4-paper", parts[0], read_only=True)
                     if resource == "inspection":
                         try:
                             orders = broker.inspect_orders_page(order_limit, order_before_id)
@@ -1218,7 +1302,10 @@ def make_handler(
                     from .btc_history import HistoryStore
 
                     query = urllib.parse.parse_qs(parsed.query)
-                    store = HistoryStore(query.get("store_root", [str(workflow.store.root / "btc-history")])[0])
+                    store_root = Path(query.get("store_root", [str(workflow.store.root / "btc-history")])[0])
+                    if not (store_root / "catalog.duckdb").is_file():
+                        raise KeyError("BTC history catalog not found")
+                    store = HistoryStore(store_root, read_only=True)
                     dataset_id, resource = parts
                     if resource == "manifest":
                         result = store.inspect_manifest(dataset_id)
@@ -1368,7 +1455,7 @@ def make_handler(
                     from .btc_connectivity import ConnectivityStore
 
                     query = urllib.parse.parse_qs(parsed.query)
-                    store = ConnectivityStore(query.get("store_root", [str(workflow.store.root / "btc-connectivity")])[0])
+                    store = ConnectivityStore(query.get("store_root", [str(workflow.store.root / "btc-connectivity")])[0], read_only=True)
                     result = store.inspect(parts[0], parts[1])
                     self._send(200, result)
                 except KeyError:

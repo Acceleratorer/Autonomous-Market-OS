@@ -1,7 +1,7 @@
 # ADR-0046: Deploy the disconnected Market OS preview to DirectAdmin
 
-**Status:** Selected on 2026-10-29; production deployment is pending the four
-repository-scoped DirectAdmin secrets.
+**Status:** Static-preview target selected on 2026-10-29; deployment is deferred
+until local milestones are closed and hosting prerequisites are available.
 
 ## Decision
 
@@ -39,8 +39,12 @@ or environment-scoped copies. Secret values are never stored in this repo.
 
 - The quality job runs the static contract test, verifies the source/legacy
   copies, builds the exact artifact, and uploads it under the triggering SHA.
-- The deploy job only runs for `main` pushes or an explicit workflow dispatch;
-  it fails before calling DirectAdmin when any required secret is missing.
+- The deploy job only runs after an explicit workflow dispatch on `main`; a
+  push never deploys. It fails before calling DirectAdmin when any required
+  secret is missing.
+- The recorded workflow attempt stopped at missing-secret validation and did
+  not change site files. A valid DirectAdmin TLS chain is also required; the
+  deployment report records the observed certificate expiry.
 - Staging, temporary archives, failed releases, and the preserved previous
   rollback slot live under `/domains/accel.io.vn/`, outside `public_html`.
 - The production path is changed only by the DirectAdmin move operations for

@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.local-exit-gate@v1",
+  "date": "2026-10-29",
+  "status": "green-local-boundary",
+  "scope": {
+    "synthetic": true,
+    "paper_only": true,
+    "loopback_only": true,
+    "external_mutation_api": false,
+    "live_trading": false
+  },
+  "verification": {
+    "pytest_passed": 546,
+    "pytest_failed": 0,
+    "pytest_skipped": 7,
+    "compileall": "passed",
+    "secret_scan": "passed",
+    "evidence_json_count": 49,
+    "evidence_validation": "passed",
+    "git_diff_check": "passed",
+    "dependency_check": "passed",
+    "npm_ci_vulnerabilities": 0,
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "static_artifact_parity": "passed",
+    "static_contract_test": "passed",
+    "m2_8_evidence_validation": "passed",
+    "security_review": "no-actionable-findings",
+    "directadmin_deployment": "not-run-manual-dispatch-required"
+  },
+  "closed_local_capabilities": [
+    "B4.1-B4.17 synthetic paper broker",
+    "shared portfolio membership and reservations",
+    "append-only ledger checkpoint recovery and fingerprints",
+    "bounded API POST validation and same-origin protection",
+    "non-mutating read-only inspection",
+    "deterministic BTC processing and explicit unavailable evaluation",
+    "recorded-response B3 evaluation",
+    "local operator inspection and evidence"
+  ],
+  "deferred_gates": [
+    "partial fills and order expiry",
+    "retention deletion or pruning",
+    "versioned schema transformation",
+    "authenticated externally exposed mutation",
+    "connected identity authorization and storage isolation",
+    "distributed ownership",
+    "live providers credentials network execution and production infrastructure"
+  ],
+  "report": "docs/LOCAL-EXIT-GATE-REPORT.md"
+}

@@ -51,7 +51,7 @@ def backup_portfolio(store_root: str | Path, portfolio_id: str, archive_path: st
     if archive.exists() or archive.is_symlink():
         raise BackupRejected("backup archive already exists")
     try:
-        files = B41Broker.open(store_root, portfolio_id).export_backup_files()
+        files = B41Broker.open(store_root, portfolio_id, read_only=True).export_backup_files()
     except (OSError, ValueError) as exc:
         raise BackupRejected("portfolio failed broker validation") from exc
 

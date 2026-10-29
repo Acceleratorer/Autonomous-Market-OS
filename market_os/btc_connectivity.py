@@ -912,10 +912,12 @@ class ProbeRecord:
 
 
 class ConnectivityStore:
-    def __init__(self, root: str | Path) -> None:
+    def __init__(self, root: str | Path, *, read_only: bool = False) -> None:
         self.root = Path(root)
+        self.read_only = read_only
         self.runs = self.root / "runs"
-        self.runs.mkdir(parents=True, exist_ok=True)
+        if not read_only:
+            self.runs.mkdir(parents=True, exist_ok=True)
 
     def _directory(self, probe_id: str) -> Path:
         path = (self.runs / probe_id).resolve()
@@ -933,6 +935,8 @@ class ConnectivityStore:
         return {"path": path.name, "sha256": _sha_bytes(raw), "size_bytes": len(raw)}
 
     def persist(self, record: ProbeRecord) -> dict[str, Any]:
+        if self.read_only:
+            raise ValueError("connectivity store is read-only")
         directory = self._directory(record.probe_id)
         directory.mkdir(parents=True, exist_ok=True)
         result_artifact = self._write(directory / "result.json", record.result or {})

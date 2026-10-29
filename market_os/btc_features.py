@@ -339,6 +339,23 @@ def build_splits(samples: list[dict[str, Any]], config: B2Config) -> dict[str, A
             "counts": {},
         }
     n = len(ordered)
+    if n < 3:
+        return {
+            "policy": {
+                "purge": "remove rows with target_end_ms >= the next split boundary",
+                "embargo": "remove the first 5 minutes after each split boundary",
+                "horizon_minutes": 5,
+                "boundaries_are_frozen_before_model_fit": True,
+            },
+            "boundaries": {},
+            "rows": [{
+                "feature_close_time_ms": sample["feature_close_time_ms"],
+                "target_end_ms": sample["target_end_ms"],
+                "split": "purged",
+                "reason": "insufficient samples for chronological train, calibration, and test partitions",
+            } for sample in ordered],
+            "counts": {"purged": n},
+        }
     train_boundary = ordered[max(1, min(n - 1, int(n * config.train_fraction)))]["feature_close_time_ms"]
     test_boundary = ordered[max(1, min(n - 1, int(n * (config.train_fraction + config.calibration_fraction))))]["feature_close_time_ms"]
     boundaries = {"train_calibration_ms": train_boundary, "calibration_test_ms": test_boundary}

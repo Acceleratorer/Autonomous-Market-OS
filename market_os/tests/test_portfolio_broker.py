@@ -85,6 +85,25 @@ def test_persisted_broker_matches_and_recovers_deterministically(tmp_path: Path)
     assert replay.snapshot_fingerprint == recovered.snapshot_fingerprint
 
 
+def test_read_only_broker_open_does_not_create_or_write_lock_files(tmp_path: Path) -> None:
+    created = B41Broker(tmp_path, genesis(), policy())
+    lock_path = created.lock_path
+    assert lock_path.is_file()
+    original_lock = lock_path.read_bytes()
+    assert original_lock == b""
+
+    opened = B41Broker.open(tmp_path, genesis().portfolio_id, read_only=True)
+    assert opened.inspect("summary")["portfolio_id"] == genesis().portfolio_id
+    assert lock_path.read_bytes() == original_lock
+    with pytest.raises(BrokerRejected, match="read-only"):
+        opened.cancel_order("order-1", "cancel-1", "key-1", 1)
+
+    lock_path.unlink()
+    with pytest.raises(FileNotFoundError):
+        B41Broker.open(tmp_path, genesis().portfolio_id, read_only=True)
+    assert not lock_path.exists()
+
+
 def test_market_event_id_is_unique_and_retry_does_not_mutate(tmp_path: Path) -> None:
     broker = B41Broker(tmp_path, genesis(), policy())
     first = event("event-1", time_ms=1_000)

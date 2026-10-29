@@ -11,7 +11,7 @@ import urllib.request
 import pytest
 
 from market_os.api import make_handler
-from market_os.btc_features import B2Config, materialize_rows
+from market_os.btc_features import B2Config, B2Store, materialize_rows, run_b2
 from market_os.btc_jev_evaluation import (
     B3Config,
     B3_ANSWER_SCHEMA,
@@ -87,6 +87,38 @@ def _fixture_for(materialized: dict[str, object], kinds: dict[str, str] | None =
     })
 
 
+def _continuous_synthetic_history_fixture(count: int = 100) -> dict[str, object]:
+    start_ms = 1_767_225_600_000
+    received_at = "2026-01-01T03:00:00+00:00"
+    rows = []
+    for index in range(count):
+        close = 100 + index * 0.03 + (index % 7) * 0.11
+        volume = index + 1
+        open_time = start_ms + index * 60_000
+        rows.append([
+            open_time,
+            f"{close - 0.1:.8f}",
+            f"{close + 0.2:.8f}",
+            f"{close - 0.2:.8f}",
+            f"{close:.8f}",
+            str(volume),
+            open_time + 59_999,
+            f"{close * volume:.8f}",
+            10,
+            f"{volume / 2:.8f}",
+            f"{close * volume / 2:.8f}",
+            "0",
+        ])
+    return {
+        "schema": "market-os.btc-history-fixture.v1",
+        "received_at": received_at,
+        "requested_start_ms": start_ms,
+        "requested_end_ms_exclusive": start_ms + count * 60_000,
+        "as_of_ms": int(datetime.fromisoformat(received_at).timestamp() * 1000),
+        "pages": [rows],
+    }
+
+
 def test_b3_contract_and_recorded_response_validation() -> None:
     answer = {
         "model": "jev-1.14.0",
@@ -146,6 +178,23 @@ def test_b3_evaluation_uses_same_inputs_and_calibration_range_only() -> None:
     assert result == evaluate_b3(materialized, adapter, config)
 
 
+def test_b3_single_labeled_sample_is_explicitly_unavailable() -> None:
+    materialized = _materialized()
+    feature = next(item for item in materialized["features"] if item["status"] == "eligible")
+    label = next(item for item in materialized["labels"] if item["feature_close_time_ms"] == feature["close_time_ms"])
+    single_sample = {**materialized, "features": [feature], "labels": [label]}
+    adapter = _fixture_for(single_sample)
+    config = B3Config("single-sample", "btc-test-revision", materialized["feature_fingerprint"], adapter.fixture_id)
+
+    result = evaluate_b3(single_sample, adapter, config)
+
+    assert result["splits"]["boundaries"] == {}
+    assert result["splits"]["counts"] == {"purged": 1}
+    assert result["metrics"]["E1_numerical_only"]["coverage"]["status"] == "unavailable"
+    assert result["metrics"]["E2_numerical_plus_jev"]["coverage"]["status"] == "unavailable"
+    assert result["matched_controls"]["status"] == "unavailable"
+
+
 def test_b3_abstentions_are_excluded_from_e2_but_not_hidden() -> None:
     materialized = _materialized()
     baseline_adapter = _fixture_for(materialized)
@@ -171,6 +220,56 @@ def test_b3_store_replay_and_inspection_are_deterministic(tmp_path: Path) -> Non
     assert store.replay(first["run_id"])["provider_requests"] == 0
     assert store.inspect(first["run_id"], "fingerprints")["feature_fingerprint"] == first["feature_fingerprint"]
     assert store.inspect(first["run_id"], "abstentions")["resource"] == "abstentions"
+
+
+def test_continuous_synthetic_positive_evaluation_persists_replays_and_inspects(tmp_path: Path, capsys) -> None:
+    history = HistoryStore(tmp_path / "history")
+    dataset = history.ingest_fixture(_continuous_synthetic_history_fixture())
+    workflow = MarketWorkflow(RunStore(tmp_path / "workflow"))
+    b2_store = B2Store(workflow.store.root / "btc-b2")
+    b3_store = B3Store(workflow.store.root / "btc-b3")
+    materialized = materialize_rows(
+        history.inspect_candles(dataset.dataset_revision),
+        B2Config("positive-b3", "2026-01-01T03:00:00+00:00"),
+        dataset_revision=dataset.dataset_revision,
+    )
+    adapter = _fixture_for(materialized)
+
+    b2 = run_b2(history, dataset.dataset_revision, b2_store)
+    b3 = run_b3(history, dataset.dataset_revision, adapter, b3_store, experiment_id="positive-b3")
+
+    assert b2["sample_count"] > 50
+    assert b2["metrics"]["naive_0_5"]["raw"]["status"] == "measured"
+    assert b2["calibration"]["empirical_rate"]["status"] == "measured"
+    assert b2_store.replay(b2["run_id"])["replayed"] is True
+    assert b3["sample_count"] == b2["sample_count"]
+    assert b3["metrics"]["E1_numerical_only"]["coverage"]["status"] == "measured"
+    assert b3["metrics"]["E2_numerical_plus_jev"]["coverage"]["status"] == "measured"
+    assert b3["matched_controls"]["status"] == "measured"
+    assert b3["promotion_decision"] == "not-promoted"
+    assert b3_store.replay(b3["run_id"])["provider_requests"] == 0
+
+    assert main(["btc-paper", "b2", "inspect", b2["run_id"], "--resource", "metrics", "--store-root", str(b2_store.root)]) == 0
+    assert json.loads(capsys.readouterr().out)["value"]["naive_0_5"]["raw"]["status"] == "measured"
+    assert main(["btc-paper", "b3", "inspect", b3["run_id"], "--resource", "metrics", "--store-root", str(b3_store.root)]) == 0
+    assert json.loads(capsys.readouterr().out)["value"]["E1_numerical_only"]["coverage"]["status"] == "measured"
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        b2_api = json.loads(urllib.request.urlopen(
+            f"http://127.0.0.1:{server.server_port}/v1/btc/b2/{b2['run_id']}/metrics", timeout=3,
+        ).read())
+        b3_api = json.loads(urllib.request.urlopen(
+            f"http://127.0.0.1:{server.server_port}/v1/btc/b3/{b3['run_id']}/metrics", timeout=3,
+        ).read())
+        assert b2_api["value"]["naive_0_5"]["raw"]["status"] == "measured"
+        assert b3_api["value"]["E1_numerical_only"]["coverage"]["status"] == "measured"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
 
 
 def test_b3_cli_and_api_inspection_are_read_only(tmp_path: Path, capsys) -> None:

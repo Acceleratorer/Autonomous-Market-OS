@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from datetime import datetime, timezone
+from http.server import ThreadingHTTPServer
 import json
 import threading
 import urllib.parse
@@ -470,7 +471,28 @@ def test_offline_connectivity_cli_and_api_inspection_are_read_only(tmp_path: Pat
         thread.join(timeout=2)
 
 
+def test_connectivity_api_missing_store_read_does_not_create_files(tmp_path: Path) -> None:
+    missing_root = tmp_path / "missing-connectivity"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(tmp_path / "workflow"))))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        url = (
+            f"http://127.0.0.1:{server.server_port}/v1/btc/connectivity/missing/manifest"
+            f"?store_root={urllib.parse.quote(str(missing_root))}"
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(url, timeout=2)
+        assert response.value.code == 404
+        assert not missing_root.exists()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
 def test_live_cli_commands_refuse_before_transport(tmp_path: Path, capsys, monkeypatch) -> None:
+    monkeypatch.delenv("TYPESAFE_API_KEY", raising=False)
     with pytest.raises(SystemExit, match="allow-live-probe"):
         main(["btc-paper", "connectivity", "binance", "--operation", "ticker", "--store-root", str(tmp_path)])
     with pytest.raises(ConnectivityError, match="TYPESAFE_API_KEY"):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import http.client
 import threading
 import threading as thread_module
 import urllib.request
@@ -13,7 +14,7 @@ from market_os.providers import default_providers
 from market_os.contracts import Run, RunEvent
 from market_os.store import RunStore
 from market_os.workflow import MarketWorkflow
-from market_os.api import make_handler, serve
+from market_os.api import MAX_POST_BODY_BYTES, make_handler, serve
 from http.server import ThreadingHTTPServer
 
 
@@ -331,6 +332,127 @@ def test_service_rejects_untrusted_host_header(tmp_path: Path, method: str, host
         with pytest.raises(urllib.error.HTTPError) as response:
             urllib.request.urlopen(request, timeout=2)
         assert response.value.code == 403
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+@pytest.mark.parametrize("headers", [
+    {"Content-Type": "text/plain", "Origin": "https://attacker.example", "Sec-Fetch-Site": "cross-site"},
+    {"Content-Type": "text/plain", "Origin": "null"},
+    {"Content-Type": "text/plain", "Sec-Fetch-Site": "cross-site"},
+    {"Content-Type": "text/plain", "Host": "127.0.0.1", "Origin": "http://127.0.0.1:0", "Sec-Fetch-Site": "same-origin"},
+])
+def test_service_rejects_cross_origin_post_before_creating_a_run(tmp_path: Path, headers: dict[str, str]) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        body = json.dumps({"objective": "blocked cross-site task", "symbols": ["SPY"], "start": "2026-01-02", "end": "2026-01-06"}).encode()
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/v1/tasks",
+            data=body,
+            headers=headers,
+            method="POST",
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(request, timeout=2)
+        assert response.value.code == 403
+        assert json.loads(response.value.read())["error"] == "same-origin POST required"
+        assert not workflow.store.runs.read_text(encoding="utf-8").strip()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_accepts_an_exact_same_origin_browser_post(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        body = json.dumps({"objective": "same-origin task", "symbols": ["SPY"], "start": "2026-01-02", "end": "2026-01-06"}).encode()
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/v1/tasks",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "Origin": f"http://127.0.0.1:{server.server_port}",
+                "Sec-Fetch-Site": "same-origin",
+            },
+            method="POST",
+        )
+        result = json.loads(urllib.request.urlopen(request, timeout=2).read())
+        assert result["run"]["status"] == "completed"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_rejects_oversized_post_before_creating_a_run(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=2)
+        connection.putrequest("POST", "/v1/tasks")
+        connection.putheader("Content-Type", "application/json")
+        connection.putheader("Content-Length", str(MAX_POST_BODY_BYTES + 1))
+        connection.endheaders()
+        response = connection.getresponse()
+        assert response.status == 413
+        assert json.loads(response.read())["error"]["code"] == "payload_too_large"
+        connection.close()
+        assert not workflow.store.runs.read_text(encoding="utf-8").strip()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_rejects_unknown_post_route_without_parsing_a_body(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/v1/unknown",
+            method="POST",
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(request, timeout=2)
+        assert response.value.code == 404
+        assert not workflow.store.runs.read_text(encoding="utf-8").strip()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_rejects_deeply_nested_json_with_a_client_error(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        body = b"[" * 1100 + b"0" + b"]" * 1100
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/v1/tasks",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(request, timeout=2)
+        assert response.value.code == 400
+        assert json.loads(response.value.read())["error"]["code"] == "invalid_request_body"
+        assert not workflow.store.runs.read_text(encoding="utf-8").strip()
     finally:
         server.shutdown()
         server.server_close()

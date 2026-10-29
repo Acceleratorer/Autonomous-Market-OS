@@ -24,6 +24,20 @@ def test_migration_preflight_reports_current_schema_without_mutation(tmp_path: P
     assert after == before
 
 
+def test_migration_preflight_does_not_create_a_missing_writer_lock(tmp_path: Path) -> None:
+    root = tmp_path / "store"
+    broker = B41Broker(root, genesis(), policy())
+    lock_path = broker.lock_path
+    lock_path.unlink()
+    before = {path.name: path.read_bytes() for path in broker.root.iterdir() if path.is_file()}
+
+    with pytest.raises(MigrationRejected, match="unsupported or recovery failed"):
+        preflight_portfolio(root, genesis().portfolio_id)
+
+    assert not lock_path.exists()
+    assert {path.name: path.read_bytes() for path in broker.root.iterdir() if path.is_file()} == before
+
+
 def test_migration_preflight_rejects_unsupported_genesis_schema(tmp_path: Path) -> None:
     root = tmp_path / "store"
     B41Broker(root, genesis(), policy())

@@ -166,6 +166,31 @@ def test_b2_calibration_is_separate_from_test_predictions() -> None:
     assert result == evaluate_baselines(materialized, B2Config("test"))
 
 
+def test_b2_single_labeled_sample_is_explicitly_unavailable() -> None:
+    timestamp = 1_767_225_600_000
+    for sample_count in (1, 2):
+        materialized = {
+            "features": [{
+                "status": "eligible",
+                "close_time_ms": timestamp + index * 60_000,
+                "values": {"log_return_1m": 0.01},
+            } for index in range(sample_count)],
+            "labels": [{
+                "feature_close_time_ms": timestamp + index * 60_000,
+                "target_end_ms": timestamp + (index + 5) * 60_000,
+                "direction": "up",
+            } for index in range(sample_count)],
+        }
+
+        result = evaluate_baselines(materialized, B2Config("small-sample"))
+
+        assert result["splits"]["boundaries"] == {}
+        assert result["splits"]["counts"] == {"purged": sample_count}
+        assert all(row["reason"].startswith("insufficient samples") for row in result["splits"]["rows"])
+        assert all(metric["raw"]["status"] == "unavailable" for metric in result["metrics"].values())
+        assert all(metric["calibrated"]["status"] == "unavailable" for metric in result["metrics"].values())
+
+
 def test_b2_cli_and_api_inspection_are_read_only(tmp_path: Path, capsys) -> None:
     history, dataset_revision = _candles(tmp_path)
     store_root = tmp_path / "b2"

@@ -120,6 +120,8 @@ OpenAI, hosted models, credentials, LightGBM, broker/portfolio/execution code,
 and live trading. The unresolved data limitation is the small B1 fixture's
 missing interval and resulting absence of leakage-safe evaluation labels.
 
-The next unified milestone is **U3/B3 — controlled Jev incremental-value
-benchmark**, after a larger approved local dataset and matched numerical
-controls exist.
+B3 is implemented as a separate offline, recorded-response benchmark. Neither
+the B1 gap fixture nor synthetic positive acceptance results establish real
+market predictive value. Any later evaluation or promotion still requires a
+larger source-approved dataset, matched numerical controls, and separate
+uncertainty and prospective evidence.

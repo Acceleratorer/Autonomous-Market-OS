@@ -182,3 +182,5 @@ cost. No framework dependency is added speculatively.
 3. Preserve synthetic, paper-only, local boundaries unless a new milestone explicitly changes them.
 4. Update tests and evidence when a contract or schema changes.
 5. Keep source repositories, credentials, temporary probes, and unrelated worktree changes out of rename work.
+
+The current local-first exit gate is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json`. Latest local verification is 546 passed, 0 failed, 7 skipped; compileall, secret scan, evidence validation, and diff check pass. Connected web/deployment and other explicitly deferred gates remain closed.
