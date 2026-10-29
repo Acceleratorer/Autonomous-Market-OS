@@ -14,7 +14,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U3 | B2–B3 + M5 controls + API connectivity | Features, labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded provider connectivity | Implemented offline; B3 not promoted |
 | U3 synthetic surfaces | B3.8–B3.14 | Deterministic session artifacts, local read-only API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | B4.17 formalizes indefinite local retention and validated non-destructive backup; deletion, authenticated mutation API, and schema transformation remain separate gates |
-| U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.23 completes responsive and keyboard navigation for the local operator on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. Keep the Next.js operator loopback-only and close the remaining local backend, recovery, audit, testing, CI, and packaging gates before further web work. DirectAdmin remains a manual, deferred path for the disconnected static preview; connected identity, authorization, and isolation stay gated |
+| U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.23 and the local exit gate are complete on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. Continue only with a defined loopback-local web slice; connected access remains gated. DirectAdmin is selected for the disconnected static preview, but no deployment has run; its manual dispatch still needs the documented host prerequisites |
 | U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | Planned |
 | U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | Planned selectively |
 | U8 | M6 | Separate live-readiness review or explicit permanent paper mode | Deferred; no automatic live trading |
@@ -112,4 +112,4 @@ The web, CLI, and app must consume the same versioned backend contracts. They mu
 
 Each unified milestone updates `docs/UNDERSTANDING-LOG.md`, adds or updates an ADR when a boundary changes, and writes machine-readable evidence under `docs/evidence/`. Reports must state what was implemented, what was verified, what remains unknown, and the exact next gate.
 
-Local-first exit evidence is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json`. The current local verification is green; connected access and deployment remain gated.
+Local-first exit evidence is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json`. Local verification and the pushed GitHub CI/security workflows are green. Connected access remains gated; DirectAdmin static deployment is not run and needs its documented host prerequisites.

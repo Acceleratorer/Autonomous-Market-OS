@@ -26,7 +26,13 @@
     "static_contract_test": "passed",
     "m2_8_evidence_validation": "passed",
     "security_review": "no-actionable-findings",
-    "directadmin_deployment": "not-run-manual-dispatch-required"
+    "github_ci": "passed",
+    "github_ci_run_id": 40865631843,
+    "security_package_workflow": "passed",
+    "security_package_run_id": 40865631753,
+    "static_preview_artifact_job": "passed",
+    "directadmin_deployment": "not-run-host-prerequisites-outstanding",
+    "github_runner_warnings": "non-blocking action runtime and ubuntu-latest migration annotations"
   },
   "closed_local_capabilities": [
     "B4.1-B4.17 synthetic paper broker",
