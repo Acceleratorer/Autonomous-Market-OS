@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
 
-const dashboardPath = resolve(process.cwd(), "docs/hosting/market-os/index.html");
+const dashboardPath = resolve(process.cwd(), "apps/web/public/index.html");
 
 test("hosted Market OS preview keeps the paper-only read-only boundary", async () => {
   const html = await readFile(dashboardPath, "utf8");

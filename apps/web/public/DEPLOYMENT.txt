@@ -1,0 +1,17 @@
+Market OS static preview
+
+Canonical source: apps/web/public/
+URL base: /market-os/
+DirectAdmin target: /domains/accel.io.vn/public_html/market-os/
+
+The directory path serves this disconnected static HTML preview at
+https://accel.io.vn/market-os/. It contains no portfolio state, API endpoints,
+private datasets, credentials, or mutation controls. The local Python API,
+paper broker, and local Next.js operator are not deployed or exposed here.
+
+GitHub Actions runs the static contract check, builds one artifact named for
+the commit SHA, stages it outside public_html, promotes it to the target path,
+verifies the production HTML hash and preserved site routes, and restores the
+previous release automatically if production verification fails. The previous
+Market OS release is retained at the DirectAdmin rollback path after a
+successful promotion.

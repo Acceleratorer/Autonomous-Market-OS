@@ -1,0 +1,105 @@
+name: Market OS static preview deploy
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Test and build static preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check static preview contract
+        run: npx --yes tsx tests/market-os-readonly-dashboard.test.ts
+
+      - name: Verify source parity
+        run: python scripts/build_web_artifact.py --check
+
+      - name: Build immutable static artifact
+        run: python scripts/build_web_artifact.py --output site/market-os --manifest site/market-os.manifest.json
+
+      - name: Upload artifact for deploy
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-os-static-${{ github.sha }}
+          path: |
+            site/market-os
+            site/market-os.manifest.json
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    name: Stage, promote, and verify production
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: quality
+    runs-on: ubuntu-latest
+    concurrency:
+      group: market-os-directadmin-production
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact built by quality job
+        uses: actions/download-artifact@v4
+        with:
+          name: market-os-static-${{ github.sha }}
+          path: site
+
+      - name: Create release archive
+        run: (cd site/market-os && zip -X -qr "../../market-os-${GITHUB_SHA}.zip" .)
+
+      - name: Validate DirectAdmin secrets
+        env:
+          DIRECTADMIN_HOST: ${{ secrets.DIRECTADMIN_HOST }}
+          DIRECTADMIN_USER: ${{ secrets.DIRECTADMIN_USER }}
+          DIRECTADMIN_PASSWORD: ${{ secrets.DIRECTADMIN_PASSWORD }}
+          DIRECTADMIN_CA_BUNDLE: ${{ secrets.DIRECTADMIN_CA_BUNDLE }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for name in DIRECTADMIN_HOST DIRECTADMIN_USER DIRECTADMIN_PASSWORD DIRECTADMIN_CA_BUNDLE; do
+            if [[ -z "${!name:-}" ]]; then
+              missing+=("${name}")
+            fi
+          done
+          if ((${#missing[@]})); then
+            printf '::error title=DirectAdmin secrets missing::Configure these secrets for Autonomous-Market-OS: %s\n' "${missing[*]}"
+            exit 1
+          fi
+
+      - name: Prepare verified DirectAdmin CA bundle
+        env:
+          DIRECTADMIN_CA_BUNDLE: ${{ secrets.DIRECTADMIN_CA_BUNDLE }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' "${DIRECTADMIN_CA_BUNDLE}" > "${RUNNER_TEMP}/directadmin-ca-bundle.pem"
+          chmod 600 "${RUNNER_TEMP}/directadmin-ca-bundle.pem"
+
+      - name: Deploy release with staging and automatic rollback
+        env:
+          DIRECTADMIN_HOST: ${{ secrets.DIRECTADMIN_HOST }}
+          DIRECTADMIN_USER: ${{ secrets.DIRECTADMIN_USER }}
+          DIRECTADMIN_PASSWORD: ${{ secrets.DIRECTADMIN_PASSWORD }}
+          DIRECTADMIN_CA_BUNDLE: ${{ secrets.DIRECTADMIN_CA_BUNDLE }}
+          REMOTE_DIR: /domains/accel.io.vn/public_html/market-os
+        run: bash scripts/deploy_market_os_directadmin.sh

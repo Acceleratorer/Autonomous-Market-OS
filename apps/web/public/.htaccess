@@ -1,0 +1,5 @@
+Options -Indexes
+DirectoryIndex index.html
+<FilesMatch "^(DEPLOYMENT\.txt)$">
+  Require all denied
+</FilesMatch>
