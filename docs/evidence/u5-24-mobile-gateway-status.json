@@ -26,5 +26,20 @@
     "security_boundary": "unchanged: loopback-local, GET-only, paper-only, read-only",
     "deployment": "not run"
   },
+  "ci": {
+    "commit": "33989fed0bf7b19a235dec84b804bb9cd432c66f",
+    "offline_tests_and_package": {
+      "result": "passed",
+      "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998693"
+    },
+    "security_and_package_checks": {
+      "result": "passed",
+      "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998684"
+    },
+    "static_preview": {
+      "artifact_build": "passed",
+      "production_deploy": "not run: DirectAdmin workflow is manual-only and host prerequisites remain outstanding"
+    }
+  },
   "remaining_gate": "Connected access remains deferred until hosting runtime, identity, authorization, and portfolio isolation are defined."
 }
