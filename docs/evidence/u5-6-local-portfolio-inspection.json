@@ -1,0 +1,32 @@
+{
+  "schema": "market-os.u5.6-local-portfolio-inspection@v1",
+  "review_date": "2026-10-29",
+  "status": "implemented-local",
+  "surface": {
+    "routes": ["/operator/", "/operator/<portfolio-id>/"],
+    "source": "apps/web/operator",
+    "resources": ["portfolio-catalog", "summary", "genesis", "reservations", "orders", "risk"],
+    "read_only": true,
+    "synthetic_only": true,
+    "paper_only": true
+  },
+  "boundary": {
+    "mutation_routes": false,
+    "credentials": false,
+    "providers": false,
+    "public_deployment": false,
+    "authentication": false,
+    "framework": false,
+    "client_domain_logic": false
+  },
+  "verification": {
+    "focused_operator_tests": true,
+    "resource_parity": true,
+    "responsive_css": true,
+    "compileall": true,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "next_gate": "select_deployment_target_and_identity_boundary"
+}

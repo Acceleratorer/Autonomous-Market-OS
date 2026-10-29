@@ -20,7 +20,8 @@ HKUDS/
 │   ├── RAG-Anything/
 │   ├── Vibe-Trading/
 │   └── ViMax/
-├── market_os/               # Fusion product implementation
+├── market_os/               # Fusion product implementation; see STRUCTURE.md
+├── apps/                    # thin web, CLI, and gateway surfaces
 ├── docs/                    # Fusion plans, decisions, and evidence
 └── pyproject.toml
 ```
@@ -59,4 +60,8 @@ python -m pytest -q market_os/tests
 python -m compileall -q market_os
 ```
 
-See `docs/PRODUCT-VISION.md`, `docs/PHASES.md`, `docs/ROADMAP.md`, `docs/TARGET-STRUCTURE.md`, `docs/FUSION-MAP.md`, `docs/INTEGRATION-GUIDE.md`, and `docs/decisions/ADR-0001-phase-0.md` for the product boundary and next milestone.
+See `STRUCTURE.md`, `docs/PRODUCT-VISION.md`, `docs/PHASES.md`, `docs/ROADMAP.md`, `docs/TARGET-STRUCTURE.md`, `docs/APP-SURFACES-CONTRACT.md`, `docs/WEB-STACK-OPTIONS.md`, `docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md`, `docs/U5.2-STATIC-DEPLOYMENT-READINESS.md`, `docs/FUSION-MAP.md`, `docs/INTEGRATION-GUIDE.md`, and `docs/decisions/ADR-0001-phase-0.md` for the product boundary and next milestone.
+
+The current web surface is a static, read-only paper-only preview. Build it
+with `python scripts/build_web_artifact.py --output <new-directory>`; public
+deployment and authenticated access remain separate gates.

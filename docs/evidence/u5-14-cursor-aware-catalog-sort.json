@@ -1,0 +1,47 @@
+{
+  "schema": "market-os.u5-14-cursor-aware-catalog-sort-evidence@v1",
+  "status": "passed",
+  "date": "2026-10-29",
+  "measurement": {
+    "method": "synthetic temporary directory trees; five runs per scenario; medians are diagnostic and exclude broker recovery",
+    "cases": [
+      {"candidate_directories": 100, "page": "first", "entries_scanned": 100, "sort_inputs_before": 100, "sort_inputs_after": 100, "median_ms_before": 3.679, "median_ms_after": 3.718},
+      {"candidate_directories": 100, "page": "middle", "entries_scanned": 100, "sort_inputs_before": 100, "sort_inputs_after": 50, "median_ms_before": 3.95, "median_ms_after": 2.669},
+      {"candidate_directories": 100, "page": "last", "entries_scanned": 100, "sort_inputs_before": 100, "sort_inputs_after": 1, "median_ms_before": 4.056, "median_ms_after": 1.308},
+      {"candidate_directories": 1000, "page": "first", "entries_scanned": 1000, "sort_inputs_before": 1000, "sort_inputs_after": 1000, "median_ms_before": 31.147, "median_ms_after": 31.724},
+      {"candidate_directories": 1000, "page": "middle", "entries_scanned": 1000, "sort_inputs_before": 1000, "sort_inputs_after": 500, "median_ms_before": 30.604, "median_ms_after": 16.791},
+      {"candidate_directories": 1000, "page": "last", "entries_scanned": 1000, "sort_inputs_before": 1000, "sort_inputs_after": 1, "median_ms_before": 31.941, "median_ms_after": 3.039},
+      {"candidate_directories": 10000, "page": "first", "entries_scanned": 10000, "sort_inputs_before": 10000, "sort_inputs_after": 10000, "median_ms_before": 330.655, "median_ms_after": 331.855},
+      {"candidate_directories": 10000, "page": "middle", "entries_scanned": 10000, "sort_inputs_before": 10000, "sort_inputs_after": 5000, "median_ms_before": 324.019, "median_ms_after": 178.343},
+      {"candidate_directories": 10000, "page": "last", "entries_scanned": 10000, "sort_inputs_before": 10000, "sort_inputs_after": 1, "median_ms_before": 328.041, "median_ms_after": 27.629}
+    ]
+  },
+  "checks": {
+    "focused_python_tests_passed": 65,
+    "focused_python_tests_skipped": 0,
+    "portfolio_cursor_order_and_invalid_cursor_regressions": "passed",
+    "drive_qualified_path_escape_rejected_on_windows": "passed",
+    "symlinked_portfolio_and_policy_rejected": "passed",
+    "symlinked_and_dangling_writer_lock_rejected_without_external_write": "passed",
+    "python_compile": "passed",
+    "git_diff_check": "passed"
+  },
+  "preserved": [
+    "full directory enumeration",
+    "case-sensitive portfolio ID sort and cursor order",
+    "catalog-root containment for cursor paths",
+    "rejection of symlink/reparse directories, policy files, and writer-lock files",
+    "unrecoverable-candidate skip count",
+    "cursor recoverability check",
+    "full portfolio cold recovery",
+    "stale-state conflict response"
+  ],
+  "remaining": [
+    "directory enumeration remains linear",
+    "first page sorts every eligible catalog name",
+    "each cursor and displayed candidate requires full validated cold recovery",
+    "hostile same-user replacement of store directories between path validation and file opens is outside the local threat model",
+    "U5.5 connected deployment still needs target, identity, isolation, and operations decisions",
+    "B4 retention deletion and versioned schema transformation remain separate gates"
+  ]
+}

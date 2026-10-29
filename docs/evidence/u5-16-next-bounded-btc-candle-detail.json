@@ -1,0 +1,42 @@
+{
+  "schema": "market-os.u5-16-next-bounded-btc-candle-detail-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": "apps/web/next-operator/src/app/datasets/[datasetRevision]/page.tsx",
+  "api": "GET /v1/btc/history/datasets/<revision>/candles",
+  "checks": {
+    "focused_api_and_history_tests": "passed: 39 tests",
+    "bounded_exclusive_candle_paging": "passed",
+    "caller_selected_store_rejected": "passed",
+    "canonical_relative_parquet_path_and_hash": "passed",
+    "parquet_hash_tampering_rejected": "passed",
+    "symlink_loop_path_resolution_rejected": "passed",
+    "dataset_and_page_links_disable_prefetch": "passed",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "desktop_and_mobile_browser_smoke": "passed: registry navigation, 3-row pages, valid empty cursor page, 375px document width, separator hidden on mobile, and zero console errors",
+    "code_review": "passed: spec and security reviewers confirmed the fixes; no remaining findings"
+  },
+  "contract": {
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "cursor": "exclusive after_open_time_ms; cursor must identify a stored candle",
+    "sort": "ascending open_time_ms",
+    "store_path_parameter": false,
+    "read_only": true,
+    "parquet_hash_check": "streamed before each page",
+    "returns_filesystem_paths": false,
+    "returns_provenance_or_manifest_arrays": false,
+    "history_acquisition_or_provider_call": false,
+    "replay_required_for_canonical_validation": true
+  },
+  "remaining": [
+    "Parquet hash verification remains linear in file bytes per page",
+    "ingestion-manifest, outcomes/provenance/gaps, and B2/B3 experiment views need separate bounded contracts",
+    "connected deployment remains gated by U5.5 target, identity, isolation, and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-16/dataset-detail-desktop.png",
+    "output/playwright/u5-16/dataset-detail-mobile.png"
+  ]
+}

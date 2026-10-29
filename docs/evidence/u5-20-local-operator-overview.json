@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.u5-20-local-operator-overview-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": [
+    "apps/web/next-operator/src/app/overview/page.tsx",
+    "apps/web/next-operator/src/components/app-shell.tsx",
+    "apps/web/next-operator/src/components/ui.tsx",
+    "apps/web/next-operator/src/app/globals.css"
+  ],
+  "sources": [
+    "GET /v1/b4/portfolios?limit=3",
+    "GET /v1/btc/history/datasets?limit=3",
+    "GET /v1/btc/research/b2/runs?limit=3",
+    "GET /v1/btc/research/b3/runs?limit=3"
+  ],
+  "checks": {
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed; /overview is server-rendered on demand",
+    "desktop_mobile_browser_smoke": "passed: 375, 768, 1024, and 1440 px; no page overflow; skip link, >=44 px targets, reduced motion, dataset detail and research catalog navigation",
+    "configured_gateway_unavailable_state": "passed: independent resource errors and 127.0.0.1:8788 guidance",
+    "browser_requests": "passed: 32 browser requests stayed on the local Next.js operator",
+    "browser_console": "passed: zero console errors in populated and unavailable states",
+    "screenshots_reviewed": true,
+    "code_review": "passed: standards review found no issues",
+    "spec_review": "passed: initial partial-catalog and browser-evidence findings fixed; no residual findings",
+    "security_review": "passed: no actionable findings"
+  },
+  "contract": {
+    "server_rendered": true,
+    "read_only": true,
+    "max_portfolios_preview": 3,
+    "max_datasets_preview": 3,
+    "max_research_runs_per_engine_preview": 3,
+    "catalog_totals_inferred": false,
+    "derived_performance_metrics": false,
+    "user_controlled_api_root": false,
+    "filesystem_paths_returned": false,
+    "b3_promotion_decision": "not-promoted",
+    "portfolio_registry_route_preserved": "/"
+  },
+  "remaining": [
+    "The shipped B1 fixture has no leakage-safe labels for B2/B3 metrics",
+    "Connected deployment remains gated by U5.5 target, identity, isolation, and operations decisions",
+    "Select the next product surface after U5.20"
+  ],
+  "screenshots": [
+    "output/playwright/u5-20/screenshots/overview-desktop.png",
+    "output/playwright/u5-20/screenshots/overview-mobile.png"
+  ]
+}

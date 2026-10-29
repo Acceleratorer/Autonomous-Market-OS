@@ -46,6 +46,10 @@ MAX_CANDLES = 100_000
 MAX_ATTEMPTS = 3
 MAX_RETRY_AFTER_SECONDS = 60
 HISTORY_MAX_RESPONSE_BYTES = 256 * 1024
+MAX_JS_DATE_TIME_MS = 8_640_000_000_000_000
+MAX_MANIFEST_INSPECTION_BYTES = 8 * 1024 * 1024
+MAX_MANIFEST_RECORD_PAGE_SIZE = 100
+MAX_MANIFEST_RECORD_PREVIEW_CHARS = 512
 READINESS_DAYS = 30
 READINESS_MAX_PAGES = 44
 READINESS_MAX_ROWS = 43_200
@@ -57,6 +61,8 @@ _REQUESTED_AUTHORIZATION_FIELDS = frozenset({
     "max_runtime_seconds", "max_attempts",
 })
 _DATASET_ID_RE = re.compile(r"^(?:btc-history-[0-9a-f]{20}|btc-history-manifest-[0-9a-f]{20})$")
+_BTC_DATASET_REVISION_RE = re.compile(r"^btc-history-[0-9a-f]{20}$")
+_MANIFEST_ID_RE = re.compile(r"^btc-history-manifest-[0-9a-f]{20}$")
 
 
 class HistoryError(ValueError):
@@ -559,19 +565,21 @@ class IngestResult:
 
 
 class HistoryStore:
-    def __init__(self, root: str | Path) -> None:
+    def __init__(self, root: str | Path, *, read_only: bool = False) -> None:
         self.root = Path(root)
+        self.read_only = read_only
         self.raw_dir = self.root / "raw"
         self.dataset_dir = self.root / "datasets"
         self.manifest_dir = self.root / "manifests"
         self.checkpoint_dir = self.root / "checkpoints"
-        for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir):
-            path.mkdir(parents=True, exist_ok=True)
         self.catalog_path = self.root / "catalog.duckdb"
-        self._initialize()
+        if not read_only:
+            for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir):
+                path.mkdir(parents=True, exist_ok=True)
+            self._initialize()
 
     def _connect(self):
-        return duckdb.connect(str(self.catalog_path))
+        return duckdb.connect(str(self.catalog_path), read_only=self.read_only)
 
     def _initialize(self) -> None:
         with self._connect() as db:
@@ -1137,6 +1145,744 @@ class HistoryStore:
         names = ("dataset_revision", "symbol", "venue", "interval", "canonical_fingerprint", "parquet_path", "parquet_sha256", "candle_count", "first_open_time_ms", "last_close_time_ms")
         return [dict(zip(names, row)) for row in rows]
 
+    def inspect_datasets_page(
+        self,
+        *,
+        limit: int = 25,
+        after_dataset_revision: str | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if after_dataset_revision is not None and not _DATASET_ID_RE.fullmatch(after_dataset_revision):
+            raise KeyError(after_dataset_revision)
+
+        try:
+            with self._connect() as db:
+                if after_dataset_revision is not None and db.execute(
+                    "SELECT 1 FROM datasets WHERE dataset_revision=?",
+                    [after_dataset_revision],
+                ).fetchone() is None:
+                    raise KeyError(after_dataset_revision)
+                rows = db.execute(
+                    "SELECT dataset_revision, symbol, venue, interval, canonical_fingerprint, candle_count, first_open_time_ms, last_close_time_ms "
+                    "FROM datasets WHERE (? IS NULL OR dataset_revision > ?) "
+                    "ORDER BY dataset_revision LIMIT ?",
+                    [after_dataset_revision, after_dataset_revision, limit + 1],
+                ).fetchall()
+        except duckdb.Error as exc:
+            raise HistoryError("catalog_integrity_error", "BTC history catalog cannot be read") from exc
+
+        has_more = len(rows) > limit
+        rows = rows[:limit]
+        datasets: list[dict[str, Any]] = []
+        for row in rows:
+            revision, symbol, venue, interval, fingerprint, count, first_open, last_close = row
+            if (
+                not isinstance(revision, str)
+                or not _DATASET_ID_RE.fullmatch(revision)
+                or not all(isinstance(value, str) and value and len(value) <= 64 for value in (symbol, venue, interval))
+                or not isinstance(fingerprint, str)
+                or re.fullmatch(r"[0-9a-f]{64}", fingerprint) is None
+                or type(count) is not int
+                or count < 1
+                or type(first_open) is not int
+                or type(last_close) is not int
+                or first_open < 0
+                or first_open >= last_close
+                or last_close > MAX_JS_DATE_TIME_MS
+            ):
+                raise HistoryError("catalog_integrity_error", "BTC history catalog contains invalid dataset metadata")
+            datasets.append({
+                "dataset_revision": revision,
+                "symbol": symbol,
+                "venue": venue,
+                "interval": interval,
+                "canonical_fingerprint": fingerprint,
+                "candle_count": count,
+                "first_open_time_ms": first_open,
+                "last_close_time_ms": last_close,
+            })
+
+        next_revision = datasets[-1]["dataset_revision"] if has_more and datasets else None
+        return {
+            "datasets": datasets,
+            "page": {
+                "limit": limit,
+                "after_dataset_revision": after_dataset_revision,
+                "has_more": has_more,
+                "next_after_dataset_revision": next_revision,
+            },
+        }
+
+    def inspect_manifests_page(
+        self,
+        dataset_revision: str,
+        *,
+        limit: int = 25,
+        after_manifest_id: str | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if not _BTC_DATASET_REVISION_RE.fullmatch(dataset_revision):
+            raise KeyError(dataset_revision)
+        if after_manifest_id is not None and not _MANIFEST_ID_RE.fullmatch(after_manifest_id):
+            raise KeyError(after_manifest_id)
+
+        try:
+            with self._connect() as db:
+                if db.execute(
+                    "SELECT 1 FROM datasets WHERE dataset_revision=?",
+                    [dataset_revision],
+                ).fetchone() is None:
+                    raise KeyError(dataset_revision)
+                if after_manifest_id is not None and db.execute(
+                    "SELECT 1 FROM ingestion_runs WHERE dataset_revision=? AND manifest_id=?",
+                    [dataset_revision, after_manifest_id],
+                ).fetchone() is None:
+                    raise KeyError(after_manifest_id)
+                rows = db.execute(
+                    "SELECT manifest_id, dataset_revision, run_id, raw_fingerprint, manifest_sha256, "
+                    "requested_start_ms, requested_end_ms, network_requests "
+                    "FROM ingestion_runs WHERE dataset_revision=? AND (? IS NULL OR manifest_id > ?) "
+                    "ORDER BY manifest_id LIMIT ?",
+                    [dataset_revision, after_manifest_id, after_manifest_id, limit + 1],
+                ).fetchall()
+        except duckdb.Error as exc:
+            raise HistoryError("manifest_integrity_error", "BTC history catalog cannot be read") from exc
+
+        has_more = len(rows) > limit
+        records = [self._validated_manifest_catalog_record(row) for row in rows[:limit]]
+        next_manifest_id = records[-1]["manifest_id"] if has_more and records else None
+        return {
+            "dataset_revision": dataset_revision,
+            "manifests": records,
+            "page": {
+                "limit": limit,
+                "after_manifest_id": after_manifest_id,
+                "has_more": has_more,
+                "next_after_manifest_id": next_manifest_id,
+            },
+        }
+
+    def inspect_manifest_record(self, dataset_revision: str, manifest_id: str) -> dict[str, Any]:
+        detail, _ = self._load_manifest_record(dataset_revision, manifest_id)
+        return detail
+
+    def _load_manifest_record(self, dataset_revision: str, manifest_id: str) -> tuple[dict[str, Any], dict[str, Any]]:
+        if not _BTC_DATASET_REVISION_RE.fullmatch(dataset_revision) or not _MANIFEST_ID_RE.fullmatch(manifest_id):
+            raise KeyError(manifest_id)
+        try:
+            with self._connect() as db:
+                row = db.execute(
+                    "SELECT manifest_id, dataset_revision, run_id, raw_fingerprint, manifest_sha256, "
+                    "requested_start_ms, requested_end_ms, network_requests "
+                    "FROM ingestion_runs WHERE dataset_revision=? AND manifest_id=?",
+                    [dataset_revision, manifest_id],
+                ).fetchone()
+        except duckdb.Error as exc:
+            raise HistoryError("manifest_integrity_error", "BTC history catalog cannot be read") from exc
+        if row is None:
+            raise KeyError(manifest_id)
+        catalog_record = self._validated_manifest_catalog_record(row)
+
+        try:
+            root = self.root.resolve()
+            manifest_dir = self.manifest_dir.resolve()
+            path = (root / "manifests" / f"{manifest_id}.json").resolve()
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError("manifest_integrity_error", "manifest path cannot be resolved safely") from exc
+        if not manifest_dir.is_relative_to(root) or not path.is_relative_to(manifest_dir) or not path.is_file():
+            raise HistoryError("manifest_integrity_error", "manifest file is missing or outside manifest storage")
+        try:
+            with path.open("rb") as source:
+                raw = source.read(MAX_MANIFEST_INSPECTION_BYTES + 1)
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError("manifest_integrity_error", "manifest file cannot be read") from exc
+        if len(raw) > MAX_MANIFEST_INSPECTION_BYTES:
+            raise HistoryError("manifest_integrity_error", "manifest exceeds the local inspection size limit")
+        if hashlib.sha256(raw).hexdigest() != catalog_record["manifest_sha256"]:
+            raise HistoryError("manifest_integrity_error", "manifest hash mismatch")
+        try:
+            manifest = json.loads(raw)
+        except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
+            raise HistoryError("manifest_integrity_error", "manifest JSON cannot be read") from exc
+        if not isinstance(manifest, dict):
+            raise HistoryError("manifest_integrity_error", "manifest JSON has an invalid shape")
+        try:
+            detail = self._bounded_manifest_detail(catalog_record, manifest)
+        except HistoryError:
+            raise
+        except (TypeError, ValueError, OverflowError, RecursionError) as exc:
+            raise HistoryError("manifest_integrity_error", "manifest display metadata is invalid") from exc
+        return detail, manifest
+
+    def inspect_manifest_outcomes_page(
+        self,
+        dataset_revision: str,
+        manifest_id: str,
+        *,
+        limit: int = 25,
+        after_outcome_index: int | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= MAX_MANIFEST_RECORD_PAGE_SIZE:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if after_outcome_index is not None and (
+            type(after_outcome_index) is not int
+            or not 0 <= after_outcome_index <= MAX_CANDLES * 2
+        ):
+            raise HistoryError("invalid_page", "after_outcome_index is outside the supported range")
+        detail, manifest = self._load_manifest_record(dataset_revision, manifest_id)
+        raw_page_hashes = _manifest_raw_page_hashes(manifest)
+        outcome_counts = detail["outcome_counts"]
+        if sum(outcome_counts.values()) != detail["raw_record_count"]:
+            raise HistoryError("manifest_integrity_error", "manifest outcome counts do not match its raw-record count")
+
+        try:
+            with self._connect() as db:
+                if after_outcome_index is not None and db.execute(
+                    "SELECT 1 FROM run_outcomes WHERE manifest_id=? AND outcome_index=? LIMIT 1",
+                    [manifest_id, after_outcome_index],
+                ).fetchone() is None:
+                    raise KeyError(after_outcome_index)
+                counts = db.execute(
+                    "SELECT status, COUNT(*) FROM run_outcomes WHERE manifest_id=? GROUP BY status ORDER BY status LIMIT 33",
+                    [manifest_id],
+                ).fetchall()
+                rows = db.execute(
+                    "SELECT o.outcome_index, o.raw_page_sha256, o.row_index, o.source_record_fingerprint, "
+                    "o.open_time_ms, o.status, CASE WHEN o.reason IS NULL THEN NULL ELSE substr(o.reason, 1, ?) END, "
+                    "CASE WHEN o.reason IS NOT NULL THEN length(o.reason) ELSE 0 END, o.accepted_canonical, "
+                    "p.source_record_fingerprint "
+                    "FROM run_outcomes o LEFT JOIN run_provenance p ON "
+                    "p.manifest_id=o.manifest_id AND p.raw_page_sha256=o.raw_page_sha256 AND p.row_index=o.row_index "
+                    "WHERE o.manifest_id=? AND (? IS NULL OR o.outcome_index > ?) "
+                    "ORDER BY o.outcome_index LIMIT ?",
+                    [MAX_MANIFEST_RECORD_PREVIEW_CHARS, manifest_id, after_outcome_index, after_outcome_index, limit + 1],
+                ).fetchall()
+        except KeyError:
+            raise
+        except duckdb.Error as exc:
+            raise HistoryError("manifest_integrity_error", "BTC history outcome records cannot be read") from exc
+
+        if len(counts) > 32:
+            raise HistoryError("manifest_integrity_error", "BTC history outcome catalog has too many status categories")
+        stored_counts: dict[str, int] = {}
+        for status, count in counts:
+            if (
+                not isinstance(status, str)
+                or re.fullmatch(r"[a-z][a-z0-9_]{0,47}", status) is None
+                or type(count) is not int
+                or count < 0
+            ):
+                raise HistoryError("manifest_integrity_error", "BTC history outcome catalog contains invalid status counts")
+            stored_counts[status] = count
+        if stored_counts != outcome_counts or sum(stored_counts.values()) != detail["raw_record_count"]:
+            raise HistoryError("manifest_integrity_error", "BTC history outcome rows do not match their manifest counts")
+
+        has_more = len(rows) > limit
+        selected = rows[:limit]
+        outcomes: list[dict[str, Any]] = []
+        for row in selected:
+            index, page_sha256, row_index, record_fingerprint, open_time_ms, status, reason, reason_length, accepted, provenance_fingerprint = row
+            if (
+                type(index) is not int
+                or index < 0
+                or index >= detail["raw_record_count"]
+                or (outcomes and outcomes[-1]["outcome_index"] >= index)
+                or not isinstance(page_sha256, str)
+                or page_sha256 not in raw_page_hashes
+                or type(row_index) is not int
+                or not 0 <= row_index < MAX_PAGE_SIZE
+                or not isinstance(record_fingerprint, str)
+                or re.fullmatch(r"[0-9a-f]{64}", record_fingerprint) is None
+                or provenance_fingerprint != record_fingerprint
+                or (open_time_ms is not None and (type(open_time_ms) is not int or not 0 <= open_time_ms <= MAX_JS_DATE_TIME_MS))
+                or not isinstance(status, str)
+                or re.fullmatch(r"[a-z][a-z0-9_]{0,47}", status) is None
+                or accepted != (status in {"accepted", "out_of_order"})
+                or (reason is not None and not isinstance(reason, str))
+                or type(reason_length) is not int
+                or reason_length > HISTORY_MAX_RESPONSE_BYTES
+                or type(accepted) is not bool
+            ):
+                raise HistoryError("manifest_integrity_error", "BTC history outcome row failed validation")
+            reason_preview = reason.encode("ascii", "backslashreplace").decode("ascii")[:MAX_MANIFEST_RECORD_PREVIEW_CHARS] if reason is not None else None
+            outcomes.append({
+                "outcome_index": index,
+                "raw_page_sha256": page_sha256,
+                "row_index": row_index,
+                "source_record_fingerprint": record_fingerprint,
+                "open_time_ms": open_time_ms,
+                "status": status,
+                "reason": reason_preview,
+                "reason_truncated": reason_length > MAX_MANIFEST_RECORD_PREVIEW_CHARS or (
+                    reason is not None and len(reason.encode("ascii", "backslashreplace")) > MAX_MANIFEST_RECORD_PREVIEW_CHARS
+                ),
+                "accepted_canonical": accepted,
+            })
+
+        next_cursor = outcomes[-1]["outcome_index"] if has_more and outcomes else None
+        return {
+            "dataset_revision": dataset_revision,
+            "manifest_id": manifest_id,
+            "total_count": detail["raw_record_count"],
+            "outcomes": outcomes,
+            "page": {
+                "limit": limit,
+                "after_outcome_index": after_outcome_index,
+                "has_more": has_more,
+                "next_after_outcome_index": next_cursor,
+            },
+        }
+
+    def inspect_manifest_gaps_page(
+        self,
+        dataset_revision: str,
+        manifest_id: str,
+        *,
+        limit: int = 25,
+        after_start_time_ms: int | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= MAX_MANIFEST_RECORD_PAGE_SIZE:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if after_start_time_ms is not None and (
+            type(after_start_time_ms) is not int
+            or not 0 <= after_start_time_ms <= MAX_JS_DATE_TIME_MS
+        ):
+            raise HistoryError("invalid_page", "after_start_time_ms is outside the supported UTC date range")
+        detail, manifest = self._load_manifest_record(dataset_revision, manifest_id)
+        raw_gaps = manifest["gaps"]
+        gaps: list[dict[str, int]] = []
+        previous_start = -1
+        previous_end = -1
+        for gap in raw_gaps:
+            if (
+                not isinstance(gap, dict)
+                or set(gap) != {"start_time_ms", "end_time_ms"}
+                or type(gap["start_time_ms"]) is not int
+                or type(gap["end_time_ms"]) is not int
+                or not 0 <= gap["start_time_ms"] < gap["end_time_ms"] <= MAX_JS_DATE_TIME_MS
+                or gap["start_time_ms"] % 60_000
+                or gap["end_time_ms"] % 60_000
+                or gap["end_time_ms"] - gap["start_time_ms"] < 60_000
+                or gap["start_time_ms"] <= previous_start
+                or gap["start_time_ms"] < previous_end
+            ):
+                raise HistoryError("manifest_integrity_error", "manifest gap records are invalid")
+            gaps.append(gap)
+            previous_start = gap["start_time_ms"]
+            previous_end = gap["end_time_ms"]
+        if len(gaps) != detail["gap_count"]:
+            raise HistoryError("manifest_integrity_error", "manifest gap count does not match its records")
+        if after_start_time_ms is not None and not any(gap["start_time_ms"] == after_start_time_ms for gap in gaps):
+            raise KeyError(after_start_time_ms)
+        page_gaps = [gap for gap in gaps if after_start_time_ms is None or gap["start_time_ms"] > after_start_time_ms]
+        has_more = len(page_gaps) > limit
+        selected = page_gaps[:limit]
+        next_cursor = selected[-1]["start_time_ms"] if has_more and selected else None
+        return {
+            "dataset_revision": dataset_revision,
+            "manifest_id": manifest_id,
+            "total_count": len(gaps),
+            "gaps": selected,
+            "page": {
+                "limit": limit,
+                "after_start_time_ms": after_start_time_ms,
+                "has_more": has_more,
+                "next_after_start_time_ms": next_cursor,
+            },
+        }
+
+    def inspect_manifest_provenance_page(
+        self,
+        dataset_revision: str,
+        manifest_id: str,
+        *,
+        limit: int = 25,
+        after_raw_page_sha256: str | None = None,
+        after_row_index: int | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= MAX_MANIFEST_RECORD_PAGE_SIZE:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if (after_raw_page_sha256 is None) != (after_row_index is None):
+            raise HistoryError("invalid_page", "provenance cursor fields must be supplied together")
+        if after_raw_page_sha256 is not None and (
+            not isinstance(after_raw_page_sha256, str)
+            or re.fullmatch(r"[0-9a-f]{64}", after_raw_page_sha256) is None
+            or type(after_row_index) is not int
+            or not 0 <= after_row_index < MAX_PAGE_SIZE
+        ):
+            raise HistoryError("invalid_page", "provenance cursor is outside the supported range")
+        detail, manifest = self._load_manifest_record(dataset_revision, manifest_id)
+        raw_page_hashes = _manifest_raw_page_hashes(manifest)
+        if after_raw_page_sha256 is not None and after_raw_page_sha256 not in raw_page_hashes:
+            raise KeyError(after_raw_page_sha256)
+
+        try:
+            with self._connect() as db:
+                if after_raw_page_sha256 is not None and db.execute(
+                    "SELECT 1 FROM run_provenance WHERE manifest_id=? AND raw_page_sha256=? AND row_index=? LIMIT 1",
+                    [manifest_id, after_raw_page_sha256, after_row_index],
+                ).fetchone() is None:
+                    raise KeyError((after_raw_page_sha256, after_row_index))
+                total = db.execute(
+                    "SELECT COUNT(*) FROM run_provenance WHERE manifest_id=?",
+                    [manifest_id],
+                ).fetchone()[0]
+                rows = db.execute(
+                    "SELECT p.raw_page_sha256, p.row_index, p.source_record_fingerprint, "
+                    "length(p.payload_json), "
+                    "CASE WHEN length(p.payload_json) <= ? THEN sha256(encode(p.payload_json)) ELSE NULL END, "
+                    "substr(p.payload_json, 1, ?) "
+                    "FROM run_provenance p WHERE p.manifest_id=? AND "
+                    "(? IS NULL OR p.raw_page_sha256 > ? OR (p.raw_page_sha256 = ? AND p.row_index > ?)) "
+                    "ORDER BY p.raw_page_sha256, p.row_index LIMIT ?",
+                    [HISTORY_MAX_RESPONSE_BYTES, MAX_MANIFEST_RECORD_PREVIEW_CHARS, manifest_id, after_raw_page_sha256,
+                     after_raw_page_sha256, after_raw_page_sha256, after_row_index, limit + 1],
+                ).fetchall()
+        except KeyError:
+            raise
+        except duckdb.Error as exc:
+            raise HistoryError("manifest_integrity_error", "BTC history provenance records cannot be read") from exc
+
+        if type(total) is not int or not 0 <= total <= detail["raw_record_count"]:
+            raise HistoryError("manifest_integrity_error", "BTC history provenance count is invalid")
+        has_more = len(rows) > limit
+        selected = rows[:limit]
+        provenance: list[dict[str, Any]] = []
+        previous_key = (
+            (after_raw_page_sha256, after_row_index)
+            if after_raw_page_sha256 is not None and after_row_index is not None
+            else None
+        )
+        for row in selected:
+            page_sha256, row_index, record_fingerprint, payload_bytes, payload_sha256, payload_preview = row
+            if (
+                not isinstance(page_sha256, str)
+                or page_sha256 not in raw_page_hashes
+                or type(row_index) is not int
+                or not 0 <= row_index < MAX_PAGE_SIZE
+                or not isinstance(record_fingerprint, str)
+                or re.fullmatch(r"[0-9a-f]{64}", record_fingerprint) is None
+                or payload_sha256 != record_fingerprint
+                or type(payload_bytes) is not int
+                or not 0 <= payload_bytes <= HISTORY_MAX_RESPONSE_BYTES
+                or not isinstance(payload_preview, str)
+                or not payload_preview.isascii()
+                or len(payload_preview) > MAX_MANIFEST_RECORD_PREVIEW_CHARS
+                or len(payload_preview) != min(payload_bytes, MAX_MANIFEST_RECORD_PREVIEW_CHARS)
+            ):
+                raise HistoryError("manifest_integrity_error", "BTC history provenance row failed validation")
+            key = (page_sha256, row_index)
+            if previous_key is not None and key <= previous_key:
+                raise HistoryError("manifest_integrity_error", "BTC history provenance rows are not strictly ordered")
+            previous_key = key
+            provenance.append({
+                "raw_page_sha256": page_sha256,
+                "row_index": row_index,
+                "source_record_fingerprint": record_fingerprint,
+                "payload_bytes": payload_bytes,
+                "payload_preview": payload_preview,
+                "payload_truncated": payload_bytes > MAX_MANIFEST_RECORD_PREVIEW_CHARS,
+            })
+
+        next_page_sha256 = provenance[-1]["raw_page_sha256"] if has_more and provenance else None
+        next_row_index = provenance[-1]["row_index"] if has_more and provenance else None
+        return {
+            "dataset_revision": dataset_revision,
+            "manifest_id": manifest_id,
+            "total_count": total,
+            "provenance": provenance,
+            "page": {
+                "limit": limit,
+                "after_raw_page_sha256": after_raw_page_sha256,
+                "after_row_index": after_row_index,
+                "has_more": has_more,
+                "next_after_raw_page_sha256": next_page_sha256,
+                "next_after_row_index": next_row_index,
+            },
+        }
+
+    @staticmethod
+    def _validated_manifest_catalog_record(row: tuple[Any, ...]) -> dict[str, Any]:
+        names = (
+            "manifest_id", "dataset_revision", "run_id", "raw_fingerprint", "manifest_sha256",
+            "requested_start_ms", "requested_end_ms_exclusive", "network_requests",
+        )
+        record = dict(zip(names, row))
+        if (
+            not isinstance(record["manifest_id"], str)
+            or not _MANIFEST_ID_RE.fullmatch(record["manifest_id"])
+            or not isinstance(record["dataset_revision"], str)
+            or not _BTC_DATASET_REVISION_RE.fullmatch(record["dataset_revision"])
+            or not isinstance(record["run_id"], str)
+            or re.fullmatch(r"[0-9a-f]{64}", record["run_id"]) is None
+            or not isinstance(record["raw_fingerprint"], str)
+            or re.fullmatch(r"[0-9a-f]{64}", record["raw_fingerprint"]) is None
+            or not isinstance(record["manifest_sha256"], str)
+            or re.fullmatch(r"[0-9a-f]{64}", record["manifest_sha256"]) is None
+            or type(record["requested_start_ms"]) is not int
+            or type(record["requested_end_ms_exclusive"]) is not int
+            or not 0 <= record["requested_start_ms"] < record["requested_end_ms_exclusive"] <= MAX_JS_DATE_TIME_MS
+            or type(record["network_requests"]) is not int
+            or not 0 <= record["network_requests"] <= MAX_PAGES * MAX_ATTEMPTS
+        ):
+            raise HistoryError("manifest_integrity_error", "BTC history catalog contains invalid manifest metadata")
+        return record
+
+    @staticmethod
+    def _bounded_manifest_detail(catalog_record: dict[str, Any], manifest: dict[str, Any]) -> dict[str, Any]:
+        def text(name: str, *, nullable: bool = False, max_length: int = 256) -> str | None:
+            value = manifest.get(name)
+            if nullable and value is None:
+                return None
+            if not isinstance(value, str) or not value or len(value) > max_length:
+                raise HistoryError("manifest_integrity_error", "manifest contains invalid display metadata")
+            return value
+
+        def timestamp(name: str, *, nullable: bool = False) -> str | None:
+            value = text(name, nullable=nullable, max_length=64)
+            if value is not None:
+                epoch_ms = int(_parse_utc(value, name).timestamp() * 1000)
+                if abs(epoch_ms) > MAX_JS_DATE_TIME_MS:
+                    raise HistoryError("manifest_integrity_error", "manifest contains an unsupported display timestamp")
+            return value
+
+        def count(name: str, *, nullable: bool = False) -> int | None:
+            value = manifest.get(name)
+            if nullable and value is None:
+                return None
+            if type(value) is not int or value < 0 or value > MAX_CANDLES * 2:
+                raise HistoryError("manifest_integrity_error", "manifest contains invalid display counts")
+            return value
+
+        def epoch_ms(name: str, *, nullable: bool = False) -> int | None:
+            value = manifest.get(name)
+            if nullable and value is None:
+                return None
+            if type(value) is not int or value < 0 or value > MAX_JS_DATE_TIME_MS:
+                raise HistoryError("manifest_integrity_error", "manifest contains invalid display timestamps")
+            return value
+
+        for name in ("raw_page_fingerprints", "gaps", "parent_revisions"):
+            if not isinstance(manifest.get(name), list):
+                raise HistoryError("manifest_integrity_error", "manifest contains invalid bounded collections")
+        raw_page_fingerprints = manifest["raw_page_fingerprints"]
+        gaps = manifest["gaps"]
+        parent_revisions = manifest["parent_revisions"]
+        if (
+            len(raw_page_fingerprints) > MAX_PAGES
+            or any(not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None for value in raw_page_fingerprints)
+            or len(gaps) > MAX_CANDLES
+            or any(not isinstance(value, str) or not _BTC_DATASET_REVISION_RE.fullmatch(value) for value in parent_revisions)
+        ):
+            raise HistoryError("manifest_integrity_error", "manifest contains invalid collection entries")
+        outcome_counts = manifest.get("outcome_counts")
+        if (
+            not isinstance(outcome_counts, dict)
+            or len(outcome_counts) > 32
+            or any(
+                not isinstance(name, str)
+                or not re.fullmatch(r"[a-z][a-z0-9_]{0,47}", name)
+                or type(value) is not int
+                or value < 0
+                or value > MAX_CANDLES * 2
+                for name, value in outcome_counts.items()
+            )
+        ):
+            raise HistoryError("manifest_integrity_error", "manifest contains invalid outcome counts")
+        package_versions = manifest.get("package_versions")
+        if (
+            not isinstance(package_versions, dict)
+            or set(package_versions) != {"duckdb", "pyarrow"}
+            or any(not isinstance(value, str) or not value or len(value) > 64 for value in package_versions.values())
+        ):
+            raise HistoryError("manifest_integrity_error", "manifest contains invalid package versions")
+        if (
+            manifest.get("schema") != "market-os.btc-history-manifest.v1"
+            or manifest.get("api_version") != HISTORY_VERSION
+            or manifest.get("manifest_id") != catalog_record["manifest_id"]
+            or manifest.get("dataset_revision") != catalog_record["dataset_revision"]
+            or manifest.get("run_id") != catalog_record["run_id"]
+            or manifest.get("raw_fingerprint") != catalog_record["raw_fingerprint"]
+            or manifest.get("requested_start_ms") != catalog_record["requested_start_ms"]
+            or manifest.get("requested_end_ms_exclusive") != catalog_record["requested_end_ms_exclusive"]
+            or manifest.get("network_requests") != catalog_record["network_requests"]
+        ):
+            raise HistoryError("manifest_integrity_error", "manifest metadata does not match the local catalog")
+
+        raw_fingerprint = text("raw_fingerprint", max_length=64)
+        canonical_fingerprint = text("canonical_fingerprint", max_length=64)
+        outcome_fingerprint = text("outcome_fingerprint", max_length=64)
+        parquet_sha256 = text("parquet_sha256", max_length=64)
+        for fingerprint in (raw_fingerprint, canonical_fingerprint, outcome_fingerprint, parquet_sha256):
+            if re.fullmatch(r"[0-9a-f]{64}", fingerprint or "") is None:
+                raise HistoryError("manifest_integrity_error", "manifest contains an invalid fingerprint")
+
+        endpoint_class = text("endpoint_class", max_length=64)
+        if endpoint_class not in {"public-market-data", "synthetic-fixture"}:
+            raise HistoryError("manifest_integrity_error", "manifest contains an invalid endpoint class")
+        endpoint_host = text("endpoint_host", nullable=True, max_length=255)
+        if endpoint_class == "public-market-data" and endpoint_host is None:
+            raise HistoryError("manifest_integrity_error", "manifest is missing its public endpoint host")
+        if endpoint_class != "public-market-data" and endpoint_host is not None:
+            raise HistoryError("manifest_integrity_error", "manifest has an unexpected endpoint host")
+
+        return {
+            **catalog_record,
+            "schema": text("schema", max_length=64),
+            "api_version": text("api_version", max_length=64),
+            "contract_version": text("contract_version", max_length=64),
+            "symbol": text("symbol", max_length=32),
+            "venue": text("venue", max_length=64),
+            "interval": text("interval", max_length=16),
+            "source_identity": text("source_identity", max_length=160),
+            "endpoint_class": endpoint_class,
+            "endpoint_host": endpoint_host,
+            "requested_start_ms": catalog_record["requested_start_ms"],
+            "requested_end_ms_exclusive": catalog_record["requested_end_ms_exclusive"],
+            "observed_start_ms": epoch_ms("observed_start_ms", nullable=True),
+            "observed_end_ms_exclusive": epoch_ms("observed_end_ms_exclusive", nullable=True),
+            "source_timestamp_min": timestamp("source_timestamp_min", nullable=True),
+            "source_timestamp_max": timestamp("source_timestamp_max", nullable=True),
+            "receipt_timestamp_min": timestamp("receipt_timestamp_min", nullable=True),
+            "receipt_timestamp_max": timestamp("receipt_timestamp_max", nullable=True),
+            "availability_timestamp_max": timestamp("availability_timestamp_max", nullable=True),
+            "canonicalization_timestamp": timestamp("canonicalization_timestamp"),
+            "raw_fingerprint": raw_fingerprint,
+            "canonical_fingerprint": canonical_fingerprint,
+            "outcome_fingerprint": outcome_fingerprint,
+            "canonical_candle_count": count("canonical_candle_count"),
+            "raw_record_count": count("raw_record_count"),
+            "outcome_counts": dict(sorted(outcome_counts.items())),
+            "raw_page_count": len(manifest["raw_page_fingerprints"]),
+            "gap_count": len(manifest["gaps"]),
+            "parent_revision_count": len(manifest["parent_revisions"]),
+            "parquet_sha256": parquet_sha256,
+            "package_versions": dict(sorted(package_versions.items())),
+            "python_version": text("python_version", max_length=64),
+        }
+
+    def inspect_candles_page(
+        self,
+        dataset_revision: str,
+        *,
+        limit: int = 25,
+        after_open_time_ms: int | None = None,
+    ) -> dict[str, Any]:
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+        if after_open_time_ms is not None and (
+            type(after_open_time_ms) is not int
+            or not 0 <= after_open_time_ms <= MAX_JS_DATE_TIME_MS
+        ):
+            raise HistoryError("invalid_page", "after_open_time_ms is outside the supported UTC date range")
+        if not _DATASET_ID_RE.fullmatch(dataset_revision):
+            raise KeyError(dataset_revision)
+
+        dataset = self._dataset_row(dataset_revision)
+        if (
+            not all(
+                isinstance(dataset[field], str)
+                and re.fullmatch(r"[A-Za-z0-9._-]{1,64}", dataset[field]) is not None
+                for field in ("symbol", "venue", "interval")
+            )
+            or not isinstance(dataset["canonical_fingerprint"], str)
+            or re.fullmatch(r"[0-9a-f]{64}", dataset["canonical_fingerprint"]) is None
+            or type(dataset["candle_count"]) is not int
+            or dataset["candle_count"] < 1
+            or dataset["candle_count"] > MAX_CANDLES
+            or type(dataset["first_open_time_ms"]) is not int
+            or type(dataset["last_close_time_ms"]) is not int
+            or dataset["first_open_time_ms"] < 0
+            or dataset["first_open_time_ms"] >= dataset["last_close_time_ms"]
+            or dataset["last_close_time_ms"] > MAX_JS_DATE_TIME_MS
+        ):
+            raise HistoryError("catalog_integrity_error", "BTC history catalog contains invalid dataset metadata")
+
+        path = self._verified_dataset_path(dataset)
+        try:
+            parquet_schema = pq.read_schema(path)
+        except (OSError, ValueError) as exc:
+            raise HistoryError("dataset_integrity_error", "BTC history Parquet metadata cannot be read") from exc
+        decimal_columns = {"open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal"}
+        if decimal_columns.issubset(set(parquet_schema.names)):
+            decimal_select = "open_decimal, high_decimal, low_decimal, close_decimal, volume_decimal"
+        else:
+            decimal_select = "NULL::VARCHAR AS open_decimal, NULL::VARCHAR AS high_decimal, NULL::VARCHAR AS low_decimal, NULL::VARCHAR AS close_decimal, NULL::VARCHAR AS volume_decimal"
+
+        try:
+            with self._connect() as db:
+                if after_open_time_ms is not None and db.execute(
+                    "SELECT 1 FROM read_parquet(?) WHERE open_time_ms=? LIMIT 1",
+                    [str(path), after_open_time_ms],
+                ).fetchone() is None:
+                    raise KeyError(after_open_time_ms)
+                rows = db.execute(
+                    f"SELECT open_time_ms, close_time_ms, open, high, low, close, volume, {decimal_select} "
+                    "FROM read_parquet(?) WHERE (? IS NULL OR open_time_ms > ?) "
+                    "ORDER BY open_time_ms LIMIT ?",
+                    [str(path), after_open_time_ms, after_open_time_ms, limit + 1],
+                ).fetchall()
+        except duckdb.Error as exc:
+            raise HistoryError("dataset_integrity_error", "BTC history Parquet candles cannot be read") from exc
+
+        has_more = len(rows) > limit
+        rows = rows[:limit]
+        candles: list[dict[str, Any]] = []
+        for row in rows:
+            open_time_ms, close_time_ms, *values = row
+            if (
+                type(open_time_ms) is not int
+                or type(close_time_ms) is not int
+                or open_time_ms < 0
+                or open_time_ms >= close_time_ms
+                or open_time_ms < dataset["first_open_time_ms"]
+                or close_time_ms > dataset["last_close_time_ms"]
+                or close_time_ms > MAX_JS_DATE_TIME_MS
+            ):
+                raise HistoryError("dataset_integrity_error", "BTC history Parquet contains invalid candle timestamps")
+            if candles and candles[-1]["open_time_ms"] >= open_time_ms:
+                raise HistoryError("dataset_integrity_error", "BTC history Parquet candle order is invalid")
+            numeric = values[:5]
+            decimals = values[5:10]
+            names = ("open", "high", "low", "close", "volume")
+            display_values: dict[str, str] = {}
+            for index, name in enumerate(names):
+                source = decimals[index] if isinstance(decimals[index], str) else numeric[index]
+                if isinstance(source, str) and len(source) > 128:
+                    raise HistoryError("dataset_integrity_error", "BTC history Parquet contains an oversized numeric value")
+                value = _decimal(source, name, minimum=Decimal(0))
+                if name != "volume" and value <= 0:
+                    raise HistoryError("dataset_integrity_error", "BTC history Parquet contains a non-positive price")
+                display_values[name] = source if isinstance(source, str) else str(value)
+            candles.append({
+                "open_time_ms": open_time_ms,
+                "close_time_ms": close_time_ms,
+                **display_values,
+            })
+
+        next_cursor = candles[-1]["open_time_ms"] if has_more and candles else None
+        return {
+            "dataset": {
+                "dataset_revision": dataset_revision,
+                "symbol": dataset["symbol"],
+                "venue": dataset["venue"],
+                "interval": dataset["interval"],
+                "canonical_fingerprint": dataset["canonical_fingerprint"],
+                "candle_count": dataset["candle_count"],
+                "first_open_time_ms": dataset["first_open_time_ms"],
+                "last_close_time_ms": dataset["last_close_time_ms"],
+            },
+            "candles": candles,
+            "page": {
+                "limit": limit,
+                "after_open_time_ms": after_open_time_ms,
+                "has_more": has_more,
+                "next_after_open_time_ms": next_cursor,
+            },
+        }
+
     def inspect_manifest(self, dataset_or_manifest_id: str) -> dict[str, Any]:
         if not _DATASET_ID_RE.fullmatch(dataset_or_manifest_id):
             raise KeyError(dataset_or_manifest_id)
@@ -1170,11 +1916,7 @@ class HistoryStore:
 
     def inspect_candles(self, dataset_revision: str, *, start_time_ms: int | None = None, end_time_ms: int | None = None) -> list[dict[str, Any]]:
         dataset = self._dataset_row(dataset_revision)
-        path = (self.root / dataset["parquet_path"]).resolve()
-        if not path.is_relative_to(self.dataset_dir.resolve()) or not path.is_file():
-            raise HistoryError("dataset_integrity_error", "Parquet path is missing or outside dataset storage")
-        if _sha(path.read_bytes()) != dataset["parquet_sha256"]:
-            raise HistoryError("dataset_integrity_error", "Parquet file hash mismatch")
+        path = self._verified_dataset_path(dataset)
         parquet_schema = pq.read_schema(path)
         decimal_columns = {"open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal"}
         if decimal_columns.issubset(set(parquet_schema.names)):
@@ -1194,6 +1936,32 @@ class HistoryStore:
             rows = db.execute(query, parquet_params).fetchall()
         fields = ("open_time_ms", "close_time_ms", "open", "high", "low", "close", "volume", "open_decimal", "high_decimal", "low_decimal", "close_decimal", "volume_decimal", "source_timestamp", "received_at", "availability_timestamp", "canonical_fingerprint")
         return [dict(zip(fields, row)) for row in rows]
+
+    def _verified_dataset_path(self, dataset: dict[str, Any]) -> Path:
+        revision = dataset.get("dataset_revision")
+        expected_relative_path = f"datasets/{revision}/candles.parquet"
+        if (
+            not isinstance(revision, str)
+            or not _DATASET_ID_RE.fullmatch(revision)
+            or dataset.get("parquet_path") != expected_relative_path
+        ):
+            raise HistoryError("dataset_integrity_error", "Parquet path is invalid")
+        try:
+            root = self.root.resolve()
+            dataset_dir = self.dataset_dir.resolve()
+            path = (root / dataset["parquet_path"]).resolve()
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError("dataset_integrity_error", "Parquet path cannot be resolved safely") from exc
+        if not dataset_dir.is_relative_to(root) or not path.is_relative_to(dataset_dir) or not path.is_file():
+            raise HistoryError("dataset_integrity_error", "Parquet path is missing or outside dataset storage")
+        try:
+            with path.open("rb") as source:
+                parquet_fingerprint = hashlib.file_digest(source, "sha256").hexdigest()
+        except OSError as exc:
+            raise HistoryError("dataset_integrity_error", "Parquet file cannot be read") from exc
+        if parquet_fingerprint != dataset["parquet_sha256"]:
+            raise HistoryError("dataset_integrity_error", "Parquet file hash mismatch")
+        return path
 
     def inspect_outcomes(self, dataset_or_manifest_id: str) -> list[dict[str, Any]]:
         manifest_ids = self._manifest_ids(dataset_or_manifest_id)
@@ -1462,3 +2230,14 @@ def _count_outcomes(outcomes: list[dict[str, Any]]) -> dict[str, int]:
     for item in outcomes:
         counts[item["status"]] = counts.get(item["status"], 0) + 1
     return dict(sorted(counts.items()))
+
+
+def _manifest_raw_page_hashes(manifest: dict[str, Any]) -> set[str]:
+    values = manifest.get("raw_page_fingerprints")
+    if (
+        not isinstance(values, list)
+        or len(values) > MAX_PAGES
+        or any(not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None for value in values)
+    ):
+        raise HistoryError("manifest_integrity_error", "manifest raw-page fingerprints are invalid")
+    return set(values)

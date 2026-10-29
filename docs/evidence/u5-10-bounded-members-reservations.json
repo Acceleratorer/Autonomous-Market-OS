@@ -1,0 +1,75 @@
+{
+  "schema": "market-os.u5.10-bounded-members-reservations@v1",
+  "review_date": "2026-10-29",
+  "status": "implemented-local",
+  "endpoint": {
+    "method": "GET",
+    "path": "/v2/b4/portfolios/{portfolio_id}/inspection",
+    "api_version": "market-os.b4-portfolio-inspection@v2",
+    "maximum_page_size": 100,
+    "page_limits": {
+      "members": 25,
+      "reservations": 25,
+      "orders": 25,
+      "risk": 8
+    },
+    "independent_cursors": [
+      "member_after_strategy_id",
+      "reservation_before_order_id",
+      "order_before_id",
+      "risk_before_sequence"
+    ],
+    "reservation_totals_cover_full_open_set": true,
+    "member_total_count_covers_full_membership": true,
+    "rejects_unknown_or_duplicate_query_parameters": true,
+    "unknown_cursor_status": 400,
+    "v1_compatibility_preserved": true
+  },
+  "consumers": [
+    "apps/web/next-operator",
+    "apps/web/operator"
+  ],
+  "verification": {
+    "focused_python_tests": "42 passed",
+    "typescript_check": "passed",
+    "optimized_production_build": "passed",
+    "browser_smoke": {
+      "status": "passed",
+      "mode": "production",
+      "synthetic_members": 30,
+      "members_per_page": 25,
+      "synthetic_open_reservations": 27,
+      "reservations_per_page": 25,
+      "synthetic_orders": 37,
+      "orders_per_page": 25,
+      "synthetic_risk_outcomes": 10,
+      "risk_outcomes_per_page": 8,
+      "independent_cursors_preserved_in_next_and_html_shell": true,
+      "viewport_width": 375,
+      "next_document_width": 375,
+      "html_shell_document_width": 375,
+      "browser_console_errors": 0,
+      "screenshots": [
+        "output/playwright/u5-10/next-mobile-paged-full.png",
+        "output/playwright/u5-10/operator-shell-mobile-full.png"
+      ]
+    }
+  },
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "loopback_only": true,
+    "credentials": false,
+    "provider_calls": false,
+    "public_listener": false,
+    "live_trading": false
+  },
+  "known_limits": [
+    "The v1 aggregate, legacy detail resources, and portfolio catalog are not bounded by this milestone.",
+    "Validated broker recovery and risk-page ledger selection remain linear in ledger size.",
+    "The legacy local risk resource still returns complete history.",
+    "Connected access still requires the U5.5 target, identity, isolation, and operating decisions.",
+    "B4 retention deletion and versioned schema transformation remain separate contracts."
+  ]
+}

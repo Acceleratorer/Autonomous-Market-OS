@@ -5,6 +5,10 @@ The fusion repository is the product. The repositories under
 Do not merge their histories or copy their entire trees into this repository.
 Integrate them through narrow adapters and versioned contracts.
 
+The current application-surface slice has been staged under `apps/web`,
+`apps/cli`, and `apps/gateway`; these remain thin consumers and do not replace
+the canonical `market_os` compatibility entrypoints.
+
 ## Current repository shape
 
 ```text
@@ -23,7 +27,9 @@ Autonomous-Market-OS/
   apps/
     gateway/                 # HTTP/WebSocket transport over root services
     cli/                     # CLI entry points; domain logic stays in packages
-    web/                     # browser operator console
+    web/                     # browser operator console; public static source plus local shell
+      public/                # disconnected static preview
+      operator/              # loopback GET-only operator shell
     desktop/                 # thin desktop shell
     mobile/                  # thin mobile shell
   market_os/
@@ -83,3 +89,7 @@ Autonomous-Market-OS/
 6. Reuse the capability through the shared API and CLI.
 
 Do not create a package merely because the target tree contains a directory name. Add a module when a real workflow needs it.
+
+The active surface split is `apps/web`, `apps/cli`, and `apps/gateway`. Desktop
+and mobile folders remain reserved for concrete shell workflows; a generic
+`apps/app` folder is intentionally not part of the target layout.

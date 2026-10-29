@@ -1,0 +1,22 @@
+{
+  "schema": "market-os.u5.7-web-stack-deployment-matrix@v1",
+  "review_date": "2026-10-29",
+  "status": "decision-ready-not-selected",
+  "active_stack": "plain-html-css-js",
+  "framework_candidates": {
+    "astro": "componentized-read-only-candidate",
+    "react-vite": "client-interaction-candidate",
+    "nextjs": "authenticated-server-runtime-deferred"
+  },
+  "active_deployment": ["loopback", "static-artifact-handoff"],
+  "unselected_deployment": ["private-authenticated-preview", "public-connected-deployment"],
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "credentials": false,
+    "public_listener": false,
+    "live_trading": false
+  },
+  "next_gate": "choose_deployment_target_identity_and_interaction_scope"
+}

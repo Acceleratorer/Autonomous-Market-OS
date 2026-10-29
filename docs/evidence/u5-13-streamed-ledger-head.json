@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.u5-13-streamed-ledger-head-evidence@v1",
+  "status": "passed",
+  "date": "2026-10-29",
+  "measurement": {
+    "ledger_records": 100,
+    "ledger_bytes": 3475892,
+    "operation": "compact summary freshness check; local median milliseconds",
+    "sample_runs": 5,
+    "before": 5.47,
+    "after": 4.44,
+    "cold_recovery_before_ms": 322.426,
+    "cold_recovery_after_ms": 411.923,
+    "note": "Diagnostic sample only; timings varied between runs and are not a CI performance threshold."
+  },
+  "checks": {
+    "focused_python_tests": 60,
+    "stream_does_not_materialize_full_ledger": "passed",
+    "interior_invalid_utf8_rejected": "passed",
+    "crlf_and_trailing_blank_lines": "passed",
+    "large_trailing_whitespace_after_blank_line": "passed",
+    "large_same_line_trailing_whitespace_preserved": "passed",
+    "large_unicode_whitespace_line_skipped": "passed",
+    "non_json_whitespace_prefix_rejected": "passed",
+    "raw_tab_at_chunk_boundary_rejected": "passed",
+    "multi_chunk_tail_record": "passed",
+    "malformed_ledger_regressions": "passed",
+    "python_compile": "passed",
+    "git_diff_check": "passed"
+  },
+  "preserved": [
+    "full cold ledger replay",
+    "append-only hash-chain validation",
+    "checkpoint-to-replayed-snapshot validation",
+    "stale-state rejection"
+  ],
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "loopback_only": true,
+    "read_only": true,
+    "public_deployment_enabled": false
+  },
+  "remaining": [
+    "catalog directory enumeration remains linear",
+    "per-portfolio cold recovery remains a full replay",
+    "risk, approval, and ledger page selection remains a full scan",
+    "U5.5 connected target, identity, isolation, and operations decisions",
+    "B4 retention deletion and versioned schema transformation"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "market-os.u5.3-deployment-access-observability@v1",
+  "review_date": "2026-10-28",
+  "status": "implemented-local",
+  "static_handoff": {
+    "manifest_schema": "market-os.web-static-artifact@v1",
+    "exact_file_set": true,
+    "sha256_entries": true,
+    "deterministic_fingerprint": true,
+    "credentials": false,
+    "public_deployment": false
+  },
+  "local_gateway": {
+    "request_id_response_header": "X-Request-ID",
+    "request_id_audit_field": true,
+    "query_values_logged": false,
+    "loopback_only": true,
+    "untrusted_host_rejected": true,
+    "authentication": false,
+    "mutation_routes": false
+  },
+  "verification": {
+    "surface_tests": true,
+    "request_correlation_test": true,
+    "compileall": true,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "next_gate": "separate_authenticated_connected_web_contract"
+}

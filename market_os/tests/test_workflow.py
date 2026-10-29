@@ -8,11 +8,12 @@ from pathlib import Path
 
 import pytest
 
+import market_os.api as api
 from market_os.providers import default_providers
 from market_os.contracts import Run, RunEvent
 from market_os.store import RunStore
 from market_os.workflow import MarketWorkflow
-from market_os.api import make_handler
+from market_os.api import make_handler, serve
 from http.server import ThreadingHTTPServer
 
 
@@ -269,6 +270,91 @@ def test_service_writes_structured_request_audit_log(tmp_path: Path) -> None:
     assert records[-1]["method"] == "GET"
     assert records[-1]["path"] == "/healthz"
     assert records[-1]["status"] == 200
+
+
+def test_service_request_id_is_correlated_without_logging_query_values(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path / "state"))
+    log_path = tmp_path / "logs" / "service.jsonl"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow, service_log_path=log_path))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        response = urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2)
+        request_id = response.headers["X-Request-ID"]
+        assert request_id and len(request_id) == 32
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    record = json.loads(log_path.read_text(encoding="utf-8").splitlines()[-1])
+    assert record["request_id"] == request_id
+    assert record["path"] == "/healthz"
+    assert "request_id" in log_path.read_text(encoding="utf-8")
+
+
+def test_service_audit_log_omits_query_string(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path / "state"))
+    log_path = tmp_path / "logs" / "service.jsonl"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow, service_log_path=log_path))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        response = urllib.request.urlopen(
+            f"http://127.0.0.1:{server.server_port}/v1/btc/history/readiness?cutoff-ms=1704067200000&token=fixture-secret",
+            timeout=2,
+        )
+        assert response.status == 200
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    records = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+    assert records[-1]["path"] == "/v1/btc/history/readiness"
+    assert "fixture-secret" not in log_path.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("method", ["GET", "POST"])
+@pytest.mark.parametrize("host", ["attacker.example", "evil@localhost", "localhost#attacker", "localhost:99999", "[invalid"])
+def test_service_rejects_untrusted_host_header(tmp_path: Path, method: str, host: str) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow))
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/healthz",
+            headers={"Host": host},
+            method=method,
+        )
+        with pytest.raises(urllib.error.HTTPError) as response:
+            urllib.request.urlopen(request, timeout=2)
+        assert response.value.code == 403
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_rejects_non_loopback_bind(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    with pytest.raises(ValueError, match="loopback-only"):
+        serve(workflow, host="0.0.0.0")
+
+
+def test_service_recovers_before_opening_listener(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    class BrokenRecovery:
+        def recover_inflight_runs(self) -> None:
+            raise RuntimeError("recovery failed")
+
+    opened = []
+    monkeypatch.setattr(api, "ThreadingHTTPServer", lambda *args, **kwargs: opened.append((args, kwargs)))
+
+    with pytest.raises(RuntimeError, match="recovery failed"):
+        api.serve(BrokenRecovery(), host="127.0.0.1", port=0)
+
+    assert opened == []
 
 
 def test_service_startup_recovers_abandoned_run(tmp_path: Path) -> None:

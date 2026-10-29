@@ -1,0 +1,54 @@
+{
+  "schema": "market-os.u5-17-next-bounded-btc-ingestion-manifests-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": [
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/page.tsx",
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/page.tsx"
+  ],
+  "api": [
+    "GET /v1/btc/history/datasets/<revision>/manifests",
+    "GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>"
+  ],
+  "checks": {
+    "focused_api_and_history_tests": "passed: 41 tests",
+    "bounded_manifest_catalog_paging": "passed: 1..100 summaries, ordered exclusive cursor, dataset-bound cursor validation",
+    "read_only_fixed_store": "passed: caller root rejected, missing store does not initialize, catalog mtime unchanged",
+    "manifest_detail_integrity": "passed: ID-derived contained path, 8 MiB cap, SHA-256 verified before parsing",
+    "oversized_manifest_rejected": "passed: file above 8 MiB returns generic integrity response",
+    "response_omissions": "passed: no filesystem paths, raw-page arrays, gap arrays, parent arrays, or provenance payloads",
+    "configured_root_error_normalization": "passed: resolver failure returns fixed message without local path disclosure",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "desktop_and_mobile_browser_smoke": "passed: registry to dataset to manifest list/detail, next-page navigation, 375px document width, 341px scroll region containing a 912px table, zero console errors, browser requests stayed on loopback",
+    "code_review": "passed: path-disclosure finding fixed; follow-up found no remaining issues",
+    "security_review": "passed: no actionable findings"
+  },
+  "contract": {
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "cursor": "exclusive after_manifest_id; cursor must identify a manifest for the requested dataset",
+    "sort": "ascending manifest_id",
+    "store_path_parameter": false,
+    "read_only": true,
+    "manifest_read_limit_bytes": 8388608,
+    "manifest_hash_check": "SHA-256 checked against the configured DuckDB catalog before parsing",
+    "returned_collections": "outcome_counts plus counts of raw pages, gaps, and parent revisions",
+    "returns_filesystem_paths": false,
+    "returns_full_manifest_arrays_or_provenance": false,
+    "history_acquisition_or_provider_call": false,
+    "canonical_replay_still_required": true
+  },
+  "remaining": [
+    "Manifest details above 8 MiB intentionally fail closed in the web view",
+    "Outcome rows, gap rows, and raw provenance require separate bounded pages",
+    "B2/B3 experiment and report views remain separate bounded contracts",
+    "Connected deployment remains gated by U5.5 target, identity, isolation, and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-17/manifest-list-desktop.png",
+    "output/playwright/u5-17/manifest-detail-desktop.png",
+    "output/playwright/u5-17/manifest-list-mobile.png",
+    "output/playwright/u5-17/manifest-detail-mobile.png"
+  ]
+}

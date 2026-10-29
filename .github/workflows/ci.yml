@@ -34,13 +34,21 @@ jobs:
       - name: CLI and API smoke tests
         run: >-
           python -m pytest -q
-          market_os/tests/test_m2_quality_benchmark.py::test_cli_runs_and_inspects_benchmark
-          market_os/tests/test_m2_quality_benchmark.py::test_api_runs_and_inspects_benchmark_without_trading_state
-          market_os/tests/test_m2_openai_summary.py::test_default_selection_does_not_import_or_call_openai
+          market_os/tests/test_quality_benchmark.py::test_cli_runs_and_inspects_benchmark
+          market_os/tests/test_quality_benchmark.py::test_api_runs_and_inspects_benchmark_without_trading_state
+          market_os/tests/test_openai_summary_adapter.py::test_default_selection_does_not_import_or_call_openai
       - name: Diff check
         run: git diff --check
       - name: TypeScript dashboard contract test
         run: npx --yes tsx tests/market-os-readonly-dashboard.test.ts
+      - name: Verify web preview compatibility copy
+        run: python scripts/build_web_artifact.py --check
+      - name: Verify static deployment readiness
+        run: python -m pytest -q market_os/tests/test_app_surfaces.py::test_web_artifact_packaging_is_exact_and_deterministic
+      - name: Verify application surfaces
+        run: python -m pytest -q market_os/tests/test_app_surfaces.py
+      - name: Verify local operator surface
+        run: python -m pytest -q market_os/tests/test_operator_surface.py
 
   package-readonly-dashboard:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -51,14 +59,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Stage paper-only read-only dashboard
-        run: |
-          mkdir -p site/market-os
-          cp docs/hosting/market-os/index.html site/market-os/index.html
-          cp docs/hosting/market-os/.htaccess site/market-os/.htaccess
-          cp docs/hosting/market-os/DEPLOYMENT.txt site/market-os/DEPLOYMENT.txt
+        run: python scripts/build_web_artifact.py --output site/market-os --manifest site/market-os.manifest.json
       - name: Upload dashboard artifact
         uses: actions/upload-artifact@v4
         with:
           name: market-os-readonly-dashboard
-          path: site/market-os
+          path: |
+            site/market-os
+            site/market-os.manifest.json
           if-no-files-found: error

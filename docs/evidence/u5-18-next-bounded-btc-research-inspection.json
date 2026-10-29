@@ -1,0 +1,58 @@
+{
+  "schema": "market-os.u5-18-next-bounded-btc-research-inspection-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": [
+    "apps/web/next-operator/src/app/experiments/page.tsx",
+    "apps/web/next-operator/src/app/experiments/[engine]/[runId]/page.tsx"
+  ],
+  "api": [
+    "GET /v1/btc/research/b2/runs",
+    "GET /v1/btc/research/b2/runs/<run-id>",
+    "GET /v1/btc/research/b3/runs",
+    "GET /v1/btc/research/b3/runs/<run-id>"
+  ],
+  "checks": {
+    "focused_research_and_operator_tests": "passed: 29 tests",
+    "catalog_paging": "passed: 1..100 summaries, ordered exclusive cursor, engine-specific cursor validation",
+    "fixed_store_read_only": "passed: caller roots rejected, missing stores not initialized, legacy read-only stores do not initialize on GET",
+    "result_integrity": "passed: 256 KiB cap and SHA-256/size validation before parsing",
+    "b3_lineage": "passed: dataset, feature, fixture and experiment match; matched inputs required; source request counts remain zero",
+    "response_omissions": "passed: no filesystem paths, feature/label/prediction arrays, fixture cases, or provider responses",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "desktop_and_mobile_browser_smoke": "passed: B2 paging/detail, B3 detail, 375px document width, 341px table region containing 1205px B2 and 698px B3 tables, 61 loopback browser requests, zero console errors",
+    "screenshots_reviewed": true,
+    "code_review": "passed: no findings",
+    "security_review": "passed: no actionable findings",
+    "standards_review": "passed: no hard breaches; duplicate active-link styles combined"
+  },
+  "contract": {
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "cursor": "exclusive after_run_id; cursor must identify a run for the selected engine",
+    "sort": "ascending run_id",
+    "store_roots": "gateway-configured B2/B3 roots; no caller-selected root",
+    "read_only": true,
+    "manifest_read_limit_bytes": 262144,
+    "result_read_limit_bytes": 262144,
+    "result_hash_check": "SHA-256 and size checked against the selected run manifest before parsing",
+    "returns_filesystem_paths": false,
+    "returns_full_artifact_arrays": false,
+    "runs_experiments_or_calls_providers": false,
+    "b3_promotion": "not-promoted",
+    "local_api_host": "127.0.0.1",
+    "local_api_port_default": 8787
+  },
+  "remaining": [
+    "The shipped B1 fixture has no leakage-safe test samples, so measured metrics remain unavailable",
+    "Outcome rows, gap rows, and raw provenance need separate bounded web routes",
+    "Connected deployment remains gated by U5.5 target, identity, isolation, and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-18/b2-detail-desktop.png",
+    "output/playwright/u5-18/b2-detail-mobile.png",
+    "output/playwright/u5-18/b3-detail-desktop.png",
+    "output/playwright/u5-18/b3-detail-mobile.png"
+  ]
+}

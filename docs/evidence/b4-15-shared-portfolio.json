@@ -1,0 +1,61 @@
+{
+  "schema": "market-os.b4-15.shared-portfolio@v1",
+  "milestone": "B4.15",
+  "review_date": "2026-10-28",
+  "status": "implemented-local",
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "shared_portfolio_scope": "local_python_broker",
+    "mutation_surface": "python_only",
+    "cli_http_mutation": false,
+    "providers": false,
+    "network": false,
+    "credentials": false,
+    "live_trading": false
+  },
+  "capabilities": {
+    "stable_shared_identity": true,
+    "immutable_membership": true,
+    "strategy_attributed_orders": true,
+    "cash_reservations": true,
+    "inventory_reservations": true,
+    "portfolio_wide_locking": true,
+    "stale_writer_rejection": true,
+    "idempotent_retries_and_conflicts": true,
+    "recovery_invariant_validation": true,
+    "checkpoint_lag_without_rewrite": true,
+    "append_only_ledger": true,
+    "deterministic_fingerprints": true
+  },
+  "focused_tests": 7,
+  "lifecycle_follow_up": {
+    "contract": "B4.16-LIFECYCLE-CONTRACT.md",
+    "focused_tests": 5,
+    "full_suite": "494_passed_0_failed_1_skipped_with_empty_typesafe_api_key",
+    "status": "implemented-local"
+  },
+  "retention_follow_up": {
+    "contract": "B4.17-RETENTION-ARCHIVE-CONTRACT.md",
+    "status": "implemented-local",
+    "checkpoint_without_ledger": "rejected",
+    "deletion_enabled": false,
+    "schema_transform_enabled": false
+  },
+  "verification": {
+    "shared_tests": "passed",
+    "broker_concurrency_mutation_backup_migration": "passed",
+    "full_suite": "497_passed_0_failed_1_skipped_with_empty_typesafe_api_key",
+    "non_integration_suite": "484_passed_0_failed_1_skipped_with_empty_typesafe_api_key",
+    "compileall": true,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "open_gaps": [
+    "partial_fills_and_expiry",
+    "authenticated_external_mutation_api",
+    "retention_and_archive_operations",
+    "versioned_schema_migration_transformer"
+  ]
+}

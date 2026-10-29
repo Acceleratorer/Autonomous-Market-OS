@@ -1,0 +1,35 @@
+{
+  "schema": "market-os.u4.b4-local-closeout@v1",
+  "review_date": "2026-10-28",
+  "status": "local-slice-closed",
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "portfolio_scope": "isolated_strategy_instrument_fixture",
+    "writer_scope": "single_writer_local_stale_reject_reload",
+    "api_scope": "read_only"
+  },
+  "slices": {
+    "completed_through": "B4.14",
+    "backup_restore": "validated_local_zip_v1",
+    "migration": "read_only_preflight_only"
+  },
+  "verification": {
+    "focused_tests_passed": 62,
+    "full_offline_tests_passed": 482,
+    "full_offline_preexisting_optional_failures": 0,
+    "full_offline_skipped": 1,
+    "compileall": true,
+    "secret_scan": true,
+    "diff_check": true
+  },
+  "open_gaps": [
+    "partial_fills_and_expiry_if_lifecycle_scope_expands",
+    "shared_portfolio_membership_and_concurrency",
+    "externally_exposed_mutation_api_authentication_and_operator_audit_policy",
+    "retention_and_archive_operations",
+    "versioned_schema_migration_transformer"
+  ],
+  "deployment": "deferred",
+  "live_trading": "out_of_scope"
+}

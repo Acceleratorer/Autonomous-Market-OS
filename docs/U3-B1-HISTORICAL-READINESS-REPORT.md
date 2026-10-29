@@ -118,7 +118,7 @@ Verified locally without provider access:
 
 - `python -m pytest market_os/tests/test_btc_history.py -q`: **30 passed**.
 - `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **44 passed**.
-- `python -m pytest market_os/tests/test_btc_b2.py market_os/tests/test_btc_b3.py market_os/tests/test_btc_connectivity.py -q`: **58 passed** with `TYPESAFE_API_KEY` unset.
+- `python -m pytest market_os/tests/test_btc_features.py market_os/tests/test_btc_jev_evaluation.py market_os/tests/test_btc_connectivity.py -q`: **58 passed** with `TYPESAFE_API_KEY` unset.
 - `python -m pytest -q`: **273 passed, 0 failed, 1 skipped** with `TYPESAFE_API_KEY` unset.
 - `python -m compileall -q market_os`: passed.
 - `python scripts/ci_checks.py validate-evidence`: passed for 22 evidence JSON files.

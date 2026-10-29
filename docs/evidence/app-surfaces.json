@@ -1,0 +1,34 @@
+{
+  "schema": "market-os.app-surfaces@v1",
+  "review_date": "2026-10-28",
+  "status": "implemented-local",
+  "surfaces": {
+    "web_source": "apps/web/public",
+    "cli_entrypoint": "apps/cli",
+    "gateway_entrypoint": "apps/gateway",
+    "legacy_compatibility_copy": "docs/hosting/market-os"
+  },
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "web_read_only": true,
+    "public_deployment": false,
+    "authentication": false,
+    "mutation_routes": false,
+    "providers": false,
+    "network": false,
+    "credentials": false
+  },
+  "verification": {
+    "surface_tests": 4,
+    "full_suite": "498_passed_0_failed_7_skipped_with_empty_typesafe_api_key",
+    "web_copy_check": true,
+    "static_artifact_readiness": true,
+    "dashboard_contract": true,
+    "compileall": true,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "next_gate": "separate_versioned_deployment_and_access_decision"
+}

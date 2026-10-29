@@ -1,0 +1,49 @@
+{
+  "schema": "market-os.u5-12-one-pass-audit-paging-evidence@v1",
+  "status": "passed",
+  "date": "2026-10-29",
+  "change": "Risk and ledger page scans validate freshness using the final fingerprint captured by the same scan.",
+  "preserved": [
+    "full cold ledger replay",
+    "append-only hash-chain validation",
+    "checkpoint-to-replayed-snapshot validation",
+    "stale-state rejection"
+  ],
+  "measurement": {
+    "ledger_records": 100,
+    "ledger_bytes": 3475892,
+    "sample": "three cold opens and five page reads per resource; local median milliseconds",
+    "before": {
+      "cold_recovery_ms": 408.396,
+      "ledger_page_ms": 28.778,
+      "risk_page_ms": 26.421
+    },
+    "after": {
+      "cold_recovery_ms": 402.613,
+      "ledger_page_ms": 20.629,
+      "risk_page_ms": 20.297
+    },
+    "catalog_timings_are_not_compared": "Catalog code did not change and timing variation was material."
+  },
+  "checks": {
+    "focused_python_tests": 53,
+    "risk_and_ledger_pages_avoid_separate_head_read": "passed",
+    "changed_ledger_head_rejected": "passed",
+    "python_compile": "passed",
+    "git_diff_check": "passed"
+  },
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "loopback_only": true,
+    "read_only": true,
+    "public_deployment_enabled": false
+  },
+  "remaining": [
+    "catalog directory enumeration and per-candidate recovery remain linear",
+    "cold broker recovery remains a full ledger replay",
+    "risk, approval, and ledger page selection remains a single linear ledger scan",
+    "U5.5 connected target, identity, isolation, and operations decisions",
+    "B4 retention deletion and versioned schema transformation"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "market-os.u5-15-next-local-btc-dataset-registry-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": "apps/web/next-operator/src/app/datasets/page.tsx",
+  "api": "GET /v1/btc/history/datasets",
+  "checks": {
+    "python_api_pagination_and_read_only_regression": "passed",
+    "focused_api_and_history_tests": "passed: 37 tests after code-review fixes",
+    "empty_store_is_not_initialized": "passed",
+    "malformed_existing_store_is_rejected": "passed",
+    "unrenderable_timestamp_is_rejected": "passed",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "desktop_and_mobile_browser_smoke": "passed: populated catalog, next-page navigation, 375px document width, and zero console errors",
+    "code_review_findings_closed": "passed: both independent reviewers confirmed fixes; no further findings"
+  },
+  "contract": {
+    "max_page_size": 100,
+    "cursor": "exclusive after_dataset_revision",
+    "sort": "case-sensitive dataset_revision ascending",
+    "store_path_parameter": false,
+    "empty_store_side_effects": false,
+    "duckdb_existing_catalog_mode": "read-only",
+    "catalog_metadata_only": true,
+    "returns_filesystem_paths": false,
+    "history_acquisition_or_provider_call": false
+  },
+  "remaining": [
+    "catalog metadata does not verify stored Parquet integrity; replay remains required",
+    "candle and ingestion-manifest details need separate bounded contracts",
+    "connected deployment remains gated by U5.5 identity and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-15/dataset-registry-desktop.png",
+    "output/playwright/u5-15/dataset-registry-mobile.png"
+  ]
+}

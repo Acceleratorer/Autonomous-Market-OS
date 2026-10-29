@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:,">
+  <title>Market OS · Local Operator</title>
+  <link rel="stylesheet" href="/operator/operator.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">Market OS / local operator</p>
+        <h1>Paper portfolio monitor</h1>
+        <p class="lede">A read-only browser view over the loopback B4 inspection contract.</p>
+      </div>
+      <span class="status-pill">SYNTHETIC · PAPER ONLY</span>
+    </header>
+    <section class="boundary" aria-label="Boundary">
+      <strong>Local access only.</strong> This screen reads one portfolio summary. It cannot submit, cancel, or change orders.
+    </section>
+    <section id="state" class="state" aria-live="polite">Loading local portfolio…</section>
+    <section id="summary" class="summary" hidden>
+      <article><span>Portfolio</span><strong id="portfolio-id">—</strong></article>
+      <article><span>Cash USDT</span><strong id="cash">—</strong></article>
+      <article><span>BTC inventory</span><strong id="inventory">—</strong></article>
+      <article><span>Mark price</span><strong id="mark">—</strong></article>
+      <article><span>Processed events</span><strong id="events">—</strong></article>
+      <article><span>Open orders</span><strong id="orders">—</strong></article>
+    </section>
+    <section id="workspace" class="workspace" hidden>
+      <article class="panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Identity</p><h2>Portfolio context</h2></div>
+          <span id="portfolio-mode" class="panel-tag">—</span>
+        </div>
+        <dl class="details">
+          <div><dt>Strategy members</dt><dd id="members">—</dd></div>
+          <div><dt>Fixture lineage</dt><dd id="lineage">—</dd></div>
+          <div><dt>Policy fingerprint</dt><dd id="policy-fingerprint">—</dd></div>
+        </dl>
+        <div class="audit-pagination" role="group" aria-label="Strategy member pages">
+          <p id="member-page-status" class="empty" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <button id="member-latest" type="button" hidden>First members</button>
+          <button id="member-older" type="button" hidden>Next members</button>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Capacity</p><h2>Reservations</h2></div>
+          <span class="panel-tag">PORTFOLIO-WIDE</span>
+        </div>
+        <dl class="details">
+          <div><dt>Cash reserved</dt><dd id="reserved-cash">—</dd></div>
+          <div><dt>BTC reserved</dt><dd id="reserved-btc">—</dd></div>
+          <div><dt>Buy quantity reserved</dt><dd id="reserved-buy">—</dd></div>
+        </dl>
+        <div class="table-wrap" role="region" aria-label="Portfolio-wide reservation detail" tabindex="0">
+          <table>
+            <caption class="sr-only">Portfolio-wide reservation detail</caption>
+            <thead><tr><th>Order</th><th>Strategy</th><th>Cash USDT</th><th>BTC</th><th>Buy quantity</th></tr></thead>
+            <tbody id="reservations-table"></tbody>
+          </table>
+          <p id="reservations-empty" class="empty" hidden>No open reservations recorded.</p>
+        </div>
+        <div class="audit-pagination" role="group" aria-label="Reservation pages">
+          <p id="reservation-page-status" class="empty" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <button id="reservation-latest" type="button" hidden>Latest reservations</button>
+          <button id="reservation-older" type="button" hidden>Older reservations</button>
+        </div>
+      </article>
+      <article class="panel panel-wide">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Execution state</p><h2>Orders</h2></div>
+          <span class="panel-tag">READ ONLY</span>
+        </div>
+        <div class="table-wrap" role="region" aria-label="Portfolio orders" tabindex="0">
+          <table>
+            <caption class="sr-only">Portfolio orders</caption>
+            <thead><tr><th>Order</th><th>Strategy</th><th>Side</th><th>Type</th><th>Quantity</th><th>State</th></tr></thead>
+            <tbody id="orders-table"></tbody>
+          </table>
+          <p id="orders-empty" class="empty" hidden>No orders recorded.</p>
+        </div>
+        <div class="audit-pagination" role="group" aria-label="Order pages">
+          <p id="order-page-status" class="empty" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <button id="order-latest" type="button" hidden>Latest orders</button>
+          <button id="order-older" type="button" hidden>Older orders</button>
+        </div>
+      </article>
+      <article class="panel panel-wide">
+        <div class="panel-heading">
+          <div><p class="eyebrow">Control evidence</p><h2>Risk audit</h2></div>
+          <span class="panel-tag">APPEND ONLY</span>
+        </div>
+        <ul id="risk-list" class="audit-list"></ul>
+        <p id="risk-empty" class="empty" hidden>No risk or rejection outcomes recorded.</p>
+        <div class="audit-pagination" role="group" aria-label="Risk outcome pages">
+          <p id="risk-page-status" class="empty" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <button id="risk-latest" type="button" hidden>Latest outcomes</button>
+          <button id="risk-older" type="button" hidden>Older outcomes</button>
+        </div>
+      </article>
+    </section>
+    <nav class="actions" aria-label="Read-only resources" hidden id="actions">
+      <a id="dashboard-link" href="#">Open server dashboard</a>
+      <a href="/healthz">Check service health</a>
+    </nav>
+    <footer>GET-only local inspection · no credentials · no providers · no live venue</footer>
+  </main>
+  <script src="/operator/operator.js" defer></script>
+</body>
+</html>

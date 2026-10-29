@@ -1,0 +1,42 @@
+{
+  "schema": "market-os.u5.4-local-operator-shell@v1",
+  "review_date": "2026-10-29",
+  "status": "implemented-local",
+  "surface": {
+    "route": "/operator/<portfolio-id>/",
+    "source": "apps/web/operator",
+    "canonical_assets": ["index.html", "operator.js", "operator.css"],
+    "compatibility_assets": ["app.js", "styles.css"],
+    "summary_contract": "/v1/b4/portfolios/<portfolio-id>/summary",
+    "read_only": true,
+    "synthetic_only": true,
+    "paper_only": true
+  },
+  "boundary": {
+    "post_mutation": false,
+    "query_parameters": false,
+    "path_traversal": false,
+    "credentials": false,
+    "credential_mode": "omit",
+    "content_security_policy": true,
+    "referrer_policy": "no-referrer",
+    "content_type_nosniff": true,
+    "providers": false,
+    "live_trading": false,
+    "public_deployment": false,
+    "authentication": false
+  },
+  "verification": {
+    "route_tests": true,
+    "summary_open_orders_contract": true,
+    "desktop_browser_smoke": true,
+    "mobile_browser_smoke": true,
+    "console_errors": 0,
+    "mutation_controls": 0,
+    "compileall": true,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "next_gate": "separate_authenticated_connected_web_contract"
+}

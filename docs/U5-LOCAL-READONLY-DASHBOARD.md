@@ -1,6 +1,6 @@
 # U5 Local Read-Only Operator Dashboard
 
-**Status:** Local slice started on 2026-10-27.
+**Status:** Local slice accepted on 2026-10-28.
 **Scope:** Synthetic, paper-only, GET-only inspection of an existing B4 portfolio.
 
 ## Contract
@@ -13,7 +13,7 @@ The page contains no command form, mutation control, provider path, credential i
 
 ## Verification
 
-`market_os/tests/test_b41_broker.py::test_u5_operator_dashboard_is_read_only_and_escaped` verifies HTML content type, escaped order identifiers, absence of a form, and rejection of POST.
+`market_os/tests/test_portfolio_broker.py::test_u5_operator_dashboard_is_read_only_and_escaped` and [U5-LOCAL-ACCEPTANCE.md](U5-LOCAL-ACCEPTANCE.md) verify HTML content type, escaped order identifiers, absence of a form, health/readiness, JSON parity, query rejection, and POST rejection. The static preview also passes the Node contract test and a Playwright browser smoke with zero console errors.
 
 ## Remaining U5 gates
 

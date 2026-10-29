@@ -1,0 +1,65 @@
+{
+  "schema": "market-os.u5.9-bounded-local-inspection@v1",
+  "review_date": "2026-10-29",
+  "status": "implemented-local",
+  "endpoint": {
+    "method": "GET",
+    "path": "/v1/b4/portfolios/{portfolio_id}/inspection",
+    "api_version": "market-os.b4-portfolio-inspection@v1",
+    "maximum_page_size": 100,
+    "independent_cursors": ["order_before_id", "risk_before_sequence"],
+    "rejects_unknown_or_duplicate_query_parameters": true,
+    "unknown_cursor_status": 400,
+    "compact_summary_omits_event_cursor": true,
+    "risk_rows_projected": ["sequence", "kind", "reason_code"]
+  },
+  "consumers": [
+    "apps/web/next-operator",
+    "apps/web/operator"
+  ],
+  "verification": {
+    "focused_python_tests": "37 passed",
+    "typescript_check": "passed",
+    "optimized_production_build": "passed",
+    "browser_smoke": {
+      "status": "passed",
+      "mode": "production",
+      "synthetic_orders": 27,
+      "orders_per_page": 25,
+      "synthetic_risk_outcomes": 10,
+      "risk_outcomes_per_page": 8,
+      "independent_page_cursors": "passed",
+      "viewport_width": 375,
+      "document_width": 360,
+      "browser_console_errors": 0,
+      "order_and_risk_page_limits_preserved_in_next_consumer": true,
+      "compatibility_pagination_status_is_announced": true,
+      "screenshots": [
+        "output/playwright/u5-9/mobile-latest-pages.png",
+        "output/playwright/u5-9/mobile-risk-page.png"
+      ]
+    }
+  },
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "loopback_only": true,
+    "credentials": false,
+    "provider_calls": false,
+    "public_listener": false,
+    "live_trading": false
+  },
+  "known_limits": [
+    "Validated broker recovery and risk-page ledger selection remain linear in ledger size.",
+    "The aggregate returns complete genesis membership and current reservation rows.",
+    "The legacy local risk resource still returns complete history and must not be reused by a shared service."
+  ],
+  "open_gates": [
+    "choose_connected_deployment_target_and_identity_boundary",
+    "define_tenant_storage_isolation_sessions_rate_limits_and_production_observability",
+    "retire_or_bound_legacy_full_history_risk_resource_before_shared_exposure",
+    "define_retention_deletion_contract",
+    "define_versioned_schema_transformation_contract"
+  ]
+}

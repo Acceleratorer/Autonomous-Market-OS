@@ -167,6 +167,10 @@ The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local
 
 ```text
 GET /v1/btc/history/readiness?cutoff-ms=<UTC-minute-ms>
+GET /v1/btc/history/datasets?limit=<1..100>&after_dataset_revision=<revision>
+GET /v1/btc/history/datasets/<revision>/candles?limit=<1..100>&after_open_time_ms=<UTC-ms>
+GET /v1/btc/history/datasets/<revision>/manifests?limit=<1..100>&after_manifest_id=<manifest-id>
+GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>
 ```
 
 ```text
@@ -181,6 +185,88 @@ GET /v1/btc/history/<dataset-revision>/replay
 These paths invoke no model, broker, or network transport. Canonical Parquet
 content is hash-checked before inspection; DuckDB stores raw-page, manifest,
 outcome, and provenance lineage.
+
+The dataset catalog is bounded, revision-ordered, and uses the gateway's
+configured local HistoryStore. It rejects `store_root`, opens an existing
+catalog read-only, and returns an empty page without creating files when the
+store is absent. An existing non-directory store path is an integrity error.
+Catalog rows expose metadata only, and timestamps must fit the JavaScript UTC
+date range used by the local renderer. Replay remains necessary to validate
+stored Parquet content.
+
+The local Next.js detail surface uses the bounded candle-page route. It is
+bound to the configured HistoryStore, rejects caller-selected roots, returns at
+most 100 rows in ascending `open_time_ms` order, and uses an exclusive cursor
+that must identify a stored candle. Each page verifies the canonical Parquet
+path and file hash before selecting rows; the hash is streamed so memory use
+does not grow with file size. The response contains UTC timestamps and bounded
+decimal strings, without filesystem paths or provenance payloads. Replay is
+still required to verify canonical-content equivalence.
+
+The local Next.js ingestion-manifest surface is bound to the same configured
+HistoryStore. Manifest catalog pages return at most 100 validated catalog
+summaries in manifest-ID order; the exclusive cursor must identify a manifest
+for the requested dataset. Detail requests derive the manifest file path from
+the validated ID, check that it remains inside local manifest storage, read no
+more than 8 MiB, and verify its SHA-256 against the catalog before parsing.
+Responses contain fixed scalar metadata, outcome counts, and counts of raw-page,
+gap, and parent-revision collections. They do not return filesystem paths,
+payload arrays, or provenance. Oversized, malformed, or mismatched manifests
+fail closed. This display check does not replace canonical dataset replay.
+
+The local Next.js ingestion-record pages use these manifest-scoped GET routes:
+
+```text
+GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/outcomes?limit=<1..100>&after_outcome_index=<index>
+GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/gaps?limit=<1..100>&after_start_time_ms=<UTC-ms>
+GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/provenance?limit=<1..100>&after_raw_page_sha256=<sha256>&after_row_index=<index>
+```
+
+These routes use the configured read-only HistoryStore and require the
+manifest to belong to the requested dataset. They accept only unique query
+fields and reject caller-selected roots. Outcomes validate manifest status
+counts and join rows to raw provenance fingerprints. Gaps are read from the
+single 8 MiB-capped, hash-verified manifest and validate entry shape and order.
+Provenance pages use the existing `(manifest, raw-page SHA-256, row index)`
+catalog key, verify the full source-row fingerprint, and return at most 512
+preview characters for payloads up to 256 KiB. The API returns no filesystem
+paths or complete raw payloads. Canonical replay remains the dataset integrity
+check.
+
+## Local B2/B3 research inspection
+
+The local Next.js operator uses these bounded read-only routes:
+
+```text
+GET /v1/btc/research/b2/runs?limit=<1..100>&after_run_id=<run-id>
+GET /v1/btc/research/b2/runs/<run-id>
+GET /v1/btc/research/b3/runs?limit=<1..100>&after_run_id=<run-id>
+GET /v1/btc/research/b3/runs/<run-id>
+```
+
+The default page size is 25. Catalogs return at most 100 summaries in ascending
+run-ID order; the exclusive cursor must identify a run for the selected
+engine. Unknown or duplicate query parameters and caller-supplied roots are
+rejected.
+
+The gateway reads from `MARKET_OS_BTC_B2_STORE_ROOT` and
+`MARKET_OS_BTC_B3_STORE_ROOT`, or from the corresponding `btc-b2` / `btc-b3`
+directory under the workflow root. A missing store returns an empty catalog and
+is not initialized by GET. Run manifests are capped at 256 KiB and the selected
+metrics/report artifact is capped at 256 KiB. The artifact's exact size and
+SHA-256 must match its run manifest before parsing.
+
+Responses include fixed run metadata and normalized B2 metrics or a normalized
+B3 report. They omit artifact paths, full feature/label/prediction arrays,
+fixture cases, and provider responses. B2 score sample counts must match the
+run. B3 validates dataset, feature, fixture, and experiment lineage, requires
+matched inputs and zero network/provider requests, and preserves
+`not-promoted`. These checks cover the displayed artifact; full run replay
+remains the integrity check for the complete artifact set.
+
+The Next.js API port is configurable through the server-only
+`MARKET_OS_API_PORT` setting, defaulting to 8787. The target host remains
+`127.0.0.1`.
 
 ## U3/B2 BTC feature and baseline evaluation
 

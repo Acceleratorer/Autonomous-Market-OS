@@ -1,0 +1,7 @@
+"""Run the existing Market OS CLI."""
+
+from market_os.cli import main
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

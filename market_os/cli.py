@@ -134,6 +134,16 @@ def build_parser() -> argparse.ArgumentParser:
     b4_inspect.add_argument("--resource", choices=("summary", "snapshot", "orders", "fills", "ledger", "risk", "approvals", "fingerprints", "replay", "policy", "genesis"), default="summary")
     b4_inspect.add_argument("--id", dest="item_id")
     b4_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_B4_STORE_ROOT", ".market_os/b4-paper"))
+    b4_backup = b4_commands.add_parser("backup")
+    b4_backup.add_argument("portfolio_id")
+    b4_backup.add_argument("--archive", required=True)
+    b4_backup.add_argument("--store-root", default=os.environ.get("MARKET_OS_B4_STORE_ROOT", ".market_os/b4-paper"))
+    b4_restore = b4_commands.add_parser("restore")
+    b4_restore.add_argument("--archive", required=True)
+    b4_restore.add_argument("--store-root", default=os.environ.get("MARKET_OS_B4_STORE_ROOT", ".market_os/b4-paper"))
+    b4_migration = b4_commands.add_parser("migration-check")
+    b4_migration.add_argument("portfolio_id")
+    b4_migration.add_argument("--store-root", default=os.environ.get("MARKET_OS_B4_STORE_ROOT", ".market_os/b4-paper"))
     synthetic = commands.add_parser("synthetic")
     synthetic_commands = synthetic.add_subparsers(dest="synthetic_command", required=True)
     synthetic_run = synthetic_commands.add_parser("run")
@@ -179,22 +189,31 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.command == "b4-paper":
-        from .b41_broker import B41Broker
+        from .portfolio_broker import B41Broker
+        from .portfolio_backup import backup_portfolio, restore_portfolio
+        from .portfolio_migration import preflight_portfolio
 
         try:
-            result = B41Broker.open(args.store_root, args.portfolio_id).inspect_jsonable(args.resource, args.item_id)
+            if args.b4_command == "inspect":
+                result = B41Broker.open(args.store_root, args.portfolio_id).inspect_jsonable(args.resource, args.item_id)
+            elif args.b4_command == "backup":
+                result = {"archive": str(backup_portfolio(args.store_root, args.portfolio_id, args.archive))}
+            elif args.b4_command == "restore":
+                result = {"portfolio_root": str(restore_portfolio(args.archive, args.store_root))}
+            else:
+                result = preflight_portfolio(args.store_root, args.portfolio_id)
         except (KeyError, OSError, TypeError, ValueError) as exc:
             raise SystemExit(f"B4 portfolio inspection failed: {exc}") from exc
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.command == "synthetic":
         from pathlib import Path
-        from .b35_strategy_replay import StrategyReplayReport
-        from .b36_accounting import build_synthetic_accounting_report
-        from .b311_synthetic_catalog import catalog_sessions, compare_sessions
-        from .b39_synthetic_api import SyntheticSessionStore
-        from .b38_synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
-        from .b310_synthetic_server import serve_synthetic
+        from .strategy_replay import StrategyReplayReport
+        from .accounting import build_synthetic_accounting_report
+        from .synthetic_catalog import catalog_sessions, compare_sessions
+        from .synthetic_session_api import SyntheticSessionStore
+        from .synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
+        from .synthetic_server import serve_synthetic
 
         if args.synthetic_command == "run":
             try:
@@ -296,7 +315,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(plan_historical_readiness(args.cutoff_ms), indent=2, sort_keys=True))
             return 0
         if args.btc_command == "b2":
-            from .btc_b2 import B2Config, B2Store, run_b2
+            from .btc_features import B2Config, B2Store, run_b2
 
             b2_store = B2Store(args.store_root)
             if args.b2_command == "run":
@@ -307,7 +326,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, indent=2, sort_keys=True, default=str))
             return 0
         if args.btc_command == "b3":
-            from .btc_b3 import B3Store, RecordedJevAdapter, run_b3
+            from .btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
 
             b3_store = B3Store(args.store_root)
             if args.b3_command == "run":

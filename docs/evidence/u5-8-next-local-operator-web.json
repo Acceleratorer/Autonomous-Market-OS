@@ -1,0 +1,62 @@
+{
+  "schema": "market-os.u5.8-next-local-operator-web@v1",
+  "review_date": "2026-10-29",
+  "status": "implemented-local",
+  "decision": {
+    "owner_selected_stack": ["typescript", "react", "nodejs", "nextjs", "tailwindcss"],
+    "surface": "apps/web/next-operator",
+    "connected_deployment_selected": false
+  },
+  "runtime": {
+    "web_bind_address": "127.0.0.1",
+    "web_port": 3000,
+    "api_origin": "http://127.0.0.1:8787",
+    "server_rendered": true,
+    "dynamic_no_store": true,
+    "request_method": "GET",
+    "request_timeout_ms": 4000
+  },
+  "reads": [
+    "/v1/b4/portfolios",
+    "/v1/b4/portfolios/{portfolio_id}/summary",
+    "/v1/b4/portfolios/{portfolio_id}/genesis",
+    "/v1/b4/portfolios/{portfolio_id}/reservations",
+    "/v1/b4/portfolios/{portfolio_id}/orders",
+    "/v1/b4/portfolios/{portfolio_id}/risk"
+  ],
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "loopback_only": true,
+    "credentials": false,
+    "mutation_routes": false,
+    "public_listener": false,
+    "live_trading": false,
+    "python_owns_domain_logic": true,
+    "csp_nonce_and_hardening_headers": true
+  },
+  "verification": {
+    "npm_audit_vulnerabilities": 0,
+    "typescript_check": "passed",
+    "production_build": "passed",
+    "browser_smoke": {
+      "status": "passed",
+      "routes": ["/", "/portfolios/{portfolio_id}"],
+      "viewport_widths": [1440, 375],
+      "browser_console_errors": 0,
+      "csp_nonce": true,
+      "loopback_binding": true,
+      "screenshots": [
+        "output/playwright/u5-8/.playwright-cli/page-2026-10-28T19-19-36-169Z.png",
+        "output/playwright/u5-8/.playwright-cli/page-2026-10-28T19-19-39-533Z.png"
+      ]
+    }
+  },
+  "open_gates": [
+    "choose_connected_deployment_target_and_identity_boundary",
+    "define_retention_deletion_contract",
+    "define_versioned_schema_transformation_contract",
+    "paginate_risk_history_before_shared_or_remote_exposure"
+  ]
+}

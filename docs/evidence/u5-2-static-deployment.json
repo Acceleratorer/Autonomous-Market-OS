@@ -1,0 +1,36 @@
+{
+  "schema": "market-os.u5.2-static-deployment-readiness@v1",
+  "review_date": "2026-10-28",
+  "status": "ready-static-artifact-only",
+  "source": "apps/web/public",
+  "compatibility_copy": "docs/hosting/market-os",
+  "artifact_files": ["index.html", ".htaccess", "DEPLOYMENT.txt"],
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "scripts": false,
+    "forms": false,
+    "browser_network_apis": false,
+    "external_urls": false,
+    "credentials": false,
+    "portfolio_state": false,
+    "public_deployment": false,
+    "authentication": false,
+    "mutation_routes": false,
+    "providers": false
+  },
+  "verification": {
+    "source_parity": true,
+    "exact_file_set": true,
+    "deterministic_packaging": true,
+    "node_contract": true,
+    "playwright_console_errors": 0,
+    "playwright_mobile_horizontal_overflow": false,
+    "playwright_network_requests": 1,
+    "secret_scan": true,
+    "evidence_validation": true,
+    "diff_check": true
+  },
+  "next_gate": "separate_versioned_deployment_and_access_decision"
+}

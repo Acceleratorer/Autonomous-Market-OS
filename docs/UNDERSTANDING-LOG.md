@@ -780,3 +780,539 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   implementation can be closed.
 - No provider, network, credential, real-data, trading, deployment, commit, or
   push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-28 — B4.11 local backup and restore
+
+- Added [B4.11-BACKUP-RESTORE.md](B4.11-BACKUP-RESTORE.md) and the opt-in
+  `backup_portfolio()` / `restore_portfolio()` seams.
+- Backups contain the validated genesis, policy, ledger, and checkpoint files
+  with a versioned manifest and SHA-256 fingerprints. Restore validates archive
+  paths, identities, fingerprints, and broker recovery before atomically
+  promoting a new portfolio directory; existing destinations and source-store
+  archives are rejected.
+- Added CLI `b4-paper backup` and `b4-paper restore` commands. The focused
+  broker/backup/venue group passes 50 tests. Retention remains indefinite and
+  local; schema migration and shared/mutable surfaces remain separate gates.
+- No provider, network, credential, real-data, trading, deployment, commit, or
+  push action occurred. `approved-policy.json` remains absent.
+
+## 2026-10-28 — B4.12 read-only migration preflight
+
+- Added [B4.12-MIGRATION-PREFLIGHT.md](B4.12-MIGRATION-PREFLIGHT.md) and
+  `market-os b4-paper migration-check` to classify the supported local schema.
+- The preflight uses normal broker recovery validation, reports current schema
+  status without changing persisted bytes, and fails closed on unsupported or
+  malformed stores. It deliberately does not define or apply a future schema
+  transformer.
+- Added tests for current-schema classification, immutable files, unsupported
+  genesis schema, and CLI JSON. Retention/archive policy and transformer remain
+  open; shared concurrency and mutation API are not enabled.
+
+## 2026-10-28 — B4 local slice closeout decision
+
+- Closed the B4 local slice at B4.12 for the approved synthetic, paper-only,
+  isolated portfolio and single-writer boundary. The evidence matrix, focused
+  tests, full offline regression result, compile check, secret scan, and
+  evidence validation are recorded in `B4-LOCAL-SLICE-CLOSEOUT-REPORT.md`.
+- Kept broader U4/B4 open: lifecycle expansion (partial fills/expiry), shared
+  portfolio membership/concurrency, mutation API and complete mutation audit,
+  retention/archive operations, and a versioned migration transformer.
+- U5 deployment remains deferred by owner direction; the local GET-only view is
+  retained as a paper-only artifact.
+
+## 2026-10-28 — U5 local read-only acceptance
+
+- Added [U5-LOCAL-ACCEPTANCE.md](U5-LOCAL-ACCEPTANCE.md) and machine-readable
+  evidence at `docs/evidence/u5-local-acceptance.json`.
+- The loopback service acceptance covers health/readiness, B4 dashboard HTML,
+  JSON summary parity, escaped content, POST rejection, and query rejection.
+- The static preview passed its Node contract test and a Playwright browser
+  smoke: no scripts, forms, credentials, horizontal mobile overflow, or console
+  errors; one document request only.
+- U5 is accepted locally. Deployment, authentication, shared access, mutation,
+  retention/archive, migration transformation, and live trading remain out of
+  scope.
+
+## 2026-10-28 — B4.13 local concurrency contract
+
+- Added [B4.13-CONCURRENCY-CONTRACT.md](B4.13-CONCURRENCY-CONTRACT.md) for the
+  approved isolated portfolio and one-writer local boundary.
+- Added regression coverage proving a stale broker instance is rejected until
+  it reloads, independent portfolio identities keep separate ledger sequences
+  and lock files, and reload preserves the committed snapshot fingerprint.
+- No shared membership, distributed ownership, network lock, or mutation route
+  was added. The next contract choice is whether to define a shared portfolio
+  or move to a mutation API on the existing single-writer boundary.
+
+## 2026-10-28 — B4.14 local mutation audit outcomes
+
+- Added [B4.14-MUTATION-AUDIT-CONTRACT.md](B4.14-MUTATION-AUDIT-CONTRACT.md).
+- Submit, cancel, and approval-revocation validation failures now return stable
+  reason codes and append audit outcomes. Identical rejected retries replay the
+  recorded result; recovery and read-only inspection preserve those outcomes.
+- Idempotency conflicts remain fail-closed and append a separate audit event
+  without a command idempotency key, preserving recovery identity uniqueness.
+- CLI and HTTP mutation routes remain disabled. Focused B4 verification passed
+  62 tests; broader U4 gaps remain lifecycle expansion, shared membership and
+  concurrency, external mutation API, retention/archive, and migration transform.
+
+## 2026-10-28 — U5.1 local service boundary hardening
+
+- Added [U5.1-LOCAL-SERVICE-BOUNDARY.md](U5.1-LOCAL-SERVICE-BOUNDARY.md).
+- The HTTP service now rejects non-loopback bind addresses and untrusted Host
+  headers, completes startup recovery before opening the listener, and records
+  only URL paths in structured request logs.
+- Added regression coverage for all three boundaries. Authentication, shared
+  access, retention, and production deployment remain separate gates.
+- The initial U5.1 verification snapshot reached 477 passed and 1 skipped in the
+  non-integration suite (5 integration tests deselected). The full suite reached
+  477 passed, 5 optional LightRAG/Vibe integration failures from separate
+  reference-environment dependency issues, and 1 skipped. Those runtime
+  discovery failures were later resolved; see the final verification entry
+  below.
+
+## 2026-10-28 — Optional provider runtime discovery repair and final B4 verification
+
+- Added a test-only optional-runtime resolver that honors explicit environment
+  overrides, scans the local temporary runtime family, validates executable
+  files, and requires deep import probes before selecting LightRAG or
+  Vibe-Trading. Stale broken virtualenvs are ignored; Market OS core
+  dependencies and the separate reference repositories remain unchanged.
+- Re-ran the complete suite with `TYPESAFE_API_KEY=''`: **482 passed, 0
+  failed, 1 skipped**. All five optional LightRAG/Vibe integration tests pass;
+  the CI-compatible non-integration run remains 477 passed, 1 skipped, with
+  five integration tests deselected.
+- Compileall, secret scan, evidence validation, and `git diff --check` also
+  passed. B4 remains closed only for the synthetic, paper-only, isolated
+  single-writer local boundary; the documented lifecycle, shared concurrency,
+  mutation API, retention, and migration-transformer gaps remain open.
+
+## 2026-10-28 — B4.15 shared paper portfolio
+
+- Added [B4.15-SHARED-PORTFOLIO-CONTRACT.md](B4.15-SHARED-PORTFOLIO-CONTRACT.md)
+  and ADR-0023 for immutable shared membership, strategy attribution, portfolio-wide
+  reservations, local ledger ordering, stale writers, retries, and recovery.
+- Kept the existing append-only ledger and legacy isolated identities; shared
+  recovery validates membership and reservations and accepts a verified lagging
+  checkpoint without rewriting history. CLI and HTTP remain read-only.
+- The boundary remains synthetic, paper-only, and local; lifecycle expansion,
+  authenticated mutation, retention/archive, and migration transformation remain open.
+
+## 2026-10-28 — B4.16 paper order lifecycle
+
+- Confirmed the owner-approved full-fill, accepted-order FIFO and disabled
+  expiry policy in [B4.16-LIFECYCLE-CONTRACT.md](B4.16-LIFECYCLE-CONTRACT.md)
+  and ADR-0024. Synthetic volume is informational, not fill capacity.
+- Added lifecycle regression cases for full fills, unmatched limits and retained
+  reservations, FIFO, cancellation, risk rejection, and recovery. Partial fills
+  and order expiry require a separate versioned contract before implementation.
+- Re-ran the B4.16 full suite with an empty `TYPESAFE_API_KEY`: 494 passed and
+  1 skipped. Corrected the earlier B4.15 evidence that conflated full and
+  non-integration results.
+
+## 2026-10-28 — B4.17 local retention and archive integrity
+
+- Added [B4.17-RETENTION-ARCHIVE-CONTRACT.md](B4.17-RETENTION-ARCHIVE-CONTRACT.md)
+  and ADR-0025. The ledger remains indefinite and local; validated ZIP backup is
+  a non-destructive copy; pruning, deletion, remote archive, and schema transforms
+  remain disabled.
+- Recovery, backup, and migration preflight now fail closed when a checkpoint
+  exists without its ledger. Shared backup/restore tests preserve reservations,
+  audit inspection, fingerprints, and source bytes. Migration preflight reports
+  the actual isolated or shared genesis schema.
+
+## 2026-10-28 — application surfaces and naming
+
+- Added `apps/web/public`, `apps/cli`, and `apps/gateway` as thin surfaces over
+  the existing canonical package. Existing `market_os.api` and `market_os.cli`
+  names remain stable for compatibility.
+- Added `scripts/build_web_artifact.py` and a parity check between the canonical
+  web source and `docs/hosting/market-os/`. The artifact remains static,
+  synthetic, paper-only, and read-only; public deployment and authentication
+  remain separate U5 gates.
+- Verified the product-facing folder split in `STRUCTURE.md`, with canonical
+  domain compatibility kept under `market_os/` and thin web, CLI, and gateway
+  surfaces under `apps/`. No module rename or public deployment was performed.
+
+## 2026-10-28 — U5.2 static deployment readiness
+
+- Added [U5.2-STATIC-DEPLOYMENT-READINESS.md](U5.2-STATIC-DEPLOYMENT-READINESS.md)
+  and `docs/evidence/u5-2-static-deployment.json`.
+- `scripts/build_web_artifact.py` now validates the exact three-file artifact,
+  source and compatibility-copy byte parity, deterministic packaging, and
+  rejects scripts, forms, browser network APIs, external URLs, credentials, or
+  extra files.
+- Browser review at desktop and 375px mobile found zero console errors, no
+  horizontal overflow, and one document request. This prepares a static
+  artifact only; public deployment, authentication, and connected API access
+  remain separate gates.
+
+## 2026-10-28 — web stack selection gate
+
+- Added [ADR-0027](decisions/ADR-0027-web-stack-selection.md).
+- Kept plain HTML as the active web source. Astro is the static-first candidate
+  for a future componentized read-only surface; React/Next requires an approved
+  authenticated or interactive workflow. No framework dependency was added.
+
+## 2026-10-28 — U5.3 deployment handoff and local diagnostics
+
+- Added [U5.3-DEPLOYMENT-ACCESS-OBSERVABILITY-CONTRACT.md](U5.3-DEPLOYMENT-ACCESS-OBSERVABILITY-CONTRACT.md),
+  ADR-0028, and machine-readable evidence.
+- Static packaging can now emit a deterministic manifest with exact file hashes
+  and the paper-only boundary. Local gateway responses carry `X-Request-ID`,
+  which is copied into query-free JSONL audit records.
+- No public listener, authentication provider, shared tenant access, mutation
+  route, credential, provider, or live venue was enabled.
+
+## 2026-10-29 — U5.4 local operator shell
+
+- Added [U5.4-LOCAL-OPERATOR-SHELL.md](U5.4-LOCAL-OPERATOR-SHELL.md) and
+  `docs/evidence/u5-4-local-operator-shell.json`.
+- Added a GET-only `/operator/<portfolio-id>/` shell with fixed local assets,
+  summary parity, accessible focus states, responsive layout, and explicit
+  paper-only boundary copy. The summary contract now exposes `open_orders` as a
+  stable derived count.
+- Route tests reject query parameters, POST, traversal/private assets, and
+  untrusted hosts. No public deployment, authentication, mutation route,
+  provider, credential, or live venue was enabled.
+
+## 2026-10-29 — U5.5 web stack gate and surface naming polish
+
+- Added [WEB-STACK-OPTIONS.md](WEB-STACK-OPTIONS.md),
+  [U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md](U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md),
+  ADR-0029, and machine-readable U5.5 evidence.
+- Kept plain HTML active, selected Astro as the next static-first candidate,
+  reserved React + Vite for richer client interaction, and deferred Next.js
+  until authenticated server rendering and a separately operated runtime are
+  approved.
+- Polished the local operator asset names to `operator.js` and `operator.css`.
+  The gateway keeps `app.js` and `styles.css` as compatibility aliases so
+  existing local bookmarks and tests continue to work.
+- Clarified `apps/web`, `apps/cli`, and `apps/gateway` as the active product
+  surface split. Desktop/mobile folders remain reserved for concrete shell
+  workflows; no generic `apps/app` folder or framework dependency was added.
+- The next gate is a concrete deployment target and identity boundary. The
+  system remains loopback-only, synthetic, paper-only, read-only, and local.
+
+## 2026-10-29 — U5.6 local portfolio inspection
+
+- Added [U5.6-LOCAL-PORTFOLIO-INSPECTION.md](U5.6-LOCAL-PORTFOLIO-INSPECTION.md),
+  ADR-0030, and machine-readable U5.6 evidence.
+- Extended the local operator shell to read the existing B4 `summary`,
+  `genesis`, `reservations`, `orders`, and `risk` resources in parallel.
+- Added a GET-only `/operator/` portfolio directory and `/v1/b4/portfolios`
+  JSON catalog. Only portfolios that pass normal broker recovery validation are
+  listed.
+- Added responsive identity, reservation, order, and append-only risk-audit
+  panels. Values are rendered with DOM text nodes and the Python broker remains
+  authoritative for all accounting, membership, recovery, and fingerprints.
+- Focused operator, U5 acceptance, and application-surface tests remain green.
+  No framework, credential, provider, public listener, mutation route, or live
+  venue was added.
+
+## 2026-10-29 — U5.7 web stack and deployment matrix
+
+- Added [U5.7-WEB-STACK-DEPLOYMENT-MATRIX.md](U5.7-WEB-STACK-DEPLOYMENT-MATRIX.md),
+  ADR-0031, and machine-readable evidence.
+- Separated framework selection from deployment selection. Plain HTML remains
+  active; Astro is the first framework candidate, React + Vite requires real
+  client-side interaction scope, and Next.js requires authenticated server
+  rendering plus an operated runtime.
+- Kept loopback service and static artifact handoff as the only active targets.
+  Private authenticated preview and public connected deployment remain
+  unselected until identity, tenant isolation, session, secret, rate-limit,
+  audit, backup, rollback, and operator access inputs are concrete.
+
+## 2026-10-29 — U5.9 bounded local inspection
+
+- Added [U5.9-BOUNDED-LOCAL-INSPECTION.md](U5.9-BOUNDED-LOCAL-INSPECTION.md),
+  ADR-0033, and `docs/evidence/u5-9-bounded-local-inspection.json`.
+- Added a single versioned aggregate GET for both local web surfaces, compacted
+  the summary event cursor to a count, and added exclusive pages for orders and
+  risk outcomes with a 1–100 page-size limit.
+- Verified latest/older navigation in Next.js and the compatibility HTML shell
+  against 27 synthetic open orders and 10 synthetic rejection outcomes. The two
+  cursors remain independent. The production browser had no console errors and
+  the 375px document had no horizontal overflow.
+- Ledger recovery and risk-page selection remain linear. Complete genesis
+  membership/reservation sets and the old full-history `/risk` route remain
+  local-only; U5.5 still gates any connected deployment.
+
+## 2026-10-29 — U5.10 bounded members and reservations
+
+- Added [U5.10](U5.10-BOUNDED-MEMBERS-RESERVATIONS.md),
+  [ADR-0034](decisions/ADR-0034-u5-10-bounded-members-reservations.md), and
+  `docs/evidence/u5-10-bounded-members-reservations.json`.
+- Added a v2 read-only aggregate that pages sorted members and current open
+  reservations while retaining portfolio-wide reservation totals. The Next.js
+  operator and HTML shell now expose four independent page cursors; v1 remains
+  unchanged for compatibility.
+- Verified 30 members, 27 open reservations, 37 orders, and 10 risk outcomes
+  across both surfaces. All cursors remained independent, the browser console
+  had no errors, and both 375px documents fit the viewport after fixing a
+  min-content overflow in the HTML shell.
+- The v1 aggregate, legacy routes, and catalog remain compatibility paths;
+  connected access remains behind U5.5, and B4 deletion/schema transformation
+  remain separate gates.
+
+## 2026-10-29 — U5.11 bounded catalog and legacy resources
+
+- Added [U5.11](U5.11-BOUNDED-CATALOG-LEGACY-RESOURCES.md),
+  [ADR-0035](decisions/ADR-0035-u5-11-bounded-catalog-legacy-resources.md),
+  and `docs/evidence/u5-11-bounded-catalog-legacy-resources.json`.
+- Added bounded catalog paging to both local registries. Catalog rows now
+  return a member count instead of every strategy ID. Unrecoverable entries
+  are counted and announced; a concurrent ledger change returns HTTP 409.
+- Added 1–100 row cursors for legacy B4 member, reservation, order, fill, risk,
+  approval, and ledger resources. The v1 aggregate now pages members and
+  reservations as well. The full snapshot HTTP export is rejected.
+- Verified 28 synthetic portfolios plus one unreadable synthetic directory
+  through production Next.js and the HTML compatibility shell. Pages returned
+  25/3 and 2/2 rows; both surfaces announced the skipped directory, browser
+  errors were zero, and the Next.js document fit at 375px.
+- Focused regression suite: 50 passed, including invalid cursor rejection and
+  concurrent catalog state-change conflicts. TypeScript check, production
+  build, and compile/diff checks passed.
+- Catalog enumeration, per-portfolio recovery, and one-pass ledger-page scans
+  remain linear. Connected access remains behind U5.5; B4 deletion and schema
+  transformation remain separate gates.
+
+## 2026-10-29 — U5.12 one-pass audit page freshness
+
+- Added [U5.12](U5.12-ONE-PASS-AUDIT-PAGING.md), [ADR-0036](decisions/ADR-0036-u5-12-one-pass-audit-paging.md), and its machine-readable evidence.
+- Risk and ledger page selection now captures the final event fingerprint in
+  the same pass used to validate the recovered head, cursor, totals, and rows.
+  Cold recovery and append-only chain validation are unchanged.
+- A 100-record synthetic ledger showed ledger-page median moving from 28.8 ms
+  to 20.6 ms and risk-page median from 26.4 ms to 20.3 ms; cold recovery
+  remained around 408 ms. The measurements are diagnostic samples, not CI
+  thresholds.
+- The focused Python group passed 53 tests. Catalog enumeration and
+  per-portfolio recovery remain the next local performance gate; connected
+  access and B4 deletion/schema transformation remain separate decisions.
+
+## 2026-10-29 — U5.13 streamed ledger-head validation
+
+- Added [U5.13](U5.13-STREAMED-LEDGER-HEAD.md), [ADR-0037](decisions/ADR-0037-u5-13-streamed-ledger-head.md), and its machine-readable evidence.
+- `_ledger_head()` now decodes the full file in bounded chunks, retains only
+  the candidate final non-empty line for parsing, and parses only that record.
+  Interior invalid UTF-8 and raw-tab corruption at a chunk boundary remain
+  fail-closed; blank Unicode whitespace lines are discarded and 1 MiB
+  same-line whitespace is preserved through parsing.
+- On a synthetic 100-record ledger, compact summary freshness median moved
+  from 5.47 ms to 4.44 ms. Cold recovery timings varied; the focused Python
+  group passed 60 tests.
+- Catalog enumeration and per-portfolio cold recovery remain linear. Connected
+  access and B4 deletion/schema transformation remain separate decisions.
+
+## 2026-10-29 — U5.14 cursor-aware catalog sorting
+
+- Added [U5.14](U5.14-CURSOR-AWARE-CATALOG-SORT.md), [ADR-0038](decisions/ADR-0038-u5-14-cursor-aware-catalog-sort.md), and its machine-readable evidence.
+- Later catalog pages now filter directory names at or before the exclusive
+  cursor before sorting. Cursor validation, skip counts, page ordering, and
+  full candidate recovery remain intact.
+- Synthetic temporary trees (100, 1,000, 10,000 directories) scanned every
+  entry as before; middle/last pages reduced sort inputs to N/2 and 1.
+  Cursor paths remain inside the catalog root and symlink/reparse paths fail
+  closed. Linked writer-lock files, including dangling targets, are rejected
+  without an external write. Diagnostic timings exclude portfolio recovery.
+  Focused Python group: 65 passed; Windows drive-qualified path regression ran.
+- Full directory enumeration and cold portfolio replay remain the integrity
+  floor under the current store contract. Connected deployment and the
+  separate B4 retention/schema gates remain open.
+
+## 2026-10-29 — U5.15 Next.js local BTC dataset registry
+
+- Added the bounded, revision-ordered `GET /v1/btc/history/datasets` catalog
+  and server-rendered `/datasets` route. The endpoint is bound to the configured
+  HistoryStore, does not initialize an absent store, opens existing DuckDB
+  catalogs read-only, and returns metadata without filesystem paths.
+- Added strict query, response-shape, pagination, and UTC timestamp validation.
+  Code review found that a regular file at `btc-history` could be mislabeled as
+  an empty store and that timestamps outside JavaScript's `Date` range could
+  fail rendering. Both now return an integrity error and have regressions;
+  two independent review follow-ups confirmed the fixes and found no further
+  issue in this slice.
+- The initial focused suite passed 66 tests; the API/HistoryStore suite passed
+  37 tests after the review fixes. TypeScript checking and the production build
+  passed. Browser smoke covered populated paging, desktop/mobile layout,
+  375px width, and zero console errors; empty-store no-initialization is covered
+  by the API regression. Screenshots are under `output/playwright/u5-15/`.
+- The registry displays metadata only. Candle details, ingestion manifests,
+  and experiment/report views still require bounded contracts before exposure;
+  U5.5 connected deployment and the U5.14 enumeration/recovery limits remain.
+
+## 2026-10-29 — U5.16 Next.js bounded BTC candle detail
+
+- Added `GET /v1/btc/history/datasets/<revision>/candles` with a fixed
+  configured store, read-only catalog access, 1–100 row pages, ascending open
+  timestamps, and an exclusive cursor that must identify a stored candle.
+- Verified the expected relative Parquet path and streamed its file hash before
+  each page. The response contains only bounded timestamps and decimal strings;
+  path/hash tampering fails with an integrity response. Canonical replay remains
+  necessary to validate the dataset fingerprint.
+- Added `/datasets/<revision>` as a server-rendered detail page linked from the
+  registry. It displays dataset coverage/fingerprint and a seven-column candle
+  table with GET pagination. The labelled table scrolls inside its region at
+  375px, while the document width matches the viewport; browser errors were
+  zero. Focused API/HistoryStore tests passed 39 cases; Next.js build passed.
+- UI search supported a dense data table and keyboard-scrollable region. A
+  screenshot review caught the mobile boundary separator overriding its hidden
+  rule; the more specific mobile selector now hides it. No chart or decorative
+  animation was added.
+- A follow-up security review found that symlink loops could escape the typed
+  error response. Path-resolution failures now become a generic integrity
+  response, with a route regression; spec and security reviewers confirmed the
+  fix and evidence count, with no remaining actionable findings.
+- Detail and candle-page links disable background prefetch so viewport
+  observation does not trigger a full-file hash read.
+- Per-page hashing remains linear in file bytes. Ingestion-manifest and
+  experiment/report views still need bounded contracts; connected deployment
+  remains behind U5.5 decisions.
+
+## 2026-10-29 — U5.17 Next.js bounded BTC ingestion manifests
+
+- Added fixed-store read-only manifest endpoints for revision-bound catalog
+  paging and manifest detail. Pages return at most 100 summaries with an
+  exclusive manifest cursor; details use ID-derived paths, stay within local
+  manifest storage, read at most 8 MiB, and verify file SHA-256 against the
+  DuckDB catalog before parsing.
+- Added `/datasets/<revision>/manifests` and a per-manifest detail page. The
+  response displays fixed scalar metadata, outcome counts, and counts for raw
+  pages, gaps, and parent revisions. Paths, raw arrays, and provenance are not
+  sent to the browser; all inspection remains GET-only.
+- A security review found a configured-root resolution failure could include a
+  local path in the error body. The route now returns a fixed integrity message;
+  its regression passed, and the reviewer confirmed closure with no further
+  findings. The independent security review found no actionable issues.
+- The focused operator/API/HistoryStore group passed 41 tests; Next.js
+  typecheck and production build passed. Desktop and 375px browser smoke
+  exercised the registry → dataset → manifest list → detail flow and next-page
+  navigation. The mobile document stayed 375px wide with the 912px manifest
+  table contained in a 341px scroll region; console errors were zero. Screenshots
+  are in `output/playwright/u5-17/`.
+- Manifest details above 8 MiB fail closed. Outcome rows, gap rows, raw
+  provenance, and B2/B3 experiment/report views remain separate bounded local
+  web slices. U5.5 connected deployment remains gated on target, identity,
+  isolation, and operations decisions.
+
+## 2026-10-29 — U5.18 Next.js bounded BTC research inspection
+
+- Added configured-root B2/B3 run catalogs with strict, exclusive run-ID
+  pagination and no store creation on GET. Legacy B2/B3 resource stores now
+  also use read-only mode and cannot persist through those instances.
+- Detail requests read only the fixed metrics/report artifact, cap run
+  manifests and result files at 256 KiB, and verify result bytes against stored
+  size and SHA-256 before parsing. B2 metric counts match the run sample count;
+  B3 report checks include fixture lineage, matching inputs, offline request
+  counts, and the `not-promoted` boundary.
+- Added `/experiments` B2/B3 catalogs and server-rendered detail pages. The
+  375px browser pass contained the 1,205px B2 and 698px B3 tables in 341px
+  scroll regions; the document stayed 375px wide and 61 browser requests stayed
+  on loopback, with no console errors. Screenshots are in
+  `output/playwright/u5-18/`.
+- Focused research/operator tests passed 29 cases; Next.js typecheck and
+  production build passed. The B1 fixture's empty leakage-safe test set remains
+  explicitly unavailable; the U5.5 connected deployment gate remains.
+
+## 2026-10-29 — U5.19 Next.js bounded BTC ingestion records
+
+- Added manifest-scoped, fixed-store GET pages for outcomes, gaps, and raw
+  provenance. Each page returns at most 100 ordered rows, enforces a strict
+  exclusive cursor, rejects caller roots and duplicate/unknown query fields,
+  and opens the configured HistoryStore read-only.
+- Outcome status totals match the hash-verified manifest and each page row is
+  checked against its raw provenance fingerprint. Gaps are shape/order checked
+  after validating the manifest file hash and 8 MiB cap. Provenance full-row
+  SHA-256 is checked for payloads up to 256 KiB; the browser receives a maximum
+  512-character escaped preview only.
+- Added responsive server-rendered views and navigation from manifest detail.
+  Synthetic cursor smoke passed across all three resources. Next.js typecheck
+  and production build passed. Desktop and mobile browser smoke passed with a
+  375 px document and contained 610 px table inside a 341 px scroll region;
+  all 78 browser requests stayed on the local operator and console errors were
+  zero. Screenshots are in `output/playwright/u5-19/screenshots/`.
+- Local bounded B1 detail is complete. The shipped B1 fixture still has no
+  leakage-safe B2/B3 test labels. The local TypeScript/React/Node.js/Next.js/
+  Tailwind stack is selected and in use. Connected deployment remains behind
+  U5.5 target, identity, isolation, and operations decisions.
+
+## 2026-10-29 — U5.20 Local operator overview
+
+- Added `/overview` as a server-rendered entry page across the existing local
+  portfolio, BTC history, and B2/B3 research catalogs. Each request is capped
+  at three rows, runs independently, and preserves per-resource failure states.
+- Added Overview navigation and kept `/` as the existing portfolio registry.
+  Catalog summaries identify themselves as first-page previews and do not
+  invent whole-catalog totals or performance measures. B3 remains marked
+  offline and not promoted.
+- The gateway status panel and unavailable guidance now use the configured
+  local API port. The page adds no API contract, client-side code, or motion.
+- Verification: Next.js typecheck and production build passed. A production
+  browser pass covered 375, 768, 1024, and 1440 px, verified local navigation,
+  checked the unavailable-gateway state on the configured port, and recorded
+  no console errors or page-level horizontal overflow. Standards and spec
+  rechecks found no residual issues; security review found no actionable
+  issues. Screenshots are in `output/playwright/u5-20/screenshots/`.
+- The shipped B1 fixture still lacks leakage-safe B2/B3 labels. Connected
+  deployment remains behind the U5.5 target, identity, isolation, and
+  operations decisions; select another product surface before the next slice.
+
+## 2026-10-29 — U5.21 Bounded BTC candle visualization
+
+- Added a static server-rendered SVG chart for the current U5.16 candle page,
+  capped at 100 rows. Empty cursor pages omit the chart; the exact seven-column
+  OHLCV table remains the reference for precise values.
+- The chart states its USDT quote unit and bounded page range, displays exact
+  page extrema, and distinguishes rising, falling, and flat candles through
+  fill, outline, and wick pattern plus a text legend. It adds no client state,
+  API request, dependency, provider call, or motion.
+- Updated the page design contract and U5 milestone handoff. Typecheck, build,
+  browser smoke, screenshot review, and spec/standards/security review results
+  are recorded in `docs/evidence/u5-21-bounded-btc-candle-visualization.json`.
+- The chart covers only the displayed page and its plot geometry uses numeric
+  conversion; exact stored decimal strings remain available in the table.
+  Connected deployment remains behind the U5.5 target, identity, isolation,
+  and operations decisions.
+
+## 2026-10-29 — U5.22 Bounded portfolio equity history
+
+- Added `GET /v3/b4/portfolios/{portfolio_id}/inspection`, extending the v2
+  aggregate with the latest 100 equity samples from the broker's policy-retained
+  risk window. Existing v1 and v2 shapes remain unchanged. Python returns exact
+  decimal strings, exact extrema for the returned page, total retained count,
+  and non-decreasing event-time samples; duplicate timestamps are preserved.
+- Switched the local Next.js portfolio detail consumer to v3 and added runtime
+  contract validation. The page now displays a static SVG and a bounded exact
+  timestamp/value table, with explicit empty, single-point, and truncated-page
+  states. TypeScript uses numeric conversion only for approximate SVG geometry.
+- No chart library, client component, motion, mutation route, or connected
+  deployment behavior was added. Python compileall, the focused API test (1
+  passed), and Next.js typecheck/build passed. Production browser smoke passed
+  at 375 px and 1440 px with 100 rows/markers and the empty-history state. A
+  synthetic one-sample response fixture showed one exact table row and no chart
+  at 375 px. There was no horizontal overflow, browser requests stayed local,
+  and console errors were zero. Mobile, desktop, empty-state, and single-sample
+  screenshots were visually reviewed. Review findings and machine-readable
+  evidence are in
+  `docs/evidence/u5-22-bounded-portfolio-equity-history.json`.
+- The page covers only the latest 100 observations. The broker's configured
+  risk window remains the history retention boundary; lifetime history and
+  connected access are not implied. U5.5 target, identity, isolation, and
+  operations decisions remain the next connected-web gate.
+
+## 2026-10-29 — U5.5 Private single-tenant preview scope
+
+- The owner selected a private, single-tenant, read-only preview direction and
+  the TypeScript/React/Node.js/Next.js/Tailwind CSS stack. ADR-0045 records
+  these choices; no host, identity provider, or deployment has been selected
+  or enabled.
+- Research compares Tailscale Serve for tailnet-only clients, Cloudflare Tunnel
+  + Access for browser access without a VPN client, and self-operated WireGuard
+  with application OIDC. The proposed storage boundary keeps one active Python
+  service and an explicit portfolio allowlist.
+- Identity propagation from ingress through Next.js to Python, the number of
+  allowed subjects in the tenant, exact session and operations policies, and
+  the concrete host remain open. U5.5 connected-access code remains gated on
+  these decisions and an allowed/denied/expired/replay/forged-principal/
+  direct-origin/cross-tenant test matrix.

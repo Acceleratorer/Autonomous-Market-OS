@@ -1,0 +1,48 @@
+{
+  "schema": "market-os.u5-11-bounded-catalog-legacy-resources-evidence@v1",
+  "status": "passed",
+  "date": "2026-10-29",
+  "catalog": {
+    "default_limit": 25,
+    "maximum_limit": 100,
+    "browser_smoke_portfolios": 28,
+    "unreadable_candidates_skipped_and_announced": 1,
+    "next_page_rows": [25, 3],
+    "html_page_rows": [2, 2]
+  },
+  "legacy_resources": {
+    "bounded": ["genesis members", "reservations", "orders", "fills", "risk", "approvals", "ledger"],
+    "http_snapshot_export": "rejected"
+  },
+  "checks": {
+    "focused_python_tests": 50,
+    "catalog_concurrent_change": "409 conflict",
+    "python_compile": "passed",
+    "next_typecheck": "passed",
+    "next_production_build": "passed",
+    "browser_page_width_at_375": [375, 375],
+    "browser_console_errors": 0,
+    "browser_page_errors": 0,
+    "skipped_candidate_status_accessible": "passed",
+    "git_diff_check": "passed"
+  },
+  "screenshots": [
+    "output/playwright/u5-11/next-catalog-page-1.png",
+    "output/playwright/u5-11/next-catalog-page-2.png",
+    "output/playwright/u5-11/html-catalog-page-2.png",
+    "output/playwright/u5-11/html-catalog-unreadable-warning.png"
+  ],
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "loopback_only": true,
+    "read_only": true,
+    "public_deployment_enabled": false
+  },
+  "remaining": [
+    "catalog directory enumeration and per-page portfolio recovery",
+    "linear ledger recovery and risk, approval, and ledger page scans",
+    "U5.5 connected target, identity, isolation, and operations decisions",
+    "B4 retention deletion and versioned schema transformation"
+  ]
+}

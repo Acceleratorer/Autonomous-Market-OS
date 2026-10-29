@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.u5-22-bounded-portfolio-equity-history-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "contract": {
+    "method": "GET",
+    "path": "/v3/b4/portfolios/{portfolio_id}/inspection",
+    "api_version": "market-os.b4-portfolio-inspection@v3",
+    "latest_sample_limit": 100,
+    "timestamp_order": "non_decreasing_equal_timestamps_allowed",
+    "equity_source": "Python broker retained risk-window history",
+    "v1_v2_shapes_unchanged": true
+  },
+  "web": {
+    "stack": [
+      "TypeScript",
+      "React",
+      "Node.js",
+      "Next.js",
+      "Tailwind CSS"
+    ],
+    "rendering": "server_component",
+    "chart": "static accessible SVG",
+    "exact_values": "bounded timestamp and equity table",
+    "motion": "none",
+    "new_dependencies": []
+  },
+  "verification": {
+    "python_compileall": "passed: market_os/api.py, market_os/portfolio_broker.py, and market_os/tests/test_operator_surface.py",
+    "automated_tests": "passed: focused v3 inspection test (1 passed); covered latest 100 of 111 samples, exact known decimal values and extrema, timestamp ordering, duplicate timestamps, empty history, v1/v2 compatibility, rejected query and POST",
+    "next_typecheck": "passed",
+    "next_optimized_build": "passed",
+    "browser_smoke": "passed: production app at 375px and 1440px; 100 table rows and SVG markers; empty-history state; synthetic single-sample response fixture showed one exact row and no SVG at 375px; no horizontal overflow",
+    "browser_requests": "passed: browser requests stayed on the local Next.js operator origin",
+    "browser_console": "passed: zero console errors",
+    "visual_screenshot_review": "passed: rising series, full table, responsive layout, empty state, and one-sample state reviewed",
+    "git_diff_check": "passed",
+    "reviews": {
+      "standards": "passed: no actionable findings",
+      "spec": "passed: exact values, extrema, ordering, compatibility, and bounds covered; one-sample UI branch verified in production browser smoke",
+      "security": "passed: no actionable findings"
+    }
+  },
+  "limits": [
+    "The chart shows at most the latest 100 samples from the broker's policy-retained risk window, not lifetime history.",
+    "Chart coordinates use approximate JavaScript numeric conversion; the returned decimal strings remain available in the table.",
+    "The U5.5 connected deployment target, identity, isolation, and operations decisions remain open."
+  ],
+  "boundaries": [
+    "synthetic",
+    "paper_only",
+    "local",
+    "read_only",
+    "no_provider_calls",
+    "no_mutation_routes"
+  ],
+  "screenshots": [
+    "output/playwright/u5-22/portfolio-mobile.png",
+    "output/playwright/u5-22/portfolio-desktop.png",
+    "output/playwright/u5-22/portfolio-empty.png",
+    "output/playwright/u5-22/portfolio-single-sample.png"
+  ]
+}

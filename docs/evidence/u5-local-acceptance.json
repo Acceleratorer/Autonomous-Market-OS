@@ -1,0 +1,38 @@
+{
+  "schema": "market-os.u5.local-readonly-acceptance@v1",
+  "review_date": "2026-10-28",
+  "status": "accepted-local",
+  "surface": {
+    "loopback_service": true,
+    "b4_dashboard": true,
+    "json_summary": true,
+    "healthz": true,
+    "readyz": true,
+    "static_preview": true,
+    "u5_1_service_boundary": true
+  },
+  "boundary_checks": {
+    "dashboard_post_rejected": true,
+    "dashboard_query_rejected": true,
+    "dashboard_has_form": false,
+    "static_preview_has_script": false,
+    "static_preview_has_credentials": false,
+    "static_preview_network_requests": 1,
+    "mobile_horizontal_overflow": false,
+    "loopback_bind_required": true,
+    "untrusted_host_rejected": true,
+    "audit_log_omits_query": true,
+    "recovery_before_listener": true
+  },
+  "verification": {
+    "python_acceptance_tests_passed": 1,
+    "focused_regression_tests_passed": 40,
+    "node_static_contract_tests_passed": 1,
+    "playwright_console_errors": 0,
+    "service_boundary_tests_passed": 13
+  },
+  "deployment": "deferred",
+  "shared_access": "not_authorized",
+  "mutation_api": "not_enabled",
+  "live_trading": "out_of_scope"
+}

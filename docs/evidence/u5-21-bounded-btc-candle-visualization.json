@@ -1,0 +1,49 @@
+{
+  "schema": "market-os.u5-21-bounded-btc-candle-visualization-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": [
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/page.tsx",
+    "apps/web/next-operator/src/app/globals.css",
+    "design-system/autonomous-market-os/pages/dataset-detail.md"
+  ],
+  "checks": {
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed; /datasets/[datasetRevision] is server-rendered on demand",
+    "desktop_mobile_browser_smoke": "passed: 320, 375, 768, 1024, and 1440 px; rising/falling/flat encodings and exact-value table present; valid empty cursor page omits chart; no page overflow; reduced-motion preference honored",
+    "browser_requests": "passed: 49 requests stayed on the local Next.js operator",
+    "browser_console": "passed: zero console errors",
+    "exact_decimal_comparison": "passed: five precision and exponent edge cases",
+    "screenshots_reviewed": true,
+    "code_review": "passed: standards review found no issues",
+    "spec_review": "passed: no findings",
+    "security_review": "passed: no actionable findings; validated decimal length and numeric bounds constrain BigInt work",
+    "docs_json_diff_check": "passed"
+  },
+  "contract": {
+    "server_rendered": true,
+    "read_only": true,
+    "candles_per_page_max": 100,
+    "chart_uses_current_page_only": true,
+    "chart_rendered_on_empty_page": false,
+    "exact_ohlcv_table_preserved": true,
+    "exact_decimal_extrema_and_direction": true,
+    "svg_geometry": "approximate Number scale",
+    "quote_unit": "USDT",
+    "direction_not_color_only": true,
+    "client_state": false,
+    "new_data_requests": false,
+    "chart_dependency_added": false,
+    "motion": false,
+    "canonical_replay_still_required": true
+  },
+  "remaining": [
+    "The chart covers the current bounded page only",
+    "Numeric SVG geometry is approximate; exact stored decimal strings remain in the table",
+    "Connected deployment remains gated by U5.5 target, identity, isolation, and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-21/screenshots/dataset-detail-desktop.png",
+    "output/playwright/u5-21/screenshots/dataset-detail-mobile.png"
+  ]
+}

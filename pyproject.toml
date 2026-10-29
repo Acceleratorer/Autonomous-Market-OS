@@ -11,6 +11,9 @@ dependencies = [
 [project.scripts]
 market-os = "market_os.cli:main"
 
+[tool.setuptools.packages.find]
+include = ["market_os*"]
+
 [tool.pytest.ini_options]
 testpaths = ["market_os/tests"]
 pythonpath = ["."]

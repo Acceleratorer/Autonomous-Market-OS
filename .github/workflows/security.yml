@@ -28,6 +28,6 @@ jobs:
       - name: M2.8 live-smoke evidence gate
         run: python scripts/ci_checks.py validate-m2-8-evidence
       - name: Model boundary and paper-only tests
-        run: python -m pytest -q market_os/tests/test_m2_openai_summary.py market_os/tests/test_m2_model_summary.py
+        run: python -m pytest -q market_os/tests/test_openai_summary_adapter.py market_os/tests/test_model_summary.py
       - name: Compile and diff checks
         run: python -m compileall -q market_os && git diff --check

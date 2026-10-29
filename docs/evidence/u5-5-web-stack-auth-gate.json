@@ -1,0 +1,28 @@
+{
+  "schema": "market-os.u5.5-web-stack-auth-gate@v1",
+  "review_date": "2026-10-29",
+  "status": "defined-not-enabled",
+  "stack": {
+    "plain_html_active": true,
+    "astro_candidate": true,
+    "react_vite_candidate": true,
+    "nextjs_deferred": true,
+    "package_manager_added": false
+  },
+  "auth_gate": {
+    "authenticated_subject": false,
+    "tenant_isolation": false,
+    "session_policy": false,
+    "production_observability": false,
+    "public_deployment": false,
+    "mutation_routes": false,
+    "credentials": false
+  },
+  "current_local_boundary": {
+    "loopback_only": true,
+    "read_only": true,
+    "synthetic_only": true,
+    "paper_only": true
+  },
+  "next_gate": "select_deployment_target_and_identity_boundary"
+}

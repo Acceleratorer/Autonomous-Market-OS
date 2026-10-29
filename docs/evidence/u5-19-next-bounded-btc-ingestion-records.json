@@ -1,0 +1,54 @@
+{
+  "schema": "market-os.u5-19-next-bounded-btc-ingestion-records-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "surface": [
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/[recordType]/page.tsx",
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/page.tsx"
+  ],
+  "api": [
+    "GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/outcomes",
+    "GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/gaps",
+    "GET /v1/btc/history/datasets/<revision>/manifests/<manifest-id>/provenance"
+  ],
+  "checks": {
+    "synthetic_history_cursor_smoke": "passed: multiple pages for outcomes, gaps, and provenance",
+    "fixed_store_read_only": "passed: configured HistoryStore, no caller root, no inspection-side initialization",
+    "manifest_integrity": "passed: bounded file, catalog SHA-256, dataset binding, and gap validation",
+    "outcome_integrity": "passed: manifest status counts and raw provenance fingerprints checked",
+    "provenance_integrity": "passed: full row SHA-256 checked; 512-character preview; 256 KiB source-row cap",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "desktop_and_mobile_browser_smoke": "passed: all views and pagination; 375 px document; 341 px table region contains 610 px table",
+    "browser_requests": "passed: 78 requests stayed on the local Next.js operator",
+    "browser_console": "passed: zero console errors",
+    "screenshots_reviewed": true,
+    "code_review": "passed: no findings",
+    "security_review": "passed: no actionable findings"
+  },
+  "contract": {
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "outcomes_cursor": "exclusive after_outcome_index; cursor must identify a stored outcome",
+    "gaps_cursor": "exclusive after_start_time_ms; cursor must identify a manifest gap",
+    "provenance_cursor": "exclusive (after_raw_page_sha256, after_row_index); both fields required together",
+    "manifest_read_limit_bytes": 8388608,
+    "provenance_record_read_limit_bytes": 262144,
+    "provenance_preview_chars": 512,
+    "reason_preview_chars": 512,
+    "read_only": true,
+    "returns_filesystem_paths": false,
+    "returns_full_provenance_payloads": false,
+    "local_api_host": "127.0.0.1"
+  },
+  "remaining": [
+    "The shipped B1 fixture has no leakage-safe test labels, so B2/B3 metrics remain unavailable",
+    "Connected deployment remains gated on U5.5 target, identity, isolation, and operations decisions"
+  ],
+  "screenshots": [
+    "output/playwright/u5-19/screenshots/outcomes-desktop.png",
+    "output/playwright/u5-19/screenshots/gaps-desktop.png",
+    "output/playwright/u5-19/screenshots/provenance-desktop.png",
+    "output/playwright/u5-19/screenshots/provenance-mobile.png"
+  ]
+}
