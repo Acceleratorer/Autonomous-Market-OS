@@ -1228,6 +1228,9 @@ button:focus-visible {
 
   .sidebar nav {
     grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .service-card {
@@ -1265,10 +1268,13 @@ button:focus-visible {
 
   .sidebar nav {
     grid-column: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .nav-link {
-    width: fit-content;
+    width: 100%;
   }
 
   .topbar {

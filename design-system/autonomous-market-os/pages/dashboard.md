@@ -21,6 +21,9 @@ registry and portfolio detail pages.
   surface. Keep only short color and border feedback; respect reduced motion.
 - At 375, 768, 1024, and 1440 pixels, prevent page-level horizontal scrolling.
   Wide data tables may scroll inside their own labelled region.
+- At widths up to 560 pixels, keep primary navigation in a two-column grid so
+  section links remain touch-sized without pushing page content far below the
+  fold. At tablet widths, let links wrap in source order.
 - On nested detail routes, keep the parent section highlighted in primary
   navigation with `aria-current="location"`; reserve `aria-current="page"` for
   the exact current route.
