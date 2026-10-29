@@ -145,9 +145,20 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
             <span className="crumb-separator" aria-hidden="true">/</span>
             <span aria-current="page">{currentLabel}</span>
           </div>
-          <div className="topbar-tags" role="group" aria-label="Environment boundaries">
-            <span className="topbar-tag topbar-tag-local">Local only</span>
-            <span className="topbar-tag">Read only</span>
+          <div className="topbar-meta">
+            <div className="topbar-tags" role="group" aria-label="Environment boundaries">
+              <span className="topbar-tag topbar-tag-local">Local only</span>
+              <span className="topbar-tag topbar-tag-read-only">Read only</span>
+              <span className="topbar-tag topbar-tag-local topbar-tag-mobile">Local · read only</span>
+            </div>
+            <span
+              className={`topbar-gateway topbar-gateway-${gatewayStatus}`}
+              role="status"
+              aria-label={`${gatewayLabel} at ${gatewayAddress}`}
+            >
+              <span className={`service-dot service-dot-${gatewayStatus}`} aria-hidden="true" />
+              {gatewayLabel}
+            </span>
           </div>
         </header>
 

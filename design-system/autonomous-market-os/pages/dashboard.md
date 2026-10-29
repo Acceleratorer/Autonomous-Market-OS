@@ -21,6 +21,8 @@ registry and portfolio detail pages.
   surface. Keep only short color and border feedback; respect reduced motion.
 - At 320, 375, 768, 1024, and 1440 pixels, prevent page-level horizontal
   scrolling. Wide data tables may scroll inside their own labelled region.
+- Below 560 pixels, keep gateway availability visible in the compact header
+  when the sidebar service card is hidden; preserve the local/read-only labels.
 - Keep keyboard focus visible on labelled table-scroll regions and make the
   skip-link target (`main#main-content`) programmatically focusable.
 - At widths up to 560 pixels, keep primary navigation in a two-column grid so

@@ -1,0 +1,30 @@
+{
+  "schema": "market-os.u5-24-mobile-gateway-status-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "scope": {
+    "surface": "Next.js local operator shell",
+    "breakpoint_css_px": 560,
+    "viewports_css_px": [320, 375, 560, 561, 768, 1440]
+  },
+  "changes": {
+    "mobile_boundary": "Local · read only stays visible in the compact header at widths up to 560px",
+    "gateway_status": "Text status remains visible when the sidebar service card is hidden",
+    "accessibility": "Status role and accessible label include the gateway state and loopback address",
+    "desktop": "Existing separate boundary labels and sidebar status card remain visible",
+    "runtime_dependencies": [],
+    "network_paths": [],
+    "motion": "none"
+  },
+  "verification": {
+    "next_typecheck": "passed",
+    "next_optimized_build": "passed",
+    "production_browser_layout": "passed: gateway status visible in header at <=560px and in sidebar above 560px; no page-level horizontal overflow at tested widths",
+    "mobile_accessibility": "passed: visible text, role=status, and aria-label reports gateway state at 127.0.0.1:8787",
+    "gateway_state_during_review": "unavailable; no local API was running",
+    "browser_console": "passed: zero production browser console errors",
+    "security_boundary": "unchanged: loopback-local, GET-only, paper-only, read-only",
+    "deployment": "not run"
+  },
+  "remaining_gate": "Connected access remains deferred until hosting runtime, identity, authorization, and portfolio isolation are defined."
+}

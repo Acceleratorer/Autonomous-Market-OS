@@ -1364,3 +1364,10 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Commit `9aff897` was pushed. GitHub CI run [40865631843](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631843) and Security/package run [40865631753](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631753) passed, including the static artifact job. GitHub emitted only non-blocking runner/action-runtime migration warnings.
 - U5.23 is the latest defined web slice. The local gate is closed, but the next feature is unspecified; continue only with a defined loopback-local web task. Connected access remains deferred and no DirectAdmin deployment was triggered.
 - Connected web, public deployment, authenticated mutation, partial-fill/expiry expansion, retention deletion, schema transformation, distributed ownership, providers, credentials, and live trading remain deferred gates.
+
+## 2026-10-29 — U5.24 Mobile gateway status
+
+- Audited the existing operator shell after the owner selected “Audit and polish current UI.” On screens up to 560px, the sidebar service card was hidden and gateway availability had no visible replacement.
+- Added compact gateway status and a combined local/read-only label to the mobile header. Desktop badges and the sidebar service card are unchanged; no network path, animation, dependency, API behavior, or access boundary was added.
+- Next.js typecheck and optimized build passed. Production-browser checks at 320, 375, 560, 561, 768, and 1440px confirmed visible gateway state, expected breakpoint placement, and no page-level horizontal overflow. At 320px, the accessible status label includes `127.0.0.1:8787`; the production browser console had zero errors. The local gateway was unavailable during review.
+- Added [U5.24-MOBILE-GATEWAY-STATUS.md](U5.24-MOBILE-GATEWAY-STATUS.md), machine-readable evidence, and the responsive rule in the dashboard design system. No DirectAdmin deploy was triggered. Connected access and the existing domain deferrals remain unchanged.
