@@ -14,7 +14,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U3 | B2–B3 + M5 controls + API connectivity | Features, labels, numerical baselines, calibration, walk-forward evaluation, controlled Jev comparison, and bounded provider connectivity | Implemented offline; B3 not promoted |
 | U3 synthetic surfaces | B3.8–B3.14 | Deterministic session artifacts, local read-only API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | B4.17 formalizes indefinite local retention and validated non-destructive backup; deletion, authenticated mutation API, and schema transformation remain separate gates |
-| U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.22 adds bounded local portfolio equity history with exact values preserved. The owner selected the TypeScript/React/Node.js/Next.js/Tailwind stack and a private single-tenant preview scope. Its host, identity, authorization, isolation, and operations decisions still gate connected access |
+| U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.23 completes responsive and keyboard navigation for the local operator on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. The owner selected a private single-tenant preview scope; its host, identity, authorization, isolation, and operations decisions still gate connected access |
 | U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | Planned |
 | U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | Planned selectively |
 | U8 | M6 | Separate live-readiness review or explicit permanent paper mode | Deferred; no automatic live trading |
@@ -103,6 +103,7 @@ The web, CLI, and app must consume the same versioned backend contracts. They mu
 | [U5.20 local operator overview](U5.20-LOCAL-OPERATOR-OVERVIEW.md): bounded first-page previews across portfolios, BTC datasets, and B2/B3 research | Local surfaces are connected from one overview; choose the next product surface or resolve the U5.5 deployment gate |
 | [U5.21 bounded BTC candle visualization](U5.21-BOUNDED-BTC-CANDLE-VISUALIZATION.md): static SVG for the current hash-checked page, with exact OHLCV values preserved below | Choose the next local product surface or resolve the U5.5 deployment gate |
 | [U5.22 bounded portfolio equity history](U5.22-BOUNDED-PORTFOLIO-EQUITY-HISTORY.md): latest 100 retained broker equity samples, with exact values and a static local chart | Choose the next local product surface or resolve the U5.5 deployment gate |
+| [U5.23 responsive operator navigation](U5.23-RESPONSIVE-OPERATOR-NAVIGATION.md): 320–1440px page-fit, 44px navigation targets, keyboard skip-to-main, and visible focus for scrollable table regions | Resolve the U5.5 access, identity, subject, storage, and operations decisions before connected implementation |
 | Deployment/auth/observability policy | U5 web operations |
 | App framework and supported platforms | U6 app shell |
 | Live trading authorization and compliance review | U8 only |

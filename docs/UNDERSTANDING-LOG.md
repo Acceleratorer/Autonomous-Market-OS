@@ -1316,3 +1316,21 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   the concrete host remain open. U5.5 connected-access code remains gated on
   these decisions and an allowed/denied/expired/replay/forged-principal/
   direct-origin/cross-tenant test matrix.
+
+## 2026-10-29 — U5.23 Responsive operator navigation
+
+- Removed the root's fixed 320px minimum after production-browser inspection
+  showed a 15px horizontal overflow at a 320px viewport with a classic
+  scrollbar. The dashboard now fits at 320, 375, 768, 1024, and 1440px.
+- Kept primary navigation's 44px touch targets and source order; made the
+  skip-link target focusable and added a visible keyboard focus outline to
+  scrollable table regions. Tab then Enter moves focus from the skip link to
+  `main#main-content`.
+- Next.js typecheck and optimized build passed. Playwright checked `/overview`,
+  `/`, `/datasets`, and `/experiments` at all five widths. The local API was
+  unavailable during this shell pass, so catalog routes showed their existing
+  unavailable states; backend and detail-data rendering were not exercised.
+- Design rules and machine-readable evidence are in
+  `design-system/autonomous-market-os/pages/dashboard.md` and
+  `docs/evidence/u5-23-responsive-operator-navigation.json`. Connected access
+  remains gated by U5.5 owner decisions.

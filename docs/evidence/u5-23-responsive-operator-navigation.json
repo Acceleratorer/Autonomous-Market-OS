@@ -1,0 +1,32 @@
+{
+  "schema": "market-os.u5-23-responsive-operator-navigation-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-10-29",
+  "scope": {
+    "surface": "Next.js local operator shell",
+    "routes": ["/overview", "/", "/datasets", "/experiments"],
+    "viewports_css_px": [320, 375, 768, 1024, 1440]
+  },
+  "changes": {
+    "root_min_width": "removed; no page-level horizontal overflow at the tested widths",
+    "primary_navigation": "source order retained; links remain at least 44px high",
+    "skip_link": "first keyboard stop focuses main#main-content after activation",
+    "scroll_regions": "keyboard focus receives a visible 2px accent outline",
+    "runtime_dependencies": [],
+    "motion": "none"
+  },
+  "verification": {
+    "next_typecheck": "passed",
+    "next_optimized_build": "passed",
+    "browser_layout": "passed: four top-level routes at five widths; no page-level horizontal overflow; one main h1 per route",
+    "skip_link_keyboard": "passed: Tab focuses skip link; Enter focuses main#main-content",
+    "table_region_focus": "passed: temporary element using table-scroll class showed a 2px accent outline when keyboard-focused; element removed after check",
+    "data_state": "configured local API unavailable; catalog routes showed their existing unavailable state",
+    "security_boundary": "unchanged: local-only, GET-only, paper-only, read-only"
+  },
+  "screenshots": [
+    "output/playwright/u5-23/nav-grid-375.png",
+    "output/playwright/u5-23/overview-320-audit.png"
+  ],
+  "remaining_gate": "U5.5 access path, host, login method, subject scope, authorization/storage, and operations decisions remain owner-selected."
+}

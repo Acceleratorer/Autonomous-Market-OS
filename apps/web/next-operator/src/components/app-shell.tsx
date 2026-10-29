@@ -151,7 +151,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
           </div>
         </header>
 
-        <main id="main-content" className="main-content">{children}</main>
+        <main id="main-content" className="main-content" tabIndex={-1}>{children}</main>
 
         <footer className="footer-note">
           <span>GET-only local inspection · paper-only broker</span>

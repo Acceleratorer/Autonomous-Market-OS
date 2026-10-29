@@ -35,7 +35,6 @@
 }
 
 html {
-  min-width: 320px;
   background: var(--canvas);
 }
 
@@ -55,7 +54,8 @@ a {
 }
 
 a:focus-visible,
-button:focus-visible {
+button:focus-visible,
+.table-scroll:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
