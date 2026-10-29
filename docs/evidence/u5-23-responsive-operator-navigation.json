@@ -24,6 +24,22 @@
     "data_state": "configured local API unavailable; catalog routes showed their existing unavailable state",
     "security_boundary": "unchanged: local-only, GET-only, paper-only, read-only"
   },
+  "ci": {
+    "commit": "a10d594b5ae4251dcf8c0f91ffbdd0c6db505215",
+    "offline_tests": {
+      "result": "passed",
+      "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40852701421"
+    },
+    "security_and_package_checks": {
+      "result": "passed",
+      "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40852701587"
+    },
+    "static_preview": {
+      "artifact_build": "passed",
+      "production_deploy": "not run: DirectAdmin secret validation failed; no deployment occurred",
+      "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40852701398"
+    }
+  },
   "screenshots": [
     "output/playwright/u5-23/nav-grid-375.png",
     "output/playwright/u5-23/overview-320-audit.png"
