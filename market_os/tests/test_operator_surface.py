@@ -200,8 +200,12 @@ def test_v2_inspection_bounds_members_and_reservations(tmp_path: Path) -> None:
             f"{base}/v1/b4/portfolios/{portfolio.portfolio_id}/inspection",
             timeout=2,
         ).read())
-        assert len(legacy["genesis"]["member_strategy_ids"]) == 27
-        assert len(legacy["reservations"]["reservations"]) == 27
+        assert len(legacy["genesis"]["member_strategy_ids"]) == 25
+        assert legacy["genesis"]["members_page"]["total_count"] == 27
+        assert legacy["genesis"]["members_page"]["has_more"] is True
+        assert len(legacy["reservations"]["reservations"]) == 25
+        assert legacy["reservations"]["page"]["total_count"] == 27
+        assert legacy["reservations"]["page"]["has_more"] is True
 
         query = urllib.parse.urlencode({
             "member_after_strategy_id": member_ids[24],
