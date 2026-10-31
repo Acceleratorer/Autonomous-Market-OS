@@ -1355,14 +1355,14 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 
 ## 2026-10-29 — Local-first exit gate audit
 
-- Read `docs/PROJECT-CONTEXT.md` first and continued from the active U5.23/local boundary.
+- Read `docs/PROJECT-CONTEXT.md` first and continued from the active U5.24/local boundary.
 - Preserved the existing uncommitted code, documents, scratch directories, Playwright artifacts, and output files.
 - Verified the current local fixes for bounded POST bodies, same-origin browser POSTs, non-creating read-only BTC stores, explicit B2/B3 insufficient-sample outcomes, and non-mutating portfolio inspection locks.
 - Full verification passed: 546 tests passed, 0 failed, 7 skipped with provider credentials cleared; compileall, `pip check`, Next.js typecheck/build, the TypeScript static contract, artifact parity, secret scan, M2.8 and evidence validation, and `git diff --check` passed. `npm ci` reported zero vulnerabilities.
 - Added `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json` as the current local completion record.
 - Final security review found no actionable defects in the new read-only CLI/store paths, B4.1 inspection locks, or bounded POST handling. No DirectAdmin deployment was run; push cannot publish the static preview.
-- Commit `9aff897` was pushed. GitHub CI run [40865631843](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631843) and Security/package run [40865631753](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631753) passed, including the static artifact job. GitHub emitted only non-blocking runner/action-runtime migration warnings.
-- U5.23 is the latest defined web slice. The local gate is closed, but the next feature is unspecified; continue only with a defined loopback-local web task. Connected access remains deferred and no DirectAdmin deployment was triggered.
+- Commit `9aff897` was pushed. GitHub CI run [40865631843](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631843) and Security/package run [40865631753](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631753) passed, including the static artifact job. The later U5.24 closeout on `33989fe` passed CI run [40867998693](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998693) and Security/package run [40867998684](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998684). GitHub emitted only non-blocking runner/action-runtime migration warnings.
+- U5.24 is now the latest defined web slice. The local gate is closed; continue only with a defined loopback-local web task. Connected access remains deferred and no DirectAdmin deployment was triggered.
 - Connected web, public deployment, authenticated mutation, partial-fill/expiry expansion, retention deletion, schema transformation, distributed ownership, providers, credentials, and live trading remain deferred gates.
 
 ## 2026-10-29 — U5.24 Mobile gateway status
@@ -1371,3 +1371,155 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Added compact gateway status and a combined local/read-only label to the mobile header. Desktop badges and the sidebar service card are unchanged; no network path, animation, dependency, API behavior, or access boundary was added.
 - Next.js typecheck and optimized build passed. Production-browser checks at 320, 375, 560, 561, 768, and 1440px confirmed visible gateway state, expected breakpoint placement, and no page-level horizontal overflow. At 320px, the accessible status label includes `127.0.0.1:8787`; the production browser console had zero errors. The local gateway was unavailable during review.
 - Added [U5.24-MOBILE-GATEWAY-STATUS.md](U5.24-MOBILE-GATEWAY-STATUS.md), machine-readable evidence, and the responsive rule in the dashboard design system. Commit `33989fe` was pushed; CI [40867998693](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998693) and security/package checks [40867998684](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998684) passed. The disconnected static artifact was packaged, but no DirectAdmin deploy was triggered. Connected access and existing domain deferrals remain unchanged.
+
+## 2026-10-29 — Worktree baseline and B4.18 migration gate
+
+- Read `docs/PROJECT-CONTEXT.md`, `STRUCTURE.md`, the current B4 contracts, U5.5 access contract, stack research, and repository code paths before editing.
+- Classified the current baseline without cleanup: seven tracked product files are modified; 182 untracked paths totaling about 16.3 MB are preserved as Playwright/output/scratch/pre-existing artifacts. No reset, clean, delete, commit, push, or deployment operation was run.
+- Selected B4.18 versioned schema migration as the next local backend gate. Added the contract, ADR-0047, readiness evidence, and copy-on-write/replay/rollback requirements. The transformer was not yet implemented at this audit snapshot.
+
+## 2026-10-29 — B4.18 local migration implementation
+
+- Added `market_os/schema_migration.py` and regression coverage for isolated and shared portfolios, source immutability, replay equivalence, target hash-chain validation, destination safety, rollback archives, idempotent retries, and conflicts.
+- The transformer keeps the stable portfolio ID inside a new migration directory, preserves source file fingerprints and event provenance, recomputes target schema/fingerprint fields, and promotes only after source-projection recovery passes.
+- B4.18 remains synthetic, paper-only, local, and operator-invoked. Target-native broker recovery, retention deletion, authenticated mutation, connected access, and deployment remain separate gates.
+- Review hardening added allowlisted source/target fields, source-change checks, serialized promotion, symlink/reparse ancestor rejection, tamper-resistant idempotent retry validation, rollback fingerprint checks, and inspection-equivalence verification. Full suite now reports 553 passed, 0 failed, 7 skipped.
+- Recorded the next stack/deployment plan: Python remains authoritative for domain/persistence, Next.js remains the local/private browser stack, static DirectAdmin remains separate, and connected access waits for runtime, identity, authorization, isolation, sessions, audit, rollback, and secrets decisions.
+- Closed the B4.18 recovery follow-up: v2 target-native recovery now validates metadata, policy/genesis identity, event ordering and fingerprints, snapshot/order/fill shapes, shared reservations, checkpoint relation, and source-policy provenance independently of the v1 projection replay. Added manifest tamper, target provenance tamper, and pre/post-promotion interruption retry regressions. Focused migration tests now pass 11/11; the remaining B4 gates are retention deletion and authenticated mutation.
+
+## 2026-10-29 — B4.19 local mutation capability authorization
+
+- Audited the existing B4.13 locking, B4.14 mutation audit, B4.15 shared reservations, B4.16 lifecycle, B4.17 retention, and B4.18 migration paths before editing. Preserved the current worktree and did not add HTTP, CLI, network, provider, credential, or live-trading behavior.
+- Added `market_os/local_mutation.py` with a versioned in-memory HMAC capability seam for `order.submit`, `order.cancel`, and `approval.revoke`. Capabilities bind a stable issuer-bound subject claim, exact portfolio, operation, command fingerprint, idempotency key, and half-open validity window. Verification uses canonical payloads, constant-time signature comparison, strict field/identifier validation, and an injected local clock for deterministic tests.
+- Existing broker mutations receive only safe authorization context (`subject`, `operation`, and capability fingerprint). Raw tokens, signatures, and signing keys never enter ledger, checkpoint, inspection, or recovery artifacts. Existing lock, stale-writer, reservation, append-only, checkpoint, fingerprint, replay, and idempotency semantics remain authoritative.
+- Added contract, ADR-0048, machine-readable evidence, and 15 regression tests covering valid submit/cancel/revoke, isolated/shared binding, malformed/tampered/expired capabilities, retries/conflicts, stale writers, recovery equivalence, safe audit context, and secret/token absence. This is local capability authorization, not human authentication; U5.5 connected identity/runtime remains deferred.
+
+- Final verification: the full local suite passed with 572 tests, 0 failures, and 7 skips; `compileall`, secret scan, validation of 52 evidence JSON files, and `git diff --check` also passed.
+
+## 2026-10-30 — B4.20 read-only retention and archive preflight
+
+- Reconciled the worktree without cleanup: 13 tracked modified paths and 248
+  untracked file paths totaling 16,508,178 bytes. Product candidates, scratch,
+  Playwright output, and the pre-existing `API.md` remain classified in
+  `docs/WORKTREE-BASELINE-REPORT.md`; no reset, clean, delete, staging,
+  commit, push, or deployment operation was run.
+- Selected B4.20 as the only new local gate. It keeps B4.17's
+  `indefinite-local` retention policy and adds the read-only
+  `preflight_retention_archive()` seam. The report validates broker recovery,
+  source file fingerprints, ledger/checkpoint state, shared reservations,
+  zero-event ambiguity, and an optional backup ZIP without extracting it.
+- Archive validation is bounded and fail-closed for missing, malformed,
+  tampered, identity-mismatched, oversized, or symlink/reparse inputs. The
+  report never returns raw paths and always sets `deletion_eligible` to false.
+  The archive path is checked before resolution, the opened descriptor is
+  matched to the requested path, and the archive digest is rechecked after
+  validation; backup publication uses a no-overwrite link.
+  No deletion, pruning, archive mutation, HTTP route, CLI mutation route,
+  provider, credential, network, or live-trading path was added.
+- Added the versioned contract, ADR-0049, machine-readable evidence, and
+  regression coverage for isolated and shared stores, active reservations,
+  valid/tampered/missing/oversized/symlinked archives, zero-event ambiguity,
+  and checkpoint-without-ledger failure. The focused suite passed 20 tests,
+  including a concurrent restore-destination collision that preserves the
+  competing directory. The clean full run passed 586 tests with 7 skips.
+  Compileall, secret scan, 54 evidence validations, and diff checks passed.
+
+## 2026-10-30 — Worktree manifest and stack/runtime review
+
+- Re-read `docs/PROJECT-CONTEXT.md`, the roadmap, structure map, U5.5 contract,
+  stack/deployment plan, Next.js package, gateway entrypoint, and DirectAdmin
+  workflow before choosing the next action.
+- Added `docs/WORKTREE-BASELINE-MANIFEST.json`, an exact machine-readable path
+  inventory. It classified the then-current 13 tracked modified paths and 251
+  untracked paths, with explicit product candidates and preserved
+  scratch/inspection paths and no unclassified entries. It records that reset,
+  clean, delete, commit, push, and deploy are not part of that audit snapshot.
+- Added `docs/STACK-AND-RUNTIME-REVIEW.md`. It confirms Python remains the
+  domain/accounting/recovery authority, Next.js remains the thin local/private
+  operator stack, the static DirectAdmin artifact stays separate, and no
+  connected runtime is selected yet.
+- The next connected gate must define hosting runtime, identity, server-side
+  authorization, storage isolation, sessions, audit, rollback, secrets, abuse
+  limits, and evidence before any connected web or DirectAdmin action. No
+  public listener, mutation route, provider, credential, or live path was added.
+
+## 2026-10-30 — U5.5 runtime and identity contract v1
+
+- Defined `market-os.u5-5.connected-runtime-identity@v1` for the future private
+  read-only preview. It specifies the loopback origin trust boundary, verified
+  principal envelope, subject-to-portfolio authorization, storage path/reparse
+  protections, bounded sessions and replay handling, audit/redaction, health
+  gated rollback, server-only secrets, abuse limits, and the required evidence
+  matrix.
+- The contract is planning-only: no host, identity provider, public listener,
+  connected runtime, credential, mutation route, or deployment was selected or
+  enabled. Evidence marks the matrix as specified but not run.
+
+## 2026-10-30 — Codebase and stack understanding
+
+- Traced the implementation from the file-backed JSON/JSONL portfolio store
+  through Python broker recovery, bounded loopback inspection, the compatibility
+  HTML shell, the Next.js server-only GET adapter, and the disconnected static
+  preview. Python remains the only accounting, risk, persistence, recovery,
+  reservation, replay, and audit authority.
+- Confirmed `apps/gateway` and `apps/cli` are thin delegates, Next.js performs
+  validated GET inspection only, and CI covers Python tests, compile, Next.js
+  typecheck/build, static parity, security, evidence, and application surfaces.
+- Added `docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md` and
+  `docs/evidence/codebase-stack-understanding.json`. The worktree remains at
+  271 status paths with 36 product candidates, 235 preserved paths, and zero
+  unclassified entries. No reset, clean, delete, staging, commit, push, or
+  deployment operation was used.
+- Classified remaining work as intentional deferral or U5.5 owner decision;
+  no unsupported stack rewrite or connected deployment is justified.
+
+## 2026-10-30 — U5.5 runtime/identity decision record
+
+- Added ADR-0050 to make the U5.5 runtime, principal assertion, server-side
+  portfolio authorization, storage isolation, session, audit, rollback, secret,
+  and abuse boundaries durable and reviewable.
+- Reconciled `docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md` and
+  `docs/STACK-AND-RUNTIME-REVIEW.md`: the contract is defined, but no host,
+  identity provider, ingress, public listener, credential, or deployment is
+  selected or enabled.
+- DirectAdmin remains a disconnected static-preview target only. The local
+  Python/Next.js operator, append-only ledger, checkpoints, fingerprints,
+  deterministic replay, reservations, and audit outcomes remain unchanged.
+
+## 2026-10-30 — Local rejected-POST body handling closeout
+
+- Reproduced the Windows response-delivery failure mode in the local loopback
+  HTTP service: a rejected POST could leave request bytes unread while the
+  response was being sent, allowing the HTTP server/client exchange to become
+  unreliable.
+- Centralized the fix in `market_os/api.py`: rejected POST paths parse only a
+  single safe bounded `Content-Length`, drain at most the approved BTC ingest
+  cap, keep `close_connection=true` when the body cannot be safely drained, and
+  reuse the connection only after a complete drain. Unknown routes, untrusted
+  hosts, and cross-origin POSTs use the same guard.
+- The focused workflow/B4 regression group passed 116 tests; the clean full
+  suite passed 586 tests with 7 skips. No route, provider, credential, network,
+  live-trading, deployment, or unrelated worktree artifact was changed.
+
+## 2026-10-30 — Restore promotion atomicity hardening
+
+- Review found that the prior restore path moved validated files one at a time after reserving the destination directory. A mid-promotion failure could therefore leave a partial portfolio directory.
+- Replaced file-by-file promotion with complete staging plus one directory rename. Concurrent destination creation and simulated publication interruption now fail closed without overwriting or leaving a partial destination.
+- Added regression coverage to `market_os/tests/test_portfolio_backup.py`. The focused portfolio/recovery group passed 110 tests; the full suite passed 588 tests with 7 skips.
+
+
+## 2026-10-30 — Final local closeout and worktree reconciliation
+
+- Re-ran the focused workflow/B4 group after the Windows response-handle
+  cleanup: 118 tests passed. The clean full suite passed 588 tests with 7
+  skips; compileall, secret scan, evidence validation for 55 JSON files, and
+  `git diff --check` passed.
+- The worktree manifest was refreshed from the live read-only status: 279
+  status paths, 22 tracked product changes, 21 untracked product candidates,
+  and 236 preserved scratch/inspection paths totaling 16,569,828 bytes.
+- The final local boundary remains synthetic, paper-only, loopback-only, and
+  read-only at HTTP/CLI surfaces. B4.18 migration, B4.19 local capability
+  authorization, B4.20 archive preflight, rejected-POST body handling, and
+  atomic restore promotion are locally implemented and evidenced. Connected
+  runtime/identity, retention deletion, externally exposed mutation,
+  distributed ownership, providers, credentials, and deployment remain gated.

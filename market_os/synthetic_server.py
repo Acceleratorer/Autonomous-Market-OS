@@ -41,8 +41,18 @@ def make_synthetic_handler(store: SyntheticSessionStore) -> type[BaseHTTPRequest
             )
             return (
                 "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Market OS synthetic catalog</title>"
-                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head><body>"
-                "<main><h1>Market OS synthetic catalog</h1><p>synthetic-only · read-only</p>"
+                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                "<style>:root{color-scheme:dark;font-family:ui-sans-serif,system-ui,sans-serif;background:#06101c;color:#f1f6fb}"
+                "*{box-sizing:border-box}body{margin:0;padding:24px;background:radial-gradient(circle at 8% -10%,#173148,transparent 32rem),#06101c}"
+                "main{max-width:1120px;margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid #294056}"
+                ".brand{display:grid;gap:3px}.brand strong{color:#f1f6fb;letter-spacing:.14em;font-size:.78rem}.brand small{color:#8194a2;font-size:.72rem}"
+                ".status-strip{display:flex;flex-wrap:wrap;gap:6px}.status-strip span{padding:6px 8px;border:1px solid #294056;border-radius:5px;color:#9fd9c1;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}"
+                "h1{font-size:clamp(1.7rem,4vw,2.6rem);letter-spacing:-.03em}"
+                "p{color:#b7c7d7;line-height:1.6}table{display:block;width:100%;overflow-x:auto;border-collapse:collapse;white-space:nowrap}"
+                "th,td{padding:10px 12px;border-bottom:1px solid #294056;text-align:left}th{color:#9fd9c1;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}"
+                "a{color:#8fe0c2;text-underline-offset:3px}@media(max-width:640px){body{padding:14px}th,td{padding:9px 10px;font-size:.85rem}}</style></head><body>"
+                "<main><header class=\"topbar\"><div class=\"brand\"><strong>MARKET OS</strong><small>synthetic observability</small></div><div class=\"status-strip\"><span>synthetic</span><span>paper</span><span>read only</span></div></header>"
+                "<h1>Market OS synthetic catalog</h1><p>synthetic-only · read-only</p>"
                 f"<p>Sessions: {self._cell(catalog['session_count'])}</p>"
                 "<table><thead><tr><th>Session</th><th>Observations</th><th>Fills</th><th>Total PnL (USDT)</th><th>View</th></tr></thead>"
                 f"<tbody>{rows}</tbody></table><h2>Comparisons</h2><ul>{comparisons}</ul></main></body></html>"
@@ -57,8 +67,18 @@ def make_synthetic_handler(store: SyntheticSessionStore) -> type[BaseHTTPRequest
             )
             return (
                 "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Market OS synthetic comparison</title>"
-                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head><body>"
-                "<main><h1>Market OS synthetic comparison</h1><p>synthetic-only · read-only</p>"
+                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                "<style>:root{color-scheme:dark;font-family:ui-sans-serif,system-ui,sans-serif;background:#06101c;color:#f1f6fb}"
+                "*{box-sizing:border-box}body{margin:0;padding:24px;background:radial-gradient(circle at 8% -10%,#173148,transparent 32rem),#06101c}"
+                "main{max-width:1120px;margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid #294056}"
+                ".brand{display:grid;gap:3px}.brand strong{color:#f1f6fb;letter-spacing:.14em;font-size:.78rem}.brand small{color:#8194a2;font-size:.72rem}"
+                ".status-strip{display:flex;flex-wrap:wrap;gap:6px}.status-strip span{padding:6px 8px;border:1px solid #294056;border-radius:5px;color:#9fd9c1;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}"
+                "h1{font-size:clamp(1.7rem,4vw,2.6rem);letter-spacing:-.03em}"
+                "p{color:#b7c7d7;line-height:1.6}table{display:block;width:100%;overflow-x:auto;border-collapse:collapse;white-space:nowrap}"
+                "th,td{padding:10px 12px;border-bottom:1px solid #294056;text-align:left}th{color:#9fd9c1;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}"
+                "a{color:#8fe0c2;text-underline-offset:3px}@media(max-width:640px){body{padding:14px}th,td{padding:9px 10px;font-size:.85rem}}</style></head><body>"
+                "<main><header class=\"topbar\"><div class=\"brand\"><strong>MARKET OS</strong><small>synthetic observability</small></div><div class=\"status-strip\"><span>synthetic</span><span>paper</span><span>read only</span></div></header>"
+                "<h1>Market OS synthetic comparison</h1><p>synthetic-only · read-only</p>"
                 f"<p>Comparison direction: {self._cell(comparison['delta_direction'])}</p>"
                 f"<p>Left: {self._cell(left_id)} · Right: {self._cell(right_id)}</p>"
                 "<table><thead><tr><th>Metric</th><th>Left</th><th>Right</th><th>Right minus left</th></tr></thead>"
@@ -82,6 +102,9 @@ def make_synthetic_handler(store: SyntheticSessionStore) -> type[BaseHTTPRequest
             self.wfile.write(raw)
 
         def do_POST(self) -> None:  # noqa: N802
+            # The server is read-only; close rejected POST connections so an
+            # unread request body cannot be parsed as a second request.
+            self.close_connection = True
             self._json(405, {"error": "synthetic server is read-only", "api_version": API_VERSION})
 
         def do_GET(self) -> None:  # noqa: N802

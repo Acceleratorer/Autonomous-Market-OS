@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getAllowedPortfolioId, getInternalPrincipalHeaders, isConnectedMode } from "./connected-access";
+
 const LOCAL_API_PORT = process.env.MARKET_OS_API_PORT ?? "8787";
 if (!/^[1-9]\d{0,4}$/.test(LOCAL_API_PORT) || Number(LOCAL_API_PORT) > 65535) {
   throw new Error("MARKET_OS_API_PORT must be a valid local TCP port");
@@ -447,9 +449,13 @@ function asCandleDecimal(value: unknown, { allowZero = false } = {}): string {
 async function readJson(path: string): Promise<unknown> {
   let response: Response;
   try {
+    const internalPrincipalHeaders = await getInternalPrincipalHeaders();
     response = await fetch(new URL(path, LOCAL_API_ORIGIN), {
       method: "GET",
-      headers: { accept: "application/json" },
+      headers: {
+        accept: "application/json",
+        ...internalPrincipalHeaders,
+      },
       credentials: "omit",
       cache: "no-store",
       redirect: "error",
@@ -493,7 +499,7 @@ function asText(value: unknown, { allowEmpty = false } = {}): string {
   return value;
 }
 
-function optionalText(value: unknown, fallback = "—"): string {
+function optionalText(value: unknown, fallback = "n/a"): string {
   return typeof value === "string" && value.length <= 512 ? value : fallback;
 }
 
@@ -557,6 +563,12 @@ export async function getPortfolioCatalog(options: { limit?: number; afterPortfo
   if (payload.api_version !== "market-os.b4-catalog@v1") throw new LocalApiError("invalid");
   const entries = asArray(payload.portfolios);
   if (entries.length > limit) throw new LocalApiError("invalid");
+  if (isConnectedMode() && entries.some((value) => {
+    const portfolio = asObject(value);
+    return portfolio.portfolio_id !== getAllowedPortfolioId();
+  })) {
+    throw new LocalApiError("invalid");
+  }
   const portfolios: PortfolioCatalogEntry[] = entries.map((value): PortfolioCatalogEntry => {
     const portfolio = asObject(value);
     const portfolioId = asText(portfolio.portfolio_id);
@@ -1446,6 +1458,9 @@ export async function getPortfolioDetail(
   portfolioId: string,
   cursors: PortfolioInspectionCursors = {},
 ): Promise<PortfolioDetail> {
+  if (isConnectedMode() && portfolioId !== getAllowedPortfolioId()) {
+    throw new LocalApiError("missing");
+  }
   const { beforeSequence, beforeOrderId, afterStrategyId, beforeReservationOrderId } = cursors;
   if (!isPortfolioId(portfolioId)) throw new LocalApiError("missing");
   if (beforeSequence !== undefined && !/^[1-9]\d{0,63}$/.test(beforeSequence)) {

@@ -13,7 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function formatMetric(value: number | null): string {
-  return value === null ? "—" : value.toFixed(6);
+  return value === null ? "n/a" : value.toFixed(6);
 }
 
 function FingerprintRow({ label, value }: { label: string; value: string }) {
@@ -99,7 +99,7 @@ function B3Results({ detail }: { detail: BtcResearchRunDetail }) {
       String(coverage.predictedN),
       String(coverage.abstentionN),
       formatMetric(coverage.coverage),
-      Object.entries(coverage.outcomes).map(([outcome, count]) => `${outcome}: ${count}`).join(" · ") || "—",
+      Object.entries(coverage.outcomes).map(([outcome, count]) => `${outcome}: ${count}`).join(" · ") || "n/a",
     ],
   }));
   const matched = report.matchedControls;

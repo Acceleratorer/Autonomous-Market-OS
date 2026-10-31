@@ -1,6 +1,6 @@
 {
   "schema": "market-os.local-exit-gate@v1",
-  "date": "2026-10-29",
+  "date": "2026-10-30",
   "status": "green-local-boundary",
   "scope": {
     "synthetic": true,
@@ -10,12 +10,12 @@
     "live_trading": false
   },
   "verification": {
-    "pytest_passed": 546,
+    "pytest_passed": 588,
     "pytest_failed": 0,
     "pytest_skipped": 7,
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_json_count": 49,
+    "evidence_json_count": 55,
     "evidence_validation": "passed",
     "git_diff_check": "passed",
     "dependency_check": "passed",
@@ -27,15 +27,23 @@
     "m2_8_evidence_validation": "passed",
     "security_review": "no-actionable-findings",
     "github_ci": "passed",
-    "github_ci_run_id": 40865631843,
+    "github_ci_run_id": 40867998693,
     "security_package_workflow": "passed",
-    "security_package_run_id": 40865631753,
+    "security_package_run_id": 40867998684,
     "static_preview_artifact_job": "passed",
     "directadmin_deployment": "not-run-host-prerequisites-outstanding",
-    "github_runner_warnings": "non-blocking action runtime and ubuntu-latest migration annotations"
+    "github_runner_warnings": "non-blocking action runtime and ubuntu-latest migration annotations",
+    "b4_18_focused_tests": "7 passed",
+    "b4_18_transformer": "passed-local-copy-on-write-replay-rollback",
+    "b4_20_focused_tests": "21 passed",
+    "b4_20_preflight": "passed-read-only-retention-archive-validation",
+    "rejected_post_body_handling": "passed-bounded-drain-close-on-rejection",
+    "focused_backend_regressions": "118 passed",
+    "focused_portfolio_recovery_regressions": "110 passed",
+    "restore_promotion": "passed-atomic-directory-rename-no-partial-destination"
   },
   "closed_local_capabilities": [
-    "B4.1-B4.17 synthetic paper broker",
+    "B4.1-B4.20 synthetic paper broker",
     "shared portfolio membership and reservations",
     "append-only ledger checkpoint recovery and fingerprints",
     "bounded API POST validation and same-origin protection",
@@ -47,7 +55,6 @@
   "deferred_gates": [
     "partial fills and order expiry",
     "retention deletion or pruning",
-    "versioned schema transformation",
     "authenticated externally exposed mutation",
     "connected identity authorization and storage isolation",
     "distributed ownership",

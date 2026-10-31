@@ -1,0 +1,99 @@
+{
+  "schema": "market-os.u5-5.stack-runtime-review-evidence@v1",
+  "milestone": "U5.5",
+  "status": "locally-verified-not-enabled",
+  "contract": "market-os.u5-5.connected-runtime-identity@v1",
+  "scope": {
+    "local_operator": "implemented_loopback_only",
+    "private_preview": "selected_scope_nextjs_stack",
+    "connected_runtime": "private-linux-vm-systemd",
+    "access_path": "owner-tailscale-tailnet-serve",
+    "allowed_subject": "owner-only",
+    "allowed_portfolio_ids": [
+      "paper-main"
+    ],
+    "portfolio_root": "/var/lib/autonomous-market-os/portfolios",
+    "session_policy": {
+      "expiry_seconds": 900,
+      "clock_tolerance_seconds": 60,
+      "jti": "revocable-one-time-hashed-replay-state"
+    },
+    "backup_rollback": {
+      "owner": "project-owner",
+      "encrypted_backup_before_promotion": true,
+      "known_good_release_slots": 1,
+      "failed_health_keeps_current_active": true
+    },
+    "directadmin": "disconnected_static_preview_only",
+    "synthetic_only": true,
+    "paper_only": true,
+    "live_trading": false
+  },
+  "current_stack": {
+    "domain": "Python market_os package",
+    "gateway": "Python stdlib loopback HTTP",
+    "cli": "Python apps/cli compatibility entrypoint",
+    "operator": "TypeScript React Next.js Node.js Tailwind CSS",
+    "static_preview": "HTML CSS apps/web/public",
+    "persistence": "JSONL ledger plus JSON metadata/checkpoint"
+  },
+  "required_before_connected_web": [
+    "hosting runtime and process supervision",
+    "identity provider or login assertion and stable subject",
+    "server-side subject-to-portfolio authorization",
+    "storage isolation and path/reparse protection",
+    "session expiry revocation clock tolerance and replay handling",
+    "denied-request and principal audit",
+    "versioned promotion health verification and rollback",
+    "server-only secret injection rotation and redaction",
+    "rate limits body limits timeouts and abuse responses",
+    "authn/authz isolation session rollback and secret evidence"
+  ],
+  "contract_matrix": {
+    "runtime_trust_boundary": "locally_verified",
+    "principal_assertion": "locally_verified",
+    "subject_portfolio_authorization": "locally_verified",
+    "storage_isolation": "locally_verified",
+    "session_replay_and_revocation": "locally_verified",
+    "audit_and_redaction": "locally_verified",
+    "promotion_health_and_rollback": "procedure_verified_not_promoted",
+    "server_only_secrets": "locally_verified",
+    "abuse_limits": "locally_verified",
+    "verification_cases": "local-focused-and-browser-matrix-pass; owner-vm-promotion-and-rollback-pending"
+  },
+  "deployment_boundary": {
+    "public_listener": false,
+    "http_mutation_routes": false,
+    "python_gateway_public": false,
+    "directadmin_deployed": false,
+    "credentials_added": false,
+    "network_provider_enabled": false,
+    "tailscale_cli_on_current_windows_host": false,
+    "owner_linux_vm_promotion": "not-run"
+  },
+  "artifacts": [
+    "docs/STACK-AND-RUNTIME-REVIEW.md",
+    "docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md",
+    "docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md",
+    "docs/decisions/ADR-0050-u5-5-runtime-identity-contract.md",
+    "deploy/u5-5/README.md",
+    "deploy/u5-5/market-os-python.service",
+    "deploy/u5-5/market-os-next.service",
+    "deploy/u5-5/promote.sh",
+    "deploy/u5-5/rollback.sh"
+  ],
+  "verification": {
+    "u55_python_access_tests": "18 passed",
+    "u55_connected_http_smoke": "passed with simulated Tailscale host/identity headers",
+    "u55_connected_browser_smoke": "passed; allowed pages had zero console errors and failed requests",
+    "u55_browser_html_bundle_secret_scan": "passed",
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "owner_linux_vm_promotion": "not-run",
+    "full_pytest": "606 passed, 0 failed, 7 skipped",
+    "compileall": "passed",
+    "secret_scan": "passed",
+    "evidence_validation": "56 JSON files validated",
+    "git_diff_check": "passed"
+  }
+}

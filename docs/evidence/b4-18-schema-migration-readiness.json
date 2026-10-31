@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.b4-18.schema-migration-readiness@v1",
+  "milestone": "B4.18",
+  "date": "2026-10-29",
+  "status": "implemented-local-copy-on-write-transformer",
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "local_only": true,
+    "source_mutation": false,
+    "in_place_rewrite": false,
+    "connected_access": false,
+    "live_trading": false,
+    "credentials": false,
+    "network": false
+  },
+  "source_schemas": [
+    "market-os.b4-1.paper-broker@v1",
+    "market-os.b4-1.paper-portfolio-genesis@v1",
+    "market-os.b4-15.shared-portfolio-genesis@v1",
+    "market-os.b4-1.paper-portfolio-event@v1",
+    "market-os.b4-1.portfolio-snapshot@v1"
+  ],
+  "target_schema": "market-os.b4-18.*@v2",
+  "implementation": {
+    "transformer": true,
+    "transformer_module": "market_os.schema_migration",
+    "transformer_version": "b4.18-lossless-envelope-v1",
+    "copy_on_write_contract": true,
+    "backup_precondition": true,
+    "replay_equivalence_required": true,
+    "rollback_required": true,
+    "idempotent_retry_required": true
+  },
+  "current_evidence": {
+    "migration_preflight": "implemented-read-only",
+    "copy_on_write_migration": "implemented-local",
+    "target_validation": "implemented-local-target-native-v2-recovery-plus-source-projection-equivalence",
+    "backup_restore": "implemented-local",
+    "source_ledger": "append-only",
+    "checkpoint_validation": "implemented-local",
+    "shared_membership_and_reservations": "implemented-local"
+  },
+  "verified_tests": [
+    "isolated_and_shared_mapping",
+    "source_immutability",
+    "replay_equivalence",
+    "fingerprint_mapping",
+    "idempotent_retry_and_conflict",
+    "destination_path_safety",
+    "backup_and_rollback",
+    "preflight_and_backup_regressions",
+    "unknown_field_and_checkpoint_rejection",
+    "tampered_target_retry_rejection",
+    "inspection_equivalence",
+    "fault_injected_pre_and_post_promotion_retry"
+  ],
+  "remaining_follow_up": [
+    "explicit retention/deletion contract"
+  ],
+  "report": "docs/B4.18-SCHEMA-MIGRATION-CONTRACT.md",
+  "decision": "docs/decisions/ADR-0047-b4-18-versioned-schema-migration.md"
+}

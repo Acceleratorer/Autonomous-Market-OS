@@ -1,0 +1,12 @@
+{
+  "tagOwners": {
+    "tag:market-os": ["REPLACE_OWNER_TAILSCALE_LOGIN"]
+  },
+  "grants": [
+    {
+      "src": ["REPLACE_OWNER_TAILSCALE_LOGIN"],
+      "dst": ["tag:market-os"],
+      "ip": ["443"]
+    }
+  ]
+}

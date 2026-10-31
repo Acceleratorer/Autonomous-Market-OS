@@ -12,8 +12,8 @@ type PageHeadingProps = {
 export function PageHeading({ eyebrow, title, description, actions }: PageHeadingProps) {
   return (
     <div className="page-heading">
-      <div>
-        <p className="eyebrow">{eyebrow}</p>
+      <div className="page-heading-copy">
+        <p className="page-context">{eyebrow}</p>
         <h1 className="page-title">{title}</h1>
         <p className="page-description">{description}</p>
       </div>
@@ -31,7 +31,7 @@ type MetricCardProps = {
 export function MetricCard({ label, value, unit }: MetricCardProps) {
   return (
     <article className="metric-card">
-      <div className="metric-label"><span className="metric-label-mark" aria-hidden="true" />{label}</div>
+      <div className="metric-label">{label}</div>
       <div className="metric-value-line">
         <strong className="metric-value">{value}</strong>
         {unit ? <span className="metric-unit">{unit}</span> : null}
@@ -88,12 +88,36 @@ export function BoundaryBanner({ children }: { children: ReactNode }) {
   );
 }
 
+export function SystemStatusStrip({ gatewayStatus }: { gatewayStatus: "available" | "unavailable" | "unknown" }) {
+  const gatewayLabel = gatewayStatus === "available" ? "Available" : gatewayStatus === "unavailable" ? "Unavailable" : "Unknown";
+  return (
+    <section className="system-status-strip" aria-label="Operator system status">
+      <div className={`system-status-item system-status-${gatewayStatus}`}>
+        <span>Gateway</span>
+        <strong>{gatewayLabel}</strong>
+      </div>
+      <div className="system-status-item">
+        <span>Python authority</span>
+        <strong>Active</strong>
+      </div>
+      <div className="system-status-item">
+        <span>Data mode</span>
+        <strong>Synthetic</strong>
+      </div>
+      <div className="system-status-item system-status-warning">
+        <span>Execution</span>
+        <strong>Off</strong>
+      </div>
+    </section>
+  );
+}
+
 export function PanelHeading({ title, kicker, meta }: { title: string; kicker: string; meta?: string }) {
   return (
     <div className="panel-heading">
-      <div>
-        <p className="panel-kicker">{kicker}</p>
+      <div className="panel-heading-copy">
         <h2>{title}</h2>
+        <span className="panel-kicker">{kicker}</span>
       </div>
       {meta ? <span className="panel-meta">{meta}</span> : null}
     </div>

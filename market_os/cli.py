@@ -7,6 +7,7 @@ import os
 
 from .api import serve
 from .store import RunStore
+from .u55_access import U55AccessConfig
 from .workflow import MarketWorkflow
 
 
@@ -169,7 +170,14 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "serve":
         workflow = MarketWorkflow(RunStore(args.store_root))
-        serve(workflow, args.host, args.port, request_timeout=args.request_timeout, service_log_path=args.service_log)
+        serve(
+            workflow,
+            args.host,
+            args.port,
+            request_timeout=args.request_timeout,
+            service_log_path=args.service_log,
+            connected_access=U55AccessConfig.from_environment(),
+        )
         return 0
     if args.command == "inspect":
         workflow = MarketWorkflow(RunStore(args.store_root))

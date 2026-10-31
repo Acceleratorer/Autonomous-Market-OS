@@ -280,9 +280,10 @@ def test_service_request_id_is_correlated_without_logging_query_values(tmp_path:
     thread = thread_module.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        response = urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2)
-        request_id = response.headers["X-Request-ID"]
-        assert request_id and len(request_id) == 32
+        with urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2) as response:
+            request_id = response.headers["X-Request-ID"]
+            response.read()
+            assert request_id and len(request_id) == 32
     finally:
         server.shutdown()
         server.server_close()
@@ -301,11 +302,12 @@ def test_service_audit_log_omits_query_string(tmp_path: Path) -> None:
     thread = thread_module.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        response = urllib.request.urlopen(
+        with urllib.request.urlopen(
             f"http://127.0.0.1:{server.server_port}/v1/btc/history/readiness?cutoff-ms=1704067200000&token=fixture-secret",
             timeout=2,
-        )
-        assert response.status == 200
+        ) as response:
+            assert response.status == 200
+            response.read()
     finally:
         server.shutdown()
         server.server_close()
@@ -363,6 +365,41 @@ def test_service_rejects_cross_origin_post_before_creating_a_run(tmp_path: Path,
         assert json.loads(response.value.read())["error"] == "same-origin POST required"
         assert not workflow.store.runs.read_text(encoding="utf-8").strip()
     finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_service_drains_rejected_post_before_reusing_keep_alive_connection(tmp_path: Path) -> None:
+    workflow = MarketWorkflow(RunStore(tmp_path))
+    handler = make_handler(workflow)
+    handler.protocol_version = "HTTP/1.1"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    thread = thread_module.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=2)
+    try:
+        body = b'{"objective":"blocked cross-site task"}'
+        connection.putrequest("POST", "/v1/tasks")
+        connection.putheader("Host", "127.0.0.1")
+        connection.putheader("Origin", "https://attacker.example")
+        connection.putheader("Sec-Fetch-Site", "cross-site")
+        connection.putheader("Content-Length", str(len(body)))
+        connection.putheader("Connection", "keep-alive")
+        connection.endheaders(body)
+
+        rejected = connection.getresponse()
+        assert rejected.status == 403
+        assert json.loads(rejected.read())["error"] == "same-origin POST required"
+        assert not rejected.will_close
+
+        connection.request("GET", "/healthz", headers={"Host": "127.0.0.1", "Connection": "close"})
+        health = connection.getresponse()
+        assert health.status == 200
+        assert json.loads(health.read())["status"] == "ok"
+        assert not workflow.store.runs.read_text(encoding="utf-8").strip()
+    finally:
+        connection.close()
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)

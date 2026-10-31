@@ -9,7 +9,7 @@ test("hosted Market OS preview keeps the paper-only read-only boundary", async (
   const html = await readFile(dashboardPath, "utf8");
 
   assert.match(html, /Market OS/);
-  assert.match(html, /SYNTHETIC · PAPER ONLY · READ ONLY/);
+  assert.match(html, /SYNTHETIC · PAPER · READ ONLY · EXECUTION OFF/);
   assert.match(html, /no portfolio data, API connection, sign-in, order controls/);
   assert.doesNotMatch(html, /<form\b/i);
   assert.doesNotMatch(html, /<script\b/i);

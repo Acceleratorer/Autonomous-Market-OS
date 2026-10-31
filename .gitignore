@@ -13,3 +13,9 @@ build/
 !.env.example
 # Original HKUDS repositories stay independent Git projects.
 /company-projects/
+# Local analysis, browser, scratch, and generated deployment artifacts.
+.playwright-cli/
+.tmp-*/
+.ua/
+output/
+site/

@@ -1,0 +1,32 @@
+{
+  "allowed_page_console_errors": [],
+  "allowed_page_failed_requests": [],
+  "browser": {
+    "browser_post_status": 405,
+    "direct_next_status": 403,
+    "direct_python_health_status": 200,
+    "direct_python_status": 403,
+    "next_process_health_status": 200,
+    "owner_body_contains_paper_main": true,
+    "owner_detail_status": 200,
+    "owner_disallowed_route_status": 403,
+    "owner_other_portfolio_status": 403,
+    "owner_root_status": 200,
+    "unknown_subject_status": 403
+  },
+  "bundle_and_html_secret_scan": "passed separately",
+  "console_errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)"
+  ],
+  "failed_requests": [],
+  "ingress_simulation": {
+    "host": "owner.tailnet.ts.net",
+    "subject": "owner-only",
+    "tailscale_cli": "not used; local header simulation only"
+  },
+  "schema": "market-os.u5-5.connected-browser-smoke@v1",
+  "screenshot": "output/playwright/u5-5/owner-paper-main.png",
+  "status": "passed"
+}

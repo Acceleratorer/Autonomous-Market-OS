@@ -1,8 +1,8 @@
 # B4 Local Slice Closeout Report
 
 **Review date:** 2026-10-28
-**Scope:** U4/B4.1–B4.14 synthetic, paper-only local broker
-**Decision:** The B4.1–B4.14 local slice is **closed** for the approved inspection and single-writer paper boundary. The broader U4/B4 shared-portfolio milestone is **not closed** and remains paper-only local.
+**Scope:** U4/B4.1â€“B4.14 synthetic, paper-only local broker
+**Decision:** The B4.1â€“B4.14 local slice is **closed** for the approved inspection and single-writer paper boundary. The broader U4/B4 shared-portfolio milestone is **not closed** and remains paper-only local.
 
 ## 1. Executive decision
 
@@ -12,7 +12,7 @@ The broader U4/B4 contract still has real gaps. The current implementation is su
 
 Do not promote this work to a shared or externally mutable B4 deployment. Keep U4/B4 in paper-only local mode. The first local U5 read-only dashboard is now available, but it does not imply that B4 mutation, migration, retention, or shared-portfolio semantics are complete.
 
-## 2. B4.1–B4.14 matrix
+## 2. B4.1â€“B4.14 matrix
 
 | Slice | Implemented and verified | Evidence | Disposition |
 |---|---|---|---|
@@ -27,7 +27,9 @@ Do not promote this work to a shared or externally mutable B4 deployment. Keep U
 | B4.9 | Stable rejection reason codes, `order.rejected` audit events, idempotent rejected-submit replay, read-only risk inspection | `docs/B4.9-RISK-AUDIT-OUTCOMES.md` | Complete for submit-order outcomes |
 | B4.10 | Fill-time market-order risk failures become terminal, audited, cursor-advancing outcomes with deterministic recovery | `docs/B4.10-FILL-TIME-RISK-OUTCOMES.md` | Complete for the reproduced gap |
 | B4.11 | Opt-in local ZIP backup/restore, versioned manifest, SHA-256 fingerprints, broker-validated restore, no overwrite | `docs/B4.11-BACKUP-RESTORE.md`, `market_os/portfolio_backup.py` | Complete for local backup/restore |
-| B4.12 | Read-only schema compatibility/migration preflight; unsupported recovery fails closed; no history rewrite | `docs/B4.12-MIGRATION-PREFLIGHT.md`, `market_os/portfolio_migration.py` | Complete for preflight; transformer remains open |
+| B4.12 | Read-only schema compatibility/migration preflight; unsupported recovery fails closed; no history rewrite | `docs/B4.12-MIGRATION-PREFLIGHT.md`, `market_os/portfolio_migration.py` | Complete for preflight |
+| B4.18 | Backup-first copy-on-write schema envelope migration with stable portfolio identity, source provenance, target-native recovery, replay equivalence, rollback, and idempotent retry | `docs/B4.18-SCHEMA-MIGRATION-CONTRACT.md`, `market_os/schema_migration.py` | Complete locally; retention deletion and authenticated mutation remain separate |
+| B4.19 | Local HMAC capability authorization bound to subject claim, portfolio, operation, command fingerprint, idempotency key, and validity window; safe audit context with no HTTP/CLI mutation | `docs/B4.19-LOCAL-MUTATION-CAPABILITY-CONTRACT.md`, `market_os/local_mutation.py` | Complete locally; connected human authentication and externally exposed mutation remain separate |
 | B4.13 | Isolated portfolio identity, one-writer local lock, monotonic sequence, stale-writer rejection, reload recovery | `docs/B4.13-CONCURRENCY-CONTRACT.md`, `market_os/tests/test_portfolio_concurrency.py` | Complete for local boundary; shared membership remains open |
 | B4.14 | Typed rejection outcomes and audit events for submit, cancel, and approval-revocation methods; identical retry replay; recovery and inspection equivalence; conflict audit without duplicate idempotency identity | `docs/B4.14-MUTATION-AUDIT-CONTRACT.md`, `market_os/tests/test_portfolio_mutation.py` | Complete for local Python methods; external mutation API remains open |
 
@@ -69,7 +71,7 @@ The approved local policy deliberately uses full fills and disables expiry. The 
 
 ### 4.5 Backup, retention, and migration
 
-B4.11 closes the local backup/restore gap: an opt-in ZIP archive contains the validated genesis, policy, ledger, and checkpoint with a versioned manifest and SHA-256 fingerprints; restore validates the archive and broker recovery before atomic promotion and never overwrites an existing destination. B4.12 adds a read-only compatibility preflight that classifies supported current stores and rejects unsupported schema or recovery states. Retention remains indefinite local retention by policy, with no archive/delete workflow. A versioned schema transformer remains unimplemented.
+B4.11 closes the local backup/restore gap: an opt-in ZIP archive contains the validated genesis, policy, ledger, and checkpoint with a versioned manifest and SHA-256 fingerprints; restore validates the archive and broker recovery before atomic promotion and never overwrites an existing destination. B4.12 adds a read-only compatibility preflight that classifies supported current stores and rejects unsupported schema or recovery states. B4.18 adds a separate local copy-on-write envelope transformer with target-native recovery, backup, target fingerprint, replay, rollback, interruption, and retry evidence. Retention remains indefinite local retention by policy, with no archive/delete workflow.
 
 ### 4.6 Audit coverage outside submit-order rejection
 
@@ -99,7 +101,7 @@ closes the previously open local shared-membership gap within a new synthetic,
 paper-only boundary. It adds immutable shared genesis membership, stable
 strategy attribution, portfolio-wide cash and inventory reservations, local
 ordering and stale-writer handling, idempotent conflict behavior, and recovery
-invariant checks. The B4.1–B4.14 matrix above remains historical evidence for
+invariant checks. The B4.1â€“B4.14 matrix above remains historical evidence for
 that earlier boundary; B4.15 evidence is recorded separately in
 `docs/evidence/b4-15-shared-portfolio.json`.
 
@@ -111,3 +113,26 @@ informational event volume, unmatched-limit reservations, acceptance ordering,
 terminal reservation release, fill-time risk rejection, and recovery parity.
 Partial fills and order expiry remain deferred until a new versioned contract
 defines their replay and accounting semantics.
+
+
+## 8. B4.19 follow-up
+
+B4.19 closes the local capability-authorization gap without claiming human authentication or exposing a transport. `market_os/local_mutation.py` issues and verifies versioned HMAC capabilities bound to an issuer-bound subject claim, portfolio, operation, exact command fingerprint, idempotency key, and validity window. The broker keeps ownership of locking, stale-writer handling, shared cash/inventory reservations, append-only audit, checkpoints, fingerprints, deterministic replay, and idempotent retries.
+
+The ledger receives only bounded safe authorization context (`subject`, `operation`, and a capability fingerprint). Raw capability tokens, signatures, and signing keys are absent from ledger, checkpoints, inspection, and recovery artifacts. HTTP and CLI mutation routes remain disabled. Connected human identity, principal propagation, sessions, and any externally exposed mutation API remain U5.5/future gates.
+
+Focused B4.19 coverage is in `market_os/tests/test_local_mutation.py` (15 passed; the focused portfolio/recovery group passed 110 tests; the preflight and restore-promotion regressions bring the full repository run to 588 passed, 0 failed, and 7 skips), with contract, ADR-0048, and machine-readable evidence under `docs/`.
+
+## 9. B4.20 follow-up
+
+B4.20 adds `preflight_retention_archive()` as a read-only evidence seam. It
+reuses broker recovery and writer-lock validation, reports source file
+fingerprints, ledger/checkpoint state, shared reservations, zero-event
+ambiguity, and optional backup manifest/member validation without extraction.
+It always reports `deletion_eligible=false` and leaves B4.17's
+`indefinite-local` retention policy unchanged. The focused backup/preflight
+suite passes 21 tests. Restore promotion stages and validates the complete
+portfolio, then publishes it with one directory rename, so a concurrent
+destination or interruption cannot overwrite or leave a partial destination.
+The clean full run passes 588 tests with 7 skips. Deletion, pruning, remote archive, and externally
+exposed mutation remain separate future contracts.

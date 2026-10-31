@@ -50,14 +50,15 @@ Autonomous-Market-OS/
 │   ├── btc_paper.py           BTC paper experiment contracts and reports
 │   ├── paper_venue.py         synthetic venue and fill mechanics
 │   ├── portfolio_broker.py    B4 paper portfolio, shared membership, reservations, risk, ledger, and recovery
-│   ├── portfolio_backup.py    validated local ZIP backup and restore
-│   ├── portfolio_migration.py read-only migration preflight
+│   ├── portfolio_backup.py    validated local ZIP backup, restore, and retention preflight
+│   ├── portfolio_migration.py read-only migration preflight compatibility seam
+│   ├── schema_migration.py B4.18 copy-on-write schema transformer and validation
 │   ├── adapters/              LightRAG, Vibe-Trading, and OpenAI seams
 │   ├── orchestration/         protocol, recovery, parity, and probes
 │   └── deployment/             bounded local service wrapper
 ├── apps/                      thin product surfaces
 │   ├── web/public/            canonical static read-only dashboard source
-│   ├── web/operator/          local connected GET-only operator shell
+│   ├── web/operator/          local loopback-only GET-only operator shell
 │   │   ├── index.html         operator document
 │   │   ├── operator.js        operator behavior
 │   │   └── operator.css       operator presentation
@@ -72,6 +73,16 @@ Autonomous-Market-OS/
 └── README.md                  repository orientation
 ```
 
+The exact current worktree classification is recorded in
+`docs/WORKTREE-BASELINE-MANIFEST.json`; the stack and connected-runtime review
+is recorded in `docs/STACK-AND-RUNTIME-REVIEW.md`. Those files are planning and
+inventory artifacts, not authorization to stage, expose, or deploy anything.
+Machine-readable U5.5 planning evidence lives in
+`docs/evidence/u5-5-stack-runtime-review.json`.
+The repository-grounded stack and codebase report lives in
+`docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md`, with machine-readable
+evidence in `docs/evidence/codebase-stack-understanding.json`.
+
 ## Responsibility map
 
 | Area | Current modules | Responsibility |
@@ -81,7 +92,7 @@ Autonomous-Market-OS/
 | Orchestration | `workflow.py`, `orchestration/`, `provider_selection.py` | Tasks, runs, cancellation, recovery, provider composition |
 | Contracts | `contracts.py`, `providers.py`, `model_summary.py` | Typed boundaries, provenance, capabilities, errors, and model gates |
 | Persistence | `store.py`, `portfolio_broker.py` | Append-only events, artifacts, checkpoints, recovery, and fingerprints |
-| Portfolio/risk | `portfolio_broker.py`, `portfolio_backup.py`, `portfolio_migration.py` | Paper wallet, shared strategy membership, portfolio-wide reservations, orders, approvals, limits, audit outcomes, backup, preflight |
+| Portfolio/risk | `portfolio_broker.py`, `portfolio_backup.py`, `portfolio_migration.py`, `schema_migration.py` | Paper wallet, shared strategy membership, portfolio-wide reservations, orders, approvals, limits, audit outcomes, backup, read-only retention/archive preflight, migration preflight, and local copy-on-write migration |
 | Execution | `paper_venue.py`, `portfolio_broker.py` | Synthetic market events and paper fills; no live venue |
 | Math/statistics | `btc_features.py`, `evaluation_protocol.py`, `btc_jev_evaluation.py`, `btc_question_evaluation.py`, `quality_benchmark.py` | Features, labels, baselines, calibration, metrics, replay and evaluation |
 | Strategy/accounting | `strategy.py`, `strategy_replay.py`, `accounting.py`, `synthetic_replay.py` | Signals, deterministic replay, PnL/accounting and synthetic simulation |
@@ -163,17 +174,31 @@ The web stack and authenticated connected-access gate live in
 
 ## Future application split
 
-The repository does not currently contain a Next.js web app, desktop shell, or
-mobile shell. When those surfaces are introduced, they should live under
-`apps/web`, `apps/desktop`, `apps/mobile`, and `apps/cli` as thin consumers of
-the shared package/API. The target layout and promotion rules are documented in
-[`docs/TARGET-STRUCTURE.md`](docs/TARGET-STRUCTURE.md).
+The local Next.js operator now lives under `apps/web/next-operator/` as a thin
+consumer of the shared Python contracts. It remains loopback-only and
+read-only. Desktop and mobile shells do not exist yet; when a concrete shell
+workflow is approved, add them under `apps/desktop` and `apps/mobile` without
+moving domain logic out of `market_os`. The target layout and promotion rules
+are documented in [`docs/TARGET-STRUCTURE.md`](docs/TARGET-STRUCTURE.md).
 
-The next web stack decision is intentionally separate from artifact readiness:
-Astro is the current static-first candidate if the product remains a mostly
-read-only operator surface; React/Next should be selected only when a real
-interactive or authenticated workflow justifies the runtime and dependency
-cost. No framework dependency is added speculatively.
+The B4.18 local persistence transformer lives in `market_os/schema_migration.py`.
+Its contract, decision record, and readiness evidence live under `docs/`; it
+preserves source stores through backup-first copy-on-write replay validation.
+
+The B4.19 local capability-authorization seam lives in
+`market_os/local_mutation.py`. It verifies in-memory HMAC capabilities for the
+existing broker mutations and records only safe authorization context; it does
+not add HTTP or CLI mutation routes and does not claim human authentication.
+
+Next.js is selected for the local operator and private single-tenant preview
+direction. This does not select a connected host, identity provider, or public
+listener; those decisions remain in the U5.5 access gate.
+
+The U5.5 runtime/identity contract v1, recorded in
+`docs/decisions/ADR-0050-u5-5-runtime-identity-contract.md`, now defines those runtime, identity,
+authorization, storage-isolation, session, audit, rollback, secrets, and abuse
+boundaries, but remains planning-only until a concrete host and identity path
+are selected and verified. DirectAdmin remains a static preview target only.
 
 ## Safe change rules
 
@@ -183,4 +208,4 @@ cost. No framework dependency is added speculatively.
 4. Update tests and evidence when a contract or schema changes.
 5. Keep source repositories, credentials, temporary probes, and unrelated worktree changes out of rename work.
 
-The current local-first exit gate is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json`. Latest local verification is 546 passed, 0 failed, 7 skipped; compileall, secret scan, evidence validation, and diff check pass. Connected web/deployment and other explicitly deferred gates remain closed.
+The current local-first exit gate is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json`. B4.20 adds only a read-only retention/archive preflight; source history remains indefinitely retained and deletion remains disabled. Connected web/deployment and other explicitly deferred gates remain closed.

@@ -1,5 +1,57 @@
 # Autonomous Market OS
 
+Synthetic, paper-only market research and portfolio inspection workspace.
+The default product boundary is read-only: no live trading, provider
+credentials, Binance transport, public Python gateway, or HTTP/CLI mutation
+route is enabled.
+
+## Clone and run
+
+```bash
+git clone https://github.com/Acceleratorer/Autonomous-Market-OS.git
+cd Autonomous-Market-OS
+
+python -m venv .venv
+# Linux/macOS:
+source .venv/bin/activate
+# Windows PowerShell:
+# .venv\Scripts\Activate.ps1
+
+python -m pip install -e . pytest
+python -m pytest -q
+python -m apps.gateway --host 127.0.0.1 --port 8787
+```
+
+In a second terminal:
+
+```bash
+cd apps/web/next-operator
+npm ci
+npm run dev
+```
+
+Open `http://127.0.0.1:3000`. The Next.js operator reads the Python gateway
+server-side and keeps all accounting, risk, persistence, recovery, replay,
+audit, backup, and portfolio inspection authority in Python.
+
+## Container quick start
+
+The local container shape keeps Python on loopback inside a shared network
+namespace and exposes only the operator on host loopback:
+
+```bash
+docker compose up --build
+```
+
+Open `http://127.0.0.1:3000`. This is a private development package. It does
+not configure Tailscale, public ingress, credentials, live data, or mutation
+routes.
+
+For a private Kubernetes development shape, see
+[`deploy/k8s/README.md`](deploy/k8s/README.md). For the owner-approved U5.5
+Linux/systemd/Tailscale promotion path, see
+[`deploy/u5-5/README.md`](deploy/u5-5/README.md).
+
 ## Workspace layout
 
 This repository is the separate fusion project. The original HKUDS repositories live under `company-projects/` and remain independent Git repositories with their own histories, branches, dependencies, and working changes.
@@ -65,3 +117,10 @@ See `STRUCTURE.md`, `docs/PRODUCT-VISION.md`, `docs/PHASES.md`, `docs/ROADMAP.md
 The current web surface is a static, read-only paper-only preview. Build it
 with `python scripts/build_web_artifact.py --output <new-directory>`; public
 deployment and authenticated access remain separate gates.
+
+## Project guidance
+
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [MIT License](LICENSE)
+- [DevOps runbook](docs/DEVOPS-RUNBOOK.md)

@@ -6,13 +6,10 @@ from typing import Any
 
 from .portfolio_backup import BACKUP_SCHEMA
 from .portfolio_broker import B41Broker, BrokerRejected, SCHEMA
+from .schema_migration import MigrationRejected, migrate_portfolio
 
 
 MIGRATION_SCHEMA = "market-os.b4-12.migration-preflight@v1"
-
-
-class MigrationRejected(ValueError):
-    """A portfolio cannot be classified safely for migration."""
 
 
 def preflight_portfolio(store_root: str | Path, portfolio_id: str) -> dict[str, Any]:
@@ -35,4 +32,4 @@ def preflight_portfolio(store_root: str | Path, portfolio_id: str) -> dict[str, 
     }
 
 
-__all__ = ["MIGRATION_SCHEMA", "MigrationRejected", "preflight_portfolio"]
+__all__ = ["MIGRATION_SCHEMA", "MigrationRejected", "migrate_portfolio", "preflight_portfolio"]

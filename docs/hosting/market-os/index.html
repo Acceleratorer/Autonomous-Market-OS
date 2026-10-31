@@ -4,45 +4,148 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; connect-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:,">
   <title>Market OS · Paper Portfolio</title>
   <style>
-    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background:#08111f; color:#e5edf8; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:radial-gradient(ellipse at 15% 0%,#153257 0,transparent 42%),#08111f; }
-    main { width:min(1040px,calc(100% - 36px)); margin:0 auto; padding:48px 0 72px; }
-    .top { display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:1px solid #243349; padding-bottom:22px; }
-    .brand { color:#74d4bb; font-size:12px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
-    h1 { margin:12px 0 5px; font-size:clamp(30px,5vw,48px); letter-spacing:-.04em; }
-    .muted { color:#9aacc4; }
-    .badge { border:1px solid #27735e; color:#9ce6cf; background:#10342f; border-radius:999px; padding:9px 13px; font-size:12px; font-weight:750; white-space:nowrap; }
-    .notice { margin:28px 0; border:1px solid #385273; background:#101d2d; border-radius:16px; padding:18px 20px; color:#c8d5e7; line-height:1.6; }
-    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:18px 0 32px; }
-    .card { background:#101d2d; border:1px solid #24364e; border-radius:16px; padding:18px; min-height:112px; }
-    .label { color:#9aacc4; font-size:12px; text-transform:uppercase; letter-spacing:.1em; }
-    .value { margin-top:13px; font-size:25px; font-weight:750; }
-    .section { margin-top:30px; }
-    h2 { font-size:19px; letter-spacing:-.02em; }
-    .empty { border:1px dashed #38506d; border-radius:14px; padding:18px; color:#9aacc4; }
-    footer { border-top:1px solid #243349; margin-top:42px; padding-top:18px; color:#7589a3; font-size:12px; line-height:1.7; }
-    @media(max-width:680px){ main{padding-top:28px}.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.value{font-size:22px} }
+    :root {
+      color-scheme: dark;
+      font-family: "Avenir Next", "Segoe UI", ui-rounded, system-ui, sans-serif;
+      --bg: #06101c;
+      --panel: rgba(16, 31, 49, .78);
+      --panel-strong: #102238;
+      --text: #f1f6fb;
+      --muted: #b7c7d7;
+      --subtle: #a7b8c7;
+      --line: rgba(151, 177, 204, .18);
+      --line-strong: rgba(151, 177, 204, .3);
+      --mint: #75d9f5;
+      --mint-soft: rgba(117, 217, 245, .10);
+      --emerald: #91d8a4;
+      --amber: #e6bd72;
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--bg); }
+    body { min-height: 100vh; margin: 0; overflow-x: hidden; color: var(--text); background: radial-gradient(circle at 8% -10%, rgba(61, 122, 163, .32), transparent 32rem), radial-gradient(circle at 96% 12%, rgba(68, 143, 125, .12), transparent 28rem), var(--bg); }
+    ::selection { color: var(--bg); background: var(--mint); }
+    main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 56px; }
+    .topbar, .hero, .section-heading, .footer { display: flex; align-items: center; justify-content: space-between; }
+    .topbar { gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .brand-lockup { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { display: grid; width: 38px; height: 38px; place-items: center; color: var(--mint); background: var(--mint-soft); border: 1px solid rgba(118, 225, 189, .3); border-radius: 13px; box-shadow: inset 0 1px rgba(255, 255, 255, .12); }
+    .brand-name { display: block; color: var(--text); font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 13px; font-weight: 760; letter-spacing: .16em; text-transform: uppercase; }
+    .brand-subtitle { display: block; margin-top: 4px; color: var(--subtle); font-size: 12px; }
+    .mode-pill, .status-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--muted); background: rgba(255, 255, 255, .035); font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+    .mode-pill { padding: 9px 12px; }
+    .status-pill { padding: 8px 11px; color: var(--mint); background: var(--mint-soft); border-color: rgba(118, 225, 189, .24); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(118, 225, 189, .1); }
+    .hero { align-items: stretch; gap: 28px; padding: 64px 0 42px; }
+    .hero-copy { max-width: 680px; }
+    h1 { max-width: 640px; margin: 0; color: var(--text); font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: clamp(42px, 7vw, 78px); font-weight: 760; letter-spacing: -.03em; line-height: .98; }
+    .lede { max-width: 570px; margin: 24px 0 0; color: var(--muted); font-size: clamp(16px, 2vw, 19px); line-height: 1.65; }
+    .boundary-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 26px; }
+    .boundary { padding: 9px 11px; color: #cbd8e6; background: rgba(255, 255, 255, .045); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; }
+    .boundary strong { color: var(--text); font-weight: 680; }
+    .status-card { min-width: min(100%, 330px); align-self: end; padding: 20px; background: linear-gradient(160deg, rgba(23, 49, 72, .9), rgba(10, 24, 39, .82)); border: 1px solid var(--line-strong); border-radius: 20px; }
+    .status-card-header, .status-line { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .status-card-header { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .status-card-title { color: var(--text); font-size: 14px; font-weight: 720; }
+    .status-card-meta { margin-top: 4px; color: var(--subtle); font-size: 12px; }
+    .status-list { display: grid; gap: 12px; margin: 18px 0 0; }
+    .status-line { color: var(--muted); font-size: 13px; }
+    .status-line span:last-child { color: var(--text); font-weight: 650; }
+    .status-line .disabled { color: var(--muted); }
+    .contract-panel { margin: 0 0 56px; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
+    .contract-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+    .contract-row { min-height: 96px; padding: 20px; background: rgba(255, 255, 255, .035); border-radius: 12px; }
+    .contract-row + .contract-row { padding-left: 20px; }
+    .contract-label { color: var(--subtle); font-size: 11px; font-weight: 780; letter-spacing: .14em; text-transform: uppercase; }
+    .contract-value { margin-top: 12px; color: var(--text); font-size: 20px; font-weight: 720; letter-spacing: -.025em; }
+    .contract-note { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .section-heading { gap: 16px; margin-bottom: 15px; }
+    h2 { margin: 0; color: var(--text); font-size: 19px; letter-spacing: -.025em; }
+    .section-kicker { color: var(--subtle); font-size: 12px; }
+    .surface-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 12px; }
+    .surface { min-height: 170px; padding: 22px; background: linear-gradient(145deg, rgba(16, 31, 49, .86), rgba(10, 23, 38, .7)); border: 1px solid var(--line); border-radius: 16px; }
+    .surface-title { display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 14px; font-weight: 720; }
+    .surface-icon { display: grid; width: 28px; height: 28px; place-items: center; color: var(--mint); background: var(--mint-soft); border-radius: 9px; }
+    .surface p { max-width: 470px; margin: 18px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .surface-foot { display: flex; align-items: center; gap: 8px; margin-top: 22px; color: var(--subtle); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .surface-foot::before { width: 5px; height: 5px; content: ""; border-radius: 50%; background: var(--mint); }
+    .market-preview { margin-top: 56px; }
+    .market-preview-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 12px; }
+    .market-preview-card { min-height: 170px; padding: 22px; background: linear-gradient(145deg, rgba(16, 31, 49, .86), rgba(10, 23, 38, .7)); border: 1px solid var(--line); border-radius: 16px; }
+    .market-preview-card:first-child { grid-row: span 2; }
+    .market-preview-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text); font-size: 14px; font-weight: 720; }
+    .market-preview-state { padding: 6px 8px; color: var(--subtle); background: rgba(255, 255, 255, .045); border: 1px solid var(--line); border-radius: 8px; font-size: 10px; font-weight: 760; letter-spacing: .1em; text-transform: uppercase; }
+    .market-preview-card p { max-width: 470px; margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .market-preview-empty { display: flex; min-height: 94px; align-items: center; justify-content: center; margin-top: 18px; padding: 18px; color: var(--subtle); background: rgba(255, 255, 255, .035); border: 1px dashed var(--line-strong); border-radius: 12px; font-size: 12px; text-align: center; }
+    .market-preview-note { margin-top: 18px; color: var(--subtle); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .footer { align-items: flex-start; gap: 18px; margin-top: 52px; padding-top: 18px; color: var(--subtle); border-top: 1px solid var(--line); font-size: 12px; line-height: 1.65; }
+    .footer span:last-child { text-align: right; }
+    @media (max-width: 800px) { main { width: min(100% - 32px, 620px); padding-top: 20px; } .topbar { align-items: flex-start; flex-direction: column; } .hero { flex-direction: column; padding: 48px 0 32px; } .status-card { align-self: stretch; } .contract-list, .surface-grid, .market-preview-grid { grid-template-columns: 1fr; } .market-preview-card:first-child { grid-row: auto; } .contract-row + .contract-row { padding-left: 20px; } }
+    @media (max-width: 480px) { main { width: min(100% - 24px, 620px); } h1 { font-size: clamp(40px, 14vw, 60px); } .lede { font-size: 16px; } .boundary-row { display: grid; grid-template-columns: 1fr 1fr; } .footer { flex-direction: column; } .footer span:last-child { text-align: left; } }
+    @media (prefers-reduced-motion: no-preference) { .metric, .surface { transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; } .metric:hover, .surface:hover { transform: translateY(-2px); border-color: rgba(118, 225, 189, .34); background: var(--panel-strong); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body>
 <main>
-  <header class="top">
-    <div><div class="brand">Accelra · Research Systems</div><h1>Market OS</h1><div class="muted">Paper portfolio console</div></div>
-    <div class="badge">SYNTHETIC · PAPER ONLY · READ ONLY</div>
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 14.5 7.3 10l3.1 2.7L17 5.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.8 5.7H17v4.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div><span class="brand-name">Accelra · Research Systems</span><span class="brand-subtitle">Market OS / paper portfolio console</span></div>
+    </div>
+    <div class="mode-pill"><span class="status-dot" aria-hidden="true"></span>SYNTHETIC · PAPER · READ ONLY · EXECUTION OFF</div>
   </header>
-  <section class="notice"><strong>Local slice preview.</strong> This hosted page is a static product preview and contains no portfolio data, API connection, sign-in, order controls, market data, or trading route. B4 remains paper-only local while its sharing and operational gates are open.</section>
-  <div class="grid">
-    <article class="card"><div class="label">Portfolio</div><div class="value">Local only</div></article>
-    <article class="card"><div class="label">Execution</div><div class="value">Disabled</div></article>
-    <article class="card"><div class="label">Market data</div><div class="value">None</div></article>
-  </div>
-  <section class="section"><h2>Orders</h2><div class="empty">No hosted portfolio is connected.</div></section>
-  <section class="section"><h2>Recent paper activity</h2><div class="empty">Portfolio state stays on your local instance until access control, concurrency, retention, and restore gates are complete.</div></section>
-  <footer>Market OS · B4.1–B4.17 local synthetic broker · no external providers · no live venue · no hosted portfolio state</footer>
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <h1 id="page-title">A clear view of a paper-only market system.</h1>
+      <p class="lede">This hosted page contains no portfolio data, API connection, sign-in, order controls, market data, or trading route. Real portfolio state and execution remain on the owner’s local instance.</p>
+      <div class="boundary-row" aria-label="Preview boundaries"><span class="boundary"><strong>Scope</strong> synthetic</span><span class="boundary"><strong>Mode</strong> paper only</span><span class="boundary"><strong>Access</strong> read only</span></div>
+    </div>
+    <aside class="status-card" aria-label="Preview status">
+      <div class="status-card-header"><div><div class="status-card-title">Preview status</div><div class="status-card-meta">No hosted state connected</div></div><span class="status-pill"><span class="status-dot" aria-hidden="true"></span>Ready</span></div>
+      <div class="status-list"><div class="status-line"><span>Portfolio state</span><span>Local only</span></div><div class="status-line"><span>Execution</span><span class="disabled">Disabled</span></div><div class="status-line"><span>Market data</span><span>None</span></div></div>
+    </aside>
+  </section>
+  <section class="contract-panel" aria-labelledby="contract-title">
+    <div class="section-heading"><h2 id="contract-title">System boundaries</h2><span class="section-kicker">Read-only contract</span></div>
+    <div class="contract-list">
+      <div class="contract-row"><div class="contract-label">Portfolio</div><div class="contract-value">Local only</div><div class="contract-note">No hosted portfolio state</div></div>
+      <div class="contract-row"><div class="contract-label">Execution</div><div class="contract-value">Disabled</div><div class="contract-note">No order controls or venue</div></div>
+      <div class="contract-row"><div class="contract-label">Market data</div><div class="contract-value">None</div><div class="contract-note">No provider or external feed</div></div>
+    </div>
+  </section>
+  <section aria-labelledby="surface-title">
+    <div class="section-heading"><h2 id="surface-title">What this preview shows</h2><span class="section-kicker">Static product surface</span></div>
+    <div class="surface-grid">
+      <article class="surface"><div class="surface-title"><span class="surface-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.25" y="2.25" width="11.5" height="11.5" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 10.5h7M4.5 7.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>Orders</div><p>No hosted orders are connected. The operational ledger and broker state stay on the local instance.</p><div class="surface-foot">Read-only surface</div></article>
+      <article class="surface"><div class="surface-title"><span class="surface-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 12.5 6.3 8.8l2.1 1.8L13 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 5.5H13v2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Recent paper activity</div><p>Paper activity remains local until access control, concurrency, retention, and restore gates are complete.</p><div class="surface-foot">Local boundary</div></article>
+    </div>
+  </section>
+  <section class="market-preview" aria-labelledby="market-preview-title">
+    <div class="section-heading"><h2 id="market-preview-title">Private operator surfaces</h2><span class="section-kicker">Available on the owner instance</span></div>
+    <div class="market-preview-grid">
+      <article class="market-preview-card">
+        <div class="market-preview-title"><span>Market desk</span><span class="market-preview-state">Private</span></div>
+        <p>Chart context, watchlist, portfolio state, research lineage, and an explicitly locked execution state are available on the private Next operator.</p>
+        <div class="market-preview-empty">No hosted chart data. The private operator reads bounded local candles only.</div>
+        <div class="market-preview-note">No hosted feed · no public trading surface</div>
+      </article>
+      <article class="market-preview-card">
+        <div class="market-preview-title"><span>Watchlist</span><span class="market-preview-state">Local</span></div>
+        <p>Validated dataset revisions become drill-in points for chart and table inspection.</p>
+      </article>
+      <article class="market-preview-card">
+        <div class="market-preview-title"><span>Execution state</span><span class="market-preview-state">Locked</span></div>
+        <p>Orders and reservations remain inspectable without submit, cancel, amend, or venue access.</p>
+      </article>
+    </div>
+  </section>
+  <footer class="footer"><span>Market OS · B4 paper broker · synthetic research system</span><span>No external providers · no live venue · no hosted portfolio state</span></footer>
 </main>
 </body>
 </html>

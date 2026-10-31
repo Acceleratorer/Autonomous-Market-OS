@@ -1,0 +1,56 @@
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: deploy/docker/python.Dockerfile
+    environment:
+      MARKET_OS_HOST: "127.0.0.1"
+      MARKET_OS_PORT: "8787"
+      MARKET_OS_STORE_ROOT: "/var/lib/autonomous-market-os/state"
+      MARKET_OS_REQUEST_TIMEOUT: "5"
+      MARKET_OS_SERVICE_LOG: "/var/lib/autonomous-market-os/logs/python.jsonl"
+    volumes:
+      - market-os-runtime:/var/lib/autonomous-market-os
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen("http://127.0.0.1:8787/readyz", timeout=2).read()
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  operator:
+    build:
+      context: .
+      dockerfile: deploy/docker/next.Dockerfile
+    network_mode: "service:gateway"
+    depends_on:
+      gateway:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      MARKET_OS_API_PORT: "8787"
+      MARKET_OS_U55_MODE: "0"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  market-os-runtime:

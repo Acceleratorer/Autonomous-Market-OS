@@ -99,11 +99,11 @@ export default async function BtcManifestRecordsPage({
         values: [
           String(row.outcomeIndex),
           row.status,
-          row.openTimeMs === null ? "—" : formatUtc(row.openTimeMs),
+          row.openTimeMs === null ? "n/a" : formatUtc(row.openTimeMs),
           row.acceptedCanonical ? "Yes" : "No",
           <span key="source">{row.rawPageSha256.slice(0, 12)}… / {row.rowIndex}</span>,
           <code key="fingerprint" className="dataset-fingerprint">{row.sourceRecordFingerprint}</code>,
-          row.reason === null ? "—" : <span key="reason">{row.reason}{row.reasonTruncated ? " …" : ""}</span>,
+          row.reason === null ? "n/a" : <span key="reason">{row.reason}{row.reasonTruncated ? " ..." : ""}</span>,
         ],
       }));
     } else if (recordType === "gaps") {

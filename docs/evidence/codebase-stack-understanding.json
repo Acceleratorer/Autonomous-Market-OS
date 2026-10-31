@@ -1,0 +1,65 @@
+{
+  "schema": "market-os.codebase-stack-understanding@v1",
+  "date": "2026-10-30",
+  "status": "local-understood-connected-gated",
+  "scope": {
+    "repository": "Autonomous-Market-OS",
+    "synthetic": true,
+    "paper_only": true,
+    "loopback_only": true,
+    "connected_runtime_selected": false,
+    "deployment_run": false
+  },
+  "authority": {
+    "domain_accounting_recovery": "Python market_os",
+    "local_gateway": "Python stdlib HTTP",
+    "cli": "apps/cli delegates to market_os.cli",
+    "next_operator": "server-rendered TypeScript/React/Next.js GET adapter",
+    "static_preview": "apps/web/public disconnected artifact"
+  },
+  "worktree": {
+    "status_paths": 271,
+    "tracked_modified_paths": 15,
+    "untracked_paths": 256,
+    "product_candidate_paths": 36,
+    "preserved_paths": 235,
+    "unclassified_paths": 0
+  },
+  "gap_classification": {
+    "implemented": [
+      "B4.1-B4.20",
+      "U5.2-U5.24",
+      "worktree baseline"
+    ],
+    "intentional_deferrals": [
+      "partial fills/expiry",
+      "retention deletion",
+      "distributed ownership",
+      "external mutation",
+      "live/provider/network execution"
+    ],
+    "owner_decisions": [
+      "connected runtime",
+      "ingress/access",
+      "identity",
+      "subject-to-portfolio authorization",
+      "storage isolation",
+      "session/audit/rollback/secrets"
+    ]
+  },
+  "verification": {
+    "pytest": "588 passed, 0 failed, 7 skipped",
+    "compileall": "passed",
+    "secret_scan": "passed",
+    "evidence_validation": "55 JSON files validated",
+    "git_diff_check": "passed"
+  },
+  "artifacts": [
+    "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
+    "docs/STACK-AND-RUNTIME-REVIEW.md",
+    "docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md",
+    "docs/WORKTREE-BASELINE-MANIFEST.json",
+    "docs/LOCAL-EXIT-GATE-REPORT.md"
+  ],
+  "next_gate": "select concrete U5.5 runtime and identity path or define another loopback-local contract"
+}

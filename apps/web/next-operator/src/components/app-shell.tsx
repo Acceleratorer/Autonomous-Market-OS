@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { isConnectedMode } from "../lib/connected-access";
 
 type AppShellProps = {
   children: ReactNode;
   current:
     | "overview"
+    | "desk"
     | "registry"
     | "portfolio"
     | "datasets"
@@ -69,8 +71,20 @@ function ResearchIcon() {
   );
 }
 
+function DeskIcon() {
+  return (
+    <svg aria-hidden="true" className="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M2.5 12.75V8.5m3.7 4.25V5.5m3.6 7.25V3.25m3.7 9.5V6.75" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" />
+      <path d="M2.5 12.75h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function AppShell({ children, current, gatewayStatus = "unknown" }: AppShellProps) {
-  const gatewayAddress = `127.0.0.1:${process.env.MARKET_OS_API_PORT ?? "8787"}`;
+  const connected = isConnectedMode();
+  const gatewayAddress = connected
+    ? "Private loopback gateway"
+    : `127.0.0.1:${process.env.MARKET_OS_API_PORT ?? "8787"}`;
   const gatewayLabel = {
     available: "Gateway available",
     unavailable: "Gateway unavailable",
@@ -78,6 +92,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
   }[gatewayStatus];
   const currentLabel = {
     overview: "Operator overview",
+    desk: "Market desk",
     registry: "Portfolio registry",
     portfolio: "Portfolio detail",
     datasets: "BTC dataset registry",
@@ -90,20 +105,28 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
     <div className="app-layout">
       <a className="skip-link" href="#main-content">Skip to content</a>
       <aside className="sidebar">
-        <Link className="brand-link" href="/overview" aria-label="Market OS local operator home">
+        <Link className="brand-link" href={connected ? "/" : "/overview"} aria-label="Market OS local operator home">
           <span className="brand-mark"><BrandMark /></span>
           <span>
             <span className="brand-name">MARKET OS</span>
-            <span className="brand-subtitle">Operator workspace</span>
+            <span className="brand-subtitle">Private operator console</span>
           </span>
         </Link>
 
         <p className="nav-label">Workspace</p>
         <nav aria-label="Primary navigation">
-          <Link className="nav-link" href="/overview" aria-current={navigationCurrent(current, "overview")}>
-            <OverviewIcon />
-            <span>Overview</span>
-          </Link>
+          {!connected && (
+            <Link className="nav-link" href="/overview" aria-current={navigationCurrent(current, "overview")}>
+              <OverviewIcon />
+              <span>Overview</span>
+            </Link>
+          )}
+          {!connected && (
+            <Link className="nav-link" href="/desk" aria-current={navigationCurrent(current, "desk")}>
+              <DeskIcon />
+              <span>Market desk</span>
+            </Link>
+          )}
           <Link
             className="nav-link"
             href="/"
@@ -112,22 +135,27 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
             <PortfolioIcon />
             <span>Portfolios</span>
           </Link>
-          <Link
-            className="nav-link"
-            href="/datasets"
-            aria-current={navigationCurrent(current, "datasets", "datasetDetail")}
-          >
-            <DatasetIcon />
-            <span>BTC datasets</span>
-          </Link>
-          <Link
-            className="nav-link"
-            href="/experiments"
-            aria-current={navigationCurrent(current, "experiments", "experimentDetail")}
-          >
-            <ResearchIcon />
-            <span>BTC research</span>
-          </Link>
+          <p className="nav-label nav-label-secondary">Evidence</p>
+          {!connected && (
+            <>
+              <Link
+                className="nav-link"
+                href="/datasets"
+                aria-current={navigationCurrent(current, "datasets", "datasetDetail")}
+              >
+                <DatasetIcon />
+                <span>BTC datasets</span>
+              </Link>
+              <Link
+                className="nav-link"
+                href="/experiments"
+                aria-current={navigationCurrent(current, "experiments", "experimentDetail")}
+              >
+                <ResearchIcon />
+                <span>BTC research</span>
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="sidebar-spacer" />
@@ -147,9 +175,11 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
           </div>
           <div className="topbar-meta">
             <div className="topbar-tags" role="group" aria-label="Environment boundaries">
-              <span className="topbar-tag topbar-tag-local">Local only</span>
+              <span className="topbar-tag topbar-tag-synthetic">Synthetic</span>
+              <span className="topbar-tag topbar-tag-paper">Paper</span>
               <span className="topbar-tag topbar-tag-read-only">Read only</span>
-              <span className="topbar-tag topbar-tag-local topbar-tag-mobile">Local · read only</span>
+              <span className="topbar-tag topbar-tag-execution">Execution off</span>
+              <span className="topbar-tag topbar-tag-local topbar-tag-mobile">Synthetic · paper · read only · off</span>
             </div>
             <span
               className={`topbar-gateway topbar-gateway-${gatewayStatus}`}

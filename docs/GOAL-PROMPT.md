@@ -1,44 +1,74 @@
-# Prompt for the next implementation chat
+# Goal prompt for the next implementation chat
 
-Copy the following prompt into a new Codex chat after reviewing the current repository state. The unified roadmap is in `docs/ROADMAP.md`; this prompt targets U3/B2.
+Continue Autonomous-Market-OS from the current worktree. Read
+`docs/PROJECT-CONTEXT.md` first, then inspect `STRUCTURE.md`, the active
+milestone contracts, the local exit report, the roadmap, and the current
+worktree status before editing.
 
-```text
-Start unified milestone U3/B2 in D:\Code\Github\Autonomous-Market-OS.
+## Objective
 
-Use these documents as the source of truth:
-- docs/ROADMAP.md
-- docs/PHASES.md
-- docs/TARGET-STRUCTURE.md
-- docs/decisions/ADR-0017-unified-roadmap.md
-- TECH_DOCS.md
-- docs/BTC-PAPER-EXPERIMENT-ROADMAP.md
-- docs/B0-BTC-PAPER-REPLAY-REPORT.md
-- docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md
-- docs/UNDERSTANDING-LOG.md
-- STACK.md
+Finish the remaining **local, synthetic, paper-only** work that is justified by
+the repository's contracts. Close one explicit gate at a time, with a
+versioned contract, focused regression tests, machine-readable evidence, and a
+closeout report. Keep Python as the domain, accounting, persistence, recovery,
+risk, reservation, replay, and audit authority. Keep `apps/` surfaces thin.
 
-Read the repository AGENTS.md guidance and use the narrowest relevant skills. For coding work use ecc-harness, cautious-coding, and ponytail. Inspect the actual market_os code, tests, contracts, B0/B1 implementation, CLI, API, persistence, and evidence before editing. Preserve pre-existing .gitignore, README.md, .tmp-* directories, and unrelated changes. Never modify D:\Code\Github\company-projects.
+## Current baseline
 
-Implement only U3/B2:
-1. Materialize deterministic point-in-time BTCUSDT feature rows from the B1 canonical local dataset.
-2. Materialize separate five-minute labels with explicit future-data lineage.
-3. Define and validate warm-up, gap, stale-data, availability, and no-look-ahead outcomes.
-4. Add hand-checkable features first; keep the set small and documented.
-5. Add naïve and statistical numerical baselines before considering LightGBM. If LightGBM is not already justified by the current environment, leave it as a documented follow-up rather than adding speculative dependencies.
-6. Use chronological train/calibration/test splits with a documented purge/embargo rule for overlapping five-minute labels.
-7. Persist configurations, feature/label fingerprints, predictions, metrics, calibration results, split metadata, and artifact lineage.
-8. Add read-only CLI/API inspection and deterministic replay evidence.
-9. Update the unified roadmap, BTC roadmap, ADRs if needed, and docs/UNDERSTANDING-LOG.md.
+- B4.1–B4.20 local broker and recovery slices are implemented and verified.
+- U5.2–U5.24 local/static operator slices are implemented and verified.
+- The local exit gate is green: the latest clean full run passed 605 tests, 0
+  failed, and 7 skipped; U5.5 focused evidence and browser smoke are recorded.
+- The Next.js operator is loopback-only and read-only. DirectAdmin is only a
+  disconnected static-preview target; no connected deployment is authorized.
+- U5.5 runtime/identity contract v1 has a selected owner-controlled Linux VM,
+  systemd supervisor, owner-only Tailscale Serve ingress, subject, portfolio
+  allowlist, fixed storage root, session policy, and rollback procedure.
+  Connected access remains disabled until owner-VM promotion evidence passes.
+- The worktree contains existing uncommitted product changes and preserved
+  scratch/Playwright/output artifacts. Keep all of them intact.
 
-Hard boundaries:
-- Offline fixtures/local B1 data only; do not enable network ingestion.
-- No Jev request, OpenAI request, hosted model, credentials, broker, live exchange endpoint, live trading, or virtual portfolio implementation in B2.
-- Models are numerical experiment inputs only; deterministic policy and risk remain authoritative.
-- Do not rename historical M/B reports or rewrite unrelated code.
+## Execution rules
 
-Verification:
-- Run focused B2 tests first, then the full suite.
-- Run compileall, evidence JSON validation, secret/dependency checks, CLI/API smoke tests, replay/fingerprint checks, and git diff --check.
-- Review the final diff and report exact tests, evidence, remaining risks, and the next unified milestone.
-- Commit and push the completed work to origin/main, preserving unrelated unstaged changes. Include the commit SHA and remote verification in the final report.
-```
+1. Build an evidence-backed gap list first. Classify each item as implemented,
+   intentional deferral, or an actual local defect. Do not invent work merely
+   because a target-tree folder or old report mentions it.
+2. Choose one next gate. If it changes behavior or persistence, write its
+   versioned contract and decision record before implementation. Prefer the
+   smallest capability-based change that reuses existing helpers.
+3. Add regression coverage before or with the implementation for ordering,
+   conflicts, stale writers, retries, recovery, fingerprints, replay, audit,
+   and inspection parity when applicable.
+4. Update `STRUCTURE.md`, `docs/PROJECT-CONTEXT.md`, `docs/PHASES.md`,
+   `docs/ROADMAP.md`, `docs/UNDERSTANDING-LOG.md`, and the relevant evidence
+   JSON when the gate closes.
+5. Run the narrow focused checks first, then the required local checks:
+   `python -m pytest -q`, `python -m compileall -q market_os scripts`,
+   `python scripts/ci_checks.py secret-scan`,
+   `python scripts/ci_checks.py validate-evidence`, and `git diff --check`.
+6. Preserve the synthetic, paper-only, local boundary. Do not add Binance,
+   live trading, credentials, providers, public listeners, production
+   infrastructure, or network-backed execution.
+7. Do not add HTTP or CLI mutation routes without a separate versioned
+   contract and authentication boundary. Do not rename or delete historical
+   files or unrelated worktree artifacts during polish.
+8. Do not reset, clean, commit, push, deploy, or expose secrets unless a later
+   user request explicitly authorizes that separate operation.
+
+## Web/deployment gate
+
+Do not start connected web or hosting work merely because the local UI exists.
+Before connected implementation, select and verify a concrete U5.5 runtime and
+identity path against the v1 contract: hosting process model, identity
+assertion, subject-to-portfolio authorization, storage isolation, session
+expiry/revocation/replay handling, principal and denied-request audit,
+health/rollback, server-only secret injection and rotation, rate/body/time
+limits, and the evidence matrix. Static DirectAdmin preview and private
+connected operator remain separate tracks.
+
+## Final report
+
+Report the milestone read, gap classification, files changed, tests and
+evidence run, remaining intentional deferrals, risks, and the exact next gate.
+Only move to web/deploy after the local exit criteria and the connected runtime
+contract are both satisfied.

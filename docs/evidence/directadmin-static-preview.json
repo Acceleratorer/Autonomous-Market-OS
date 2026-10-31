@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.directadmin-static-preview@v1",
+  "status": "deployed-verified-ui-polished-no-analytics",
+  "target": {
+    "remote_path": "/domains/accel.io.vn/public_html/market-os",
+    "public_url": "https://accel.io.vn/market-os/",
+    "scope": "only-market-os"
+  },
+  "artifact": {
+    "source": "apps/web/public",
+    "files": [
+      {
+        "path": "index.html",
+        "sha256": "2dfbdc2606da717a78975012195e412e2a189345ecb901db52b1dee3a81d7f93",
+        "size_bytes": 12204
+      },
+      {
+        "path": ".htaccess",
+        "sha256": "d60a14ce8de80b5a67356e7f65b676e35fdb86c0a3a6e1913fec2f219931c7d9",
+        "size_bytes": 162
+      },
+      {
+        "path": "DEPLOYMENT.txt",
+        "sha256": "a4a9e7d4d5eef58e0365fcd110287c9acb8681687a0773c5e133386379c295fe",
+        "size_bytes": 850
+      }
+    ],
+    "artifact_fingerprint": "b56d3889f77b4fc52c1847a11f452fed3cec803198602d4cb5d6752fc2deca2f"
+  },
+  "build_verification": {
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "ui_polish": "applied with ui-ux-pro-max and apple-design guidance",
+    "static_contract_test": "passed",
+    "source_parity": "passed",
+    "artifact_file_set": [
+      "index.html",
+      ".htaccess",
+      "DEPLOYMENT.txt"
+    ],
+    "portfolio_data": false,
+    "env_files": false,
+    "credentials": false,
+    "python_gateway": false,
+    "api_or_mutation_code": false
+  },
+  "directadmin_verification": {
+    "folder_created": true,
+    "files_uploaded": 3,
+    "upload_scope_verified": "/domains/accel.io.vn/public_html/market-os"
+  },
+  "live_verification": {
+    "index_http_status": 200,
+    "deployment_txt_http_status": 403,
+    "forms": 0,
+    "api_requests": 0,
+    "successful_external_requests": 0,
+    "cloudflare_beacon": "disabled-at-zone-level",
+    "rum_post": "not-observed",
+    "console_errors": "none",
+    "screenshot": "output/playwright/market-os-final-live.png"
+  }
+}

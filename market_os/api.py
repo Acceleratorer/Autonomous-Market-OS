@@ -16,6 +16,13 @@ from typing import Any
 from dataclasses import asdict
 
 from .contracts import ContractError, error_response
+from .u55_access import (
+    U55_ACCESS_VERSION,
+    U55AccessConfig,
+    U55AccessError,
+    connected_path_portfolio_id,
+    is_connected_read_path,
+)
 from .workflow import MarketWorkflow
 
 
@@ -378,6 +385,7 @@ def make_handler(
     *,
     request_timeout: float = 5.0,
     service_log_path: str | Path | None = None,
+    connected_access: U55AccessConfig | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     log_lock = threading.Lock()
 
@@ -386,6 +394,14 @@ def make_handler(
             super().setup()
             self.request.settimeout(request_timeout)
             self.request_id = uuid.uuid4().hex
+            self.connected_principal = None
+            self._audit_event = None
+            self._audit_reason_code = None
+
+        def _portfolio_storage_root(self) -> Path:
+            if connected_access is not None:
+                return connected_access.validate_storage_root()
+            return (workflow.store.root / "b4-paper").resolve()
 
         def _trusted_host(self) -> bool:
             value = self.headers.get("Host", "")
@@ -412,13 +428,42 @@ def make_handler(
         def _reject_untrusted_host(self) -> bool:
             if self._trusted_host():
                 return False
+            if self.command == "POST":
+                self._prepare_rejected_post()
             self._send(403, {"error": "loopback host required", "api_version": "market-os.v1"})
             self._audit(403, error_type="UntrustedHost")
             return True
 
+        def _prepare_rejected_post(self) -> None:
+            """Drain a bounded rejected body so Windows clients receive the response."""
+            self.close_connection = True
+            lengths = self.headers.get_all("Content-Length", [])
+            if (
+                len(lengths) != 1
+                or not lengths[0].isascii()
+                or not lengths[0].isdecimal()
+                or len(lengths[0]) > 10
+            ):
+                return
+            size = int(lengths[0])
+            max_bytes = MAX_HISTORY_INGEST_BODY_BYTES if self.path == "/v1/btc/history/ingest" else MAX_POST_BODY_BYTES
+            if size > max_bytes:
+                return
+            remaining = size
+            try:
+                while remaining:
+                    chunk = self.rfile.read(min(64 * 1024, remaining))
+                    if not chunk:
+                        return
+                    remaining -= len(chunk)
+            except (OSError, TimeoutError):
+                return
+            self.close_connection = False
+
         def _reject_cross_origin_post(self) -> bool:
             fetch_site = self.headers.get("Sec-Fetch-Site")
             if fetch_site is not None and fetch_site.lower() != "same-origin":
+                self._prepare_rejected_post()
                 self._send(403, {"error": "same-origin POST required", "api_version": "market-os.v1"})
                 self._audit(403, error_type="CrossOriginPost")
                 return True
@@ -450,6 +495,7 @@ def make_handler(
                 trusted = False
             if trusted:
                 return False
+            self._prepare_rejected_post()
             self._send(403, {"error": "same-origin POST required", "api_version": "market-os.v1"})
             self._audit(403, error_type="CrossOriginPost")
             return True
@@ -479,9 +525,28 @@ def make_handler(
                 raise _PostBodyError(400, "invalid_request_body", "request body must be a JSON object")
             return value
 
-        def _audit(self, status: int, *, run_id: str | None = None, error_type: str | None = None) -> None:
+        def _audit(
+            self,
+            status: int,
+            *,
+            run_id: str | None = None,
+            error_type: str | None = None,
+            event: str | None = None,
+            reason_code: str | None = None,
+            portfolio_id: str | None = None,
+        ) -> None:
             if service_log_path is None:
                 return
+            if event is None:
+                event = self._audit_event
+            if reason_code is None:
+                reason_code = self._audit_reason_code
+            if event is None:
+                event = "request.allowed" if connected_access is not None and status < 400 else "request"
+            if connected_access is not None and self.connected_principal is not None:
+                subject_hash = connected_access.audit_subject(self.connected_principal)
+            else:
+                subject_hash = None
             record = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "request_id": self.request_id,
@@ -490,6 +555,10 @@ def make_handler(
                 "status": status,
                 "run_id": run_id,
                 "error_type": error_type,
+                "event": event,
+                "reason_code": reason_code,
+                "subject_hash": subject_hash,
+                "portfolio_id": portfolio_id if portfolio_id and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", portfolio_id) else None,
             }
             destination = Path(service_log_path)
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -525,6 +594,58 @@ def make_handler(
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _connected_denial(self, status: int, reason_code: str, *, event: str = "request.denied") -> bool:
+            self._send(
+                status,
+                {
+                    "error": {
+                        "code": "connected_access_denied",
+                        "message": "connected access denied",
+                        "api_version": U55_ACCESS_VERSION,
+                    },
+                },
+            )
+            self._audit(status, event=event, reason_code=reason_code)
+            return True
+
+        def _authorize_connected_request(self) -> bool:
+            if connected_access is None:
+                return False
+            request_path = urllib.parse.urlsplit(self.path).path
+            if request_path in {"/healthz", "/readyz"}:
+                return False
+            if not is_connected_read_path(request_path):
+                return self._connected_denial(404, "route_not_allowlisted")
+            try:
+                self.connected_principal = connected_access.authorize_principal(self.headers)
+            except U55AccessError as exc:
+                event = (
+                    "direct_origin.denied"
+                    if exc.reason_code in {"principal_missing", "principal_forged", "forged_principal_header"}
+                    else "request.denied"
+                )
+                return self._connected_denial(403, exc.reason_code, event=event)
+            if not connected_access.rate_limiter.allow(self.connected_principal.subject):
+                return self._connected_denial(429, "rate_limited")
+            portfolio_id = connected_path_portfolio_id(request_path)
+            if portfolio_id is not None:
+                try:
+                    connected_access.resolve_allowed_portfolio(portfolio_id)
+                except U55AccessError as exc:
+                    event = (
+                        "storage.denied"
+                        if exc.reason_code.startswith("storage_") or exc.reason_code == "portfolio_storage_missing"
+                        else "portfolio.authorization"
+                    )
+                    return self._connected_denial(403, exc.reason_code, event=event)
+                self._audit(
+                    200,
+                    event="portfolio.authorization",
+                    reason_code="allowed",
+                    portfolio_id=portfolio_id,
+                )
+            return False
 
         def _operator_asset(self) -> bool:
             parsed = urllib.parse.urlsplit(self.path)
@@ -646,7 +767,36 @@ def make_handler(
         def _operator_catalog(self, limit: int = 25, after_portfolio_id: str | None = None) -> dict[str, Any]:
             from .portfolio_broker import B41Broker, BrokerStale
 
-            root = (workflow.store.root / "b4-paper").resolve()
+            root = self._portfolio_storage_root()
+            if connected_access is not None:
+                allowed = connected_access.resolve_allowed_portfolio(connected_access.allowed_portfolio_id)
+                if after_portfolio_id is not None:
+                    if after_portfolio_id != connected_access.allowed_portfolio_id:
+                        raise _B4QueryError("after_portfolio_id is not in this portfolio catalog")
+                    return {"portfolios": [], "page": {
+                        "limit": limit,
+                        "after_portfolio_id": after_portfolio_id,
+                        "has_more": False,
+                        "next_after_portfolio_id": None,
+                        "skipped_count": 0,
+                    }}
+                from .portfolio_broker import B41Broker
+
+                broker = B41Broker.open(root, connected_access.allowed_portfolio_id, read_only=True)
+                genesis = broker.genesis
+                summary = broker.inspect_summary_compact()
+                return {"portfolios": [{
+                    "portfolio_id": genesis.portfolio_id,
+                    "mode": "shared" if genesis.shared_portfolio_id is not None else "isolated",
+                    "member_count": len(genesis.member_strategy_ids) or 1,
+                    "open_orders": summary["open_orders"],
+                }], "page": {
+                    "limit": limit,
+                    "after_portfolio_id": after_portfolio_id,
+                    "has_more": False,
+                    "next_after_portfolio_id": None,
+                    "skipped_count": 0,
+                }}
             portfolios = []
             if not root.is_dir():
                 if after_portfolio_id is not None:
@@ -735,6 +885,10 @@ def make_handler(
             self.close_connection = True
             if self._reject_untrusted_host():
                 return
+            if connected_access is not None:
+                self._prepare_rejected_post()
+                self._connected_denial(405, "mutation_disabled")
+                return
             post_routes = {
                 "/v1/btc/history/ingest",
                 "/v1/btc/b2/runs",
@@ -743,6 +897,7 @@ def make_handler(
                 "/v1/tasks",
             }
             if self.path not in post_routes:
+                self._prepare_rejected_post()
                 self._send(404, {"error": "not found"})
                 self._audit(404)
                 return
@@ -875,6 +1030,8 @@ def make_handler(
         def do_GET(self) -> None:  # noqa: N802
             if self._reject_untrusted_host():
                 return
+            if self._authorize_connected_request():
+                return
             if urllib.parse.urlsplit(self.path).path in {"/operator", "/operator/"}:
                 status = 200
                 error_type = None
@@ -927,6 +1084,12 @@ def make_handler(
                     status = 409
                     error_type = "B4CatalogConflict"
                     self._send(409, {"error": {"code": "b4_catalog_conflict", "message": "portfolio state changed during catalog inspection; retry", "api_version": "market-os.b4-catalog@v1"}})
+                except U55AccessError as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._audit_event = "storage.denied"
+                    self._audit_reason_code = exc.reason_code
+                    self._send(409, {"error": {"code": "storage_denied", "message": "portfolio storage is unavailable", "api_version": "market-os.b4-catalog@v1"}})
                 finally:
                     self._audit(status, error_type=error_type)
                 return
@@ -965,7 +1128,7 @@ def make_handler(
                         legacy_limit, legacy_cursor, legacy_item_id = _legacy_resource_page_query(query, resource)
                     from .portfolio_broker import B41Broker, InspectionCursorError
 
-                    broker = B41Broker.open(workflow.store.root / "b4-paper", parts[0], read_only=True)
+                    broker = B41Broker.open(self._portfolio_storage_root(), parts[0], read_only=True)
                     if resource == "inspection":
                         try:
                             orders = broker.inspect_orders_page(order_limit, order_before_id)
@@ -1059,7 +1222,8 @@ def make_handler(
                 except (OSError, TypeError, ValueError) as exc:
                     status = 409
                     error_type = type(exc).__name__
-                    self._send(409, {"error": {"code": "b4_inspection_error", "message": str(exc), "api_version": "market-os.b4-1.paper-broker@v1"}})
+                    message = "connected inspection failed" if connected_access is not None else str(exc)
+                    self._send(409, {"error": {"code": "b4_inspection_error", "message": message, "api_version": "market-os.b4-1.paper-broker@v1"}})
                 finally:
                     self._audit(status, error_type=error_type)
                 return
@@ -1541,13 +1705,22 @@ def serve(
     *,
     request_timeout: float = 5.0,
     service_log_path: str | Path | None = None,
+    connected_access: U55AccessConfig | None = None,
 ) -> None:
     if request_timeout <= 0:
         raise ValueError("request_timeout must be positive")
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise ValueError("market-os service is loopback-only")
     workflow.recover_inflight_runs()
-    server = ThreadingHTTPServer((host, port), make_handler(workflow, request_timeout=request_timeout, service_log_path=service_log_path))
+    server = ThreadingHTTPServer(
+        (host, port),
+        make_handler(
+            workflow,
+            request_timeout=request_timeout,
+            service_log_path=service_log_path,
+            connected_access=connected_access,
+        ),
+    )
     server.daemon_threads = True
     handled_signals = [signal.SIGTERM]
     if hasattr(signal, "SIGBREAK"):

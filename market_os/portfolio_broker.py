@@ -29,6 +29,7 @@ GENESIS_SCHEMA = "market-os.b4-1.paper-portfolio-genesis@v1"
 SHARED_GENESIS_SCHEMA = "market-os.b4-15.shared-portfolio-genesis@v1"
 EVENT_SCHEMA = "market-os.b4-1.paper-portfolio-event@v1"
 SNAPSHOT_SCHEMA = "market-os.b4-1.portfolio-snapshot@v1"
+NAMED_PORTFOLIO_IDS = frozenset({"paper-main"})
 ORDER_STATES = frozenset({"accepted", "open", "filled", "cancelled", "expired", "risk_rejected"})
 _LOCKS: dict[str, threading.RLock] = {}
 _LOCKS_GUARD = threading.Lock()
@@ -142,6 +143,24 @@ def _identifier(value: Any, field: str) -> str:
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", result):
         raise BrokerRejected(f"{field} must be a stable identifier")
     return result
+
+
+def _safe_authorization_context(context: Mapping[str, Any] | None) -> dict[str, str] | None:
+    if context is None:
+        return None
+    if not isinstance(context, Mapping) or set(context) != {"subject", "operation", "capability_fingerprint"}:
+        raise BrokerRejected("local authorization context is malformed", "capability.invalid")
+    subject, operation, fingerprint = (context.get("subject"), context.get("operation"), context.get("capability_fingerprint"))
+    if operation not in {"order.submit", "order.cancel", "approval.revoke"}:
+        raise BrokerRejected("local authorization context is malformed", "capability.invalid")
+    try:
+        _identifier(subject, "subject")
+        _identifier(operation, "operation")
+    except BrokerRejected as exc:
+        raise BrokerRejected("local authorization context is malformed", "capability.invalid") from exc
+    if not isinstance(fingerprint, str) or not re.fullmatch(r"[0-9a-f]{64}", fingerprint):
+        raise BrokerRejected("local authorization context is malformed", "capability.invalid")
+    return {"subject": subject, "operation": operation, "capability_fingerprint": fingerprint}
 
 
 def _is_reparse_point(path: Path) -> bool:
@@ -399,7 +418,7 @@ class B41Genesis:
         if self.shared_portfolio_id is None:
             identity = {"strategy_id": self.strategy_id, "symbol": self.symbol, "fixture_lineage": self.fixture_lineage}
             expected = "portfolio-" + _fingerprint(identity)[:24]
-            if self.portfolio_id != expected:
+            if self.portfolio_id != expected and self.portfolio_id not in NAMED_PORTFOLIO_IDS:
                 raise BrokerRejected("portfolio_id must match strategy, instrument, and fixture lineage")
             if members:
                 raise BrokerRejected("isolated genesis cannot declare shared members")
@@ -420,6 +439,26 @@ class B41Genesis:
         identity = {"strategy_id": strategy_id, "symbol": "BTCUSDT", "fixture_lineage": fixture_lineage}
         portfolio_id = "portfolio-" + _fingerprint(identity)[:24]
         return cls(portfolio_id, strategy_id, fixture_lineage, policy_fingerprint=policy.fingerprint, initial_cash_usdt=policy.initial_cash_usdt, initial_btc_quantity=policy.initial_btc_quantity, initial_average_entry_price=policy.initial_average_entry_price)
+
+    @classmethod
+    def create_named(
+        cls,
+        portfolio_id: str,
+        strategy_id: str,
+        fixture_lineage: str,
+        policy: B41Policy,
+    ) -> "B41Genesis":
+        if portfolio_id not in NAMED_PORTFOLIO_IDS:
+            raise BrokerRejected("portfolio_id is not an approved named portfolio")
+        return cls(
+            portfolio_id,
+            strategy_id,
+            fixture_lineage,
+            policy_fingerprint=policy.fingerprint,
+            initial_cash_usdt=policy.initial_cash_usdt,
+            initial_btc_quantity=policy.initial_btc_quantity,
+            initial_average_entry_price=policy.initial_average_entry_price,
+        )
 
     @classmethod
     def create_shared(cls, shared_portfolio_id: str, fixture_lineage: str, member_strategy_ids: tuple[str, ...] | list[str], policy: B41Policy) -> "B41Genesis":
@@ -835,6 +874,50 @@ class B41Broker:
                     ("checkpoint.json", self.checkpoint_path),
                 )
                 if path.is_file()
+            }
+
+    def inspect_storage_state(self) -> dict[str, Any]:
+        """Read bounded file fingerprints and ledger count for local audit."""
+        with self._lock, self._process_guard():
+            if self._ledger_head() != self._last_ledger_fingerprint:
+                raise BrokerStale("stale portfolio snapshot; reload before storage inspection")
+            files: dict[str, dict[str, Any]] = {}
+            for name, path in (
+                ("genesis.json", self.genesis_path),
+                ("policy.json", self.policy_path),
+                ("ledger.jsonl", self.ledger_path),
+                ("checkpoint.json", self.checkpoint_path),
+            ):
+                if not path.is_file():
+                    files[name] = {"present": False}
+                    continue
+                if _is_reparse_point(path) or path.resolve(strict=True).parent != self.root:
+                    raise BrokerRejected(f"portfolio {name} must remain a local file")
+                digest = hashlib.sha256()
+                size = 0
+                record_count = 0
+                ledger_line_has_data = False
+                with path.open("rb") as handle:
+                    for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                        digest.update(chunk)
+                        size += len(chunk)
+                        if name == "ledger.jsonl":
+                            for byte in chunk:
+                                if byte == 10:
+                                    record_count += ledger_line_has_data
+                                    ledger_line_has_data = False
+                                elif byte not in b" \t\r\v\f":
+                                    ledger_line_has_data = True
+                row: dict[str, Any] = {"present": True, "size": size, "sha256": digest.hexdigest()}
+                if name == "ledger.jsonl":
+                    record_count += ledger_line_has_data
+                    row["record_count"] = record_count
+                files[name] = row
+            if self._ledger_head() != self._last_ledger_fingerprint:
+                raise BrokerStale("portfolio changed during storage inspection; reload before retry")
+            return {
+                "files": files,
+                "checkpoint_status": "current" if self._checkpoint_status == "current" else "stale_or_missing",
             }
 
     def inspect(self, resource: str, item_id: str | None = None) -> dict[str, Any]:
@@ -1287,19 +1370,23 @@ class B41Broker:
         self._append_event(kind, payload | {"reason_code": error.reason_code}, result)
         return result
 
-    def _record_idempotency_conflict(self, command_type: str, idempotency_key: str, fingerprint: str, attempt: dict[str, Any]) -> BrokerRejected:
+    def _record_idempotency_conflict(self, command_type: str, idempotency_key: str, fingerprint: str, attempt: dict[str, Any], authorization_context: Mapping[str, Any] | None = None) -> BrokerRejected:
         error = BrokerRejected("idempotency key conflicts with a different command", "command.idempotency_conflict")
         result = {"command_type": command_type, "conflicting_idempotency_key": idempotency_key, "attempted_command_fingerprint": fingerprint, "state": "rejected", "reason_code": error.reason_code, "reason": str(error)}
-        self._append_event("command.idempotency_conflict", {"command_type": command_type, "idempotency_key": idempotency_key, "attempted_command_fingerprint": fingerprint, "attempt": attempt}, result)
+        payload = {"command_type": command_type, "idempotency_key": idempotency_key, "attempted_command_fingerprint": fingerprint, "attempt": attempt}
+        if authorization_context is not None:
+            payload["authorization"] = dict(authorization_context)
+        self._append_event("command.idempotency_conflict", payload, result)
         return error
 
     @_portfolio_write
-    def submit_order(self, order: B41Order, approval: B41Approval) -> dict[str, Any]:
+    def submit_order(self, order: B41Order, approval: B41Approval, *, _authorization_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+        _authorization_context = _safe_authorization_context(_authorization_context)
         existing = self._find_idempotency(order.idempotency_key, ("order.accepted", "order.rejected"))
         if existing is not None:
             if existing["command_fingerprint"] == order.command_fingerprint:
                 return existing
-            raise self._record_idempotency_conflict("order.submit", order.idempotency_key, order.command_fingerprint, {"order": order.to_dict(), "approval": approval.to_dict()})
+            raise self._record_idempotency_conflict("order.submit", order.idempotency_key, order.command_fingerprint, {"order": order.to_dict(), "approval": approval.to_dict()}, _authorization_context)
         try:
             if self._last_event_time_ms is not None and order.submitted_at_ms <= self._last_event_time_ms:
                 raise BrokerRejected("order cannot backdate into a processed market event", "order.backdated")
@@ -1342,20 +1429,27 @@ class B41Broker:
                     raise BrokerRejected("buy order exceeds reserved inventory limit", "risk.inventory_limit")
         except BrokerRejected as exc:
             result = {"command_id": order.command_id, "idempotency_key": order.idempotency_key, "order_id": order.order_id, "state": "rejected", "reason_code": exc.reason_code, "reason": str(exc), "command_fingerprint": order.command_fingerprint}
-            self._append_event("order.rejected", {"order": order.to_dict(), "approval": approval.to_dict(), "reason_code": exc.reason_code}, result)
+            payload = {"order": order.to_dict(), "approval": approval.to_dict(), "reason_code": exc.reason_code}
+            if _authorization_context is not None:
+                payload["authorization"] = dict(_authorization_context)
+            self._append_event("order.rejected", payload, result)
             return result
         record = {"command_fingerprint": order.command_fingerprint, "idempotency_key": order.idempotency_key, "order_id": order.order_id, "state": "open"}
         accepted = B41Order(**{**order.to_dict(include_fingerprint=False), "state": "open"})
         self._orders.append(accepted)
         try:
-            self._append_event("order.accepted", {"order": order.to_dict(), "approval": approval.to_dict()}, record)
+            payload = {"order": order.to_dict(), "approval": approval.to_dict()}
+            if _authorization_context is not None:
+                payload["authorization"] = dict(_authorization_context)
+            self._append_event("order.accepted", payload, record)
         except Exception:
             self._orders.pop()
             raise
         return record
 
     @_portfolio_write
-    def cancel_order(self, portfolio_id: str, order_id: str, command_id: str, idempotency_key: str, submitted_at_ms: int, approval: B41Approval, strategy_id: str | None = None) -> dict[str, Any]:
+    def cancel_order(self, portfolio_id: str, order_id: str, command_id: str, idempotency_key: str, submitted_at_ms: int, approval: B41Approval, strategy_id: str | None = None, *, _authorization_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+        _authorization_context = _safe_authorization_context(_authorization_context)
         cancel_projection = {"portfolio_id": portfolio_id, "order_id": order_id, "command_id": command_id, "idempotency_key": idempotency_key, "submitted_at_ms": submitted_at_ms}
         if strategy_id is not None:
             cancel_projection["strategy_id"] = strategy_id
@@ -1363,12 +1457,14 @@ class B41Broker:
         existing = self._find_idempotency(idempotency_key, ("order.cancelled", "order.cancel.rejected"))
         if existing is not None:
             if existing.get("command_fingerprint") != cancel_fingerprint:
-                raise self._record_idempotency_conflict("order.cancel", idempotency_key, cancel_fingerprint, {**cancel_projection, "approval": approval.to_dict()})
+                raise self._record_idempotency_conflict("order.cancel", idempotency_key, cancel_fingerprint, {**cancel_projection, "approval": approval.to_dict()}, _authorization_context)
             return existing
         identity = {"command_id": command_id, "idempotency_key": idempotency_key, "order_id": order_id, "command_fingerprint": cancel_fingerprint}
         if strategy_id is not None:
             identity["strategy_id"] = strategy_id
         payload = {"cancel": cancel_projection, "approval": approval.to_dict()}
+        if _authorization_context is not None:
+            payload["authorization"] = dict(_authorization_context)
         try:
             if portfolio_id != self.genesis.portfolio_id:
                 raise BrokerRejected("portfolio identity mismatch", "command.portfolio_mismatch")
@@ -1394,7 +1490,7 @@ class B41Broker:
                 self._orders[index] = changed
                 result = {**identity, "state": "cancelled"}
                 try:
-                    self._append_event("order.cancelled", {"cancel": payload["cancel"], "approval": approval.to_dict()}, result)
+                    self._append_event("order.cancelled", payload, result)
                 except Exception:
                     self._orders[index] = order
                     raise
@@ -1402,15 +1498,18 @@ class B41Broker:
         return self._record_command_rejection("order.cancel.rejected", payload, identity, BrokerRejected("open order not found", "order.not_open"))
 
     @_portfolio_write
-    def revoke_approval(self, approval_id: str, command_id: str, idempotency_key: str, revoked_at_ms: int, approver_id: str = "owner") -> dict[str, Any]:
+    def revoke_approval(self, approval_id: str, command_id: str, idempotency_key: str, revoked_at_ms: int, approver_id: str = "owner", *, _authorization_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+        _authorization_context = _safe_authorization_context(_authorization_context)
         command_fingerprint = _fingerprint({"approval_id": approval_id, "command_id": command_id, "idempotency_key": idempotency_key, "revoked_at_ms": revoked_at_ms})
         existing = self._find_idempotency(idempotency_key, ("approval.revoked", "approval.revoke.rejected"))
         if existing is not None:
             if existing.get("command_fingerprint") == command_fingerprint:
                 return existing
-            raise self._record_idempotency_conflict("approval.revoke", idempotency_key, command_fingerprint, {"approval_id": approval_id, "command_id": command_id, "revoked_at_ms": revoked_at_ms, "approver_id": approver_id})
+            raise self._record_idempotency_conflict("approval.revoke", idempotency_key, command_fingerprint, {"approval_id": approval_id, "command_id": command_id, "revoked_at_ms": revoked_at_ms, "approver_id": approver_id}, _authorization_context)
         identity = {"approval_id": approval_id, "command_id": command_id, "idempotency_key": idempotency_key, "command_fingerprint": command_fingerprint}
         payload = {"revoke": {"approval_id": approval_id, "command_id": command_id, "idempotency_key": idempotency_key, "revoked_at_ms": revoked_at_ms, "approver_id": approver_id}}
+        if _authorization_context is not None:
+            payload["authorization"] = dict(_authorization_context)
         try:
             if approver_id != "owner":
                 raise BrokerRejected("approval revocation identity is invalid", "approval.revocation_unauthorized")
@@ -1425,7 +1524,7 @@ class B41Broker:
         result = {"approval_id": approval_id, "command_id": command_id, "idempotency_key": idempotency_key, "command_fingerprint": command_fingerprint, "state": "revoked"}
         self._revoked_approval_ids.append(approval_id)
         try:
-            self._append_event("approval.revoked", payload["revoke"], result)
+            self._append_event("approval.revoked", payload, result)
         except Exception:
             self._revoked_approval_ids.remove(approval_id)
             raise

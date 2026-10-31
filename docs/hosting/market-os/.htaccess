@@ -1,5 +1,6 @@
 Options -Indexes
 DirectoryIndex index.html
+Header set Cache-Control "public, no-transform"
 <FilesMatch "^(DEPLOYMENT\.txt)$">
   Require all denied
 </FilesMatch>

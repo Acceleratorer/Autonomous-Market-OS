@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { BoundaryBanner, MetricCard, PageHeading, PanelHeading, ServiceState } from "@/components/ui";
+import { BoundaryBanner, MetricCard, PageHeading, PanelHeading, ServiceState, SystemStatusStrip } from "@/components/ui";
 import {
   getBtcHistoryDatasetCatalog,
   getBtcResearchRunPage,
@@ -70,20 +70,22 @@ export default async function OperatorOverviewPage() {
           <span>Synthetic research and paper portfolios only; this workspace has no live venue or order controls.</span>
         </BoundaryBanner>
 
+        <SystemStatusStrip gatewayStatus={gatewayStatus} />
+
         <section className="overview-metric-grid" aria-label="First-page resource summary">
           <MetricCard
             label="Portfolios · first page"
-            value={portfolios.ok ? portfolios.value.portfolios.length : "—"}
+            value={portfolios.ok ? portfolios.value.portfolios.length : "n/a"}
             unit={portfolios.ok ? "shown" : "unavailable"}
           />
           <MetricCard
             label="BTC datasets · first page"
-            value={datasets.ok ? datasets.value.datasets.length : "—"}
+            value={datasets.ok ? datasets.value.datasets.length : "n/a"}
             unit={datasets.ok ? "shown" : "unavailable"}
           />
           <MetricCard
             label="B2 + B3 runs · first pages"
-            value={researchRunCount ?? "—"}
+            value={researchRunCount ?? "n/a"}
             unit={researchRunCount === null ? "unavailable" : researchCatalogsComplete ? "shown" : "partial"}
           />
         </section>
@@ -168,7 +170,7 @@ export default async function OperatorOverviewPage() {
 
           <article className="panel overview-panel" aria-label="BTC offline research preview">
             <PanelHeading
-              kicker="B2–B3 · offline research"
+              kicker="B2 + B3 · offline research"
               title="BTC research"
               meta={researchRunCount === null ? "Unavailable" : `${researchRunCount} shown${researchCatalogsComplete ? "" : " · partial"}`}
             />

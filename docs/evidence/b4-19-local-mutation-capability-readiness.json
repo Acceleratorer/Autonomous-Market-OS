@@ -1,0 +1,44 @@
+{
+  "schema": "market-os.b4-19.local-mutation-capability-readiness@v1",
+  "milestone": "B4.19",
+  "date": "2026-10-29",
+  "status": "implemented-local-capability-seam",
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "local_only": true,
+    "http_mutation_routes": false,
+    "cli_mutation_routes": false,
+    "human_authentication": false,
+    "network": false,
+    "credentials": false,
+    "live_trading": false
+  },
+  "implementation": {
+    "capability_module": "market_os.local_mutation",
+    "hmac_algorithm": "sha256",
+    "capability_schema": "market-os.b4-19.local-capability@v1",
+    "replay_binding": "command-idempotency-key",
+    "raw_secret_persistence": false,
+    "safe_audit_context": true,
+    "broker_lock_and_stale_writer_rules_preserved": true,
+    "idempotency_authority": "append-only-ledger"
+  },
+  "verified_tests": [
+    "valid_capability",
+    "wrong_subject_portfolio_operation_command_and_idempotency_key",
+    "not_yet_valid_expired_malformed_and_tampered_capability",
+    "idempotent_retry_and_conflict",
+    "stale_writer_after_capability_verification",
+    "recovery_and_inspection_equivalence",
+    "raw_secret_absent_from_ledger_checkpoint_and_inspection",
+    "broker_rejects_forged_authorization_context"
+  ],
+  "remaining_gates": [
+    "retention-or-deletion-contract",
+    "connected-identity-and-runtime-contract",
+    "authenticated-http-or-cli-mutation-contract-if-ever-needed"
+  ],
+  "report": "docs/B4.19-LOCAL-MUTATION-CAPABILITY-CONTRACT.md",
+  "decision": "docs/decisions/ADR-0048-b4-19-local-mutation-capability.md"
+}

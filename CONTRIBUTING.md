@@ -1,0 +1,52 @@
+# Contributing
+
+Thanks for helping improve Autonomous-Market-OS.
+
+## Scope
+
+Keep changes aligned with the repository boundary:
+
+- synthetic and paper-only by default;
+- read-only HTTP/CLI inspection;
+- Python remains authoritative for accounting, risk, persistence, recovery,
+  reservations, replay, audit, backup, and portfolio inspection;
+- no Binance, live trading, provider credentials, or public mutation route;
+- no changes to `company-projects/`.
+
+## Local setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e . pytest
+python -m pytest -q
+python -m compileall -q market_os
+```
+
+For the local Next.js operator:
+
+```bash
+cd apps/web/next-operator
+npm ci
+npm run typecheck
+npm run build
+```
+
+## Before opening a pull request
+
+Run the checks relevant to your change:
+
+```bash
+python scripts/ci_checks.py secret-scan
+python scripts/ci_checks.py validate-evidence
+python scripts/build_web_artifact.py --check
+git diff --check
+```
+
+Frontend changes should also include browser evidence for desktop and mobile,
+keyboard focus, reduced motion, no horizontal overflow, and GET-only network
+behavior.
+
+Do not commit `.env` files, credentials, portfolio data, generated runtime
+state, or private deployment metadata. Keep commits focused and explain
+contract or security changes in the message.

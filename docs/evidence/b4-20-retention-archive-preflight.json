@@ -1,0 +1,33 @@
+{
+  "schema": "market-os.b4-20.retention-archive-preflight-evidence@v1",
+  "milestone": "B4.20",
+  "status": "implemented",
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "local_only": true,
+    "network": false,
+    "http_mutation_routes": false,
+    "cli_mutation_routes": false
+  },
+  "policy": {
+    "source_retention": "indefinite-local",
+    "deletion": false,
+    "deletion_eligible": false,
+    "mutation": false
+  },
+  "archive_validation": "read_only_streamed",
+  "paths_returned": false,
+  "zero_event_history": "ambiguous_when_ledger_and_checkpoint_are_absent",
+  "regression_tests": "market_os/tests/test_portfolio_backup.py",
+  "verification": {
+    "focused_tests": "21 passed",
+    "backend_regression_tests": "110 passed",
+    "full_suite": "588 passed, 0 failed, 7 skipped",
+    "compileall": "passed",
+    "secret_scan": "passed",
+    "evidence_validation": "55 evidence JSON files validated",
+    "diff_check": "passed",
+    "restore_promotion": "passed-atomic-directory-rename-no-partial-destination"
+  }
+}
