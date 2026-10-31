@@ -40,6 +40,7 @@ Run the checks relevant to your change:
 python scripts/ci_checks.py secret-scan
 python scripts/ci_checks.py validate-evidence
 python scripts/build_web_artifact.py --check
+python scripts/ci_checks.py validate-mlops-manifest
 git diff --check
 ```
 
@@ -48,5 +49,6 @@ keyboard focus, reduced motion, no horizontal overflow, and GET-only network
 behavior.
 
 Do not commit `.env` files, credentials, portfolio data, generated runtime
-state, or private deployment metadata. Keep commits focused and explain
-contract or security changes in the message.
+state, MLflow runs, Terraform state, Ansible inventories, or private
+deployment metadata. Keep commits focused and explain contract or security
+changes in the message.

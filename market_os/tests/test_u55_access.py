@@ -368,6 +368,7 @@ def test_connected_http_denies_expired_replayed_cross_portfolio_and_mutation(
             jti="expired-http-jti-1",
         )
         assert request(server, "/v1/b4/portfolios", headers=expired)[0] == 403
+        assert request(server, "/metrics", headers={})[0] == 404
 
         replay = make_signed_headers(
             config.owner_subject,

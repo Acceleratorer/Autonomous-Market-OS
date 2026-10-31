@@ -1,0 +1,43 @@
+{
+  "schema": "market-os.platform-toolchain-readiness@v1",
+  "status": "locally-scaffolded-not-promoted",
+  "iac": {
+    "terraform": "provider-neutral-u5-5-contract",
+    "ansible": "private-linux-host-preparation-playbook",
+    "cloud_provider": "not-selected",
+    "production_apply": false
+  },
+  "observability": {
+    "metrics": "prometheus-compatible-loopback-endpoint",
+    "dashboards": "grafana-private-compose-profile",
+    "logs": "loki-promtail-jsonl-compose-profile",
+    "public_ingress": false
+  },
+  "devsecops": {
+    "codeql": true,
+    "trivy": true,
+    "dependency_audit": true,
+    "secret_scan": true,
+    "iac_validation": true,
+    "sbom": true
+  },
+  "mlops": {
+    "tracking": "optional-private-mlflow",
+    "offline_manifest_validation": true,
+    "network_requests": 0,
+    "provider_requests": 0,
+    "promotion_decision": "not-promoted"
+  },
+  "data_plane": {
+    "kafka": "deferred",
+    "spark": "deferred",
+    "airflow_or_prefect": "deferred"
+  },
+  "security_boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "live_trading": false,
+    "provider_credentials": false
+  }
+}

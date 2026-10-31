@@ -34,3 +34,5 @@ jobs:
         run: python -m pytest -q market_os/tests/test_openai_summary_adapter.py market_os/tests/test_model_summary.py
       - name: Compile and diff checks
         run: python -m compileall -q market_os && git diff --check
+      - name: Validate MLOps contract manifest
+        run: python scripts/ci_checks.py validate-mlops-manifest

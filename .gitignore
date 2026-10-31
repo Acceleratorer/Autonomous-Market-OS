@@ -19,3 +19,10 @@ build/
 .ua/
 output/
 site/
+.terraform/
+*.tfstate
+*.tfstate.*
+.ansible/
+mlruns/
+mlflow.db
+observability/data/

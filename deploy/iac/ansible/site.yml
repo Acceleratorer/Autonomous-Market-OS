@@ -1,0 +1,75 @@
+---
+- name: Prepare the private Market OS host
+  hosts: market_os
+  become: true
+  vars:
+    market_os_root: /opt/autonomous-market-os
+    market_os_state: /var/lib/autonomous-market-os
+    market_os_log: /var/log/autonomous-market-os
+    market_os_repo_root: "{{ playbook_dir }}/../../.."
+  tasks:
+    - name: Require a Debian-family host for the checked package shape
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == "Debian"
+        fail_msg: "Use the documented Debian/Ubuntu host shape or add a reviewed platform role."
+
+    - name: Install required host packages
+      ansible.builtin.apt:
+        name:
+          - age
+          - ca-certificates
+          - curl
+          - python3
+        state: present
+        update_cache: true
+
+    - name: Create service account
+      ansible.builtin.user:
+        name: market-os
+        system: true
+        shell: /usr/sbin/nologin
+        create_home: false
+
+    - name: Create private runtime directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: market-os
+        group: market-os
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ market_os_root }}", mode: "0750" }
+        - { path: "{{ market_os_root }}/releases", mode: "0750" }
+        - { path: "{{ market_os_state }}", mode: "0700" }
+        - { path: "{{ market_os_state }}/portfolios", mode: "0700" }
+        - { path: "{{ market_os_state }}/session", mode: "0700" }
+        - { path: "{{ market_os_log }}", mode: "0750" }
+
+    - name: Install Python systemd unit
+      ansible.builtin.copy:
+        src: "{{ market_os_repo_root }}/deploy/u5-5/market-os-python.service"
+        dest: /etc/systemd/system/market-os-python.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install Next systemd unit
+      ansible.builtin.copy:
+        src: "{{ market_os_repo_root }}/deploy/u5-5/market-os-next.service"
+        dest: /etc/systemd/system/market-os-next.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Reload systemd units without starting them
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Report next owner-only steps
+      ansible.builtin.debug:
+        msg:
+          - "Install a reviewed release under {{ market_os_root }}/releases/<version>."
+          - "Create /etc/autonomous-market-os/operator.env with Ansible Vault or a host secret manager."
+          - "Create the encrypted age recipient file and paper-main portfolio before enabling services."
+          - "Apply Tailscale ACL/Serve only after local health and rollback checks pass."

@@ -25,3 +25,7 @@ Replace it with an encrypted, access-controlled persistent volume and add the
 approved Tailscale/private ingress controls before treating this as a
 promotion candidate. The owner-approved U5.5 production path remains the
 Linux VM + systemd + Tailscale Serve package under `deploy/u5-5/`.
+
+Observability and MLflow are intentionally separate local Compose profiles;
+they are not exposed by this manifest. Add them only through a reviewed
+private namespace design with encrypted storage and network policies.

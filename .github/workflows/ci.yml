@@ -60,6 +60,8 @@ jobs:
         run: python -m pytest -q market_os/tests/test_app_surfaces.py
       - name: Verify local operator surface
         run: python -m pytest -q market_os/tests/test_operator_surface.py
+      - name: Validate MLOps contract manifest
+        run: python scripts/ci_checks.py validate-mlops-manifest
 
   package-readonly-dashboard:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

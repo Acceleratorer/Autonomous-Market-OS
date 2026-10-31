@@ -8,7 +8,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "docs" / "evidence"
-SCAN_ROOTS = (ROOT / "market_os", ROOT / "scripts", ROOT / ".github")
+SCAN_ROOTS = (
+    ROOT / "market_os",
+    ROOT / "scripts",
+    ROOT / ".github",
+    ROOT / "deploy",
+    ROOT / "observability",
+    ROOT / "mlops",
+)
 SECRET_PATTERNS = (
     re.compile(r"sk-[A-Za-z0-9_-]{20,}"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
@@ -97,6 +104,21 @@ def secret_scan() -> None:
     print("secret scan passed")
 
 
+def validate_mlops_manifest() -> None:
+    import subprocess
+
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "mlops" / "validate_manifest.py"), str(ROOT / "mlops" / "experiment-manifest.example.json")],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if completed.returncode:
+        raise SystemExit(completed.stderr or completed.stdout or "MLOps manifest validation failed")
+    print(completed.stdout.strip())
+
+
 def main(argv: list[str] | None = None) -> int:
     command = (argv or sys.argv[1:])[:1]
     if command == ["validate-evidence"]:
@@ -108,7 +130,10 @@ def main(argv: list[str] | None = None) -> int:
     if command == ["validate-m2-8-evidence"]:
         validate_m2_8_evidence()
         return 0
-    raise SystemExit("usage: python scripts/ci_checks.py validate-evidence|validate-m2-8-evidence|secret-scan")
+    if command == ["validate-mlops-manifest"]:
+        validate_mlops_manifest()
+        return 0
+    raise SystemExit("usage: python scripts/ci_checks.py validate-evidence|validate-m2-8-evidence|validate-mlops-manifest|secret-scan")
 
 
 if __name__ == "__main__":

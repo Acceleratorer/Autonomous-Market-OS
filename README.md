@@ -52,6 +52,12 @@ For a private Kubernetes development shape, see
 Linux/systemd/Tailscale promotion path, see
 [`deploy/u5-5/README.md`](deploy/u5-5/README.md).
 
+Infrastructure and operations packaging lives under `deploy/iac/`:
+Terraform validates the provider-neutral U5.5 contract and Ansible prepares
+the private Linux host. Optional local observability is documented in
+[`observability/README.md`](observability/README.md); optional offline MLOps
+tracking is documented in [`mlops/README.md`](mlops/README.md).
+
 ## Workspace layout
 
 This repository is the separate fusion project. The original HKUDS repositories live under `company-projects/` and remain independent Git repositories with their own histories, branches, dependencies, and working changes.

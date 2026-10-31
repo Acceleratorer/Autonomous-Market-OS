@@ -34,3 +34,10 @@ If the report includes secrets, redact them and rotate them immediately.
 Never add secrets to source, HTML, browser bundles, logs, evidence artifacts,
 Docker images, or Kubernetes manifests. Use host-injected secret stores for
 the owner-controlled private runtime.
+
+## Automated security controls
+
+CI runs high-confidence secret scanning, dependency audits, CodeQL, Trivy
+filesystem/IaC/secret scanning, Terraform/Ansible syntax checks, and source
+SBOM generation. These checks reduce risk but do not replace review of the
+owner VM, Tailscale policy, image provenance, or secret-manager configuration.

@@ -24,6 +24,7 @@ from .u55_access import (
     is_connected_read_path,
 )
 from .workflow import MarketWorkflow
+from .metrics import MetricsRegistry
 
 
 OPERATOR_ROOT = Path(__file__).resolve().parents[1] / "apps" / "web" / "operator"
@@ -386,8 +387,10 @@ def make_handler(
     request_timeout: float = 5.0,
     service_log_path: str | Path | None = None,
     connected_access: U55AccessConfig | None = None,
+    metrics: MetricsRegistry | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     log_lock = threading.Lock()
+    metrics_registry = metrics or MetricsRegistry()
 
     class Handler(BaseHTTPRequestHandler):
         def setup(self) -> None:
@@ -535,14 +538,16 @@ def make_handler(
             reason_code: str | None = None,
             portfolio_id: str | None = None,
         ) -> None:
-            if service_log_path is None:
-                return
             if event is None:
                 event = self._audit_event
-            if reason_code is None:
-                reason_code = self._audit_reason_code
             if event is None:
                 event = "request.allowed" if connected_access is not None and status < 400 else "request"
+            metrics_registry.record_request(self.command, urllib.parse.urlsplit(self.path).path, status)
+            metrics_registry.record_event(event)
+            if service_log_path is None:
+                return
+            if reason_code is None:
+                reason_code = self._audit_reason_code
             if connected_access is not None and self.connected_principal is not None:
                 subject_hash = connected_access.audit_subject(self.connected_principal)
             else:
@@ -613,6 +618,8 @@ def make_handler(
             if connected_access is None:
                 return False
             request_path = urllib.parse.urlsplit(self.path).path
+            if request_path == "/metrics":
+                return self._connected_denial(404, "route_not_allowlisted")
             if request_path in {"/healthz", "/readyz"}:
                 return False
             if not is_connected_read_path(request_path):
@@ -1063,6 +1070,16 @@ def make_handler(
             if self.path == "/readyz":
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
+                return
+            if urllib.parse.urlsplit(self.path).path == "/metrics":
+                raw = metrics_registry.render()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                self._audit(200, event="metrics.read")
                 return
             if urllib.parse.urlsplit(self.path).path == "/v1/b4/portfolios":
                 status = 200
@@ -1706,6 +1723,7 @@ def serve(
     request_timeout: float = 5.0,
     service_log_path: str | Path | None = None,
     connected_access: U55AccessConfig | None = None,
+    metrics: MetricsRegistry | None = None,
 ) -> None:
     if request_timeout <= 0:
         raise ValueError("request_timeout must be positive")
@@ -1719,6 +1737,7 @@ def serve(
             request_timeout=request_timeout,
             service_log_path=service_log_path,
             connected_access=connected_access,
+            metrics=metrics,
         ),
     )
     server.daemon_threads = True

@@ -1,0 +1,21 @@
+{
+  "schema": "market-os.mlops.experiment-manifest@v1",
+  "experiment_id": "btc-b2-offline-example",
+  "code_revision": "replace-with-git-sha",
+  "dataset_revision": "btc-history-replace-with-revision",
+  "dataset_fingerprint": "replace-with-64-char-sha256",
+  "feature_fingerprint": "replace-with-64-char-sha256",
+  "replay_fingerprint": "replace-with-64-char-sha256",
+  "metrics": {
+    "status": "unavailable",
+    "sample_count": 0
+  },
+  "network_requests": 0,
+  "provider_requests": 0,
+  "artifact_lineage": [
+    "dataset_revision",
+    "feature_fingerprint",
+    "replay_fingerprint"
+  ],
+  "promotion_decision": "not-promoted"
+}
