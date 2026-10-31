@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Autonomous Market OS foundation slice"
 requires-python = ">=3.11"
 dependencies = [
-    "duckdb>=1.4,<2",
+    "duckdb>=1.4,<3",
     "pyarrow>=18,<27",
 ]
 
