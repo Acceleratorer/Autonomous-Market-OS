@@ -1,7 +1,7 @@
 {
   "schema": "market-os.local-exit-gate@v1",
-  "date": "2026-10-30",
-  "reconciled_at": "2026-11-01",
+  "date": "2026-11-02",
+  "reconciled_at": "2026-11-02",
   "status": "green-local-boundary",
   "scope": {
     "synthetic": true,
@@ -11,12 +11,12 @@
     "live_trading": false
   },
   "verification": {
-    "pytest_passed": 588,
+    "pytest_passed": 613,
     "pytest_failed": 0,
     "pytest_skipped": 7,
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_json_count": 55,
+    "evidence_json_count": 62,
     "evidence_validation": "passed",
     "git_diff_check": "passed",
     "dependency_check": "passed",
@@ -28,10 +28,10 @@
     "m2_8_evidence_validation": "passed",
     "security_review": "no-actionable-findings",
     "github_ci": "passed",
-    "github_ci_run_id": 40867998693,
+    "github_ci_run_id": 41345129472,
     "security_package_workflow": "passed",
-    "security_package_run_id": 40867998684,
-    "static_preview_artifact_job": "passed",
+    "security_package_run_id": 41345129404,
+    "static_preview_artifact_job": "passed in CI job 124963977482",
     "directadmin_deployment": "static-preview-live-read-only-verified; private-runtime-not-promoted",
     "directadmin_static_preview": {
       "index_status": 200,
@@ -76,29 +76,28 @@
   "report": "docs/LOCAL-EXIT-GATE-REPORT.md",
   "current_verification": {
     "date": "2026-11-02",
-    "full_suite_attempts": 1,
-    "full_suite_observed": "613 passed, 0 failed, 7 skipped",
+    "full_suite_attempts": 2,
+    "full_suite_observed": "final rerun: 613 passed, 0 failed, 7 skipped",
     "isolated_retries": {
-      "fixture_ingest_read_only": "1 passed",
-      "synthetic_rejected_post": "5 passed out of 5"
+      "socket_flake": "one preceding full-suite attempt hit WinError 10053; isolated test 10/10, server file 10/10, direct HTTP harness 20/20, then full rerun passed"
     },
-    "evidence_and_graph_checks": "passed: 62 evidence JSON files; knowledge graph and domain graph edge-resolved",
+    "evidence_and_graph_checks": "passed: 62 evidence JSON files; knowledge graph 1,991 nodes/5,025 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
     "git_diff_check": "passed",
-    "status": "clean-green-local-pack; main and origin/main aligned with 0 tracked changes and 6 preserved untracked workspace paths",
-    "note": "Full local rerun completed without a socket timeout; Next.js typecheck/build and all three hosted workflows passed.",
+    "status": "green-local-pack; main and origin/main aligned with 0 tracked changes and 6 preserved untracked workspace paths",
+    "note": "One transient Windows socket flake occurred in an earlier full-suite attempt; the isolated repro loops and subsequent full rerun passed. Next.js typecheck/build, TypeScript dashboard contract, static artifact parity, evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed.",
     "evidence_json_count": 62,
-    "graph_validation": "knowledge and domain graphs valid; latest knowledge-graph refresh is recorded in .ua/meta.json",
+    "graph_validation": "knowledge and domain graphs valid; graph metadata points to f6ba90a",
     "github_workflows": {
       "ci": {
-        "run_id": 41342180642,
+        "run_id": 41345129472,
         "result": "passed"
       },
       "devsecops": {
-        "run_id": 41342180638,
+        "run_id": 41345129459,
         "result": "passed"
       },
       "security_package": {
-        "run_id": 41342180686,
+        "run_id": 41345129404,
         "result": "passed"
       }
     }

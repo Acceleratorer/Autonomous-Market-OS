@@ -1585,3 +1585,33 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   ingestion inspection resource. No VM, provider, credential, mutation, or
   live-trading path is enabled.
 
+## 2026-11-02 — Verification and graph closeout at `f6ba90a`
+
+- Reconciled the historical 279-path inventory and the earlier 20-path
+  reconciliation against live Git state. `main` and `origin/main` are aligned;
+  the live worktree has zero tracked changes and six preserved untracked paths
+  (five `.tmp-*` review artifacts plus `API.md`). The manifest is explicitly a
+  historical audit snapshot, with the live classification recorded separately.
+- Re-ran the full verification pack: the final run passed `613 passed, 0
+  failed, 7 skipped`. One preceding full-suite attempt hit the known Windows
+  `WinError 10053` socket flake in the synthetic server rejection test; the
+  isolated test passed 10/10, the complete server test file passed 10/10, and
+  a direct HTTP harness passed 20/20 requests before the clean full rerun.
+  Evidence validation covered 62 JSON files; M2.8, MLOps, secret scan,
+  compileall, Next.js typecheck/build, TypeScript dashboard contract, static
+  artifact parity, and `git diff --check` passed.
+- Read-only DirectAdmin verification returned `/market-os/` 200 with SHA-256
+  `54be6a2203944045267bef54975d3a8fc7d7fb1a4ff2ca1e846375943540f82b`, root,
+  `/waifu/`, and `/wuwa-map/` 200, and `DEPLOYMENT.txt` 403 with zero forms or
+  scripts. This is the disconnected static preview; the private connected
+  runtime remains unpromoted.
+- Graph-backed `understand-chat`, `understand-domain`, and `understand-explain`
+  review confirms Python `market_os` owns accounting, persistence, recovery,
+  and bounded inspection; `market_os.cli` and `market_os.api` are thin
+  projections, while the Next.js `market-api.ts` adapter consumes the same
+  versioned GET contracts. The refreshed graph has 1,991 nodes and 5,025 edges;
+  the domain graph has 78 nodes and 85 edges, with all edge targets resolving.
+- The next gate remains a local read-only U6 app-shell contract over the shared
+  CLI/API/Next.js semantics. No VM, provider, credential, mutation, or
+  live-trading path is enabled.
+

@@ -13,14 +13,21 @@
 The current worktree is preserved as-is. No reset, clean, delete, commit, push,
 or deploy operation was run for this baseline audit.
 
-## Current read-only reconciliation — 2026-11-01
+## Historical read-only reconciliation — 2026-11-01
 
-The live repository is now at `a1e007552c809b8fa45a57bd6f23fd00a7d6da78`,
-which matches `origin/main`. The reconciliation leaves **12 tracked documentation/evidence edits** and **8 preserved untracked paths**: five
-temporary diff/status files, the pre-existing `API.md`, and the two baseline
-documents themselves. No cleanup, staging, commit, push, deploy, or connected
-runtime promotion was performed. Use `git status --short` for the current state;
-the historical counts below remain unchanged for audit traceability.
+At that audit point the repository was at `a1e007552c809b8fa45a57bd6f23fd00a7d6da78`,
+which matched `origin/main`, with **12 tracked documentation/evidence edits**
+and **8 preserved untracked paths**. That state is retained as historical
+audit context. Use `git status --short` for the live state.
+
+## Live read-only reconciliation — 2026-11-02
+
+The live repository is at the `main` tip and matches `origin/main`. The current
+status is **0 tracked changes plus 6 preserved untracked paths**: five `.tmp-*`
+review artifacts and the pre-existing `API.md`. The historical 2026-10-30
+inventory remains **279 status paths** and the 2026-11-01 20-path reconciliation
+is retained above for audit traceability. No scratch path is a product commit
+candidate by default; no cleanup or connected-runtime promotion was performed.
 
 ## Tracked product changes
 

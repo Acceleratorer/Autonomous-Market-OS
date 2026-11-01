@@ -1,7 +1,7 @@
 {
   "schema": "market-os.directadmin-static-preview@v1",
   "status": "deployed-verified-ui-polished-no-analytics",
-  "reconciled_at": "2026-11-01",
+  "reconciled_at": "2026-11-02",
   "reconciliation_method": "read-only HTTP verification against the public URL",
   "target": {
     "remote_path": "/domains/accel.io.vn/public_html/market-os",
@@ -67,5 +67,19 @@
       "/waifu/": 200,
       "/wuwa-map/": 200
     }
+  },
+  "last_read_only_recheck": {
+    "index_http_status": 200,
+    "index_sha256": "54be6a2203944045267bef54975d3a8fc7d7fb1a4ff2ca1e846375943540f82b",
+    "index_bytes": 15131,
+    "forms": 0,
+    "scripts": 0,
+    "preserved_routes": {
+      "/": 200,
+      "/waifu/": 200,
+      "/wuwa-map/": 200
+    },
+    "deployment_txt_http_status": 403,
+    "private_runtime_promoted": false
   }
 }

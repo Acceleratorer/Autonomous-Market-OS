@@ -87,7 +87,7 @@ The CLI delegates to `market_os.cli`. The gateway delegates to the existing
   idempotency, audit, migration, and archive preflight;
 - the current live worktree at the `main` tip: zero tracked changes and six
   preserved untracked workspace paths (five `.tmp-*` artifacts plus `API.md`);
-- the current knowledge graph contains 1,988 nodes and 5,008 edges, and the
+- the current knowledge graph contains 1,991 nodes and 5,025 edges, and the
   domain graph contains 78 nodes and 85 edges with all edge targets resolving;
 - the latest full local pack passed 613 tests, 0 failed, and 7 skipped; evidence,
   M2.8, MLOps, secret scan, compileall, Next.js typecheck/build, and diff checks
@@ -123,6 +123,18 @@ The next safe action is to define the U6 read-only app-shell contract over the
 completed CLI, HTTP API, and Next.js projections. Keep the three surfaces
 semantically aligned; keep mutation, providers, credentials, and connected
 access disabled. U5.5 promotion remains a separate gate for a future owner VM.
+
+## Graph-backed contract boundary
+
+The refreshed knowledge graph places `market_os/cli.py` and `market_os/api.py`
+in the API layer. The CLI imports the API adapter, store, workflow, metrics,
+and U5.5 access configuration; its `build_parser` and `main` functions define
+the command tree and serialize the same bounded inspection envelopes. The
+Next.js `market-api.ts` node is a server-only projection that parses those
+versioned GET responses for pages under `apps/web/next-operator/`. The domain
+graph links these operator surfaces to the orchestration, portfolio, and BTC
+market-data domains while keeping the disconnected static preview separate
+from the deferred private connected runtime.
 
 ## Source evidence
 

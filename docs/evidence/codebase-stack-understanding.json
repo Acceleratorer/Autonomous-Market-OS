@@ -57,7 +57,7 @@
     ]
   },
   "verification": {
-    "pytest": "613 passed, 0 failed, 7 skipped",
+    "pytest": "final rerun: 613 passed, 0 failed, 7 skipped",
     "compileall": "passed",
     "secret_scan": "passed",
     "evidence_validation": "62 JSON files validated",
@@ -66,21 +66,22 @@
     "next_typecheck": "passed",
     "next_build": "passed",
     "git_diff_check": "passed",
-    "graph_validation": "knowledge graph 1,988 nodes/5,008 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
+    "graph_validation": "knowledge graph 1,991 nodes/5,025 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
     "github_workflows": {
       "ci": {
-        "run_id": 41342180642,
+        "run_id": 41345129472,
         "result": "passed"
       },
       "devsecops": {
-        "run_id": 41342180638,
+        "run_id": 41345129459,
         "result": "passed"
       },
       "security_and_package_checks": {
-        "run_id": 41342180686,
+        "run_id": 41345129404,
         "result": "passed"
       }
-    }
+    },
+    "pytest_flake_recovery": "one transient WinError 10053 in full-suite attempt; isolated synthetic-server checks passed 10/10 and subsequent full rerun passed"
   },
   "artifacts": [
     "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
@@ -90,14 +91,14 @@
     "docs/LOCAL-EXIT-GATE-REPORT.md"
   ],
   "graph": {
-    "knowledge_nodes": 1988,
-    "knowledge_edges": 5008,
+    "knowledge_nodes": 1991,
+    "knowledge_edges": 5025,
     "domain_nodes": 78,
     "domain_edges": 85,
     "validated": true,
-    "graph_commit": "see .ua/meta.json for latest refresh commit",
+    "graph_commit": "f6ba90a03fec8444b1983d1531e8df4d118301d5",
     "domain_graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
-    "refresh_note": "Knowledge graph incrementally refreshed after the latest documentation closeout; domain graph structure validates and remains semantically unchanged by documentation-only updates."
+    "refresh_note": "Knowledge graph incrementally refreshed at f6ba90a; domain graph remains structurally valid and semantically unchanged by the documentation closeout."
   },
   "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
 }
