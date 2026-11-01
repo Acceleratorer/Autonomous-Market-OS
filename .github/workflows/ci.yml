@@ -12,7 +12,7 @@ jobs:
   offline-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -70,7 +70,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Stage paper-only read-only dashboard
         run: python scripts/build_web_artifact.py --output site/market-os --manifest site/market-os.manifest.json
       - name: Upload dashboard artifact
@@ -89,7 +89,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build Python gateway image
         run: docker build -f deploy/docker/python.Dockerfile -t autonomous-market-os/python:ci .
       - name: Build Next.js operator image
