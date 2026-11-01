@@ -1,0 +1,3 @@
+# Local-only Kubernetes image tags are intentionally not registry-qualified.
+# This manifest is not a public deployment target.
+KSV-0125

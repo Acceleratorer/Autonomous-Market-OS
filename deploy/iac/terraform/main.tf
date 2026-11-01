@@ -4,16 +4,16 @@ terraform {
 
 resource "terraform_data" "u55_runtime_contract" {
   input = {
-    runtime               = var.runtime
-    supervisor            = var.supervisor
-    ingress               = var.ingress
-    allowed_subject       = var.allowed_subject
-    allowed_portfolio_id  = var.allowed_portfolio_id
-    portfolio_root        = var.portfolio_root
-    session_expiry        = var.session_expiry_seconds
-    clock_tolerance       = var.clock_tolerance_seconds
-    mutation_enabled      = var.mutation_enabled
-    public_listener       = var.public_listener
+    runtime              = var.runtime
+    supervisor           = var.supervisor
+    ingress              = var.ingress
+    allowed_subject      = var.allowed_subject
+    allowed_portfolio_id = var.allowed_portfolio_id
+    portfolio_root       = var.portfolio_root
+    session_expiry       = var.session_expiry_seconds
+    clock_tolerance      = var.clock_tolerance_seconds
+    mutation_enabled     = var.mutation_enabled
+    public_listener      = var.public_listener
   }
 
   lifecycle {

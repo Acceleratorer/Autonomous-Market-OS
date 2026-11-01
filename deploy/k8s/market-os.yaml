@@ -55,10 +55,19 @@ spec:
             - name: python-tmp
               mountPath: /tmp
           securityContext:
+            runAsUser: 10001
+            runAsGroup: 10001
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           readinessProbe:
             exec:
               command:
@@ -100,10 +109,19 @@ spec:
             - name: next-tmp
               mountPath: /tmp
           securityContext:
+            runAsUser: 10001
+            runAsGroup: 10001
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           readinessProbe:
             exec:
               command:
