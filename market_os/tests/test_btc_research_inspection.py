@@ -14,7 +14,7 @@ from market_os.api import make_handler
 from market_os.btc_features import B2Config, B2Store, run_b2
 from market_os.btc_history import HistoryStore
 from market_os.btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
-from market_os.btc_research_inspection import MAX_RESULT_ARTIFACT_BYTES
+from market_os.btc_research_inspection import BtcResearchInspectionStore, MAX_RESULT_ARTIFACT_BYTES
 from market_os.store import RunStore
 from market_os.workflow import MarketWorkflow
 
@@ -141,6 +141,52 @@ def test_research_routes_do_not_create_empty_stores_and_read_only_stores_cannot_
         with pytest.raises(ValueError, match="read-only"):
             store.persist({})
         assert not root.exists()
+
+
+def test_research_catalog_cli_matches_api_page_and_missing_store_is_read_only(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    for engine in ("b2", "b3"):
+        missing_root = tmp_path / f"missing-{engine}"
+        assert main(["btc-paper", engine, "catalog", "--store-root", str(missing_root)]) == 0
+        assert json.loads(capsys.readouterr().out) == {
+            "api_version": "market-os.btc-research-inspection@v1",
+            "engine": engine,
+            "runs": [],
+            "page": {
+                "limit": 25,
+                "after_run_id": None,
+                "has_more": False,
+                "next_after_run_id": None,
+            },
+        }
+        assert not missing_root.exists()
+        with pytest.raises(SystemExit, match="between 1 and 100"):
+            main(["btc-paper", engine, "catalog", "--limit", "0", "--store-root", str(missing_root)])
+        assert capsys.readouterr().out == ""
+
+    workflow_root = tmp_path / "seeded"
+    _seed_runs(workflow_root)
+    for engine, store_root in (
+        ("b2", workflow_root / "btc-b2"),
+        ("b3", workflow_root / "btc-b3"),
+    ):
+        expected = BtcResearchInspectionStore(store_root, engine).list_runs_page(limit=1)
+        assert main([
+            "btc-paper", engine, "catalog", "--limit", "1", "--store-root", str(store_root),
+        ]) == 0
+        assert json.loads(capsys.readouterr().out) == {
+            "api_version": "market-os.btc-research-inspection@v1",
+            **expected,
+        }
+        expected_cursor = expected["page"]["next_after_run_id"] or expected["runs"][0]["run_id"]
+        assert main([
+            "btc-paper", engine, "catalog", "--limit", "1", "--after-run-id", expected_cursor,
+            "--store-root", str(store_root),
+        ]) == 0
+        page = json.loads(capsys.readouterr().out)
+        assert page["api_version"] == "market-os.btc-research-inspection@v1"
+        assert page["page"]["after_run_id"] == expected_cursor
 
 
 def test_research_result_integrity_and_b3_lineage_fail_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

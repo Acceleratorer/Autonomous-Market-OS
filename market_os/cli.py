@@ -97,6 +97,10 @@ def build_parser() -> argparse.ArgumentParser:
     b2_run.add_argument("--history-store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     b2_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
     b2_run.add_argument("--experiment-id", default="btc-b2-offline")
+    b2_catalog = b2_commands.add_parser("catalog")
+    b2_catalog.add_argument("--limit", type=int, default=25)
+    b2_catalog.add_argument("--after-run-id")
+    b2_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
     b2_inspect = b2_commands.add_parser("inspect")
     b2_inspect.add_argument("run_id")
     b2_inspect.add_argument("--resource", choices=("manifest", "config", "features", "labels", "splits", "predictions", "metrics", "calibration", "lineage", "artifacts"), default="manifest")
@@ -110,6 +114,10 @@ def build_parser() -> argparse.ArgumentParser:
     b3_run.add_argument("--fixture", required=True)
     b3_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
     b3_run.add_argument("--experiment-id", default="btc-b3-jev-offline")
+    b3_catalog = b3_commands.add_parser("catalog")
+    b3_catalog.add_argument("--limit", type=int, default=25)
+    b3_catalog.add_argument("--after-run-id")
+    b3_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
     b3_inspect = b3_commands.add_parser("inspect")
     b3_inspect.add_argument("run_id")
     b3_inspect.add_argument("--resource", choices=("manifest", "config", "fixture_cases", "responses", "abstentions", "splits", "predictions", "metrics", "calibration", "control_baselines", "matched_controls", "report", "lineage", "artifacts", "fingerprints", "replay"), default="manifest")
@@ -354,6 +362,19 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"api_version": "market-os.btc-history-catalog@v1", **result}, indent=2, sort_keys=True))
             return 0
         if args.btc_command == "b2":
+            if args.b2_command == "catalog":
+                from .btc_research_inspection import BtcResearchInspectionStore, ResearchInspectionError
+
+                try:
+                    result = BtcResearchInspectionStore(args.store_root, "b2").list_runs_page(
+                        limit=args.limit,
+                        after_run_id=args.after_run_id,
+                    )
+                except (KeyError, ResearchInspectionError, OSError, RuntimeError, TypeError, ValueError) as exc:
+                    raise SystemExit(f"BTC b2 research catalog failed: {exc}") from exc
+                print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
+                return 0
+
             from .btc_features import B2Config, B2Store, run_b2
 
             b2_store = B2Store(args.store_root, read_only=args.b2_command == "inspect")
@@ -365,6 +386,19 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, indent=2, sort_keys=True, default=str))
             return 0
         if args.btc_command == "b3":
+            if args.b3_command == "catalog":
+                from .btc_research_inspection import BtcResearchInspectionStore, ResearchInspectionError
+
+                try:
+                    result = BtcResearchInspectionStore(args.store_root, "b3").list_runs_page(
+                        limit=args.limit,
+                        after_run_id=args.after_run_id,
+                    )
+                except (KeyError, ResearchInspectionError, OSError, RuntimeError, TypeError, ValueError) as exc:
+                    raise SystemExit(f"BTC b3 research catalog failed: {exc}") from exc
+                print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
+                return 0
+
             from .btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
 
             b3_store = B3Store(args.store_root, read_only=args.b3_command == "inspect")
