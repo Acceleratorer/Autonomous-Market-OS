@@ -15,7 +15,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U3 synthetic surfaces | B3.8–B3.14 | Deterministic session artifacts, local read-only API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | B4.20 read-only retention/archive preflight is implemented without deletion or mutation routes; retention deletion, connected identity, and distributed ownership remain separate gates |
 | U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.24 and the local exit gate are complete on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. The disconnected DirectAdmin static preview is deployed and read-only verified; the private connected runtime remains gated. |
-| U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | Planned |
+| U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | First B6 read-only CLI catalog slice complete offline; app shell remains planned |
 | U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | Planned selectively |
 | U8 | M6 | Separate live-readiness review or explicit permanent paper mode | Deferred; no automatic live trading |
 

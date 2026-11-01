@@ -690,6 +690,36 @@ def test_fixture_ingest_cli_and_api_inspection_are_read_only(tmp_path: Path, cap
         thread.join(timeout=2)
 
 
+def test_btc_catalog_cli_matches_versioned_api_contract_and_missing_store_is_read_only(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    missing_root = tmp_path / "missing-history"
+    assert main(["btc-paper", "catalog", "--store-root", str(missing_root)]) == 0
+    assert json.loads(capsys.readouterr().out) == {
+        "api_version": "market-os.btc-history-catalog@v1",
+        "datasets": [],
+        "page": {
+            "limit": 25,
+            "after_dataset_revision": None,
+            "has_more": False,
+            "next_after_dataset_revision": None,
+        },
+    }
+    assert not missing_root.exists()
+    with pytest.raises(SystemExit, match="between 1 and 100"):
+        main(["btc-paper", "catalog", "--limit", "0", "--store-root", str(missing_root)])
+
+    assert main(["btc-paper", "ingest", "--fixture", str(FIXTURE), "--store-root", str(tmp_path / "history")]) == 0
+    capsys.readouterr()
+    store = HistoryStore(tmp_path / "history", read_only=True)
+    expected = store.inspect_datasets_page(limit=1)
+    assert main(["btc-paper", "catalog", "--limit", "1", "--store-root", str(tmp_path / "history")]) == 0
+    assert json.loads(capsys.readouterr().out) == {
+        "api_version": "market-os.btc-history-catalog@v1",
+        **expected,
+    }
+
+
 def test_history_api_missing_store_read_does_not_create_files(tmp_path: Path) -> None:
     missing_root = tmp_path / "missing-history"
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(MarketWorkflow(RunStore(tmp_path / "workflow"))))

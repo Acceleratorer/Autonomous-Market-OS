@@ -68,5 +68,5 @@
     "graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
     "refresh_note": "Incremental graph refresh completed after the worktree reconciliation; architecture coverage now includes the current deployment contract nodes."
   },
-  "next_gate": "run a clean local verification pack, then define U6 read-only CLI parity over the shared Python contracts"
+  "next_gate": "extend U6 read-only CLI parity to the next existing inspection resource without changing the local-only boundary"
 }

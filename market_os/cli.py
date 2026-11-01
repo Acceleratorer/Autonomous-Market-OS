@@ -80,6 +80,10 @@ def build_parser() -> argparse.ArgumentParser:
     btc_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     btc_readiness = btc_commands.add_parser("historical-readiness")
     btc_readiness.add_argument("--cutoff-ms", type=int, required=True)
+    btc_catalog = btc_commands.add_parser("catalog")
+    btc_catalog.add_argument("--limit", type=int, default=25)
+    btc_catalog.add_argument("--after-dataset-revision")
+    btc_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     btc_inspect = btc_commands.add_parser("inspect")
     btc_inspect.add_argument("dataset_id")
     btc_inspect.add_argument("--resource", choices=("manifest", "candles", "outcomes", "provenance", "gaps", "replay"), default="manifest")
@@ -323,6 +327,31 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.btc_command == "historical-readiness":
             print(json.dumps(plan_historical_readiness(args.cutoff_ms), indent=2, sort_keys=True))
+            return 0
+        if args.btc_command == "catalog":
+            from pathlib import Path
+
+            if type(args.limit) is not int or not 1 <= args.limit <= 100:
+                raise SystemExit("BTC history catalog limit must be an integer between 1 and 100")
+            store_root = Path(args.store_root)
+            if not (store_root / "catalog.duckdb").is_file():
+                if args.after_dataset_revision is not None:
+                    raise SystemExit("BTC history dataset revision not found")
+                result = {
+                    "datasets": [],
+                    "page": {
+                        "limit": args.limit,
+                        "after_dataset_revision": None,
+                        "has_more": False,
+                        "next_after_dataset_revision": None,
+                    },
+                }
+            else:
+                result = HistoryStore(store_root, read_only=True).inspect_datasets_page(
+                    limit=args.limit,
+                    after_dataset_revision=args.after_dataset_revision,
+                )
+            print(json.dumps({"api_version": "market-os.btc-history-catalog@v1", **result}, indent=2, sort_keys=True))
             return 0
         if args.btc_command == "b2":
             from .btc_features import B2Config, B2Store, run_b2

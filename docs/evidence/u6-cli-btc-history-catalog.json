@@ -1,0 +1,26 @@
+{
+  "schema": "market-os.u6-cli-btc-history-catalog-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-11-02",
+  "surface": "market_os.cli",
+  "command": "market-os btc-paper catalog",
+  "contract": {
+    "api_version": "market-os.btc-history-catalog@v1",
+    "source_route": "GET /v1/btc/history/datasets",
+    "max_page_size": 100,
+    "cursor": "exclusive after_dataset_revision",
+    "store_mode": "existing DuckDB catalog opened read-only",
+    "missing_store": "empty catalog with no filesystem initialization",
+    "mutation": false,
+    "provider_calls": false
+  },
+  "verification": {
+    "focused_cli_history_tests": "passed",
+    "missing_store_no_initialization": "passed",
+    "invalid_limit_rejected_before_storage_access": "passed",
+    "cli_contract_matches_history_store_page": "passed",
+    "full_suite_after_slice": "609 passed, 0 failed, 7 skipped",
+    "github_ci": "pending for the slice commit"
+  },
+  "remaining_gate": "Extend the same read-only parity pattern to the next existing inspection resource; keep the desktop/mobile shell and connected runtime deferred."
+}

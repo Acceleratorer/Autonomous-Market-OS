@@ -118,9 +118,9 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-The next safe action is a clean local verification pack and a versioned U6
-read-only CLI contract that reuses `market_os.cli`, `market_os.api`, and the
-existing inspection resources. Keep the CLI, HTTP API, and Next.js operator
+The next safe action is to extend the versioned U6 read-only CLI contract across
+the next existing inspection resource, reusing `market_os.cli`, `market_os.api`,
+and the current store helpers. Keep the CLI, HTTP API, and Next.js operator
 semantics aligned; keep mutation, providers, credentials, and connected access
 disabled. U5.5 promotion remains a separate gate for a future owner VM.
 

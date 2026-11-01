@@ -1538,3 +1538,9 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Refreshed the Understand Anything graphs: 1,982 knowledge nodes and 4,940 knowledge edges at commit `9c81005`; the current domain graph contains 78 nodes and 85 edges. Deterministic graph validation passed with zero structural issues.
 - Ran two full verification packs with `608 passed, 0 failed, 7 skipped` each. The focused workflow/synthetic acceptance group passed 45 tests, the rejected-POST regression passed 5/5 isolated retries, and Next.js typecheck/build, evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed.
 - The next local gate is U6 read-only CLI parity over the existing Python contracts; no VM, connected access, provider, credential, mutation, or live-trading path is enabled.
+
+## 2026-11-02 — U6 first read-only CLI catalog slice
+
+- Added `market-os btc-paper catalog` as a versioned, read-only projection of `/v1/btc/history/datasets` and the Next.js dataset catalog. It reuses `HistoryStore.inspect_datasets_page`, supports the existing 1–100 limit and exclusive dataset-revision cursor, and emits `market-os.btc-history-catalog@v1`.
+- Missing history storage returns an empty catalog without creating a DuckDB catalog or any parent directory; invalid page sizes fail before storage access. No mutation route, provider call, credential, connected runtime, or app-shell code was added.
+- Focused CLI/history parity coverage passed 2 tests, then the dedicated catalog regression passed again after the page-size guard. Evidence is in `docs/evidence/u6-cli-btc-history-catalog.json`.
