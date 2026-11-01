@@ -84,13 +84,13 @@ The CLI delegates to `market_os.cli`. The gateway delegates to the existing
 - U5.2–U5.24 local/static operator slices;
 - shared portfolio membership, reservations, stale-writer handling,
   idempotency, audit, migration, and archive preflight;
-- the 2026-11-01 worktree reconciliation with 20 status paths: 12 tracked
-  documentation/evidence edits and 8 preserved untracked paths;
-- the current knowledge graph contains 1,982 nodes and 4,940 edges, and the
-  domain graph has been validated with zero structural issues;
-- the latest full local pack passed 608 tests, 0 failed, and 7 skipped on two
-  full runs; the rejected-POST regression passed 5/5 isolated retries and the
-  hosted CI workflows are green.
+- the current live worktree at the `main` tip: zero tracked changes and six
+  preserved untracked workspace paths (five `.tmp-*` artifacts plus `API.md`);
+- the current knowledge graph contains 1,988 nodes and 5,008 edges, and the
+  domain graph contains 78 nodes and 85 edges with all edge targets resolving;
+- the latest full local pack passed 611 tests, 0 failed, and 7 skipped; evidence,
+  M2.8, MLOps, secret scan, compileall, Next.js typecheck/build, and diff checks
+  passed, and the three hosted workflows for the verification commit are green.
 
 ### Intentional deferrals
 

@@ -26,7 +26,7 @@
     "m2_8_evidence_validation": "passed",
     "mlops_manifest_validation": "passed",
     "secret_scan": "passed",
-    "graph_validation": "knowledge-graph.json and domain-graph.json valid; incremental refresh complete at commit 2f37d45",
+    "graph_validation": "knowledge-graph.json and domain-graph.json valid; latest refresh is recorded in .ua/meta.json",
     "nextjs_typecheck": "passed",
     "nextjs_production_build": "passed",
     "diff_check": "passed",

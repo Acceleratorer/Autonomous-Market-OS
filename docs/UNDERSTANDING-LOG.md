@@ -1559,3 +1559,22 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The commands reuse `BtcResearchInspectionStore.inspect_run`, preserve the `market-os.btc-research-inspection@v1` envelope and bounded B2/B3 result validation, and leave the older resource-oriented `b2/b3 inspect` commands unchanged.
 - Added CLI/API parity coverage for both engines and missing-store non-creation. The focused research-inspection group passed 5 tests; the full suite passed `611 passed, 0 failed, 7 skipped`.
 - No provider, credential, connected runtime, mutation, app-shell, or live-trading path was added. Evidence is in `docs/evidence/u6-cli-btc-research-detail.json`.
+
+## 2026-11-02 — Post-U6 source-of-truth reconciliation
+
+- Rechecked the live repository after the U6 detail closeout. `main` and
+  `origin/main` are aligned; there are zero tracked changes and six
+  preserved untracked workspace paths: five `.tmp-*` review artifacts and the
+  pre-existing `API.md`. The 2026-10-30 279-path manifest remains historical.
+- Re-ran the full local verification pack: `611 passed, 0 failed, 7 skipped`,
+  61 evidence JSON files, M2.8, MLOps, secret scan, compileall, Next.js
+  typecheck/build, and `git diff --check` all passed. CI `41341187158`,
+  DevSecOps `41341187176`, and Security/package `41341187140` passed.
+- Graph-backed review confirms Python `market_os` remains authoritative for
+  accounting, persistence, recovery, and bounded inspection; `market_os.cli`,
+  `market_os.api`, and the Next.js `market-api.ts` adapter project the same
+  contracts. The domain graph keeps six domains and separates the disconnected
+  DirectAdmin static preview from the deferred private connected runtime.
+- The next gate remains a local, read-only U6 CLI projection over an existing
+  ingestion inspection resource. No VM, provider, credential, mutation, or
+  live-trading path is enabled.

@@ -18,12 +18,21 @@
     "static_preview": "apps/web/public disconnected artifact"
   },
   "worktree": {
-    "status_paths": 20,
-    "tracked_modified_paths": 12,
-    "untracked_paths": 8,
-    "product_candidate_paths": 14,
+    "status_paths": 6,
+    "tracked_modified_paths": 0,
+    "untracked_paths": 6,
+    "product_candidate_paths": 0,
     "preserved_paths": 6,
-    "unclassified_paths": 0
+    "unclassified_paths": 0,
+    "head": "latest main tip",
+    "untracked_classification": [
+      ".tmp-b1-closeout-staged.diff",
+      ".tmp-current-review.diff",
+      ".tmp-current-status.txt",
+      ".tmp-review-code.diff",
+      ".tmp-review-diff.txt",
+      "API.md"
+    ]
   },
   "gap_classification": {
     "implemented": [
@@ -48,11 +57,30 @@
     ]
   },
   "verification": {
-    "pytest": "608 passed, 0 failed, 7 skipped on two full runs; rejected-POST regression passed 5/5 isolated retries",
+    "pytest": "611 passed, 0 failed, 7 skipped",
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_validation": "55 JSON files validated",
-    "git_diff_check": "passed"
+    "evidence_validation": "61 JSON files validated",
+    "m2_8_evidence_validation": "passed",
+    "mlops_manifest_validation": "passed",
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "git_diff_check": "passed",
+    "graph_validation": "knowledge graph 1,988 nodes/5,008 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
+    "github_workflows": {
+      "ci": {
+        "run_id": 41341187158,
+        "result": "passed"
+      },
+      "devsecops": {
+        "run_id": 41341187176,
+        "result": "passed"
+      },
+      "security_and_package_checks": {
+        "run_id": 41341187140,
+        "result": "passed"
+      }
+    }
   },
   "artifacts": [
     "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
@@ -62,11 +90,14 @@
     "docs/LOCAL-EXIT-GATE-REPORT.md"
   ],
   "graph": {
-    "knowledge_nodes": 1982,
-    "knowledge_edges": 4940,
+    "knowledge_nodes": 1988,
+    "knowledge_edges": 5008,
+    "domain_nodes": 78,
+    "domain_edges": 85,
     "validated": true,
-    "graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
-    "refresh_note": "Incremental graph refresh completed after the worktree reconciliation; architecture coverage now includes the current deployment contract nodes."
+    "graph_commit": "see .ua/meta.json for latest refresh commit",
+    "domain_graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
+    "refresh_note": "Knowledge graph incrementally refreshed after the latest documentation closeout; domain graph structure validates and remains semantically unchanged by documentation-only updates."
   },
   "next_gate": "extend U6 read-only CLI parity to the next existing inspection resource without changing the local-only boundary"
 }

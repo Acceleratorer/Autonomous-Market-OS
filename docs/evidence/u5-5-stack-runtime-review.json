@@ -93,10 +93,10 @@
     "next_typecheck": "passed",
     "next_build": "passed",
     "owner_linux_vm_promotion": "not-run",
-    "full_pytest": "606 passed, 0 failed, 7 skipped",
+    "full_pytest": "611 passed, 0 failed, 7 skipped",
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_validation": "56 JSON files validated",
+    "evidence_validation": "61 JSON files validated",
     "git_diff_check": "passed"
   },
   "reconciliation_note": "The directadmin_deployed=false field applies only to the private connected U5.5 runtime. The separate disconnected static preview is deployed and read-only verified."
