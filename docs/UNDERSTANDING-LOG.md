@@ -1578,3 +1578,4 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The next gate remains a local, read-only U6 CLI projection over an existing
   ingestion inspection resource. No VM, provider, credential, mutation, or
   live-trading path is enabled.
+

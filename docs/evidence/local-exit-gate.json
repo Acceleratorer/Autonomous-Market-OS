@@ -90,15 +90,15 @@
     "graph_validation": "knowledge and domain graphs valid; latest knowledge-graph refresh is recorded in .ua/meta.json",
     "github_workflows": {
       "ci": {
-        "run_id": 41341187158,
+        "run_id": 41342180642,
         "result": "passed"
       },
       "devsecops": {
-        "run_id": 41341187176,
+        "run_id": 41342180638,
         "result": "passed"
       },
       "security_package": {
-        "run_id": 41341187140,
+        "run_id": 41342180686,
         "result": "passed"
       }
     }

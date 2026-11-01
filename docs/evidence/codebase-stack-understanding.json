@@ -69,15 +69,15 @@
     "graph_validation": "knowledge graph 1,988 nodes/5,008 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
     "github_workflows": {
       "ci": {
-        "run_id": 41341187158,
+        "run_id": 41342180642,
         "result": "passed"
       },
       "devsecops": {
-        "run_id": 41341187176,
+        "run_id": 41342180638,
         "result": "passed"
       },
       "security_and_package_checks": {
-        "run_id": 41341187140,
+        "run_id": 41342180686,
         "result": "passed"
       }
     }
