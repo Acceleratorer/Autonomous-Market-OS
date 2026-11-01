@@ -1545,3 +1545,10 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Missing history storage returns an empty catalog without creating a DuckDB catalog or any parent directory; invalid page sizes fail before storage access. No mutation route, provider call, credential, connected runtime, or app-shell code was added.
 - Focused CLI/history parity coverage passed 2 tests, then the dedicated catalog regression passed again after the page-size guard. Evidence is in `docs/evidence/u6-cli-btc-history-catalog.json`.
 - Full local verification passed `609 passed, 0 failed, 7 skipped`; evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed. GitHub CI `41336219926`, DevSecOps `41336219954`, and Security/package checks `41336219924` passed for the slice commit.
+
+## 2026-11-02 — U6 B2/B3 research catalog CLI slice
+
+- Added `market-os btc-paper b2 catalog` and `market-os btc-paper b3 catalog` as local, read-only projections of `GET /v1/btc/research/{engine}/runs` and the Next.js `getBtcResearchRunPage` contract.
+- The commands reuse `BtcResearchInspectionStore.list_runs_page`, preserve the `market-os.btc-research-inspection@v1` envelope, support bounded 1–100 pages and exclusive `after_run_id` cursors, and avoid constructing `B2Store`/`B3Store` in catalog mode. Missing stores return empty pages without filesystem initialization.
+- Added CLI/API parity coverage for both engines, seeded paging, cursor reads, invalid limits, and missing-store non-creation. The focused research-inspection group passed 4 tests before the full verification pack.
+- No provider, credential, connected runtime, mutation, app-shell, or live-trading path was added. Full verification passed `610 passed, 0 failed, 7 skipped`; CI `41337910962`, DevSecOps `41337910985`, and Security/package `41337910956` passed for `df1d0cc`. Evidence is in `docs/evidence/u6-cli-btc-research-catalog.json`; the next U6 slice remains another shared read-only contract projection.

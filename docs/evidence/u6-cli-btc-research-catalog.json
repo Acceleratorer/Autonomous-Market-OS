@@ -1,0 +1,46 @@
+{
+  "schema": "market-os.u6-cli-btc-research-catalog-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-11-02",
+  "surface": "market_os.cli",
+  "commands": [
+    "market-os btc-paper b2 catalog",
+    "market-os btc-paper b3 catalog"
+  ],
+  "contract": {
+    "api_version": "market-os.btc-research-inspection@v1",
+    "source_route": "GET /v1/btc/research/{engine}/runs",
+    "engines": ["b2", "b3"],
+    "max_page_size": 100,
+    "cursor": "exclusive after_run_id",
+    "store_mode": "existing research run directory opened through BtcResearchInspectionStore without mutation",
+    "missing_store": "empty catalog with no filesystem initialization",
+    "mutation": false,
+    "provider_calls": false
+  },
+  "verification": {
+    "focused_research_inspection_tests": "4 passed",
+    "full_suite": "610 passed, 0 failed, 7 skipped",
+    "compileall": "passed: market_os and scripts",
+    "evidence_validation": "passed; 60 JSON files",
+    "m2_8_evidence_validation": "passed",
+    "mlops_manifest_validation": "passed",
+    "secret_scan": "passed",
+    "graph_validation": "knowledge-graph.json and domain-graph.json valid",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "diff_check": "passed",
+    "github_workflows": {
+      "ci": {"result": "passed", "run_id": 41337910962},
+      "devsecops": {"result": "passed", "run_id": 41337910985},
+      "security_and_package_checks": {"result": "passed", "run_id": 41337910956}
+    },
+    "coverage": [
+      "B2 and B3 CLI catalog envelopes match the shared inspection contract",
+      "bounded limit validation rejects values outside 1..100 before storage access",
+      "exclusive after_run_id cursor reads are preserved",
+      "missing stores return empty pages without creating directories"
+    ]
+  },
+  "remaining_gate": "Continue U6 with another local read-only contract projection before considering a desktop/mobile shell; keep connected runtime, providers, credentials, mutation, and live trading deferred."
+}
