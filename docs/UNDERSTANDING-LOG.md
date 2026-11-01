@@ -1615,3 +1615,28 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   CLI/API/Next.js semantics. No VM, provider, credential, mutation, or
   live-trading path is enabled.
 
+
+
+## 2026-11-02 — Final live-state and graph reconciliation
+
+- Rechecked `main` after the local cleanup pass. `main` and `origin/main` are
+  aligned at `849a4c2`; the live worktree has zero tracked changes and zero
+  untracked paths. The six previously preserved top-level scratch/workspace
+  files were moved, without deletion, to
+  `D:\\Code\\Github\\HKUDS\\Autonomous-Market-OS-local-scratch-2026-11-02`.
+  The 2026-10-30 279-path inventory and 2026-11-01 20-path reconciliation
+  remain historical audit snapshots.
+- The current verification evidence remains `613 passed, 0 failed, 7 skipped`,
+  with 63 evidence JSON files, M2.8, MLOps, secret scan, compileall, Next.js
+  typecheck/build, static artifact parity, TypeScript dashboard contract, and
+  `git diff --check` passing.
+- Refreshed the knowledge graph and domain graph against `849a4c2`: 1,991
+  knowledge nodes / 5,025 edges and 88 domain nodes / 96 edges. The graph
+  validator and manual endpoint checks passed.
+- A fresh read-only DirectAdmin check returned `/market-os/` 200 with the local
+  source hash, the preserved routes 200, `DEPLOYMENT.txt` 403, and zero forms
+  or scripts. This confirms only the disconnected static preview; the private
+  Next.js/Python runtime remains unpromoted.
+- The next gate is the U6 read-only app-shell implementation over the shared
+  Python, CLI, API, and Next.js semantics, after selecting a concrete platform.
+  No VM, provider, credential, mutation, or live-trading path is enabled.

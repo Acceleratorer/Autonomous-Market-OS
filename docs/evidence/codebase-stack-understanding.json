@@ -18,21 +18,16 @@
     "static_preview": "apps/web/public disconnected artifact"
   },
   "worktree": {
-    "status_paths": 6,
+    "status_paths": 0,
     "tracked_modified_paths": 0,
-    "untracked_paths": 6,
+    "untracked_paths": 0,
     "product_candidate_paths": 0,
-    "preserved_paths": 6,
+    "preserved_paths": 0,
     "unclassified_paths": 0,
-    "head": "latest main tip",
-    "untracked_classification": [
-      ".tmp-b1-closeout-staged.diff",
-      ".tmp-current-review.diff",
-      ".tmp-current-status.txt",
-      ".tmp-review-code.diff",
-      ".tmp-review-diff.txt",
-      "API.md"
-    ]
+    "head": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
+    "untracked_classification": [],
+    "archived_paths": 6,
+    "archive_path": "D:\\Code\\Github\\HKUDS\\Autonomous-Market-OS-local-scratch-2026-11-02"
   },
   "gap_classification": {
     "implemented": [
@@ -60,13 +55,13 @@
     "pytest": "final rerun: 613 passed, 0 failed, 7 skipped",
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_validation": "62 JSON files validated",
+    "evidence_validation": "63 JSON files validated",
     "m2_8_evidence_validation": "passed",
     "mlops_manifest_validation": "passed",
     "next_typecheck": "passed",
     "next_build": "passed",
     "git_diff_check": "passed",
-    "graph_validation": "knowledge graph 1,991 nodes/5,025 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
+    "graph_validation": "knowledge graph 1,991 nodes/5,025 edges and refreshed domain graph 88 nodes/96 edges; all edge targets resolve",
     "github_workflows": {
       "ci": {
         "run_id": 41345129472,
@@ -93,12 +88,12 @@
   "graph": {
     "knowledge_nodes": 1991,
     "knowledge_edges": 5025,
-    "domain_nodes": 78,
-    "domain_edges": 85,
+    "domain_nodes": 88,
+    "domain_edges": 96,
     "validated": true,
-    "graph_commit": "see .ua/meta.json for latest refresh commit",
-    "domain_graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
-    "refresh_note": "Knowledge graph incrementally refreshed after the documentation closeout; .ua/meta.json records the latest refresh commit. Domain graph remains structurally valid and semantically unchanged by documentation-only updates."
+    "graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
+    "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
+    "refresh_note": "Knowledge and domain graphs were refreshed against main HEAD 849a4c2. The domain derivation adds current U6 bounded CLI and Next operator flows; graph validation and endpoint checks passed."
   },
-  "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
+  "next_gate": "implement one parity-tested U6 read-only app-shell slice after platform selection"
 }

@@ -58,9 +58,12 @@ The B1 readiness defect-closure milestone confirmed and fixed exclusive observed
 5. The desktop/mobile shell remains deferred. U6 stays local-only, read-only, fixture-backed, and paper-only; no provider, credential, connected runtime, mutation, or live-trading path is enabled. Evidence: `docs/evidence/u6-cli-btc-history-manifests.json`.
 
 The current worktree is reconciled separately from the historical 2026-10-30
-manifest: `main` is aligned with `origin/main`, with zero tracked changes and six preserved
-untracked scratch/workspace paths. The disconnected DirectAdmin static preview
-and the private connected runtime remain separate scopes.
+manifest: `main` is aligned with `origin/main`, with zero tracked changes and zero
+untracked paths. The six previously preserved top-level scratch/workspace files
+were moved, without deletion, to the sibling archive
+`D:\Code\Github\HKUDS\Autonomous-Market-OS-local-scratch-2026-11-02`. The
+disconnected DirectAdmin static preview and the private connected runtime remain
+separate scopes.
 
 ## Product surface order
 

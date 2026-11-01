@@ -71,7 +71,7 @@
   "last_read_only_recheck": {
     "index_http_status": 200,
     "index_sha256": "54be6a2203944045267bef54975d3a8fc7d7fb1a4ff2ca1e846375943540f82b",
-    "index_bytes": 15131,
+    "index_bytes": 15119,
     "forms": 0,
     "scripts": 0,
     "preserved_routes": {
@@ -80,6 +80,9 @@
       "/wuwa-map/": 200
     },
     "deployment_txt_http_status": 403,
-    "private_runtime_promoted": false
+    "private_runtime_promoted": false,
+    "local_source_index_bytes": 15131,
+    "live_index_sha256_matches_local_source": true,
+    "verification_method": "Invoke-WebRequest read-only HTTP check; hash compared with local source"
   }
 }

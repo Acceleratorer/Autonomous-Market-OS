@@ -16,7 +16,7 @@
     "pytest_skipped": 7,
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_json_count": 62,
+    "evidence_json_count": 63,
     "evidence_validation": "passed",
     "git_diff_check": "passed",
     "dependency_check": "passed",
@@ -81,12 +81,12 @@
     "isolated_retries": {
       "socket_flake": "one preceding full-suite attempt hit WinError 10053; isolated test 10/10, server file 10/10, direct HTTP harness 20/20, then full rerun passed"
     },
-    "evidence_and_graph_checks": "passed: 62 evidence JSON files; knowledge graph 1,991 nodes/5,025 edges and domain graph 78 nodes/85 edges; all edge targets resolve",
+    "evidence_and_graph_checks": "passed: 63 evidence JSON files; knowledge graph 1,991 nodes/5,025 edges and refreshed domain graph 88 nodes/96 edges; all edge targets resolve",
     "git_diff_check": "passed",
-    "status": "green-local-pack; main and origin/main aligned with 0 tracked changes and 6 preserved untracked workspace paths",
+    "status": "green-local-pack; main and origin/main aligned with 0 tracked changes and 0 untracked workspace paths",
     "note": "One transient Windows socket flake occurred in an earlier full-suite attempt; the isolated repro loops and subsequent full rerun passed. Next.js typecheck/build, TypeScript dashboard contract, static artifact parity, evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed.",
-    "evidence_json_count": 62,
-    "graph_validation": "knowledge and domain graphs valid; latest refresh commit is recorded in .ua/meta.json",
+    "evidence_json_count": 63,
+    "graph_validation": "knowledge and domain graphs valid at main HEAD 849a4c2; latest refresh commit is recorded in .ua/meta.json",
     "github_workflows": {
       "ci": {
         "run_id": 41345129472,
@@ -100,6 +100,14 @@
         "run_id": 41345129404,
         "result": "passed"
       }
+    },
+    "worktree_reconciliation": {
+      "tracked_changes": 0,
+      "untracked_paths": 0,
+      "historical_279_path_manifest_preserved": true,
+      "historical_20_path_reconciliation_preserved": true,
+      "cleanup": "six preserved top-level scratch/workspace files moved to sibling archive without deletion",
+      "archive_path": "D:\\Code\\Github\\HKUDS\\Autonomous-Market-OS-local-scratch-2026-11-02"
     }
   }
 }
