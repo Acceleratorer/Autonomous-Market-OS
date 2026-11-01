@@ -20,7 +20,11 @@
     "invalid_limit_rejected_before_storage_access": "passed",
     "cli_contract_matches_history_store_page": "passed",
     "full_suite_after_slice": "609 passed, 0 failed, 7 skipped",
-    "github_ci": "pending for the slice commit"
+    "github_ci": {
+      "ci": {"result": "passed", "run_id": 41336219926},
+      "devsecops": {"result": "passed", "run_id": 41336219954},
+      "security_and_package_checks": {"result": "passed", "run_id": 41336219924}
+    }
   },
   "remaining_gate": "Extend the same read-only parity pattern to the next existing inspection resource; keep the desktop/mobile shell and connected runtime deferred."
 }
