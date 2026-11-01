@@ -96,9 +96,9 @@
     "domain_nodes": 78,
     "domain_edges": 85,
     "validated": true,
-    "graph_commit": "f6ba90a03fec8444b1983d1531e8df4d118301d5",
+    "graph_commit": "see .ua/meta.json for latest refresh commit",
     "domain_graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
-    "refresh_note": "Knowledge graph incrementally refreshed at f6ba90a; domain graph remains structurally valid and semantically unchanged by the documentation closeout."
+    "refresh_note": "Knowledge graph incrementally refreshed after the documentation closeout; .ua/meta.json records the latest refresh commit. Domain graph remains structurally valid and semantically unchanged by documentation-only updates."
   },
   "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
 }

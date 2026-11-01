@@ -86,7 +86,7 @@
     "status": "green-local-pack; main and origin/main aligned with 0 tracked changes and 6 preserved untracked workspace paths",
     "note": "One transient Windows socket flake occurred in an earlier full-suite attempt; the isolated repro loops and subsequent full rerun passed. Next.js typecheck/build, TypeScript dashboard contract, static artifact parity, evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed.",
     "evidence_json_count": 62,
-    "graph_validation": "knowledge and domain graphs valid; graph metadata points to f6ba90a",
+    "graph_validation": "knowledge and domain graphs valid; latest refresh commit is recorded in .ua/meta.json",
     "github_workflows": {
       "ci": {
         "run_id": 41345129472,
