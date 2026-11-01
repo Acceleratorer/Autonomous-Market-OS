@@ -189,6 +189,36 @@ def test_research_catalog_cli_matches_api_page_and_missing_store_is_read_only(tm
         assert page["page"]["after_run_id"] == expected_cursor
 
 
+def test_research_detail_cli_matches_api_and_missing_store_is_read_only(tmp_path: Path, capsys) -> None:
+    from market_os.cli import main
+
+    workflow_root = tmp_path / "seeded-detail"
+    _, b2_run_ids, b3_run_id = _seed_runs(workflow_root)
+    server, thread, base = _start_api(workflow_root)
+    try:
+        for engine, run_id, store_root in (
+            ("b2", b2_run_ids[0], workflow_root / "btc-b2"),
+            ("b3", b3_run_id, workflow_root / "btc-b3"),
+        ):
+            expected = json.loads(urlopen(f"{base}/v1/btc/research/{engine}/runs/{run_id}", timeout=2).read())
+            assert main([
+                "btc-paper", engine, "detail", run_id, "--store-root", str(store_root),
+            ]) == 0
+            assert json.loads(capsys.readouterr().out) == expected
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    for engine in ("b2", "b3"):
+        missing_root = tmp_path / f"missing-detail-{engine}"
+        run_id = f"btc-{engine}-{'0' * 20}"
+        with pytest.raises(SystemExit, match=f"BTC {engine} research detail failed"):
+            main(["btc-paper", engine, "detail", run_id, "--store-root", str(missing_root)])
+        assert capsys.readouterr().out == ""
+        assert not missing_root.exists()
+
+
 def test_research_result_integrity_and_b3_lineage_fail_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("MARKET_OS_BTC_B2_STORE_ROOT", raising=False)
     monkeypatch.delenv("MARKET_OS_BTC_B3_STORE_ROOT", raising=False)

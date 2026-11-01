@@ -101,6 +101,9 @@ def build_parser() -> argparse.ArgumentParser:
     b2_catalog.add_argument("--limit", type=int, default=25)
     b2_catalog.add_argument("--after-run-id")
     b2_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
+    b2_detail = b2_commands.add_parser("detail")
+    b2_detail.add_argument("run_id")
+    b2_detail.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B2_STORE_ROOT", ".market_os/btc-b2"))
     b2_inspect = b2_commands.add_parser("inspect")
     b2_inspect.add_argument("run_id")
     b2_inspect.add_argument("--resource", choices=("manifest", "config", "features", "labels", "splits", "predictions", "metrics", "calibration", "lineage", "artifacts"), default="manifest")
@@ -118,6 +121,9 @@ def build_parser() -> argparse.ArgumentParser:
     b3_catalog.add_argument("--limit", type=int, default=25)
     b3_catalog.add_argument("--after-run-id")
     b3_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
+    b3_detail = b3_commands.add_parser("detail")
+    b3_detail.add_argument("run_id")
+    b3_detail.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_B3_STORE_ROOT", ".market_os/btc-b3"))
     b3_inspect = b3_commands.add_parser("inspect")
     b3_inspect.add_argument("run_id")
     b3_inspect.add_argument("--resource", choices=("manifest", "config", "fixture_cases", "responses", "abstentions", "splits", "predictions", "metrics", "calibration", "control_baselines", "matched_controls", "report", "lineage", "artifacts", "fingerprints", "replay"), default="manifest")
@@ -374,6 +380,15 @@ def main(argv: list[str] | None = None) -> int:
                     raise SystemExit(f"BTC b2 research catalog failed: {exc}") from exc
                 print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
                 return 0
+            if args.b2_command == "detail":
+                from .btc_research_inspection import BtcResearchInspectionStore, ResearchInspectionError
+
+                try:
+                    result = BtcResearchInspectionStore(args.store_root, "b2").inspect_run(args.run_id)
+                except (KeyError, ResearchInspectionError, OSError, RuntimeError, TypeError, ValueError) as exc:
+                    raise SystemExit(f"BTC b2 research detail failed: {exc}") from exc
+                print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
+                return 0
 
             from .btc_features import B2Config, B2Store, run_b2
 
@@ -396,6 +411,15 @@ def main(argv: list[str] | None = None) -> int:
                     )
                 except (KeyError, ResearchInspectionError, OSError, RuntimeError, TypeError, ValueError) as exc:
                     raise SystemExit(f"BTC b3 research catalog failed: {exc}") from exc
+                print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
+                return 0
+            if args.b3_command == "detail":
+                from .btc_research_inspection import BtcResearchInspectionStore, ResearchInspectionError
+
+                try:
+                    result = BtcResearchInspectionStore(args.store_root, "b3").inspect_run(args.run_id)
+                except (KeyError, ResearchInspectionError, OSError, RuntimeError, TypeError, ValueError) as exc:
+                    raise SystemExit(f"BTC b3 research detail failed: {exc}") from exc
                 print(json.dumps({"api_version": "market-os.btc-research-inspection@v1", **result}, indent=2, sort_keys=True, default=str))
                 return 0
 
