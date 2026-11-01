@@ -1,0 +1,46 @@
+{
+  "schema": "market-os.u6-cli-btc-research-detail-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-11-02",
+  "surface": "market_os.cli",
+  "commands": [
+    "market-os btc-paper b2 detail <run-id>",
+    "market-os btc-paper b3 detail <run-id>"
+  ],
+  "contract": {
+    "api_version": "market-os.btc-research-inspection@v1",
+    "source_route": "GET /v1/btc/research/{engine}/runs/{run-id}",
+    "engines": ["b2", "b3"],
+    "detail_source": "BtcResearchInspectionStore.inspect_run",
+    "legacy_inspect_preserved": true,
+    "store_mode": "existing research run directory opened read-only",
+    "missing_store": "fail-closed detail error with no filesystem initialization",
+    "mutation": false,
+    "provider_calls": false
+  },
+  "verification": {
+    "focused_research_inspection_tests": "5 passed",
+    "full_suite": "611 passed, 0 failed, 7 skipped",
+    "compileall": "passed: market_os and scripts",
+    "evidence_validation": "passed; 61 JSON files",
+    "m2_8_evidence_validation": "passed",
+    "mlops_manifest_validation": "passed",
+    "secret_scan": "passed",
+    "graph_validation": "knowledge-graph.json and domain-graph.json valid; final incremental refresh pending docs closeout",
+    "nextjs_typecheck": "passed",
+    "nextjs_production_build": "passed",
+    "diff_check": "passed",
+    "github_workflows": {
+      "ci": {"result": "passed", "run_id": 41340238740},
+      "devsecops": {"result": "passed", "run_id": 41340238659},
+      "security_and_package_checks": {"result": "passed", "run_id": 41340238564}
+    },
+    "coverage": [
+      "B2 and B3 detail CLI envelopes match the shared HTTP API payload",
+      "bounded result validation remains owned by BtcResearchInspectionStore",
+      "legacy resource-oriented inspect commands remain unchanged",
+      "missing detail stores fail closed without creating directories"
+    ]
+  },
+  "remaining_gate": "Continue U6 with another existing local read-only contract only after the CLI/API/Next.js parity matrix is reviewed; keep connected runtime, providers, credentials, mutation, and live trading deferred."
+}

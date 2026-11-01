@@ -53,7 +53,8 @@ The B1 readiness defect-closure milestone confirmed and fixed exclusive observed
 
 1. `market-os btc-paper catalog` projects the bounded BTC dataset catalog contract with read-only DuckDB access and an empty missing-store response.
 2. `market-os btc-paper b2 catalog` and `market-os btc-paper b3 catalog` project the existing bounded research-run catalog contract with exclusive `after_run_id` cursors. Both reuse `BtcResearchInspectionStore`, avoid constructing mutating stores in catalog mode, and keep missing stores empty and non-creating.
-3. The desktop/mobile shell remains deferred. U6 stays local-only, read-only, fixture-backed, and paper-only; no provider, credential, connected runtime, mutation, or live-trading path is enabled. Evidence: `docs/evidence/u6-cli-btc-research-catalog.json`.
+3. `market-os btc-paper b2 detail` and `market-os btc-paper b3 detail` return the same bounded detail envelope as `GET /v1/btc/research/{engine}/runs/{run-id}` while preserving the legacy resource-oriented `inspect` commands.
+4. The desktop/mobile shell remains deferred. U6 stays local-only, read-only, fixture-backed, and paper-only; no provider, credential, connected runtime, mutation, or live-trading path is enabled. Evidence: `docs/evidence/u6-cli-btc-research-detail.json`.
 
 ## Product surface order
 

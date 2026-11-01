@@ -1552,3 +1552,10 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The commands reuse `BtcResearchInspectionStore.list_runs_page`, preserve the `market-os.btc-research-inspection@v1` envelope, support bounded 1–100 pages and exclusive `after_run_id` cursors, and avoid constructing `B2Store`/`B3Store` in catalog mode. Missing stores return empty pages without filesystem initialization.
 - Added CLI/API parity coverage for both engines, seeded paging, cursor reads, invalid limits, and missing-store non-creation. The focused research-inspection group passed 4 tests before the full verification pack.
 - No provider, credential, connected runtime, mutation, app-shell, or live-trading path was added. Full verification passed `610 passed, 0 failed, 7 skipped`; CI `41337910962`, DevSecOps `41337910985`, and Security/package `41337910956` passed for `df1d0cc`. Evidence is in `docs/evidence/u6-cli-btc-research-catalog.json`; the next U6 slice remains another shared read-only contract projection.
+
+## 2026-11-02 — U6 B2/B3 research detail CLI slice
+
+- Added `market-os btc-paper b2 detail` and `market-os btc-paper b3 detail` as local, read-only projections of `GET /v1/btc/research/{engine}/runs/{run-id}` and the Next.js `getBtcResearchRun` contract.
+- The commands reuse `BtcResearchInspectionStore.inspect_run`, preserve the `market-os.btc-research-inspection@v1` envelope and bounded B2/B3 result validation, and leave the older resource-oriented `b2/b3 inspect` commands unchanged.
+- Added CLI/API parity coverage for both engines and missing-store non-creation. The focused research-inspection group passed 5 tests; the full suite passed `611 passed, 0 failed, 7 skipped`.
+- No provider, credential, connected runtime, mutation, app-shell, or live-trading path was added. Evidence is in `docs/evidence/u6-cli-btc-research-detail.json`.

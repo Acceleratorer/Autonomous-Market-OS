@@ -279,6 +279,8 @@ The CLI surfaces are:
 
 ```text
 market-os btc-paper b2 run --dataset-revision <revision> --history-store-root <b1-root> --store-root <b2-root>
+market-os btc-paper b2 catalog [--limit <1..100>] [--after-run-id <run-id>] --store-root <b2-root>
+market-os btc-paper b2 detail <run-id> --store-root <b2-root>
 market-os btc-paper b2 inspect <run-id> --resource manifest|config|features|labels|splits|predictions|metrics|calibration|lineage|artifacts --store-root <b2-root>
 ```
 
@@ -326,6 +328,8 @@ The CLI surfaces are:
 
 ```text
 market-os btc-paper b3 run --dataset-revision <revision> --history-store-root <b1-root> --fixture <recorded-responses.json> --store-root <b3-root>
+market-os btc-paper b3 catalog [--limit <1..100>] [--after-run-id <run-id>] --store-root <b3-root>
+market-os btc-paper b3 detail <run-id> --store-root <b3-root>
 market-os btc-paper b3 inspect <run-id> --resource manifest|config|fixture_cases|responses|abstentions|splits|predictions|metrics|calibration|control_baselines|matched_controls|report|lineage|artifacts|fingerprints|replay --store-root <b3-root>
 ```
 
