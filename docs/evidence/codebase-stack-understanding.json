@@ -1,6 +1,6 @@
 {
   "schema": "market-os.codebase-stack-understanding@v1",
-  "date": "2026-10-30",
+  "date": "2026-11-02",
   "status": "local-understood-connected-gated",
   "scope": {
     "repository": "Autonomous-Market-OS",
@@ -8,7 +8,7 @@
     "paper_only": true,
     "loopback_only": true,
     "connected_runtime_selected": false,
-    "deployment_run": false
+    "deployment_run": "disconnected_static_preview_verified; private_runtime_not_promoted"
   },
   "authority": {
     "domain_accounting_recovery": "Python market_os",
@@ -18,11 +18,11 @@
     "static_preview": "apps/web/public disconnected artifact"
   },
   "worktree": {
-    "status_paths": 271,
-    "tracked_modified_paths": 15,
-    "untracked_paths": 256,
-    "product_candidate_paths": 36,
-    "preserved_paths": 235,
+    "status_paths": 20,
+    "tracked_modified_paths": 12,
+    "untracked_paths": 8,
+    "product_candidate_paths": 14,
+    "preserved_paths": 6,
     "unclassified_paths": 0
   },
   "gap_classification": {
@@ -48,7 +48,7 @@
     ]
   },
   "verification": {
-    "pytest": "588 passed, 0 failed, 7 skipped",
+    "pytest": "608 passed, 0 failed, 7 skipped on two full runs; rejected-POST regression passed 5/5 isolated retries",
     "compileall": "passed",
     "secret_scan": "passed",
     "evidence_validation": "55 JSON files validated",
@@ -61,5 +61,12 @@
     "docs/WORKTREE-BASELINE-MANIFEST.json",
     "docs/LOCAL-EXIT-GATE-REPORT.md"
   ],
-  "next_gate": "select concrete U5.5 runtime and identity path or define another loopback-local contract"
+  "graph": {
+    "knowledge_nodes": 1982,
+    "knowledge_edges": 4940,
+    "validated": true,
+    "graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
+    "refresh_note": "Incremental graph refresh completed after the worktree reconciliation; architecture coverage now includes the current deployment contract nodes."
+  },
+  "next_gate": "run a clean local verification pack, then define U6 read-only CLI parity over the shared Python contracts"
 }

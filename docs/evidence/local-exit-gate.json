@@ -1,6 +1,7 @@
 {
   "schema": "market-os.local-exit-gate@v1",
   "date": "2026-10-30",
+  "reconciled_at": "2026-11-01",
   "status": "green-local-boundary",
   "scope": {
     "synthetic": true,
@@ -31,7 +32,19 @@
     "security_package_workflow": "passed",
     "security_package_run_id": 40867998684,
     "static_preview_artifact_job": "passed",
-    "directadmin_deployment": "not-run-host-prerequisites-outstanding",
+    "directadmin_deployment": "static-preview-live-read-only-verified; private-runtime-not-promoted",
+    "directadmin_static_preview": {
+      "index_status": 200,
+      "index_matches_local_source": true,
+      "deployment_metadata_status": 403,
+      "preserved_routes": {
+        "/": 200,
+        "/waifu/": 200,
+        "/wuwa-map/": 200
+      },
+      "forms": 0,
+      "scripts": 0
+    },
     "github_runner_warnings": "non-blocking action runtime and ubuntu-latest migration annotations",
     "b4_18_focused_tests": "7 passed",
     "b4_18_transformer": "passed-local-copy-on-write-replay-rollback",
@@ -60,5 +73,20 @@
     "distributed ownership",
     "live providers credentials network execution and production infrastructure"
   ],
-  "report": "docs/LOCAL-EXIT-GATE-REPORT.md"
+  "report": "docs/LOCAL-EXIT-GATE-REPORT.md",
+  "current_verification": {
+    "date": "2026-11-02",
+    "full_suite_attempts": 2,
+    "full_suite_observed": "608 passed, 0 failed, 7 skipped on both attempts",
+    "isolated_retries": {
+      "fixture_ingest_read_only": "1 passed",
+      "synthetic_rejected_post": "5 passed out of 5"
+    },
+    "evidence_and_graph_checks": "passed",
+    "git_diff_check": "passed",
+    "status": "clean-green-local-pack",
+    "note": "Two full reruns passed without a socket timeout; the rejected-POST regression also passed 5/5 isolated retries.",
+    "evidence_json_count": 58,
+    "graph_validation": "knowledge and domain graphs approved with zero structural issues"
+  }
 }

@@ -17,8 +17,7 @@ risk, reservation, replay, and audit authority. Keep `apps/` surfaces thin.
 
 - B4.1–B4.20 local broker and recovery slices are implemented and verified.
 - U5.2–U5.24 local/static operator slices are implemented and verified.
-- The local exit gate is green: the latest clean full run passed 605 tests, 0
-  failed, and 7 skipped; U5.5 focused evidence and browser smoke are recorded.
+- The local exit gate remains local-only: the latest historical clean full run passed 605 tests, 0 failed, and 7 skipped. The 2026-11-02 verification pack passed 608 tests, 0 failed, and 7 skipped on two full runs; rejected-POST isolated retries passed 5/5, and U5.5 focused evidence and browser smoke are recorded.
 - The Next.js operator is loopback-only and read-only. DirectAdmin is only a
   disconnected static-preview target; no connected deployment is authorized.
 - U5.5 runtime/identity contract v1 has a selected owner-controlled Linux VM,

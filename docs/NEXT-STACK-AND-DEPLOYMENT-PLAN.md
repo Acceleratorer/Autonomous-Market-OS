@@ -1,7 +1,7 @@
 # Next Stack and Deployment Plan
 
 **Status:** Locally verified; U5.5 connected implementation is not enabled or promoted on the owner VM.
-**Date:** 2026-10-29
+**Date:** 2026-11-01
 
 The durable U5.5 decision is recorded in
 [`ADR-0050`](decisions/ADR-0050-u5-5-runtime-identity-contract.md). The owner
@@ -33,8 +33,8 @@ on the owner VM evidence.
    selected target.
 5. Run the owner-VM U5.5 matrix and promotion/rollback procedure before
    enabling access.
-6. Deploy the disconnected static preview separately when DirectAdmin
-   prerequisites are available.
+6. Maintain and revalidate the disconnected static preview separately; its
+   current public artifact is live, while the private runtime remains gated.
 
 ## Connected runtime prerequisites
 
@@ -82,4 +82,6 @@ not host the private Next.js/gateway path.
 
 This plan does not authorize live trading, Binance, provider credentials,
 public mutation routes, multi-tenant hosting, distributed broker ownership, or
-DirectAdmin deployment. Those require separate contracts and evidence.
+promotion of the private connected runtime. The disconnected DirectAdmin static
+preview is already deployed under separate evidence; any additional deployment
+or scope change requires its own contract and evidence.

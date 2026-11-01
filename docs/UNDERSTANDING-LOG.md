@@ -1360,9 +1360,9 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Verified the current local fixes for bounded POST bodies, same-origin browser POSTs, non-creating read-only BTC stores, explicit B2/B3 insufficient-sample outcomes, and non-mutating portfolio inspection locks.
 - Full verification passed: 546 tests passed, 0 failed, 7 skipped with provider credentials cleared; compileall, `pip check`, Next.js typecheck/build, the TypeScript static contract, artifact parity, secret scan, M2.8 and evidence validation, and `git diff --check` passed. `npm ci` reported zero vulnerabilities.
 - Added `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json` as the current local completion record.
-- Final security review found no actionable defects in the new read-only CLI/store paths, B4.1 inspection locks, or bounded POST handling. No DirectAdmin deployment was run; push cannot publish the static preview.
+- Final security review found no actionable defects in the new read-only CLI/store paths, B4.1 inspection locks, or bounded POST handling. At that 2026-10-29 point, no DirectAdmin deployment was run; push could not publish the static preview.
 - Commit `9aff897` was pushed. GitHub CI run [40865631843](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631843) and Security/package run [40865631753](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631753) passed, including the static artifact job. The later U5.24 closeout on `33989fe` passed CI run [40867998693](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998693) and Security/package run [40867998684](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998684). GitHub emitted only non-blocking runner/action-runtime migration warnings.
-- U5.24 is now the latest defined web slice. The local gate is closed; continue only with a defined loopback-local web task. Connected access remains deferred and no DirectAdmin deployment was triggered.
+- U5.24 is now the latest defined web slice. The local gate is closed; continue only with a defined loopback-local web task. Connected access remained deferred, and no DirectAdmin deployment was triggered at that time.
 - Connected web, public deployment, authenticated mutation, partial-fill/expiry expansion, retention deletion, schema transformation, distributed ownership, providers, credentials, and live trading remain deferred gates.
 
 ## 2026-10-29 — U5.24 Mobile gateway status
@@ -1523,3 +1523,18 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   atomic restore promotion are locally implemented and evidenced. Connected
   runtime/identity, retention deletion, externally exposed mutation,
   distributed ownership, providers, credentials, and deployment remain gated.
+
+
+## 2026-11-01 — DirectAdmin static preview reconciliation
+
+- The 2026-10-29 entries above describe the pre-deployment state and remain historical.
+- A later read-only HTTP check confirmed `https://accel.io.vn/market-os/` returns 200 and has SHA-256 `54be6a2203944045267bef54975d3a8fc7d7fb1a4ff2ca1e846375943540f82b`, matching `apps/web/public/index.html`. The root, `/waifu/`, and `/wuwa-map/` routes returned 200; `DEPLOYMENT.txt` returned 403; no forms or scripts were present.
+- This reconciles the workflow history with the current state: the disconnected static preview is live, while the private Next.js/Python runtime, connected identity, credentials, mutation API, and live trading remain unpromoted. Machine-readable evidence is in `docs/evidence/directadmin-static-preview.json` and `docs/evidence/local-exit-gate.json`.
+
+## 2026-11-02 — Reconciled status and clean local verification
+
+- Classified the live pre-staging worktree as 12 tracked documentation/evidence edits plus 8 preserved untracked paths. The five `.tmp-*` files and pre-existing `API.md` remain scratch/workspace artifacts; the two baseline reports are product audit documents.
+- Updated the canonical context, roadmap, local exit report, deployment plan, DirectAdmin evidence, U5.5 runtime evidence, and codebase/stack report so the disconnected static preview is explicitly separate from the unpromoted private runtime.
+- Refreshed the Understand Anything graphs: 1,982 knowledge nodes and 4,940 knowledge edges at commit `9c81005`; the current domain graph contains 78 nodes and 85 edges. Deterministic graph validation passed with zero structural issues.
+- Ran two full verification packs with `608 passed, 0 failed, 7 skipped` each. The focused workflow/synthetic acceptance group passed 45 tests, the rejected-POST regression passed 5/5 isolated retries, and Next.js typecheck/build, evidence, M2.8, MLOps, secret scan, compileall, and diff checks passed.
+- The next local gate is U6 read-only CLI parity over the existing Python contracts; no VM, connected access, provider, credential, mutation, or live-trading path is enabled.

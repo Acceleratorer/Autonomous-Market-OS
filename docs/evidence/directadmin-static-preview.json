@@ -1,6 +1,8 @@
 {
   "schema": "market-os.directadmin-static-preview@v1",
   "status": "deployed-verified-ui-polished-no-analytics",
+  "reconciled_at": "2026-11-01",
+  "reconciliation_method": "read-only HTTP verification against the public URL",
   "target": {
     "remote_path": "/domains/accel.io.vn/public_html/market-os",
     "public_url": "https://accel.io.vn/market-os/",
@@ -11,8 +13,8 @@
     "files": [
       {
         "path": "index.html",
-        "sha256": "2dfbdc2606da717a78975012195e412e2a189345ecb901db52b1dee3a81d7f93",
-        "size_bytes": 12204
+        "sha256": "54be6a2203944045267bef54975d3a8fc7d7fb1a4ff2ca1e846375943540f82b",
+        "size_bytes": 15131
       },
       {
         "path": ".htaccess",
@@ -25,7 +27,7 @@
         "size_bytes": 850
       }
     ],
-    "artifact_fingerprint": "b56d3889f77b4fc52c1847a11f452fed3cec803198602d4cb5d6752fc2deca2f"
+    "artifact_fingerprint": "6e6d90a9657066b311fca331ddf678125d0fe061ae332c1636a8a1c8f654c8af"
   },
   "build_verification": {
     "next_typecheck": "passed",
@@ -58,6 +60,12 @@
     "cloudflare_beacon": "disabled-at-zone-level",
     "rum_post": "not-observed",
     "console_errors": "none",
-    "screenshot": "output/playwright/market-os-final-live.png"
+    "screenshot": "output/playwright/market-os-final-live.png",
+    "live_index_sha256_matches_local_source": true,
+    "preserved_routes": {
+      "/": 200,
+      "/waifu/": 200,
+      "/wuwa-map/": 200
+    }
   }
 }

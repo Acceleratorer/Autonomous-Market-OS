@@ -1,6 +1,6 @@
 # Codebase and stack understanding report
 
-**Date:** 2026-10-30
+**Date:** 2026-11-02
 **Scope:** Current local worktree, synthetic paper system, local operator, and
 future connected-preview gate
 
@@ -12,10 +12,11 @@ audit. The gateway and CLI are thin Python surfaces. The Next.js application is
 a server-rendered, read-only adapter over the loopback gateway. The static
 preview is a separate artifact with no portfolio state or API connection.
 
-The local exit gate is green. The next implementation step is **not** a stack
-rewrite or a deployment. It is either a concrete owner decision for U5.5
-runtime/identity, or another explicitly contracted loopback-local slice. No
-connected host or identity provider is selected today.
+The local exit gate is complete for continued local-only work. The disconnected
+DirectAdmin static preview is deployed and read-only verified; the private
+Next.js/Python runtime is not promoted. The next implementation step is the
+U6 read-only CLI surface over the existing Python contracts, followed by a
+thin app shell. No connected host or identity provider is available today.
 
 ## Execution flow traced from code
 
@@ -83,9 +84,13 @@ The CLI delegates to `market_os.cli`. The gateway delegates to the existing
 - U5.2–U5.24 local/static operator slices;
 - shared portfolio membership, reservations, stale-writer handling,
   idempotency, audit, migration, and archive preflight;
-- worktree classification with 271 status paths, 36 product candidates, 235
-  preserved paths, and zero unclassified paths;
-- latest full suite: 588 passed, 0 failed, 7 skipped.
+- the 2026-11-01 worktree reconciliation with 20 status paths: 12 tracked
+  documentation/evidence edits and 8 preserved untracked paths;
+- the current knowledge graph contains 1,982 nodes and 4,940 edges, and the
+  domain graph has been validated with zero structural issues;
+- the latest full local pack passed 608 tests, 0 failed, and 7 skipped on two
+  full runs; the rejected-POST regression passed 5/5 isolated retries and the
+  hosted CI workflows are green.
 
 ### Intentional deferrals
 
@@ -113,11 +118,11 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-The next safe action is a **U5.5 target-selection decision record** once the
-owner chooses the runtime and identity path. Then implement only authenticated
-read-only inspection, run the U5.5 matrix, and keep mutation disabled. If the
-owner does not choose a connected target yet, continue with a new
-loopback-local contract instead of changing deployment or authentication code.
+The next safe action is a clean local verification pack and a versioned U6
+read-only CLI contract that reuses `market_os.cli`, `market_os.api`, and the
+existing inspection resources. Keep the CLI, HTTP API, and Next.js operator
+semantics aligned; keep mutation, providers, credentials, and connected access
+disabled. U5.5 promotion remains a separate gate for a future owner VM.
 
 ## Source evidence
 

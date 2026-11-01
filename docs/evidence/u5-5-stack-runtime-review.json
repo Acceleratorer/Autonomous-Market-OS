@@ -69,7 +69,10 @@
     "credentials_added": false,
     "network_provider_enabled": false,
     "tailscale_cli_on_current_windows_host": false,
-    "owner_linux_vm_promotion": "not-run"
+    "owner_linux_vm_promotion": "not-run",
+    "directadmin_scope": "private connected runtime only; disconnected static preview is tracked separately",
+    "directadmin_static_preview_deployed": true,
+    "directadmin_static_preview_evidence": "docs/evidence/directadmin-static-preview.json"
   },
   "artifacts": [
     "docs/STACK-AND-RUNTIME-REVIEW.md",
@@ -95,5 +98,6 @@
     "secret_scan": "passed",
     "evidence_validation": "56 JSON files validated",
     "git_diff_check": "passed"
-  }
+  },
+  "reconciliation_note": "The directadmin_deployed=false field applies only to the private connected U5.5 runtime. The separate disconnected static preview is deployed and read-only verified."
 }

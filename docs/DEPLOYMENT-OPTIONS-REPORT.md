@@ -12,7 +12,7 @@ Project có ba bề mặt và phải triển khai tách biệt:
 
 | Bề mặt | Công nghệ | Target phù hợp | Kết luận |
 |---|---|---|---|
-| Static preview | HTML/CSS, đúng 3 file | DirectAdmin/shared hosting | Sẵn sàng về artifact; chưa public thành công |
+| Static preview | HTML/CSS, đúng 3 file | DirectAdmin/shared hosting | Snapshot 2026-10-29: sẵn sàng về artifact; lần kiểm tra đó chưa public thành công |
 | Local operator | Next.js 16, React 19, Node.js >=20.9 | VPS/PaaS có Node runtime | Chỉ loopback; chưa đủ điều kiện public |
 | Gateway | Python 3.11+, HTTP, file-backed state | VPS/container/private service | Có local deployment probe; còn thiếu production controls |
 
@@ -40,6 +40,8 @@ Snapshot:
 - Commit gần nhất: `docs: record U5.23 CI closeout`
 - Worktree đang có tracked changes và nhiều scratch/untracked files.
 - Không dùng `git add .`, `git clean`, `git reset --hard` hoặc `git checkout --` khi chuẩn bị deploy.
+
+Cập nhật trạng thái: snapshot này được lập trước lần triển khai static preview. Bằng chứng hiện tại trong `docs/evidence/directadmin-static-preview.json` xác nhận `/market-os/` đã live và được kiểm tra read-only vào 2026-11-01; điều đó không thay đổi kết luận rằng Next.js/Python runtime riêng tư chưa được promote.
 
 ## 3. Kiến trúc hiện tại
 
