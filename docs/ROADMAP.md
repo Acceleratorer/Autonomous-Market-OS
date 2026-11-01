@@ -15,7 +15,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U3 synthetic surfaces | B3.8–B3.14 | Deterministic session artifacts, local read-only API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | B4.20 read-only retention/archive preflight is implemented without deletion or mutation routes; retention deletion, connected identity, and distributed ownership remain separate gates |
 | U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.24 and the local exit gate are complete on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. The disconnected DirectAdmin static preview is deployed and read-only verified; the private connected runtime remains gated. |
-| U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | B6 read-only dataset and B2/B3 research catalogs are complete offline; app shell remains planned |
+| U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | B6 read-only dataset, ingestion-manifest, and B2/B3 research projections are complete offline; app shell remains planned |
 | U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | Planned selectively |
 | U8 | M6 | Separate live-readiness review or explicit permanent paper mode | Deferred; no automatic live trading |
 
@@ -54,7 +54,8 @@ The B1 readiness defect-closure milestone confirmed and fixed exclusive observed
 1. `market-os btc-paper catalog` projects the bounded BTC dataset catalog contract with read-only DuckDB access and an empty missing-store response.
 2. `market-os btc-paper b2 catalog` and `market-os btc-paper b3 catalog` project the existing bounded research-run catalog contract with exclusive `after_run_id` cursors. Both reuse `BtcResearchInspectionStore`, avoid constructing mutating stores in catalog mode, and keep missing stores empty and non-creating.
 3. `market-os btc-paper b2 detail` and `market-os btc-paper b3 detail` return the same bounded detail envelope as `GET /v1/btc/research/{engine}/runs/{run-id}` while preserving the legacy resource-oriented `inspect` commands.
-4. The desktop/mobile shell remains deferred. U6 stays local-only, read-only, fixture-backed, and paper-only; no provider, credential, connected runtime, mutation, or live-trading path is enabled. Evidence: `docs/evidence/u6-cli-btc-research-detail.json`.
+4. `market-os btc-paper manifests`, `manifest`, and `manifest-records` project the bounded BTC ingestion-manifest catalog, detail, and outcome/gap/provenance page contracts with the same API envelopes and exclusive cursors as the local HTTP/Next.js surface.
+5. The desktop/mobile shell remains deferred. U6 stays local-only, read-only, fixture-backed, and paper-only; no provider, credential, connected runtime, mutation, or live-trading path is enabled. Evidence: `docs/evidence/u6-cli-btc-history-manifests.json`.
 
 The current worktree is reconciled separately from the historical 2026-10-30
 manifest: `main` is aligned with `origin/main`, with zero tracked changes and six preserved

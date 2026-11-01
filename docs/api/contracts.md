@@ -145,6 +145,10 @@ market-os btc-paper acquire --start-ms <ms> --end-ms <exclusive-ms> \
   --execution-approval "<exact B1 approval phrase>" \
   --store-root <path>
 market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outcomes|provenance|gaps|replay --store-root <path>
+market-os btc-paper manifests <dataset-revision> --limit <1..100> --after-manifest-id <manifest-id> --store-root <path>
+market-os btc-paper manifest <dataset-revision> <manifest-id> --store-root <path>
+market-os btc-paper manifest-records <dataset-revision> <manifest-id> outcomes|gaps|provenance \
+  --limit <1..100> [record cursor] --store-root <path>
 ```
 
 `historical-readiness` is offline and returns the versioned
@@ -181,6 +185,15 @@ GET /v1/btc/history/<dataset-revision>/provenance
 GET /v1/btc/history/<dataset-revision>/gaps
 GET /v1/btc/history/<dataset-revision>/replay
 ```
+
+The bounded `manifests`, `manifest`, and `manifest-records` CLI commands are
+read-only projections of the corresponding dataset manifest routes. They emit
+the same `market-os.btc-history-manifests@v1` or
+`market-os.btc-history-manifest-records@v1` envelope, use the same exclusive
+cursors, and open the configured local `HistoryStore` without initializing a
+missing store. `manifest-records` accepts `after_outcome_index` for outcomes,
+`after_start_time_ms` for gaps, and the paired
+`after_raw_page_sha256`/`after_row_index` cursor for provenance.
 
 These paths invoke no model, broker, or network transport. Canonical Parquet
 content is hash-checked before inspection; DuckDB stores raw-page, manifest,

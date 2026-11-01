@@ -1,5 +1,11 @@
 # Understanding log
 
+## 2026-11-02 — U6 bounded ingestion-manifest CLI parity
+
+- Added read-only `market-os btc-paper manifests`, `manifest`, and `manifest-records` projections over the existing `HistoryStore` bounded manifest, detail, outcome, gap, and provenance contracts.
+- The CLI emits the same versioned envelopes and exclusive cursors as the local HTTP/Next.js surface, validates resource-specific cursor fields, and never initializes a missing history store.
+- Focused parity and missing-store tests passed; the next U6 gate is a read-only app-shell contract over the completed CLI/API surfaces. Connected runtime, providers, credentials, mutation, and live trading remain deferred.
+
 ## 2026-10-13 — Initial workspace pass
 
 Inspected the top-level workspace, all 13 child repositories, their READMEs, package manifests where present, top-level layouts, Git status, and latest commit metadata. Confirmed six capability families: runtimes/harnesses, retrieval, education, finance, work evaluation, and creative generation. Existing unrelated modifications in `ClawWork` sandbox artifacts and an untracked `CLI-Anything` object directory were preserved.

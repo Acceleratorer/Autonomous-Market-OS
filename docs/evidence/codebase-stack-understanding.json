@@ -57,10 +57,10 @@
     ]
   },
   "verification": {
-    "pytest": "611 passed, 0 failed, 7 skipped",
+    "pytest": "613 passed, 0 failed, 7 skipped",
     "compileall": "passed",
     "secret_scan": "passed",
-    "evidence_validation": "61 JSON files validated",
+    "evidence_validation": "62 JSON files validated",
     "m2_8_evidence_validation": "passed",
     "mlops_manifest_validation": "passed",
     "next_typecheck": "passed",
@@ -99,5 +99,5 @@
     "domain_graph_commit": "9c81005f781c9ed41201eccf026aa20d6a3552ee",
     "refresh_note": "Knowledge graph incrementally refreshed after the latest documentation closeout; domain graph structure validates and remains semantically unchanged by documentation-only updates."
   },
-  "next_gate": "extend U6 read-only CLI parity to the next existing inspection resource without changing the local-only boundary"
+  "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
 }

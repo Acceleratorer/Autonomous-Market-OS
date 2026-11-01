@@ -14,9 +14,10 @@ preview is a separate artifact with no portfolio state or API connection.
 
 The local exit gate is complete for continued local-only work. The disconnected
 DirectAdmin static preview is deployed and read-only verified; the private
-Next.js/Python runtime is not promoted. The next implementation step is the
-U6 read-only CLI surface over the existing Python contracts, followed by a
-thin app shell. No connected host or identity provider is available today.
+Next.js/Python runtime is not promoted. U6 now includes bounded CLI projections
+for BTC datasets, ingestion manifests, and B2/B3 research inspection; the next
+implementation step is a thin read-only app shell over those shared contracts.
+No connected host or identity provider is available today.
 
 ## Execution flow traced from code
 
@@ -88,7 +89,7 @@ The CLI delegates to `market_os.cli`. The gateway delegates to the existing
   preserved untracked workspace paths (five `.tmp-*` artifacts plus `API.md`);
 - the current knowledge graph contains 1,988 nodes and 5,008 edges, and the
   domain graph contains 78 nodes and 85 edges with all edge targets resolving;
-- the latest full local pack passed 611 tests, 0 failed, and 7 skipped; evidence,
+- the latest full local pack passed 613 tests, 0 failed, and 7 skipped; evidence,
   M2.8, MLOps, secret scan, compileall, Next.js typecheck/build, and diff checks
   passed, and the three hosted workflows for the verification commit are green.
 
@@ -118,11 +119,10 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-The next safe action is to extend the versioned U6 read-only CLI contract across
-the next existing inspection resource, reusing `market_os.cli`, `market_os.api`,
-and the current store helpers. Keep the CLI, HTTP API, and Next.js operator
-semantics aligned; keep mutation, providers, credentials, and connected access
-disabled. U5.5 promotion remains a separate gate for a future owner VM.
+The next safe action is to define the U6 read-only app-shell contract over the
+completed CLI, HTTP API, and Next.js projections. Keep the three surfaces
+semantically aligned; keep mutation, providers, credentials, and connected
+access disabled. U5.5 promotion remains a separate gate for a future owner VM.
 
 ## Source evidence
 

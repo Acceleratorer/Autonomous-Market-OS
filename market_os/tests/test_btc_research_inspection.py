@@ -15,6 +15,7 @@ from market_os.btc_features import B2Config, B2Store, run_b2
 from market_os.btc_history import HistoryStore
 from market_os.btc_jev_evaluation import B3Store, RecordedJevAdapter, run_b3
 from market_os.btc_research_inspection import BtcResearchInspectionStore, MAX_RESULT_ARTIFACT_BYTES
+from market_os.cli import main
 from market_os.store import RunStore
 from market_os.workflow import MarketWorkflow
 
@@ -217,6 +218,114 @@ def test_research_detail_cli_matches_api_and_missing_store_is_read_only(tmp_path
             main(["btc-paper", engine, "detail", run_id, "--store-root", str(missing_root)])
         assert capsys.readouterr().out == ""
         assert not missing_root.exists()
+
+
+def test_ingestion_manifest_cli_matches_api_for_catalog_detail_and_records(tmp_path: Path, capsys) -> None:
+    workflow_root = tmp_path / "seeded-manifest"
+    history_root = workflow_root / "btc-history"
+    ingest = HistoryStore(history_root).ingest_fixture(json.loads(HISTORY_FIXTURE.read_text(encoding="utf-8")))
+    server, thread, base = _start_api(workflow_root)
+    try:
+        routes = (
+            (
+                ["btc-paper", "manifests", ingest.dataset_revision, "--limit", "1", "--store-root", str(history_root)],
+                f"{base}/v1/btc/history/datasets/{ingest.dataset_revision}/manifests?limit=1",
+            ),
+            (
+                ["btc-paper", "manifest", ingest.dataset_revision, ingest.manifest_id, "--store-root", str(history_root)],
+                f"{base}/v1/btc/history/datasets/{ingest.dataset_revision}/manifests/{ingest.manifest_id}",
+            ),
+        )
+        for cli_args, url in routes:
+            expected = json.loads(urlopen(url, timeout=2).read())
+            assert main(cli_args) == 0
+            assert json.loads(capsys.readouterr().out) == expected
+
+        for resource in ("outcomes", "gaps", "provenance"):
+            expected = json.loads(
+                urlopen(
+                    f"{base}/v1/btc/history/datasets/{ingest.dataset_revision}/manifests/{ingest.manifest_id}/{resource}?limit=2",
+                    timeout=2,
+                ).read()
+            )
+            assert main([
+                "btc-paper",
+                "manifest-records",
+                ingest.dataset_revision,
+                ingest.manifest_id,
+                resource,
+                "--limit",
+                "2",
+                "--store-root",
+                str(history_root),
+            ]) == 0
+            assert json.loads(capsys.readouterr().out) == expected
+
+            if expected["page"]["has_more"]:
+                if resource == "outcomes":
+                    cursor_args = ["--after-outcome-index", str(expected["page"]["next_after_outcome_index"])]
+                elif resource == "gaps":
+                    cursor_args = ["--after-start-time-ms", str(expected["page"]["next_after_start_time_ms"])]
+                else:
+                    cursor_args = [
+                        "--after-raw-page-sha256", expected["page"]["next_after_raw_page_sha256"],
+                        "--after-row-index", str(expected["page"]["next_after_row_index"]),
+                    ]
+                cursor_url = (
+                    f"{base}/v1/btc/history/datasets/{ingest.dataset_revision}/manifests/"
+                    f"{ingest.manifest_id}/{resource}?limit=2&"
+                    + ("after_outcome_index=" + str(expected["page"]["next_after_outcome_index"]) if resource == "outcomes" else
+                       "after_start_time_ms=" + str(expected["page"]["next_after_start_time_ms"]) if resource == "gaps" else
+                       "after_raw_page_sha256=" + expected["page"]["next_after_raw_page_sha256"] +
+                       "&after_row_index=" + str(expected["page"]["next_after_row_index"]))
+                )
+                expected_next = json.loads(urlopen(cursor_url, timeout=2).read())
+                assert main([
+                    "btc-paper", "manifest-records", ingest.dataset_revision, ingest.manifest_id, resource,
+                    "--limit", "2", *cursor_args, "--store-root", str(history_root),
+                ]) == 0
+                assert json.loads(capsys.readouterr().out) == expected_next
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_ingestion_manifest_cli_rejects_invalid_pages_and_missing_store_without_creating_it(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    missing_root = tmp_path / "missing-manifest-store"
+    revision = "btc-history-" + "0" * 20
+    manifest = "btc-history-manifest-" + "0" * 20
+    cases = (
+        (["btc-paper", "manifests", revision, "--limit", "0", "--store-root", str(missing_root)], "catalog"),
+        (["btc-paper", "manifest", revision, manifest, "--store-root", str(missing_root)], "detail"),
+        ([
+            "btc-paper", "manifest-records", revision, manifest, "provenance",
+            "--after-row-index", "1", "--store-root", str(missing_root),
+        ], "records"),
+    )
+    for cli_args, label in cases:
+        with pytest.raises(SystemExit, match=f"BTC ingestion manifest {label} failed"):
+            main(cli_args)
+        assert capsys.readouterr().out == ""
+        assert not missing_root.exists()
+
+    seeded_root = tmp_path / "seeded-invalid-manifest-cursor"
+    ingest = HistoryStore(seeded_root).ingest_fixture(json.loads(HISTORY_FIXTURE.read_text(encoding="utf-8")))
+    invalid_cursors = (
+        ["--after-start-time-ms", "1"],
+        ["--after-outcome-index", "+1"],
+        ["--after-raw-page-sha256", "A" * 64, "--after-row-index", "0"],
+    )
+    for cursor_args in invalid_cursors:
+        with pytest.raises(SystemExit, match="BTC ingestion manifest records failed"):
+            main([
+                "btc-paper", "manifest-records", ingest.dataset_revision, ingest.manifest_id, "outcomes",
+                *cursor_args, "--store-root", str(seeded_root),
+            ])
+        assert capsys.readouterr().out == ""
 
 
 def test_research_result_integrity_and_b3_lineage_fail_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

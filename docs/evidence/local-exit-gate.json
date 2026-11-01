@@ -77,16 +77,16 @@
   "current_verification": {
     "date": "2026-11-02",
     "full_suite_attempts": 1,
-    "full_suite_observed": "611 passed, 0 failed, 7 skipped",
+    "full_suite_observed": "613 passed, 0 failed, 7 skipped",
     "isolated_retries": {
       "fixture_ingest_read_only": "1 passed",
       "synthetic_rejected_post": "5 passed out of 5"
     },
-    "evidence_and_graph_checks": "passed: 61 evidence JSON files; knowledge graph 1,988/5,008 and domain graph 78/85 edge-resolved",
+    "evidence_and_graph_checks": "passed: 62 evidence JSON files; knowledge graph and domain graph edge-resolved",
     "git_diff_check": "passed",
     "status": "clean-green-local-pack; main and origin/main aligned with 0 tracked changes and 6 preserved untracked workspace paths",
     "note": "Full local rerun completed without a socket timeout; Next.js typecheck/build and all three hosted workflows passed.",
-    "evidence_json_count": 61,
+    "evidence_json_count": 62,
     "graph_validation": "knowledge and domain graphs valid; latest knowledge-graph refresh is recorded in .ua/meta.json",
     "github_workflows": {
       "ci": {

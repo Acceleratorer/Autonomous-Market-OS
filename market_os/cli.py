@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 
 from .api import serve
 from .metrics import MetricsRegistry
@@ -84,6 +85,25 @@ def build_parser() -> argparse.ArgumentParser:
     btc_catalog.add_argument("--limit", type=int, default=25)
     btc_catalog.add_argument("--after-dataset-revision")
     btc_catalog.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_manifests = btc_commands.add_parser("manifests")
+    btc_manifests.add_argument("dataset_revision")
+    btc_manifests.add_argument("--limit", type=int, default=25)
+    btc_manifests.add_argument("--after-manifest-id")
+    btc_manifests.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_manifest = btc_commands.add_parser("manifest")
+    btc_manifest.add_argument("dataset_revision")
+    btc_manifest.add_argument("manifest_id")
+    btc_manifest.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_manifest_records = btc_commands.add_parser("manifest-records")
+    btc_manifest_records.add_argument("dataset_revision")
+    btc_manifest_records.add_argument("manifest_id")
+    btc_manifest_records.add_argument("resource", choices=("outcomes", "gaps", "provenance"))
+    btc_manifest_records.add_argument("--limit", type=int, default=25)
+    btc_manifest_records.add_argument("--after-outcome-index")
+    btc_manifest_records.add_argument("--after-start-time-ms")
+    btc_manifest_records.add_argument("--after-raw-page-sha256")
+    btc_manifest_records.add_argument("--after-row-index")
+    btc_manifest_records.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     btc_inspect = btc_commands.add_parser("inspect")
     btc_inspect.add_argument("dataset_id")
     btc_inspect.add_argument("--resource", choices=("manifest", "candles", "outcomes", "provenance", "gaps", "replay"), default="manifest")
@@ -366,6 +386,75 @@ def main(argv: list[str] | None = None) -> int:
                     after_dataset_revision=args.after_dataset_revision,
                 )
             print(json.dumps({"api_version": "market-os.btc-history-catalog@v1", **result}, indent=2, sort_keys=True))
+            return 0
+        if args.btc_command in {"manifests", "manifest", "manifest-records"}:
+            from .btc_history import HistoryError, HistoryStore, MAX_CANDLES, MAX_JS_DATE_TIME_MS
+
+            try:
+                store = HistoryStore(args.store_root, read_only=True)
+                if args.btc_command == "manifests":
+                    if type(args.limit) is not int or not 1 <= args.limit <= 100:
+                        raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+                    result = store.inspect_manifests_page(
+                        args.dataset_revision,
+                        limit=args.limit,
+                        after_manifest_id=args.after_manifest_id,
+                    )
+                    api_version = "market-os.btc-history-manifests@v1"
+                elif args.btc_command == "manifest":
+                    result = {"manifest": store.inspect_manifest_record(args.dataset_revision, args.manifest_id)}
+                    api_version = "market-os.btc-history-manifests@v1"
+                else:
+                    if type(args.limit) is not int or not 1 <= args.limit <= 100:
+                        raise HistoryError("invalid_page", "limit must be an integer between 1 and 100")
+                    cursor_flags = {
+                        "outcomes": (args.after_start_time_ms, args.after_raw_page_sha256, args.after_row_index),
+                        "gaps": (args.after_outcome_index, args.after_raw_page_sha256, args.after_row_index),
+                        "provenance": (args.after_outcome_index, args.after_start_time_ms),
+                    }
+                    if any(value is not None for value in cursor_flags[args.resource]):
+                        raise HistoryError("invalid_page", f"cursor does not belong to {args.resource}")
+
+                    def decimal_cursor(raw: str | None, name: str, maximum: int, digits: int) -> int | None:
+                        if raw is None:
+                            return None
+                        if not raw or not raw.isascii() or not raw.isdecimal() or len(raw) > digits:
+                            raise HistoryError("invalid_page", f"{name} must be a bounded integer cursor")
+                        value = int(raw)
+                        if value > maximum:
+                            raise HistoryError("invalid_page", f"{name} is outside the supported range")
+                        return value
+
+                    if args.resource == "outcomes":
+                        result = store.inspect_manifest_outcomes_page(
+                            args.dataset_revision,
+                            args.manifest_id,
+                            limit=args.limit,
+                            after_outcome_index=decimal_cursor(args.after_outcome_index, "after_outcome_index", MAX_CANDLES * 2, 6),
+                        )
+                    elif args.resource == "gaps":
+                        result = store.inspect_manifest_gaps_page(
+                            args.dataset_revision,
+                            args.manifest_id,
+                            limit=args.limit,
+                            after_start_time_ms=decimal_cursor(args.after_start_time_ms, "after_start_time_ms", MAX_JS_DATE_TIME_MS, 16),
+                        )
+                    else:
+                        raw_hash = args.after_raw_page_sha256
+                        if raw_hash is not None and re.fullmatch(r"[0-9a-f]{64}", raw_hash) is None:
+                            raise HistoryError("invalid_page", "after_raw_page_sha256 must be a lowercase SHA-256 fingerprint")
+                        result = store.inspect_manifest_provenance_page(
+                            args.dataset_revision,
+                            args.manifest_id,
+                            limit=args.limit,
+                            after_raw_page_sha256=raw_hash,
+                            after_row_index=decimal_cursor(args.after_row_index, "after_row_index", 999, 3),
+                        )
+                    api_version = "market-os.btc-history-manifest-records@v1"
+            except (KeyError, HistoryError, OSError, RuntimeError, TypeError, ValueError) as exc:
+                label = "catalog" if args.btc_command == "manifests" else "detail" if args.btc_command == "manifest" else "records"
+                raise SystemExit(f"BTC ingestion manifest {label} failed: {exc}") from exc
+            print(json.dumps({"api_version": api_version, **result}, indent=2, sort_keys=True, default=str))
             return 0
         if args.btc_command == "b2":
             if args.b2_command == "catalog":

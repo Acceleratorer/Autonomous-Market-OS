@@ -1,0 +1,53 @@
+{
+  "schema": "market-os.u6-cli-btc-history-manifests-evidence@v1",
+  "status": "implemented_locally",
+  "date": "2026-11-02",
+  "surface": [
+    "market_os/cli.py",
+    "market_os/btc_history.py",
+    "market_os/tests/test_btc_research_inspection.py"
+  ],
+  "commands": [
+    "market-os btc-paper manifests <dataset-revision>",
+    "market-os btc-paper manifest <dataset-revision> <manifest-id>",
+    "market-os btc-paper manifest-records <dataset-revision> <manifest-id> outcomes|gaps|provenance"
+  ],
+  "contract": {
+    "catalog_api_version": "market-os.btc-history-manifests@v1",
+    "records_api_version": "market-os.btc-history-manifest-records@v1",
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "catalog_cursor": "exclusive after_manifest_id",
+    "outcomes_cursor": "exclusive after_outcome_index",
+    "gaps_cursor": "exclusive after_start_time_ms",
+    "provenance_cursor": "exclusive (after_raw_page_sha256, after_row_index)",
+    "read_only": true,
+    "missing_store": "fails closed without initializing a store",
+    "shared_source": "HistoryStore bounded inspection methods"
+  },
+  "checks": {
+    "focused_cli_api_parity": "passed: catalog, detail, outcomes, gaps, provenance, and cursor pages",
+    "missing_store_and_invalid_page": "passed: no store creation and resource-specific cursor validation",
+    "focused_python_suite": "passed: 7 tests",
+    "full_pytest": "passed: 613 passed, 0 failed, 7 skipped",
+    "compileall": "passed",
+    "evidence_validation": "passed: 62 JSON files",
+    "m2_8_evidence_validation": "passed",
+    "mlops_manifest_validation": "passed",
+    "secret_scan": "passed",
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "typescript_contract": "passed",
+    "static_artifact_parity": "passed",
+    "git_diff_check": "passed"
+  },
+  "boundary": {
+    "local_only": true,
+    "fixture_backed": true,
+    "provider_requests": 0,
+    "mutation_routes": false,
+    "connected_runtime": false,
+    "live_trading": false
+  },
+  "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
+}
