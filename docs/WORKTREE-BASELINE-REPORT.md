@@ -22,12 +22,13 @@ audit context. Use `git status --short` for the live state.
 
 ## Live read-only reconciliation — 2026-11-02
 
-The live repository is at the `main` tip and matches `origin/main`. The current
-status is **0 tracked changes plus 6 preserved untracked paths**: five `.tmp-*`
-review artifacts and the pre-existing `API.md`. The historical 2026-10-30
-inventory remains **279 status paths** and the 2026-11-01 20-path reconciliation
-is retained above for audit traceability. No scratch path is a product commit
-candidate by default; no cleanup or connected-runtime promotion was performed.
+The live repository is at the `main` tip and matches `origin/main`. A fresh
+read-only check found **0 tracked changes and 0 untracked paths**. The historical
+2026-10-30 inventory remains **279 status paths** and the 2026-11-01 20-path
+reconciliation is retained above for audit traceability. The six previously
+preserved top-level scratch/workspace files were moved, without deletion, to
+`D:\Code\Github\HKUDS\Autonomous-Market-OS-local-scratch-2026-11-02`.
+No connected-runtime promotion was performed.
 
 ## Tracked product changes
 

@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.u6-read-only-app-shell-contract@v1",
+  "status": "contract_defined_platform_deferred",
+  "date": "2026-11-02",
+  "reference_surface": "apps/web/next-operator/src/components/app-shell.tsx",
+  "authoritative_surfaces": [
+    "market_os",
+    "market_os/api.py",
+    "market_os/cli.py",
+    "apps/cli",
+    "apps/web/next-operator"
+  ],
+  "read_only_views": [
+    "overview",
+    "portfolios",
+    "btc-datasets",
+    "btc-candles",
+    "btc-manifests",
+    "btc-manifest-records",
+    "b2-research",
+    "b3-research",
+    "gateway-status"
+  ],
+  "parity_requirements": [
+    "same market-os.*@v1 envelopes",
+    "same bounded limits and exclusive cursors",
+    "same ordering, hashes, and exact decimal strings",
+    "same empty-store and invalid-input behavior",
+    "no store creation or broker mutation"
+  ],
+  "boundary": {
+    "local_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "get_only": true,
+    "provider_requests": 0,
+    "credentials": false,
+    "live_trading": false,
+    "connected_runtime": false
+  },
+  "responsive_gates": [320, 375, 768, 1024, 1440],
+  "verification_reuse": [
+    "pytest",
+    "next_typecheck",
+    "next_build",
+    "evidence_validation",
+    "secret_scan",
+    "git_diff_check"
+  ],
+  "next_gate": "select a concrete desktop/mobile platform and implement one parity-tested shell slice"
+}
