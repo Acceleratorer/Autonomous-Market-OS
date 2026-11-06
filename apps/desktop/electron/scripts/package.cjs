@@ -138,10 +138,21 @@ async function main() {
   const version = options.version || electronPackage.version;
   const nativeTarget = options.target === "windows-x64" ? "windows" : "linux";
   const nativePython = nativeTarget === "windows" ? "python" : "python3";
+  const electronBinary = path.join(
+    ELECTRON_ROOT,
+    "node_modules",
+    "electron",
+    "dist",
+    nativeTarget === "windows" ? "electron.exe" : "electron",
+  );
   const required = [
     [path.join(WEB_ROOT, ".next"), "Next.js production build"],
     [path.join(WEB_ROOT, "node_modules"), "Next.js dependencies"],
     [path.join(ELECTRON_ROOT, "node_modules"), "Electron dependencies"],
+    [
+      electronBinary,
+      `target-native Electron runtime (run "pnpm exec electron --version" after install)`,
+    ],
     [path.join(REPO_ROOT, "market_os"), "Python domain package"],
     [path.join(REPO_ROOT, "apps", "gateway"), "Python gateway package"],
     [path.join(REPO_ROOT, "pyproject.toml"), "Python dependency manifest"],

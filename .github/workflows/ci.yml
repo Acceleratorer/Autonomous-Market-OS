@@ -149,6 +149,9 @@ jobs:
       - name: Install Electron shell dependencies
         working-directory: apps/desktop/electron
         run: pnpm install --frozen-lockfile
+      - name: Download target-native Electron runtime
+        working-directory: apps/desktop/electron
+        run: pnpm exec electron --version
       - name: Build, sign, smoke, promote, and rollback two target-native artifacts
         working-directory: apps/desktop/electron
         run: pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
