@@ -1,5 +1,141 @@
 # Understanding log
 
+## 2026-11-07 — U6.4-C target-native CI hardening
+
+- Added target-native source-sidecar metadata. Windows artifacts launch with
+  `python`; Linux artifacts launch with `python3`; packaged state is forced to
+  `python/.market_os` inside the artifact.
+- Added a cross-platform CI matrix that builds `windows-x64` on
+  `windows-latest` and `linux-x64` on `ubuntu-latest`. Each runner creates two
+  distinct signed versions, smokes `/readyz`, `/healthz`, `/overview`, and
+  `/runtime`, then uploads manifests, signature metadata, smoke reports, and
+  release-drill evidence.
+- The local Windows run passed both signed smokes and the two-version drill:
+  failed launch restored metadata, promotion preserved known-good, rollback
+  availability was `true` while hashes differed, and explicit rollback restored
+  the older artifact. Evidence is in
+  `docs/evidence/u6-4-release-hardening.json`; the Linux leg remains configured
+  in CI and was not run on this Windows host.
+- The boundary remains private, synthetic, paper-only, read-only,
+  credential-free, provider-free, mutation-disabled, and execution-disabled.
+
+## 2026-11-06 — U6.4-B signed release contract
+
+- Added an external-key Ed25519 signer for the immutable artifact manifest. The
+  private key is required outside the artifact directory; only public
+  verification metadata is written to `release-signature.json`.
+- Added hash-gated release slots. Promotion verifies the manifest sidecar hash
+  and signature, preserves the prior current record as known-good, and restores
+  both slot files when a launch failure is simulated. Rollback verifies the
+  known-good artifact again and rejects tampered metadata without changing
+  current.
+- `LocalRuntime` and `/runtime` now read signature and slot metadata when
+  available. The surface remains observational and keeps U5.5 owner-VM,
+  private, read-only, paper-only, and execution-disabled boundaries visible.
+- Focused Electron tests and the CI `u6-4-release-contract` job cover signing,
+  verification, promotion, failed-launch restoration, rollback, and tamper
+  rejection. Platform-specific Python distribution and owner-VM promotion stay
+  deferred.
+
+## 2026-11-06 — U6.4-A unsigned desktop artifact
+
+- Added ADR-0054 and a target-labelled artifact contract for `windows-x64` and
+  `linux-x64`. The artifact contains the Electron shell, built Next.js
+  renderer, source-bundled Python gateway, component tree hashes, pnpm
+  lockfile fingerprints, and current/known-good slot metadata.
+- Added `pnpm run package:unsigned` and `pnpm run smoke:artifact`. The runtime
+  detects the artifact root, launches direct Electron/Next entrypoints without
+  pnpm's machine-path shims, passes the loopback readiness checks, renders the
+  release metadata page, and closes both ports after shutdown.
+- The Windows x64 artifact smoke passed `/readyz`, `/healthz`, `/overview`, and
+  `/runtime` from the generated artifact directory. Packaging excludes pnpm
+  ignored build caches and platform shim metadata; a second package run
+  reproduced manifest SHA-256
+  `e2ba56c62d6a8d00e25fca64afac02c081511a0981d7f346173dd21d4e5f706b`. The artifact remains
+  unsigned with rollback disabled; U6.4-B owns the signed local release flow,
+  while platform-specific sidecar distribution stays deferred. No credentials, providers, mutation,
+  public listener, or live-trading path was added.
+- Machine-readable evidence is in `docs/evidence/u6-4-unsigned-artifact.json`.
+
+## 2026-11-03 — U6.3 local Electron shell slice
+
+- Added the isolated `apps/desktop/electron` developer shell. Electron's main
+  process starts the existing Python gateway and server-rendered Next.js
+  operator on loopback, uses separate working directories, waits for bounded
+  `/readyz` and `/healthz` readiness, and cleans up owned descendants.
+- Hardened the renderer boundary with sandbox, context isolation, disabled Node
+  integration, web security, denied window creation, loopback-only navigation,
+  and an immutable read-only preload surface. No filesystem, provider,
+  credential, mutation, Tailscale, or live-trading path was added.
+- A real headless smoke on custom ports returned 200 for `/readyz`, `/healthz`,
+  and `/overview`; both ports closed after graceful SIGINT cleanup. The focused
+  Electron package suite passed 6 tests. U6.1 parity tests remain the contract
+  reference rather than a duplicated native domain adapter.
+- Default startup now avoids an occupied 8787/3000 pair by selecting free
+  loopback ports unless the user explicitly pins `MARKET_OS_API_PORT` or
+  `MARKET_OS_NEXT_PORT`; child stderr is included in startup failures so the
+  dialog is actionable instead of generic.
+- Machine-readable evidence is in `docs/evidence/u6-electron-shell.json`.
+  Packaging, signed artifacts, sidecar bundling, and explicit update rollback
+  are deferred to U6.4. U5.5 owner-VM promotion and rollback remain pending.
+
+## 2026-11-03 — U6.2 native platform selection
+
+- Added ADR-0053 and selected Electron for the first read-only Windows/Linux
+  desktop container because it reuses the existing Node.js and server-rendered
+  Next.js lifecycle. Tauri 2 remains the fallback if the later native spike
+  shows that footprint and capability isolation outweigh lifecycle simplicity.
+- Kept U6.2 decision-only: no Electron dependency, native scaffold, updater,
+  credentials, provider path, mutation route, public listener, or deployment
+  was added. Python remains the domain/storage authority and the renderer stays
+  loopback HTTP only.
+- Recorded U6.3 gates for child-process readiness and cleanup, Electron
+  sandbox/context isolation/IPC validation, signed packaging and explicit
+  rollback, responsive/accessibility parity, and the existing U6.1 contract
+  suite. Machine-readable evidence is in
+  `docs/evidence/u6-native-platform-selection.json`.
+- The next implementation phase is one Electron parity-tested desktop slice;
+  U5.5 owner-VM promotion and rollback remain a separate pending gate.
+
+## 2026-11-03 — U5.5 promotion evidence and U6.1 runtime verification
+
+- Added the read-only `deploy/u5-5/promotion_evidence.py` harness. Its dry run
+  validates the selected private Linux VM, `systemd`, owner-only Tailscale
+  Serve, direct-origin denial, owner-only subject, `paper-main` storage,
+  encrypted backup ordering, and rollback preservation, then simulates a
+  health-gated restore and validates the emitted evidence schema.
+- The U5.5 evidence JSON is `locally-verified-not-enabled`; owner-VM health and
+  Tailscale probes are explicitly `not_run` on this Windows host. The runtime
+  remains disabled, owner-VM promotion and rollback remain pending, and no
+  credentials, public listener, mutation route, or live-trading path was
+  added. `promote.sh` now re-runs the health check after restoring
+  `known-good`.
+- Sequential evidence validation passed for 64 JSON files. The focused U5.5
+  access tests passed 18 tests. U6.1 TypeScript contract tests passed 3 tests;
+  Next.js typecheck and production build passed.
+- Production-browser checks against the local gateway and Next.js server
+  passed for overview and BTC dataset catalog at 320, 375, 768, 1024, and
+  1440 pixels with no page-level horizontal overflow. No owner VM was
+  contacted and no deployment was performed.
+
+## 2026-11-02 — U6.1 read-only Next.js app shell parity
+
+- Added explicit `/readyz` validation in `market-api.ts`; the overview now
+  reports gateway availability from the Python health envelope while keeping
+  the existing server-rendered GET-only shell.
+- Verified the gateway status strip, overview previews, and BTC dataset
+  catalog reuse the Python/API/CLI contracts for versioned envelopes,
+  exclusive cursors, ordering, 1–100 bounds, empty stores, and invalid input.
+- The focused Python API/CLI parity group passed 3 tests and the TypeScript
+  shell contract test passed 3 tests. Next.js typecheck and production build
+  passed.
+- Responsive screenshots for the overview and dataset catalog passed at 320,
+  375, 768, 1024, and 1440 pixels with no page-level overflow observed;
+  evidence is in `docs/evidence/u6-read-only-app-shell-contract.json`.
+- The implementation remains local, synthetic, paper-only, GET-only, with no
+  providers, credentials, mutations, live trading, or native shell. The next
+  gate is a separate ADR selecting a native platform after U6.1 review.
+
 ## 2026-11-02 — U6 bounded ingestion-manifest CLI parity
 
 - Added read-only `market-os btc-paper manifests`, `manifest`, and `manifest-records` projections over the existing `HistoryStore` bounded manifest, detail, outcome, gap, and provenance contracts.
@@ -1364,7 +1500,7 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Read `docs/PROJECT-CONTEXT.md` first and continued from the active U5.24/local boundary.
 - Preserved the existing uncommitted code, documents, scratch directories, Playwright artifacts, and output files.
 - Verified the current local fixes for bounded POST bodies, same-origin browser POSTs, non-creating read-only BTC stores, explicit B2/B3 insufficient-sample outcomes, and non-mutating portfolio inspection locks.
-- Full verification passed: 546 tests passed, 0 failed, 7 skipped with provider credentials cleared; compileall, `pip check`, Next.js typecheck/build, the TypeScript static contract, artifact parity, secret scan, M2.8 and evidence validation, and `git diff --check` passed. `npm ci` reported zero vulnerabilities.
+- Full verification passed: 546 tests passed, 0 failed, 7 skipped with provider credentials cleared; compileall, `pip check`, Next.js typecheck/build, the TypeScript static contract, artifact parity, secret scan, M2.8 and evidence validation, and `git diff --check` passed. The dependency audit reported zero vulnerabilities; current reproductions use the pinned pnpm lockfile.
 - Added `docs/LOCAL-EXIT-GATE-REPORT.md` and `docs/evidence/local-exit-gate.json` as the current local completion record.
 - Final security review found no actionable defects in the new read-only CLI/store paths, B4.1 inspection locks, or bounded POST handling. At that 2026-10-29 point, no DirectAdmin deployment was run; push could not publish the static preview.
 - Commit `9aff897` was pushed. GitHub CI run [40865631843](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631843) and Security/package run [40865631753](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40865631753) passed, including the static artifact job. The later U5.24 closeout on `33989fe` passed CI run [40867998693](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998693) and Security/package run [40867998684](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/40867998684). GitHub emitted only non-blocking runner/action-runtime migration warnings.

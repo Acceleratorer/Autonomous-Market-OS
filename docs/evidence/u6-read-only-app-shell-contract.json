@@ -1,8 +1,14 @@
 {
   "schema": "market-os.u6-read-only-app-shell-contract@v1",
-  "status": "contract_defined_platform_deferred",
+  "status": "u6.1_next_shell_locally_verified",
   "date": "2026-11-02",
   "reference_surface": "apps/web/next-operator/src/components/app-shell.tsx",
+  "platform_decision": "electron-selected-in-u6.2",
+  "implemented_slice": {
+    "gateway_status": "overview validates market-os.v1 /readyz before rendering availability",
+    "overview": "server-rendered read-only previews for portfolios, BTC datasets, and B2/B3 research",
+    "btc_dataset_catalog": "server-rendered bounded catalog with exclusive dataset-revision cursor"
+  },
   "authoritative_surfaces": [
     "market_os",
     "market_os/api.py",
@@ -39,6 +45,28 @@
     "connected_runtime": false
   },
   "responsive_gates": [320, 375, 768, 1024, 1440],
+  "responsive_evidence": {
+    "overview_screenshots": [
+      "output/playwright/u6-1/overview-320.png",
+      "output/playwright/u6-1/overview-375.png",
+      "output/playwright/u6-1/overview-768.png",
+      "output/playwright/u6-1/overview-1024.png",
+      "output/playwright/u6-1/overview-1440.png"
+    ],
+    "dataset_catalog_screenshots": [
+      "output/playwright/u6-1/datasets-320.png",
+      "output/playwright/u6-1/datasets-375.png",
+      "output/playwright/u6-1/datasets-768.png",
+      "output/playwright/u6-1/datasets-1024.png",
+      "output/playwright/u6-1/datasets-1440.png"
+    ],
+    "page_horizontal_overflow": false
+  },
+  "parity_verification": {
+    "python_api_cli": "3 focused tests passed",
+    "next_market_api_contract": "3 focused TypeScript tests passed",
+    "cases": ["envelope", "cursor", "ordering", "bounds", "empty-store", "invalid-input"]
+  },
   "verification_reuse": [
     "pytest",
     "next_typecheck",
@@ -47,5 +75,5 @@
     "secret_scan",
     "git_diff_check"
   ],
-  "next_gate": "select a concrete desktop/mobile platform and implement one parity-tested shell slice"
+  "next_gate": "U6.4-B signed metadata, sidecar distribution, and hash-gated rollback"
 }

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { BoundaryBanner, MetricCard, PageHeading, PanelHeading, ServiceState, SystemStatusStrip } from "@/components/ui";
+import { BoundaryBanner, MetricCard, PageHeading, PanelHeading, ServiceState, StatusRail } from "@/components/ui";
 import {
+  getGatewayStatus,
   getBtcHistoryDatasetCatalog,
   getBtcResearchRunPage,
   getPortfolioCatalog,
@@ -34,14 +35,17 @@ function gatewayIsAvailable(resource: ResourceResult<unknown>): boolean {
 }
 
 export default async function OperatorOverviewPage() {
-  const [portfolios, datasets, b2Runs, b3Runs] = await Promise.all([
+  const [gateway, portfolios, datasets, b2Runs, b3Runs] = await Promise.all([
+    readResource(() => getGatewayStatus()),
     readResource(() => getPortfolioCatalog({ limit: OVERVIEW_PAGE_SIZE })),
     readResource(() => getBtcHistoryDatasetCatalog({ limit: OVERVIEW_PAGE_SIZE })),
     readResource(() => getBtcResearchRunPage("b2", { limit: OVERVIEW_PAGE_SIZE })),
     readResource(() => getBtcResearchRunPage("b3", { limit: OVERVIEW_PAGE_SIZE })),
   ]);
   const resources = [portfolios, datasets, b2Runs, b3Runs];
-  const gatewayStatus = resources.some(gatewayIsAvailable) ? "available" : "unavailable";
+  const gatewayStatus = gateway.ok || resources.some(gatewayIsAvailable)
+    ? "available"
+    : "unavailable";
   const researchRunCount = b2Runs.ok || b3Runs.ok
     ? (b2Runs.ok ? b2Runs.value.runs.length : 0) + (b3Runs.ok ? b3Runs.value.runs.length : 0)
     : null;
@@ -70,7 +74,7 @@ export default async function OperatorOverviewPage() {
           <span>Synthetic research and paper portfolios only; this workspace has no live venue or order controls.</span>
         </BoundaryBanner>
 
-        <SystemStatusStrip gatewayStatus={gatewayStatus} />
+        <StatusRail gatewayStatus={gatewayStatus} />
 
         <section className="overview-metric-grid" aria-label="First-page resource summary">
           <MetricCard

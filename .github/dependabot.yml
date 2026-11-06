@@ -1,7 +1,13 @@
 version: 2
 updates:
+  # GitHub's npm ecosystem key also manages pnpm manifests and lockfiles.
   - package-ecosystem: npm
     directory: /apps/web/next-operator
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /apps/desktop/electron
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

@@ -3,6 +3,10 @@
 This directory is the owner-approved Linux VM/systemd/Tailscale Serve
 promotion package for the single-tenant read-only operator.
 
+U5.5 is locally verified and remains disabled. The selected target is a
+private Linux VM supervised by `systemd`, with owner-only Tailscale Serve
+ingress. Owner-VM promotion and rollback are still pending.
+
 The runtime contract is:
 
 - Python gateway: `127.0.0.1:8787`, Python remains the accounting, risk,
@@ -10,7 +14,8 @@ The runtime contract is:
   authority.
 - Next.js: `127.0.0.1:3000`, server-rendered GET/HEAD only.
 - Browser ingress: Tailscale Serve only; Python is never served directly.
-- Subject: the owner login configured in `MARKET_OS_TAILSCALE_OWNER_LOGIN`.
+- Subject: `owner-only`, using the owner login configured in
+  `MARKET_OS_TAILSCALE_OWNER_LOGIN`.
 - Portfolio: `paper-main` only.
 - Portfolio root: `/var/lib/autonomous-market-os/portfolios`.
 - Session assertions: 15 minutes, 60-second clock tolerance, one-time hashed
@@ -55,6 +60,21 @@ accounting values in Next.js.
 changing `current`, updates the one `known-good` slot, restarts both services,
 and restores the known-good release if health fails. `rollback.sh` explicitly
 activates that slot and reruns the health check.
+
+## Promotion evidence
+
+Run the local simulation without starting services or contacting the owner VM:
+
+```text
+python deploy/u5-5/promotion_evidence.py --mode dry-run
+python deploy/u5-5/promotion_evidence.py --validate
+```
+
+The harness validates the service, Serve, origin-denial, owner-subject,
+`paper-main` storage, encrypted-backup, and rollback contracts, then emits
+`docs/evidence/u5-5-promotion-evidence.json`. On the selected VM, set
+`MARKET_OS_U55_OWNER_VM=1` and use `--mode owner-vm` only for read-only
+`healthcheck.sh` and `tailscale serve status --json` checks.
 
 No script deletes portfolio data, enables mutations, adds provider credentials,
 starts Binance/live execution, or exposes a public listener.

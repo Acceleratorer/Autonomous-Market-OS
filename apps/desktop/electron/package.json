@@ -1,0 +1,27 @@
+{
+  "name": "market-os-electron-shell",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "description": "Local read-only Electron shell for the Market OS Next.js operator",
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "start:headless": "electron . --disable-gpu --no-sandbox",
+    "package:unsigned": "node scripts/package.cjs",
+    "sign:artifact": "node scripts/sign-artifact.cjs",
+    "release:drill": "node scripts/release-drill.cjs",
+    "release:ci": "node scripts/ci-release.cjs",
+    "release:inspect": "node scripts/release-slots.cjs inspect",
+    "release:promote": "node scripts/release-slots.cjs promote",
+    "release:rollback": "node scripts/release-slots.cjs rollback",
+    "smoke:artifact": "node scripts/smoke-artifact.cjs",
+    "test": "node --test tests/*.test.cjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "devDependencies": {
+    "electron": "45.2.1"
+  }
+}

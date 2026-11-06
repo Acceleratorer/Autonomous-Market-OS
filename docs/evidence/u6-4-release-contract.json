@@ -1,0 +1,72 @@
+{
+  "schema": "market-os.evidence.u6-4-release-contract@v1",
+  "milestone": "U6.4-B",
+  "status": "verified-local",
+  "scope": {
+    "targets": [
+      "windows-x64",
+      "linux-x64"
+    ],
+    "renderer": "apps/web/next-operator",
+    "shell": "apps/desktop/electron",
+    "authority": "Python market_os and apps.gateway"
+  },
+  "artifact": {
+    "path": "output/u6.4/market-os-windows-x64",
+    "manifest_sha256": "9cdedd478380dc9759bbcad4009d4eeb2ec54b623e766ded891ea2ad6ef98a8d",
+    "target": "windows-x64",
+    "version": "0.1.0",
+    "components": {
+      "shell": "3d668ca7f8c81231d397f698f3a33f1e01e95fd7f9bfc41da68c85b04d48a13f",
+      "web": "b52269b2f9797045c105db5df1d9c9e0c8808bca653d7d3287a6a637cdddb370",
+      "python": "75ee82be01020c5d6d0bad980723345d2227fd215d3a28b1f10047a53f498b17"
+    }
+  },
+  "signing": {
+    "algorithm": "Ed25519",
+    "signed_bytes": "artifact-manifest.json exact bytes",
+    "metadata": "release-signature.json",
+    "private_key_storage": "external-only; never copied into artifact or repository",
+    "verification": "passed",
+    "key_id": "71d4cf1c415d5a97"
+  },
+  "release_slots": {
+    "promotion": "passed-hash-and-signature-gated",
+    "known_good_preservation": "passed-previous-current-retained",
+    "failed_launch": "passed-simulated-failure-restores-current-and-known-good",
+    "rollback": "passed-known-good-reverified-before-current-change",
+    "tamper_rejection": "passed-manifest-digest-mismatch-leaves-current-unchanged"
+  },
+  "runtime": {
+    "metadata_sources": [
+      "artifact-manifest.json",
+      "release-signature.json",
+      "slots/current.json",
+      "slots/known-good.json"
+    ],
+    "surface": "/runtime",
+    "mode": "observational-only",
+    "rollback_control": "not exposed as a UI mutation",
+    "signed_smoke": {
+      "readyz_status": 200,
+      "healthz_status": 200,
+      "overview_status": 200,
+      "runtime_status": 200,
+      "runtime_exposes_signed_state": true,
+      "api_closed": true,
+      "next_closed": true
+    }
+  },
+  "verification": {
+    "command": "cd apps/desktop/electron && pnpm test",
+    "tests": 8,
+    "passed": 8,
+    "failed": 0,
+    "ci_job": "u6-4-release-contract"
+  },
+  "deferred": [
+    "platform-specific Python distribution",
+    "owner-VM U5.5 promotion and rollback",
+    "credentials, provider access, mutation routes, and live trading"
+  ]
+}

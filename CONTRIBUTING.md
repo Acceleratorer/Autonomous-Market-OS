@@ -27,10 +27,18 @@ For the local Next.js operator:
 
 ```bash
 cd apps/web/next-operator
-npm ci
-npm run typecheck
-npm run build
+corepack enable
+pnpm install --frozen-lockfile
+pnpm run typecheck
+pnpm run build
 ```
+
+The JavaScript surfaces are independent package roots and use the pinned
+`pnpm@11.25.0` release. Keep `pnpm-lock.yaml` in sync with each app's
+`package.json`; do not add a root workspace or restore legacy lockfiles. The
+Electron shell follows the same rule in `apps/desktop/electron/`. See
+[`docs/JS-PACKAGE-MANAGEMENT.md`](docs/JS-PACKAGE-MANAGEMENT.md) for the full
+workflow.
 
 ## Before opening a pull request
 

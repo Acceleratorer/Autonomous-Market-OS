@@ -1,0 +1,70 @@
+{
+  "schema": "market-os.u6.4-unsigned-artifact@v1",
+  "milestone": "U6.4-A",
+  "status": "historical-locally-verified-unsigned-artifact",
+  "date": "2026-11-06",
+  "contract": "docs/decisions/ADR-0054-u6-4-unsigned-packaging-contract.md",
+  "artifact": {
+    "path": "output/u6.4/market-os-windows-x64",
+    "manifest": "output/u6.4/market-os-windows-x64/artifact-manifest.json",
+    "manifest_sha256": "e2ba56c62d6a8d00e25fca64afac02c081511a0981d7f346173dd21d4e5f706b",
+    "target": "windows-x64",
+    "version": "0.1.0",
+    "renderer": "Next.js 16.4.3 production build",
+    "electron": "45.2.1",
+    "python_sidecar": "source bundle; Python >=3.11; duckdb and pyarrow declared in pyproject.toml",
+    "package_manager": "pnpm@11.25.0"
+  },
+  "components": {
+    "shell": {
+      "files": 1073,
+      "bytes": 400183522,
+      "sha256": "51a8023b01c13d497bf99f8e7d0c273c580773b75f06a5bf6911bf556747eb61"
+    },
+    "web": {
+      "files": 14264,
+      "bytes": 752697206,
+      "sha256": "7641bb95ecc32b7aed48bfc6ac206647c0f52f0bd1c72e39d2f38a40845843f2"
+    },
+    "python": {
+      "files": 415,
+      "bytes": 7896517,
+      "sha256": "75ee82be01020c5d6d0bad980723345d2227fd215d3a28b1f10047a53f498b17"
+    }
+  },
+  "smoke": {
+    "command": "pnpm run smoke:artifact -- --artifact ../../../output/u6.4/market-os-windows-x64",
+    "readyz_status": 200,
+    "healthz_status": 200,
+    "overview_status": 200,
+    "runtime_status": 200,
+    "runtime_exposes_unsigned_state": true,
+    "manifest_sha256_verified": "e2ba56c62d6a8d00e25fca64afac02c081511a0981d7f346173dd21d4e5f706b",
+    "api_closed": true,
+    "next_closed": true,
+    "stderr_tail": null
+  },
+  "reproducibility": {
+    "second_package_run": "passed",
+    "manifest_sha256_matches": true
+  },
+  "release_state": {
+    "signature": "unsigned",
+    "current_slot": "unsigned",
+    "known_good_slot": "u6.3-local-shell",
+    "rollback_available": false
+  },
+  "boundary": {
+    "local_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "read_only": true,
+    "credentials": false,
+    "provider_requests": 0,
+    "mutation_routes": false,
+    "live_trading": false,
+    "public_listener": false
+  },
+  "next_gate": "U6.4-B local release contract is verified; see u6-4-release-contract.json",
+  "superseded_by": "docs/evidence/u6-4-release-contract.json"
+}

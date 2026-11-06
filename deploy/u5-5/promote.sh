@@ -51,6 +51,10 @@ if ! "$HEALTHCHECK"; then
     ln -sfn -- "$(readlink -e -- "$KNOWN_GOOD_LINK")" "$CURRENT_LINK.next"
     mv -Tf -- "$CURRENT_LINK.next" "$CURRENT_LINK"
     systemctl restart market-os-python.service market-os-next.service
+    if ! "$HEALTHCHECK"; then
+      echo "known-good release failed the rollback health check" >&2
+      exit 1
+    fi
   fi
   echo "promotion health check failed; known-good release remains active" >&2
   exit 1

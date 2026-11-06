@@ -1,0 +1,73 @@
+{
+  "schema": "market-os.u6-native-platform-selection@v1",
+  "milestone": "U6.2",
+  "status": "selected-platform-implementation-deferred",
+  "decision": {
+    "platform": "electron",
+    "major_version": "current-supported-major-at-U6.3",
+    "target_os": ["windows-x64", "linux-x64"],
+    "mobile": "deferred",
+    "macos": "deferred",
+    "renderer": "existing-nextjs-operator",
+    "transport": "loopback-http-only",
+    "next_phase": "U6.3"
+  },
+  "comparison": [
+    {
+      "platform": "electron",
+      "decision": "selected",
+      "fit": "existing Node.js process lifecycle and server-rendered Next.js reuse",
+      "blocking_risk": "larger bundled runtime and privileged main/preload boundary"
+    },
+    {
+      "platform": "tauri",
+      "decision": "fallback",
+      "fit": "small native host with explicit capability permissions",
+      "blocking_risk": "Rust, sidecar, and host WebView prerequisites must be proven"
+    },
+    {
+      "platform": "react-native-or-flutter",
+      "decision": "deferred",
+      "fit": "requires a second renderer and parity adapter",
+      "blocking_risk": "duplicates the existing Next.js shell before native parity is proven"
+    }
+  ],
+  "required_gates": [
+    "loopback-only gateway and Next.js child-process lifecycle",
+    "bounded readiness handshake and descendant cleanup",
+    "sandbox, context isolation, validated IPC senders, and no renderer Node integration",
+    "same Python/API/CLI envelopes, cursors, ordering, bounds, and empty-store behavior",
+    "signed reproducible Windows/Linux artifacts with explicit rollback",
+    "responsive and accessibility parity at 320/375/768/1024/1440px"
+  ],
+  "verification": {
+    "u6_1_regression": "preserved; 3 TypeScript contract tests and 3 focused Python parity tests passed",
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "responsive_browser": "passed at 320, 375, 768, 1024, and 1440px",
+    "node_version": "v24.17.0",
+    "electron_dependency": false,
+    "native_scaffold": false,
+    "credentials_used": false
+  },
+  "boundary": {
+    "local_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "get_only": true,
+    "provider_requests": 0,
+    "credentials": false,
+    "mutation_routes": false,
+    "live_trading": false,
+    "connected_runtime": false,
+    "public_listener": false
+  },
+  "artifacts": [
+    "docs/decisions/ADR-0053-u6-native-platform-selection.md",
+    "docs/research/U6-NATIVE-PLATFORM-OPTIONS.md",
+    "docs/U6-READ-ONLY-APP-SHELL-CONTRACT.md",
+    "docs/evidence/u6-read-only-app-shell-contract.json",
+    "tests/market-os-u6-native-platform-selection.test.ts"
+  ],
+  "next_gate": "U6.4-B signed metadata, sidecar distribution, and hash-gated rollback"
+}

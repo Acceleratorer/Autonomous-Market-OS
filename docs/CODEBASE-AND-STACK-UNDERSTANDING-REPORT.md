@@ -120,8 +120,12 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-The next safe action is to define the U6 read-only app-shell contract over the
-completed CLI, HTTP API, and Next.js projections. Keep the three surfaces
+U6.2 selects Electron for the first read-only Windows/Linux desktop container.
+U6.3 now verifies one local lifecycle/security slice over the completed CLI,
+HTTP API, and Next.js projections. The next safe action is U6.4-B: extend the
+verified U6.4-A unsigned artifact with signed metadata, sidecar distribution,
+and hash-gated rollback. U6.4-A already packages the renderer and source
+sidecar reproducibly; U6.4-B adds signing and explicit rollback. Keep the three surfaces
 semantically aligned; keep mutation, providers, credentials, and connected
 access disabled. U5.5 promotion remains a separate gate for a future owner VM.
 

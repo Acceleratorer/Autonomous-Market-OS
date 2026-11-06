@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { BoundaryBanner, InspectionTable, MetricCard, PageHeading, PanelHeading, ServiceState } from "@/components/ui";
+import { BoundaryBanner, DataTable, MetricCard, PageHeading, PanelHeading, ServiceState } from "@/components/ui";
 import { getBtcHistoryDatasetCatalog, isBtcDatasetRevision, LocalApiError, type BtcHistoryDatasetPage } from "@/lib/market-api";
 
 export const runtime = "nodejs";
@@ -105,7 +105,7 @@ export default async function BtcDatasetRegistryPage({
         <section className="panel" aria-label="Local BTC history datasets">
           <PanelHeading kicker="B1 / canonical history" title="Stored revisions" meta={`${datasets.length} shown`} />
           {datasets.length ? (
-            <InspectionTable
+            <DataTable
               caption="Locally stored BTC history dataset revisions"
               columns={["Dataset revision", "Symbol", "Venue", "Interval", "Candles", "Observed UTC range", "Canonical fingerprint"]}
               rows={rows}

@@ -26,13 +26,43 @@ In a second terminal:
 
 ```bash
 cd apps/web/next-operator
-npm ci
-npm run dev
+corepack enable
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 Open `http://127.0.0.1:3000`. The Next.js operator reads the Python gateway
 server-side and keeps all accounting, risk, persistence, recovery, replay,
 audit, backup, and portfolio inspection authority in Python.
+
+The repository keeps the web operator and Electron shell as independent
+JavaScript package roots. Both pin `pnpm@11.25.0` through `packageManager` and
+commit a `pnpm-lock.yaml`; there is intentionally no root JavaScript workspace.
+See [`docs/JS-PACKAGE-MANAGEMENT.md`](docs/JS-PACKAGE-MANAGEMENT.md) for the
+reproducible install, CI, Docker, and desktop workflows.
+
+## Local Electron shell
+
+The desktop slice reuses the built Next.js operator and starts the Python
+gateway on loopback; it does not ship a second renderer:
+
+```bash
+cd apps/web/next-operator
+pnpm install --frozen-lockfile
+pnpm run build
+
+cd ../../desktop/electron
+pnpm install --frozen-lockfile
+pnpm run start
+```
+
+Use `pnpm test` in `apps/desktop/electron` for the local lifecycle/security
+and U6.4-B release-contract checks. U6.4-A provides the unsigned artifact and
+clean-directory smoke; U6.4-B adds external-key signing, hash-gated
+current/known-good slot promotion, failed-launch restoration, and explicit
+rollback. U6.4-C runs target-native Windows/Linux CI packaging, signed smoke,
+and a two-version rollback drill. Owner-VM promotion remains a separate U5.5
+gate.
 
 ## Container quick start
 
@@ -127,6 +157,7 @@ deployment and authenticated access remain separate gates.
 ## Project guidance
 
 - [Contributing](CONTRIBUTING.md)
+- [JavaScript package management](docs/JS-PACKAGE-MANAGEMENT.md)
 - [Security policy](SECURITY.md)
 - [MIT License](LICENSE)
 - [DevOps runbook](docs/DEVOPS-RUNBOOK.md)

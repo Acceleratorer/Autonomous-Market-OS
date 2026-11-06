@@ -1,15 +1,17 @@
 # Stack and Runtime Review
 
 **Date:** 2026-10-30
-**Status:** Repository-grounded review; U5.5 runtime/identity contract defined, connected runtime remains unselected
+**Status:** U5.5 target selected and locally verified; connected runtime remains disabled pending owner-VM promotion and rollback
 **Scope:** Local synthetic/paper system, future private read-only preview, and disconnected static preview
 
 ## 1. Current codebase shape
 
-The U5.5 boundary is now recorded durably in
+The U5.5 boundary is recorded durably in
 [`ADR-0050`](decisions/ADR-0050-u5-5-runtime-identity-contract.md). Its state
-is `defined`: the contract is approved as a boundary, while the concrete host,
-identity provider, ingress, and public listener remain unselected and disabled.
+is `locally_verified`: the owner-controlled private Linux VM, `systemd`,
+owner-only Tailscale Serve ingress, `owner-only` subject, and `paper-main`
+allowlist are selected. The runtime is not enabled; owner-VM promotion and
+rollback remain pending.
 
 The repository already has a useful separation of responsibilities:
 
@@ -81,7 +83,7 @@ accepted in a new versioned contract.
 | Candidate | Fit | Main risk | Decision |
 |---|---|---|---|
 | DirectAdmin static artifact | Disconnected preview only | Cannot be assumed to provide the always-on private Python + Next runtime | Selected only for static preview |
-| Private host with a reverse proxy, Next.js process, and loopback Python gateway | Single-tenant private preview | Requires process supervision, patching, backups, and origin lockdown | Best general shape; host still unselected |
+| Private Linux VM with `systemd`, Next.js process, and loopback Python gateway | Single-tenant private preview | Requires host promotion, patching, backups, and origin lockdown | **Selected U5.5 target; owner-VM promotion pending** |
 | Private network access in front of the same runtime | One owner or small trusted operator set | Device enrollment and identity lifecycle become part of operations | Candidate after runtime contract |
 | Edge access proxy in front of the same runtime | Browser-only access | Edge identity assertions must be verified at the origin; edge-only policy is insufficient | Candidate after identity contract |
 | Directly exposing the Python gateway | None | Bypasses the intended origin and authorization boundary | Rejected |
@@ -90,21 +92,23 @@ The repository therefore has two distinct deployment tracks:
 
 1. **Static preview:** build `apps/web/public/`, verify exact artifact parity,
    and deploy manually when DirectAdmin prerequisites are available.
-2. **Private operator:** run Next.js and Python together behind a selected
-   private ingress only after U5.5 closes.
+2. **Private operator:** run Next.js and Python together under `systemd`, behind
+   owner-only Tailscale Serve, only after the owner-VM promotion gate closes.
 
 The two tracks must not share secrets, portfolio storage, or deployment
 promotion logic.
 
-## 4. Required U5.5 runtime contract before connected work
+## 4. Remaining U5.5 evidence gates before connected work
 
-The following decisions are still gates, not implementation details:
+The selected runtime is locally verified; the following host evidence gates
+remain before connected work can be enabled:
 
-1. **Hosting runtime:** an always-on process model for Next.js and the Python
-   gateway, with health checks, restart behavior, patch ownership, and a
+1. **Hosting runtime:** install the selected `systemd` units on the private
+   Linux VM and verify health, restart behavior, patch ownership, and the
    loopback-only origin.
-2. **Identity:** a concrete login/assertion source and stable subject claim.
-   `X-Request-ID` is diagnostic only and cannot identify a user.
+2. **Identity:** apply the owner-controlled Tailscale policy and verify the
+   `owner-only` subject and stable assertion path. `X-Request-ID` is diagnostic
+   only and cannot identify a user.
 3. **Authorization:** a server-side subject-to-portfolio allowlist with
    fail-closed behavior for missing, forged, expired, or mismatched claims.
 4. **Storage isolation:** the private runtime may read only the approved local
@@ -127,14 +131,14 @@ The following decisions are still gates, not implementation details:
 ## 5. Recommended next sequence
 
 1. Keep the current local boundary and selective worktree baseline intact.
-2. Review and, when explicitly authorized, selectively stage the product
-   candidates listed in `WORKTREE-BASELINE-MANIFEST.json`.
-3. Select one concrete host, ingress, and identity path, then bind it to the
-   U5.5 contract and ADR-0050.
-4. Implement server-side authenticated **read-only** inspection behind that
-   contract, preserving the Python gateway as the domain owner.
-5. Run the U5.5 auth/isolation/session/audit/rollback evidence matrix.
-6. Treat DirectAdmin static deployment as a separate manual release only after
+2. Run the read-only `deploy/u5-5/promotion_evidence.py --mode dry-run`
+   harness and retain its schema-validated evidence.
+3. Run the U5.5 auth/isolation/session/audit/rollback matrix locally, preserving
+   the Python gateway as the domain owner.
+4. On the owner's Linux VM, run the harness in `--mode owner-vm`, install the
+   services, apply the reviewed tailnet policy, and perform promotion/rollback
+   only after the owner reviews the emitted evidence.
+5. Treat DirectAdmin static deployment as a separate manual release only after
    its host secrets and TLS prerequisites are supplied; never use it as proof
    that the private operator is deployable.
 

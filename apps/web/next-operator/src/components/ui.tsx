@@ -49,7 +49,7 @@ type InspectionTableProps = {
   emptyMessage: string;
 };
 
-export function InspectionTable({ caption, columns, rows, emptyMessage }: InspectionTableProps) {
+export function DataTable({ caption, columns, rows, emptyMessage }: InspectionTableProps) {
   return (
     <div className="table-scroll" role="region" aria-label={caption} tabIndex={0}>
       <table className="data-table">
@@ -74,6 +74,9 @@ export function InspectionTable({ caption, columns, rows, emptyMessage }: Inspec
   );
 }
 
+/** Backward-compatible name for existing inspection routes. */
+export const InspectionTable = DataTable;
+
 export function BoundaryBanner({ children }: { children: ReactNode }) {
   return (
     <section className="boundary-banner" aria-label="Paper-only boundary">
@@ -89,9 +92,13 @@ export function BoundaryBanner({ children }: { children: ReactNode }) {
 }
 
 export function SystemStatusStrip({ gatewayStatus }: { gatewayStatus: "available" | "unavailable" | "unknown" }) {
+  return <StatusRail gatewayStatus={gatewayStatus} />;
+}
+
+export function StatusRail({ gatewayStatus }: { gatewayStatus: "available" | "unavailable" | "unknown" }) {
   const gatewayLabel = gatewayStatus === "available" ? "Available" : gatewayStatus === "unavailable" ? "Unavailable" : "Unknown";
   return (
-    <section className="system-status-strip" aria-label="Operator system status">
+    <section className="system-status-strip status-rail" aria-label="Operator system status">
       <div className={`system-status-item system-status-${gatewayStatus}`}>
         <span>Gateway</span>
         <strong>{gatewayLabel}</strong>
@@ -109,6 +116,108 @@ export function SystemStatusStrip({ gatewayStatus }: { gatewayStatus: "available
         <strong>Off</strong>
       </div>
     </section>
+  );
+}
+
+export function FingerprintRow({ label, value }: { label: string; value: string }) {
+  return (
+    <>
+      <span className="fingerprint-label">{label}</span>
+      <strong className="fingerprint-value"><code className="dataset-fingerprint">{value}</code></strong>
+    </>
+  );
+}
+
+type EvidenceChainItem = { label: string; value: string; href?: string };
+
+export function EvidenceChain({ items }: { items: EvidenceChainItem[] }) {
+  return (
+    <ol className="evidence-chain" aria-label="Evidence chain">
+      {items.map((item, index) => (
+        <li key={`${item.label}-${item.value}`}>
+          <span className="evidence-chain-index">{String(index + 1).padStart(2, "0")}</span>
+          <span className="evidence-chain-copy">
+            <span>{item.label}</span>
+            {item.href ? <a href={item.href}>{item.value}</a> : <strong>{item.value}</strong>}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+type RiskLedgerItem = { label: string; value: string; tone?: "neutral" | "positive" | "warning" | "danger" };
+
+export function RiskLedger({ items }: { items: RiskLedgerItem[] }) {
+  return (
+    <dl className="risk-ledger" aria-label="Risk ledger">
+      {items.map((item) => (
+        <div key={item.label}>
+          <dt>{item.label}</dt>
+          <dd className={`risk-ledger-${item.tone ?? "neutral"}`}>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+type RuntimePanelProps = {
+  version: string;
+  sidecar: string;
+  signature: string;
+  currentSlot: string;
+  knownGoodSlot: string;
+  rollback: string;
+};
+
+export function RuntimePanel({
+  version,
+  sidecar,
+  signature,
+  currentSlot,
+  knownGoodSlot,
+  rollback,
+}: RuntimePanelProps) {
+  const values = [
+    ["Version", version],
+    ["Python sidecar", sidecar],
+    ["Signature", signature],
+    ["Current slot", currentSlot],
+    ["Known-good slot", knownGoodSlot],
+    ["Rollback", rollback],
+  ];
+  return (
+    <section className="panel runtime-panel" aria-label="Runtime and release status">
+      <PanelHeading kicker="U6.4 · observational only" title="Runtime / release" meta="NO MUTATION" />
+      <dl className="runtime-grid">
+        {values.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd className={`runtime-value runtime-value-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+type EventStreamItem = { sequence: string; label: string; detail: string; status: string };
+
+function eventStatusClass(status: string): string {
+  return status.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+export function EventStream({ items }: { items: EventStreamItem[] }) {
+  return (
+    <ol className="event-stream" aria-label="Append-only runtime events">
+      {items.map((item) => (
+        <li key={item.sequence}>
+          <span className="event-stream-sequence">{item.sequence}</span>
+          <span className="event-stream-copy"><strong>{item.label}</strong><span>{item.detail}</span></span>
+          <span className={`event-stream-status event-stream-status-${eventStatusClass(item.status)}`}>{item.status}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 

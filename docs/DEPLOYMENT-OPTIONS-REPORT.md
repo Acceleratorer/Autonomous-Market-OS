@@ -57,6 +57,15 @@ Private operator path:
 Browser -> Next.js :3000 -> Python gateway :8787 -> private state
 ```
 
+### 3.0 JavaScript package management
+
+The web operator and Electron shell are independent package roots. Both pin
+`pnpm@11.25.0` through `packageManager` and commit a local `pnpm-lock.yaml`;
+there is no root JavaScript workspace. Local, CI, and container instructions
+use `pnpm install --frozen-lockfile` so dependency resolution stays tied to the
+reviewed lockfile. See [`docs/JS-PACKAGE-MANAGEMENT.md`](JS-PACKAGE-MANAGEMENT.md)
+for the complete workflow.
+
 ### 3.1 Static preview
 
 Canonical source:
@@ -87,10 +96,10 @@ Location: `apps/web/next-operator/`.
 Commands:
 
 ```text
-npm ci
-npm run typecheck
-npm run build
-npm run start
+pnpm install --frozen-lockfile
+pnpm run typecheck
+pnpm run build
+pnpm run start
 ```
 
 Yêu cầu Node.js >=20.9. App hiện bind `127.0.0.1:3000` và đọc Python gateway tại `127.0.0.1:8787`. Đây là local/private shape, không phải public production deployment.
@@ -171,7 +180,7 @@ Chỉ lưu giá trị trong GitHub Secrets; không ghi password vào report, sou
 - Disk observed: khoảng `623.5 MB / 1 GB`.
 - Databases: `0 / 1`.
 - `node --version`: `node: command not found`.
-- `npm --version`: `npm: command not found`.
+- No Node.js package-manager executable was available on the hosting account.
 - Không thấy Node.js Application Manager.
 - `https://accel.io.vn/market-os/` trả HTTP 404 tại thời điểm kiểm tra.
 
@@ -229,15 +238,15 @@ Shape build/runtime:
 
 ```bash
 cd apps/web/next-operator
-npm ci
-npm run typecheck
-npm run build
+pnpm install --frozen-lockfile
+pnpm run typecheck
+pnpm run build
 
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
 python -m apps.gateway --host 127.0.0.1 --port 8787
-npm run start
+pnpm run start
 ```
 
 Đây là deployment shape tham khảo, không phải lệnh đã chạy production.
@@ -368,7 +377,7 @@ State không được rollback bằng cách rewrite event history. Rollback code
 
 - [ ] `python scripts/build_web_artifact.py --check`
 - [ ] `python -m pytest -q market_os/tests/test_app_surfaces.py`
-- [ ] `npx --yes tsx tests/market-os-readonly-dashboard.test.ts`
+- [ ] `pnpm dlx tsx tests/market-os-readonly-dashboard.test.ts`
 - [ ] DirectAdmin certificate còn hạn
 - [ ] Đủ 4 GitHub Secrets
 - [ ] Không có secret trong diff/log
@@ -417,4 +426,4 @@ Commit created by this report: NO
 Push performed by this report: NO
 ```
 
-Static preview là phương án gần production nhất về mặt code nhưng đang bị chặn bởi TLS DirectAdmin. Next.js operator bị chặn bởi việc hosting không có Node/npm và bởi các gate authentication/authorization/operations. Khi blocker thay đổi, dùng report này làm runbook; không suy luận deploy thành công chỉ vì build local pass.
+Static preview là phương án gần production nhất về mặt code nhưng đang bị chặn bởi TLS DirectAdmin. Next.js operator bị chặn bởi việc hosting không có Node.js runtime/package manager và bởi các gate authentication/authorization/operations. Khi blocker thay đổi, dùng report này làm runbook; không suy luận deploy thành công chỉ vì build local pass.

@@ -24,14 +24,16 @@ python -m apps.gateway --host 127.0.0.1 --port 8787
 Then install and run the web app from `apps/web/next-operator` in another:
 
 ```powershell
-npm ci
-npm run dev
+corepack enable
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 Open `http://127.0.0.1:3000`. The app server is bound to loopback and reads
 only the Python gateway at `127.0.0.1:8787`. The Node/Next surface owns no
 portfolio accounting, risk, recovery, or mutation logic. Node.js 20.9 or newer
-is required.
+is required. The app pins `pnpm@11.25.0`; use the committed
+`pnpm-lock.yaml` for reproducible installs.
 
 The CI artifact contains `market-os/` plus the sidecar
 `market-os.manifest.json`; the manifest is kept outside the exact three-file

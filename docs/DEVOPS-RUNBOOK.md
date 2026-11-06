@@ -31,6 +31,37 @@ the approved Tailscale path.
   the disconnected static `/market-os` artifact. It does not deploy the
   dynamic Next operator or Python gateway.
 
+U6.4-C release hardening runs in `.github/workflows/ci.yml` as a two-runner
+matrix. `windows-latest` builds `windows-x64`; `ubuntu-latest` builds
+`linux-x64`. Each runner installs the pinned Next.js and Electron dependencies,
+builds the renderer, and packages the Python source sidecar under `python/`
+with the host-native `python` or `python3` interpreter. This is a target-native
+source package; it does not embed Python or install a native service.
+
+The matrix job creates two distinct versions, signs both with an ephemeral
+external Ed25519 key, and runs `smoke-artifact.cjs --expect-signed`. The smoke
+must return 200 for `/readyz`, `/healthz`, `/overview`, and `/runtime`, close
+both loopback ports after shutdown, and expose release identity, append-only
+event evidence, and the local paper-only/read-only boundary. The uploaded CI
+artifact contains each `artifact-manifest.json`, `release-signature.json`, the
+two smoke reports, `release-drill.json`, and `ci-evidence.json`.
+
+The release drill seeds the candidate with the older signed artifact, then
+verifies the following sequence:
+
+1. a simulated failed launch restores both `current` and `known-good` metadata;
+2. promotion moves `current` to the candidate and keeps the older artifact as
+   `known-good`;
+3. the inspection report shows `rollback_available: true` while the two
+   manifest hashes differ;
+4. explicit rollback re-verifies the older artifact and restores it as
+   `current`.
+
+The manifest boundary check also requires loopback-only, synthetic, paper-only,
+read-only, zero provider requests, no credentials, no mutation routes, and
+`live_trading: false`. The Python sidecar root remains `python/`, so release
+metadata and local storage do not escape the artifact directory.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 
@@ -55,3 +86,13 @@ known-good release when health checks fail.
 
 For the static preview, deploy only the generated artifact after
 `python scripts/build_web_artifact.py --check` and the CI artifact checks pass.
+
+For a local U6.4-C drill on a matching host, run:
+
+```text
+cd apps/desktop/electron
+pnpm run release:ci -- --target windows-x64 --output ../../../output/u6.4-ci/windows-x64
+```
+
+Use `--target linux-x64` on Linux. Keep the generated output local; CI is the
+evidence store for target artifacts and public signature metadata.
