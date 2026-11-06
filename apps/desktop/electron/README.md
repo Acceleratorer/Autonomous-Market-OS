@@ -153,5 +153,6 @@ pnpm run release:ci -- --target windows-x64 --output ../../../output/u6.4-ci/win
 ```
 
 The command needs the matching host platform, a built Next.js renderer, and
-Python 3.11+ with the project dependencies. It never enables credentials,
+Python 3.11+ with the project dependencies. On a headless Linux host, prefix
+it with `xvfb-run -a`. It never enables credentials,
 provider access, mutation routes, public listeners, or live execution.

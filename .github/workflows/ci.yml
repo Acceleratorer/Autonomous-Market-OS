@@ -152,9 +152,14 @@ jobs:
       - name: Download target-native Electron runtime
         working-directory: apps/desktop/electron
         run: pnpm exec install-electron
-      - name: Build, sign, smoke, promote, and rollback two target-native artifacts
+      - name: Build, sign, smoke, promote, and rollback two target-native artifacts (Windows)
+        if: matrix.target == 'windows-x64'
         working-directory: apps/desktop/electron
         run: pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
+      - name: Build, sign, smoke, promote, and rollback two target-native artifacts (Linux)
+        if: matrix.target == 'linux-x64'
+        working-directory: apps/desktop/electron
+        run: xvfb-run -a pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
       - name: Upload U6.4-C CI evidence
         uses: actions/upload-artifact@v4
         with:

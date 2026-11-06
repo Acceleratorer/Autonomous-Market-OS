@@ -98,4 +98,6 @@ pnpm run release:ci -- --target windows-x64 --output ../../../output/u6.4-ci/win
 ```
 
 Use `--target linux-x64` on Linux. Keep the generated output local; CI is the
-evidence store for target artifacts and public signature metadata.
+evidence store for target artifacts and public signature metadata. The Linux CI
+step wraps the drill with `xvfb-run -a` because Electron's signed smoke needs a
+headless display server; no public listener or execution boundary changes.
