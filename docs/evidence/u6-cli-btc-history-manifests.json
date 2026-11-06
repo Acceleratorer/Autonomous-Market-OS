@@ -49,5 +49,5 @@
     "connected_runtime": false,
     "live_trading": false
   },
-  "next_gate": "define the U6 read-only app-shell contract over the completed CLI/API/Next.js projections"
+  "next_gate": "U6.4-B signed metadata, sidecar distribution, and hash-gated rollback"
 }

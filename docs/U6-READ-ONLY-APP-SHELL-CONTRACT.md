@@ -1,7 +1,7 @@
 # U6 Read-Only App-Shell Contract
 
-**Status:** Contract defined locally; concrete desktop/mobile platform deferred.
-**Date:** 2026-11-02
+**Status:** U6.1 locally verified; U6.2 selects Electron; U6.3 local shell slice verified; U6.4-A unsigned artifact and local U6.4-B signing/slot contract verified.
+**Date:** 2026-11-06
 
 ## Purpose
 
@@ -11,7 +11,9 @@ thin desktop and mobile shells. The shell is a presentation adapter. Python
 inspection, research inspection, and all versioned response semantics.
 
 The existing Next.js `AppShell` is the reference interaction model for the
-first implementation. A native shell may be selected later, but it must keep
+first implementation. U6.1 verifies its gateway status, overview, and BTC
+dataset catalog slice against the shared Python/API/CLI contracts. ADR-0053
+selects Electron as the desktop container; the native implementation must keep
 the same route semantics and safety boundary.
 
 ## Contract boundary
@@ -76,10 +78,93 @@ local store:
 - typecheck/build, focused parity tests, responsive browser checks, evidence
   validation, secret scan, and `git diff --check` pass.
 
+## U6.1 local verification
+
+- `getGatewayStatus()` validates the Python `/readyz` envelope before the
+  overview reports gateway availability.
+- Overview and BTC dataset registry remain server-rendered GET-only pages using
+  `market-api.ts`; the adapter preserves versioned envelopes, 1–100 bounds,
+  exclusive cursors, ordering, empty-store responses, and invalid-input
+  rejection.
+- Focused Python parity checks and the TypeScript shell contract test pass.
+- Overview and dataset captures pass at 320, 375, 768, 1024, and 1440 pixels;
+  wide tables remain inside labelled horizontal-scroll regions.
+
+## U6.2 native platform selection
+
+- ADR-0053 selects Electron for Windows x64 and Linux x64 desktop targets.
+- The existing Next.js shell remains the renderer; Python remains the gateway,
+  storage, accounting, and inspection authority.
+- U6.2 added no Electron dependency, native scaffold, updater, credentials,
+  provider path, mutation route, or deployment. U6.3 now proves the local
+  loopback child-process lifecycle and hardened Electron renderer boundary;
+  packaging/update rollback remains the U6.4 gate.
+- Machine-readable evidence is in
+  `docs/evidence/u6-native-platform-selection.json`.
+
+## U6.3 local Electron shell slice
+
+- `apps/desktop/electron` starts the existing Python gateway and server-rendered
+  Next.js operator as owned loopback child processes, waits for `/readyz` and
+  `/healthz`, and stops descendants on exit.
+- The renderer loads only `http://127.0.0.1:<next-port>/overview` with sandbox,
+  context isolation, disabled Node integration, web security, denied window
+  creation, and loopback-only navigation.
+- A real headless Electron smoke on custom ports returned 200 for `/readyz`,
+  `/healthz`, and `/overview`; both ports closed after graceful SIGINT cleanup.
+- The U6.1 parity suite remains the contract reference. U6.3 adds no provider,
+  credential, mutation, live-trading, public-listener, or Tailscale path.
+- Machine-readable evidence is in `docs/evidence/u6-electron-shell.json`.
+- Reproducible sidecar bundling, signing, and explicit update rollback remain
+  the U6.4 gate; no packaged native release exists yet.
+
 ## Platform decision
 
-No desktop or mobile framework is selected by this contract. Choosing Tauri,
-Electron, React Native, Flutter, or another platform requires a separate
-decision record with packaging, update, filesystem, and local gateway policies.
-Until that decision is made, keep the implementation in the existing
-server-rendered Next.js shell and do not create a generic `apps/app` bucket.
+Electron is selected for the first desktop shell by ADR-0053. No mobile
+framework is selected. Keep the implementation in the existing server-rendered
+Next.js shell and keep the native code isolated under `apps/desktop/electron`.
+
+## U6.4-A unsigned artifact
+
+ADR-0054 defines the first reproducible desktop artifact. It keeps the
+Electron shell, Next.js production output, and Python source sidecar in one
+target-labelled directory with a SHA-256 manifest and explicit slot metadata.
+The sidecar runs with system Python 3.11+ and the dependencies declared by
+`pyproject.toml`; Python remains the authority for all domain behavior.
+
+Build and smoke the artifact from `apps/desktop/electron`:
+
+```text
+cd apps/web/next-operator
+pnpm install --frozen-lockfile
+pnpm run build
+
+cd ../../desktop/electron
+pnpm install --frozen-lockfile
+pnpm run package:unsigned -- --target windows-x64 --output ../../../output/u6.4/market-os-windows-x64
+pnpm run smoke:artifact -- --artifact ../../../output/u6.4/market-os-windows-x64
+```
+
+The smoke starts the artifact outside the source entrypoints, validates
+`/readyz`, `/healthz`, `/overview`, and `/runtime`, checks the unsigned release
+state, and confirms graceful loopback cleanup.
+
+## U6.4-B signed release metadata and slots
+
+The local release flow signs the immutable manifest bytes with an external
+Ed25519 key. Only `release-signature.json` is stored in the artifact; it
+contains the public key, key fingerprint, signature, and manifest SHA-256. The
+private key must remain outside the artifact and repository.
+
+`release-slots.cjs promote` verifies the manifest sidecar hash and signature,
+writes a verified `current` slot, and preserves the previous current record as
+`known-good`. A simulated launch failure restores both metadata files before
+returning an error. `release-slots.cjs rollback` verifies the known-good
+artifact and its hash before changing current, so tampering leaves the current
+slot untouched.
+
+`LocalRuntime` passes the verified signature and slot state to the existing
+Next.js renderer. `/runtime` exposes version, Python sidecar, signature,
+current slot, known-good slot, and rollback availability as observation only.
+U5.5 owner-VM promotion and rollback remain pending, and all private,
+read-only, paper-only, and execution-disabled boundaries remain visible.

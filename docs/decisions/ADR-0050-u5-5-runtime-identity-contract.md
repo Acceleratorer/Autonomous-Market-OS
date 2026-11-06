@@ -52,7 +52,7 @@ future connected read-only preview.
   Next.js.
 - Ingress: owner-controlled private Tailscale tailnet with Tailscale Serve;
   only the owner's Tailscale identity is admitted.
-- Subject: one owner subject only.
+- Subject: `owner-only` (one owner subject only).
 - Portfolio allowlist: `paper-main` only.
 - Portfolio root: `/var/lib/autonomous-market-os/portfolios`, with no
   traversal, symlink, reparse, bind-alias, or cross-portfolio access.
@@ -73,8 +73,11 @@ defined -> target_selected -> locally_verified -> enabled
 
 The repository is now at `locally_verified`. Local application-boundary,
 authorization, storage, audit, browser, health, and rollback-procedure evidence
-passes; the owner Linux VM/Tailscale promotion has not been run. This status
-does not enable a listener, accept credentials, or authorize deployment.
+passes; the owner Linux VM/Tailscale promotion and rollback have not been run.
+The runtime remains disabled. See
+[`u5-5-promotion-evidence.json`](../evidence/u5-5-promotion-evidence.json).
+This status does not enable a listener, accept credentials, or authorize
+deployment.
 
 ## Rationale
 

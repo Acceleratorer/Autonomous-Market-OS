@@ -1,0 +1,78 @@
+{
+  "schema": "market-os.u6-electron-shell@v1",
+  "milestone": "U6.3",
+  "status": "local-electron-shell-slice-verified-packaging-deferred",
+  "date": "2026-11-03",
+  "platform": {
+    "container": "electron",
+    "targets": ["windows-x64", "linux-x64"],
+    "renderer": "existing Next.js server-rendered operator",
+    "package_root": "apps/desktop/electron",
+    "entrypoint": "apps/desktop/electron/src/main.cjs"
+  },
+  "implementation": {
+    "gateway": "python -m apps.gateway --host 127.0.0.1 --port <api-port>",
+    "next": "next start --hostname 127.0.0.1 --port <next-port>",
+    "readiness": ["GET /readyz", "GET /healthz"],
+    "renderer_route": "/overview",
+    "gateway_cwd": "repository root",
+    "next_cwd": "apps/web/next-operator",
+    "child_process_ownership": true,
+    "bounded_readiness_timeout_seconds": 15,
+    "bounded_cleanup": true,
+    "transport": "http://127.0.0.1:<next-port> only",
+    "default_port_behavior": "prefers 8787/3000 and selects free loopback ports when either is occupied unless explicitly pinned"
+  },
+  "security": {
+    "sandbox": true,
+    "context_isolation": true,
+    "node_integration": false,
+    "web_security": true,
+    "window_open": "denied",
+    "navigation": "loopback origin only",
+    "preload_surface": "immutable read-only version metadata",
+    "renderer_ipc_commands": 0
+  },
+  "verification": {
+    "electron_unit_tests": "passed: 6 tests",
+    "runtime_smoke": {
+      "command": "pnpm exec electron . --disable-gpu --no-sandbox",
+      "api_port": 38888,
+      "next_port": 38889,
+      "readyz_status": 200,
+      "healthz_status": 200,
+      "overview_status": 200,
+      "graceful_cleanup": "passed: both custom loopback ports closed after SIGINT"
+    },
+    "default_port_conflict_fallback": "passed: an occupied 8787 gateway was avoided and a free loopback API port was selected",
+    "u6_1_parity": "reused: focused Python parity and TypeScript shell contract suites passed",
+    "next_typecheck": "passed",
+    "next_build": "passed",
+    "packaging_signing": "U6.4-A unsigned artifact verified; signing deferred to U6.4-B",
+    "sidecar_bundling": "U6.4-A source bundle verified; platform distribution deferred to U6.4-B"
+  },
+  "boundary": {
+    "local_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "get_only": true,
+    "provider_requests": 0,
+    "credentials": false,
+    "mutation_routes": false,
+    "live_trading": false,
+    "connected_runtime": false,
+    "public_listener": false,
+    "tailscale_enabled": false
+  },
+  "artifacts": [
+    "apps/desktop/electron/package.json",
+    "apps/desktop/electron/pnpm-lock.yaml",
+    "apps/desktop/electron/src/main.cjs",
+    "apps/desktop/electron/src/preload.cjs",
+    "apps/desktop/electron/src/runtime.cjs",
+    "apps/desktop/electron/tests/runtime.test.cjs",
+    "apps/desktop/electron/README.md",
+    "docs/decisions/ADR-0053-u6-native-platform-selection.md"
+  ],
+  "next_gate": "U6.4-B signed metadata, current/known-good promotion, sidecar distribution, and explicit rollback"
+}

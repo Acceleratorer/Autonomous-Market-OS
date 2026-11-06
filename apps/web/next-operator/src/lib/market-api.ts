@@ -18,6 +18,12 @@ type JsonObject = Record<string, unknown>;
 
 export type LocalApiErrorKind = "unavailable" | "missing" | "rejected" | "invalid";
 
+export type GatewayStatus = {
+  apiVersion: "market-os.v1";
+  service: "market-os";
+  status: "ready";
+};
+
 export class LocalApiError extends Error {
   constructor(readonly kind: LocalApiErrorKind) {
     super(kind);
@@ -478,6 +484,18 @@ async function readJson(path: string): Promise<unknown> {
   } catch {
     throw new LocalApiError("invalid");
   }
+}
+
+export async function getGatewayStatus(): Promise<GatewayStatus> {
+  const payload = asObject(await readJson("/readyz"));
+  if (
+    payload.api_version !== "market-os.v1"
+    || payload.service !== "market-os"
+    || payload.status !== "ready"
+  ) {
+    throw new LocalApiError("invalid");
+  }
+  return { apiVersion: "market-os.v1", service: "market-os", status: "ready" };
 }
 
 function asObject(value: unknown): JsonObject {

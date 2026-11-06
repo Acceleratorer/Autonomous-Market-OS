@@ -92,10 +92,14 @@ Unrelated existing worktree changes were preserved.
 
 ## Checks
 
+The command names below use the current pinned `pnpm@11.25.0` workflow. The
+browser evidence predates this package-manager migration; the web operator was
+re-run with the pnpm lockfile during the migration.
+
 | Check | Result |
 | --- | --- |
-| `npm run typecheck` | Pass |
-| `npm run build` | Pass |
+| `pnpm run typecheck` | Pass |
+| `pnpm run build` | Pass |
 | Configured lint script | Not present in `package.json`; no lint claim made |
 | Frontend unit/component test script | Not present in `package.json` |
 | Focused synthetic server/catalog tests | 12 passed |

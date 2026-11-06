@@ -158,6 +158,9 @@ export function MarketCandleChart({
   );
 }
 
+/** Shared visual language name; the existing candle renderer remains canonical. */
+export const MarketChart = MarketCandleChart;
+
 export function MarketContextStrip({
   dataset,
   candles,

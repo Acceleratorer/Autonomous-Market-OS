@@ -15,6 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
@@ -26,7 +32,7 @@ jobs:
           python-version: "3.12"
 
       - name: Check static preview contract
-        run: npx --yes tsx tests/market-os-readonly-dashboard.test.ts
+        run: pnpm dlx tsx tests/market-os-readonly-dashboard.test.ts
 
       - name: Verify source parity
         run: python scripts/build_web_artifact.py --check

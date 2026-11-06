@@ -1,0 +1,92 @@
+{
+  "schema": "market-os.u5-5.promotion-evidence@v1",
+  "milestone": "U5.5",
+  "status": "locally-verified-not-enabled",
+  "mode": "dry-run",
+  "selected_runtime": {
+    "host": "private-linux-vm",
+    "supervisor": "systemd",
+    "ingress": "owner-only-tailscale-serve",
+    "subject": "owner-only",
+    "portfolio_id": "paper-main",
+    "portfolio_root": "/var/lib/autonomous-market-os/portfolios"
+  },
+  "checks": {
+    "service_health": {
+      "status": "validated",
+      "detail": "loopback health probes and restart/network restrictions are present"
+    },
+    "tailscale_serve_ingress": {
+      "status": "validated",
+      "detail": "Serve forwards only HTTPS 443 to Next.js loopback; the reviewed ACL admits the owner placeholder only"
+    },
+    "direct_origin_denial": {
+      "status": "validated",
+      "detail": "Python rejects non-loopback/forged-origin access and Next.js denies non-owner or non-GET requests"
+    },
+    "owner_only_subject": {
+      "status": "validated",
+      "detail": "owner-only subject is explicit in the contract, environment template, proxy, and tailnet policy"
+    },
+    "paper_main_storage_isolation": {
+      "status": "validated",
+      "detail": "paper-main is the fixed allowlist under a fail-closed, alias-safe portfolio root"
+    },
+    "encrypted_backup": {
+      "status": "validated",
+      "detail": "age encryption and mode 0600 backup occur before the current release link changes"
+    },
+    "rollback_preservation": {
+      "status": "validated",
+      "detail": "failed promotion restores the known-good slot and re-runs its health check; explicit rollback does the same"
+    },
+    "paper_only_boundary": {
+      "status": "validated",
+      "detail": "the package remains read-only, paper-main-only, credential-free in-repo, and private"
+    },
+    "rollback_simulation": {
+      "status": "passed",
+      "detail": "temporary candidate failure restored the prior known-good slot and passed the post-restore health gate"
+    },
+    "owner_vm_health": {
+      "status": "not_run",
+      "detail": "dry-run mode does not contact the owner VM"
+    },
+    "owner_vm_tailscale": {
+      "status": "not_run",
+      "detail": "dry-run mode does not contact the owner VM"
+    }
+  },
+  "promotion_boundary": {
+    "enabled": false,
+    "owner_vm_promotion": "pending",
+    "rollback": "pending",
+    "public_listener": false,
+    "credentials_added": false,
+    "mutation_routes": false,
+    "paper_only": true
+  },
+  "artifacts": [
+    "deploy/u5-5/healthcheck.sh",
+    "deploy/u5-5/promote.sh",
+    "deploy/u5-5/rollback.sh",
+    "deploy/u5-5/tailscale-serve.sh",
+    "deploy/u5-5/tailnet-policy.hujson",
+    "deploy/u5-5/operator.env.example",
+    "deploy/u5-5/market-os-python.service",
+    "deploy/u5-5/market-os-next.service",
+    "deploy/u5-5/promotion_evidence.py",
+    "deploy/u5-5/README.md",
+    "docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md",
+    "docs/decisions/ADR-0050-u5-5-runtime-identity-contract.md"
+  ],
+  "verification": {
+    "local_simulation": "static contract validation plus temporary health-gated rollback simulation",
+    "owner_vm_commands": [
+      "deploy/u5-5/healthcheck.sh",
+      "tailscale serve status --json"
+    ],
+    "credentials_used": false
+  },
+  "failed_checks": []
+}

@@ -12,7 +12,8 @@ type AppShellProps = {
     | "datasets"
     | "datasetDetail"
     | "experiments"
-    | "experimentDetail";
+    | "experimentDetail"
+    | "runtime";
   gatewayStatus?: "available" | "unavailable" | "unknown";
 };
 
@@ -80,6 +81,15 @@ function DeskIcon() {
   );
 }
 
+function RuntimeIcon() {
+  return (
+    <svg aria-hidden="true" className="nav-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2.25v3.1m0 5.3v3.1M2.25 8h3.1m5.3 0h3.1" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      <circle cx="8" cy="8" r="2.55" stroke="currentColor" strokeWidth="1.25" />
+    </svg>
+  );
+}
+
 export function AppShell({ children, current, gatewayStatus = "unknown" }: AppShellProps) {
   const connected = isConnectedMode();
   const gatewayAddress = connected
@@ -99,6 +109,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
     datasetDetail: "BTC dataset detail",
     experiments: "BTC research runs",
     experimentDetail: "BTC research detail",
+    runtime: "Runtime / release",
   }[current];
 
   return (
@@ -153,6 +164,10 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
               >
                 <ResearchIcon />
                 <span>BTC research</span>
+              </Link>
+              <Link className="nav-link" href="/runtime" aria-current={navigationCurrent(current, "runtime")}>
+                <RuntimeIcon />
+                <span>Runtime / release</span>
               </Link>
             </>
           )}

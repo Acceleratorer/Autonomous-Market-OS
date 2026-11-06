@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { BoundaryBanner, InspectionTable, MetricCard, PageHeading, PanelHeading, ServiceState } from "@/components/ui";
+import { BoundaryBanner, FingerprintRow, InspectionTable, MetricCard, PageHeading, PanelHeading, ServiceState } from "@/components/ui";
 import {
   getBtcResearchRun,
   LocalApiError,
@@ -14,15 +14,6 @@ export const dynamic = "force-dynamic";
 
 function formatMetric(value: number | null): string {
   return value === null ? "n/a" : value.toFixed(6);
-}
-
-function FingerprintRow({ label, value }: { label: string; value: string }) {
-  return (
-    <>
-      <span>{label}</span>
-      <strong><code className="dataset-fingerprint">{value}</code></strong>
-    </>
-  );
 }
 
 function B2Results({ detail }: { detail: BtcResearchRunDetail }) {

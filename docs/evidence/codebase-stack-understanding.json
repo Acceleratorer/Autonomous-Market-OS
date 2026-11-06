@@ -95,5 +95,5 @@
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "refresh_note": "Knowledge and domain graphs were refreshed against main HEAD 849a4c2. The domain derivation adds current U6 bounded CLI and Next operator flows; graph validation and endpoint checks passed."
   },
-  "next_gate": "implement one parity-tested U6 read-only app-shell slice after platform selection"
+  "next_gate": "U6.4-B signed metadata, sidecar distribution, and hash-gated rollback"
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { MarketCandleChart, MarketContextStrip, SyntheticFixturePreview } from "@/components/market-desk";
-import { PanelHeading, ServiceState } from "@/components/ui";
+import { MarketChart, MarketContextStrip, SyntheticFixturePreview } from "@/components/market-desk";
+import { EvidenceChain, PanelHeading, RiskLedger, ServiceState } from "@/components/ui";
 import {
   getBtcHistoryCandlePage,
   getBtcHistoryDatasetCatalog,
@@ -85,7 +85,7 @@ export default async function MarketDeskPage() {
         </section>
 
         <section className="desk-status-ribbon" role="status" aria-label="Market desk status">
-          <div><span>Gateway</span><strong>{gatewayStatus === "available" ? "Available" : "Unavailable"}</strong></div>
+          <div className={`desk-status-cell desk-status-${gatewayStatus}`}><span>Gateway</span><strong>{gatewayStatus === "available" ? "Available" : "Unavailable"}</strong></div>
           <div><span>Data</span><strong>{hasStoredData ? "Validated page" : "Fixture preview"}</strong></div>
           <div><span>Authority</span><strong>Python broker</strong></div>
           <div><span>Venue</span><strong>None</strong></div>
@@ -101,7 +101,7 @@ export default async function MarketDeskPage() {
               meta={hasStoredData ? "OHLCV" : "FIXTURE PREVIEW"}
             />
             {candles?.ok && firstDataset ? (
-              <MarketCandleChart dataset={firstDataset} candles={candles.value.candles} />
+              <MarketChart dataset={firstDataset} candles={candles.value.candles} />
             ) : datasets.ok ? (
               <SyntheticFixturePreview symbol={firstDataset?.symbol ?? "BTCUSDT"} />
             ) : candles && !candles.ok ? (
@@ -122,13 +122,13 @@ export default async function MarketDeskPage() {
               />
               {portfolioDetail?.ok ? (
                 <div className="panel-body">
-                  <dl className="desk-book-grid">
-                    <div><dt>Mark price</dt><dd>{portfolioDetail.value.summary.markPrice} USDT</dd></div>
-                    <div><dt>Realized P/L</dt><dd>{portfolioDetail.value.summary.realizedPnlUsdt} USDT</dd></div>
-                    <div><dt>BTC inventory</dt><dd>{portfolioDetail.value.summary.btcQuantity} BTC</dd></div>
-                    <div><dt>Open orders</dt><dd>{portfolioDetail.value.summary.openOrders}</dd></div>
-                    <div><dt>Risk outcomes shown</dt><dd>{portfolioDetail.value.riskRecords.length}</dd></div>
-                  </dl>
+                  <RiskLedger items={[
+                    { label: "Mark price", value: `${portfolioDetail.value.summary.markPrice} USDT` },
+                    { label: "Realized P/L", value: `${portfolioDetail.value.summary.realizedPnlUsdt} USDT`, tone: "positive" },
+                    { label: "BTC inventory", value: `${portfolioDetail.value.summary.btcQuantity} BTC` },
+                    { label: "Open orders", value: String(portfolioDetail.value.summary.openOrders), tone: portfolioDetail.value.summary.openOrders ? "warning" : "neutral" },
+                    { label: "Risk outcomes shown", value: String(portfolioDetail.value.riskRecords.length) },
+                  ]} />
                   <Link className="action-link" href={`/portfolios/${encodeURIComponent(portfolioDetail.value.portfolioId)}`} prefetch={false}>
                     Open book detail
                   </Link>
@@ -185,13 +185,13 @@ export default async function MarketDeskPage() {
 
           <section className="panel" aria-label="Evidence and research lineage">
             <PanelHeading kicker="Evidence chain" title="Lineage" meta={`${researchCount} shown`} />
-            <div className="panel-body desk-evidence-list">
-              <div><span>Dataset revision</span><strong>{firstDataset?.datasetRevision ?? "n/a"}</strong></div>
-              <div><span>Canonical fingerprint</span><code>{firstDataset?.canonicalFingerprint ?? "n/a"}</code></div>
-              <div><span>B2 baselines</span><strong>{b2Runs.ok ? b2Runs.value.runs.length : "n/a"}</strong></div>
-              <div><span>B3 comparisons</span><strong>{b3Runs.ok ? b3Runs.value.runs.length : "n/a"}</strong></div>
-              <Link className="action-link" href="/experiments">Open evidence</Link>
-            </div>
+            <EvidenceChain items={[
+              { label: "Dataset revision", value: firstDataset?.datasetRevision ?? "n/a", href: firstDataset ? datasetHref(firstDataset.datasetRevision) : undefined },
+              { label: "Canonical fingerprint", value: firstDataset?.canonicalFingerprint ?? "n/a" },
+              { label: "B2 baselines", value: b2Runs.ok ? `${b2Runs.value.runs.length} shown` : "n/a" },
+              { label: "B3 comparisons", value: b3Runs.ok ? `${b3Runs.value.runs.length} shown` : "n/a" },
+              { label: "Research catalog", value: "Open evidence", href: "/experiments" },
+            ]} />
           </section>
 
           <section className="panel" aria-label="Portfolio and risk context">

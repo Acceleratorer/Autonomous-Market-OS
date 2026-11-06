@@ -1,0 +1,98 @@
+{
+  "schema": "market-os.u6.4-release-hardening@v1",
+  "milestone": "U6.4-C",
+  "status": "local-windows-verified-ci-matrix-configured",
+  "date": "2026-11-07",
+  "ci_matrix": {
+    "windows-x64": {
+      "runner": "windows-latest",
+      "status": "passed-locally",
+      "host": "win32",
+      "known_good_version": "0.1.0-ci.1793993550152.1",
+      "candidate_version": "0.1.0-ci.1793993550152.2",
+      "known_good_manifest_sha256": "767704856d81a2e9dc653c5ef64171cfe16361573c4ac05c9a69832a9375cdfe",
+      "candidate_manifest_sha256": "5b0a4cd3cf539656516e0c41157977b41dc5d02d52ca04d82e712512c66392d5"
+    },
+    "linux-x64": {
+      "runner": "ubuntu-latest",
+      "status": "configured-in-ci",
+      "verification": "same release:ci command and smoke/drill sequence runs on the matching Linux runner"
+    }
+  },
+  "signed_smoke": {
+    "known_good": {
+      "readyz_status": 200,
+      "healthz_status": 200,
+      "overview_status": 200,
+      "runtime_status": 200,
+      "identity": true,
+      "audit": true,
+      "read_only_paper_only": true,
+      "private_loopback": true,
+      "storage_isolation": true,
+      "api_closed": true,
+      "next_closed": true
+    },
+    "candidate": {
+      "readyz_status": 200,
+      "healthz_status": 200,
+      "overview_status": 200,
+      "runtime_status": 200,
+      "identity": true,
+      "audit": true,
+      "read_only_paper_only": true,
+      "private_loopback": true,
+      "storage_isolation": true,
+      "api_closed": true,
+      "next_closed": true
+    }
+  },
+  "promotion_rollback": {
+    "candidate_signed": true,
+    "known_good_signed": true,
+    "versions_differ": true,
+    "failed_launch_restored_metadata": true,
+    "promotion_current_candidate": true,
+    "known_good_preserved": true,
+    "rollback_available_before": true,
+    "rollback_to_known_good": true,
+    "storage_isolation": true,
+    "failed_launch_error": "simulated release launch failure; previous release slots restored"
+  },
+  "boundary": {
+    "storage_root": "python/.market_os",
+    "storage_scope": "artifact-local",
+    "shared_host_root": false,
+    "loopback_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "read_only": true,
+    "credentials": false,
+    "provider_requests": 0,
+    "mutation_routes": false,
+    "live_trading": false,
+    "embedded_python": false,
+    "u5_5_owner_vm_enabled": false
+  },
+  "evidence": {
+    "ci_workflow": ".github/workflows/ci.yml",
+    "package_script": "apps/desktop/electron/scripts/package.cjs",
+    "ci_orchestrator": "apps/desktop/electron/scripts/ci-release.cjs",
+    "release_drill": "apps/desktop/electron/scripts/release-drill.cjs",
+    "uploaded_files": [
+      "artifact-manifest.json",
+      "artifact-manifest.json.sha256",
+      "release-signature.json",
+      "smoke-*.json",
+      "release-drill.json",
+      "ci-evidence.json"
+    ]
+  },
+  "deferred": [
+    "embedded Python runtime/native installer",
+    "mobile shell",
+    "credentials and provider access",
+    "live execution",
+    "U5.5 systemd/Tailscale owner-VM promotion"
+  ]
+}
