@@ -151,7 +151,7 @@ async function main() {
     [path.join(ELECTRON_ROOT, "node_modules"), "Electron dependencies"],
     [
       electronBinary,
-      `target-native Electron runtime (run "pnpm exec electron --version" after install)`,
+      `target-native Electron runtime (run "pnpm exec install-electron" after install)`,
     ],
     [path.join(REPO_ROOT, "market_os"), "Python domain package"],
     [path.join(REPO_ROOT, "apps", "gateway"), "Python gateway package"],

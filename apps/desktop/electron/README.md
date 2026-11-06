@@ -57,14 +57,15 @@ pnpm run build
 
 cd ../../desktop/electron
 pnpm install --frozen-lockfile
-pnpm exec electron --version
+pnpm exec install-electron
 pnpm run package:unsigned -- --target windows-x64 --output ../../../output/u6.4/market-os-windows-x64
 pnpm run smoke:artifact -- --artifact ../../../output/u6.4/market-os-windows-x64
 ```
 
 Electron 45 publishes its launcher without a lifecycle download hook. The
-`pnpm exec electron --version` step explicitly fetches the target-native binary
-before packaging; `package.cjs` fails closed if the binary is still missing.
+`pnpm exec install-electron` step explicitly fetches the target-native binary
+without launching Chromium; `package.cjs` fails closed if the binary is still
+missing.
 
 The smoke runs the artifact from its own directory and verifies `/readyz`,
 `/healthz`, `/overview`, `/runtime`, the unsigned release state, and loopback
@@ -147,7 +148,7 @@ Run the same local drill after a production build:
 
 ```text
 cd apps/desktop/electron
-pnpm exec electron --version
+pnpm exec install-electron
 pnpm run release:ci -- --target windows-x64 --output ../../../output/u6.4-ci/windows-x64
 ```
 

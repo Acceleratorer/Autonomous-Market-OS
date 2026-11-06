@@ -35,7 +35,7 @@ U6.4-C release hardening runs in `.github/workflows/ci.yml` as a two-runner
 matrix. `windows-latest` builds `windows-x64`; `ubuntu-latest` builds
 `linux-x64`. Each runner installs the pinned Next.js and Electron dependencies,
 explicitly downloads the target-native Electron binary with
-`pnpm exec electron --version`,
+`pnpm exec install-electron` (without launching Chromium),
 builds the renderer, and packages the Python source sidecar under `python/`
 with the host-native `python` or `python3` interpreter. This is a target-native
 source package; it does not embed Python or install a native service.
@@ -93,7 +93,7 @@ For a local U6.4-C drill on a matching host, run:
 
 ```text
 cd apps/desktop/electron
-pnpm exec electron --version
+pnpm exec install-electron
 pnpm run release:ci -- --target windows-x64 --output ../../../output/u6.4-ci/windows-x64
 ```
 
