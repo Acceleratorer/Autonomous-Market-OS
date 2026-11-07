@@ -160,12 +160,16 @@ jobs:
         if: matrix.target == 'linux-x64'
         working-directory: apps/desktop/electron
         run: xvfb-run -a pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
+      - name: Validate U6.4-C evidence bundle
+        working-directory: apps/desktop/electron
+        run: pnpm run release:validate -- --root "${{ runner.temp }}/market-os-u6-4" --report "${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json"
       - name: Upload U6.4-C CI evidence
         uses: actions/upload-artifact@v4
         with:
           name: market-os-u6-4-${{ matrix.target }}
           path: |
             ${{ runner.temp }}/market-os-u6-4/ci-evidence.json
+            ${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json
             ${{ runner.temp }}/market-os-u6-4/release-drill.json
             ${{ runner.temp }}/market-os-u6-4/smoke-*.json
             ${{ runner.temp }}/market-os-u6-4/artifact-known-good/artifact-manifest.json

@@ -12,6 +12,7 @@
     "sign:artifact": "node scripts/sign-artifact.cjs",
     "release:drill": "node scripts/release-drill.cjs",
     "release:ci": "node scripts/ci-release.cjs",
+    "release:validate": "node scripts/validate-ci-evidence.cjs",
     "release:inspect": "node scripts/release-slots.cjs inspect",
     "release:promote": "node scripts/release-slots.cjs promote",
     "release:rollback": "node scripts/release-slots.cjs rollback",
