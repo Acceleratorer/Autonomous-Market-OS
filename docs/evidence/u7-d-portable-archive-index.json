@@ -1,7 +1,8 @@
 {
   "schema": "market-os.u7-d-portable-archive-index@v1",
   "milestone": "U7-D",
-  "status": "implemented-awaiting-ci",
+  "status": "ci-verified",
+  "ci_run_id": "42404824841",
   "scope": "offline index of target-native signed portable archives",
   "checks": {
     "archives_present": true,
@@ -33,5 +34,5 @@
     "live execution",
     "U5.5 systemd/Tailscale owner-VM promotion"
   ],
-  "next_gate": "pass the pull-request CI matrix and replace implemented-awaiting-ci with the CI run evidence"
+  "next_gate": "select the next bounded U7 artifact product or begin the separate U8 live-readiness decision"
 }
