@@ -258,13 +258,16 @@ def test_service_writes_structured_request_audit_log(tmp_path: Path) -> None:
     workflow = MarketWorkflow(RunStore(tmp_path / "state"))
     log_path = tmp_path / "logs" / "service.jsonl"
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow, service_log_path=log_path))
+    server.daemon_threads = False
     thread = thread_module.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
-        response = urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2)
-        assert response.status == 200
+        with urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}/healthz", timeout=2) as response:
+            assert response.status == 200
+            response.read()
     finally:
         server.shutdown()
+        server.server_close()
         thread.join(timeout=2)
 
     records = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
@@ -277,6 +280,7 @@ def test_service_request_id_is_correlated_without_logging_query_values(tmp_path:
     workflow = MarketWorkflow(RunStore(tmp_path / "state"))
     log_path = tmp_path / "logs" / "service.jsonl"
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(workflow, service_log_path=log_path))
+    server.daemon_threads = False
     thread = thread_module.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
