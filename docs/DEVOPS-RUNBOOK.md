@@ -77,6 +77,10 @@ After archiving, `release:index` writes `portable-archive-index.json` and
 rechecks both archive hashes against their reports, the validated manifest
 hashes, signatures, target/version identity, and the read-only paper-only
 boundary before the evidence is uploaded.
+The dependent U7-E catalog job downloads both target evidence bundles and writes
+`cross-target-release-catalog.json`. It requires both target indexes to pass,
+keeps known-good/candidate versions aligned across targets, requires unique
+archive hashes, and checks one consistent private/read-only/paper-only boundary.
 
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.

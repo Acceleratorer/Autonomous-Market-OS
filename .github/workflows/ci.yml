@@ -197,6 +197,44 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/artifact-candidate/release-signature.json
           if-no-files-found: error
 
+  u7-release-catalog:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    needs: u6-4-release-hardening
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/desktop/electron/pnpm-lock.yaml
+      - name: Download Windows release evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: market-os-u6-4-windows-x64
+          path: ${{ runner.temp }}/market-os-u7/windows-x64
+      - name: Download Linux release evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: market-os-u6-4-linux-x64
+          path: ${{ runner.temp }}/market-os-u7/linux-x64
+      - name: Build cross-target release catalog
+        working-directory: apps/desktop/electron
+        run: pnpm run release:catalog -- --windows "${{ runner.temp }}/market-os-u7/windows-x64" --linux "${{ runner.temp }}/market-os-u7/linux-x64" --output "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json"
+      - name: Upload cross-target release catalog
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-os-u7-release-catalog
+          path: ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json
+          if-no-files-found: error
+
   container-build:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     needs: offline-tests
