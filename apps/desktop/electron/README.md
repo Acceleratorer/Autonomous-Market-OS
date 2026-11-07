@@ -144,6 +144,16 @@ promotion/rollback drill report. The drill proves failed-launch metadata
 restoration, preserves the previous artifact as `known-good`, observes
 `rollback_available: true` after promotion, and restores the older artifact.
 
+Validate a downloaded CI evidence bundle offline:
+
+```text
+pnpm run release:validate -- --root ../../../output/u6.4-ci/windows-x64
+```
+
+The validator rechecks both Ed25519 signatures and manifest hashes, the four
+signed smoke routes, boundary markers, and promotion/rollback evidence before
+the bundle is treated as complete.
+
 Run the same local drill after a production build:
 
 ```text

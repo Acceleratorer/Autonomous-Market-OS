@@ -64,6 +64,11 @@ read-only, zero provider requests, no credentials, no mutation routes, and
 `live_trading: false`. The Python sidecar root remains `python/`, so release
 metadata and local storage do not escape the artifact directory.
 
+The CI job validates the evidence bundle before upload with
+`pnpm run release:validate`. The validator rechecks both signed artifact
+directories, manifest hashes, four-route smoke reports, and the promotion /
+rollback boundary without contacting a VM or provider.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 
