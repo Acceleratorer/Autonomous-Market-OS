@@ -228,11 +228,21 @@ jobs:
       - name: Build cross-target release catalog
         working-directory: apps/desktop/electron
         run: pnpm run release:catalog -- --windows "${{ runner.temp }}/market-os-u7/windows-x64" --linux "${{ runner.temp }}/market-os-u7/linux-x64" --output "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json"
+      - name: Render cross-target catalog report
+        working-directory: apps/desktop/electron
+        run: >-
+          pnpm run release:catalog:report --
+          --catalog "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json"
+          --markdown "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.md"
+          --json "${{ runner.temp }}/market-os-u7/cross-target-release-catalog-report.json"
       - name: Upload cross-target release catalog
         uses: actions/upload-artifact@v4
         with:
           name: market-os-u7-release-catalog
-          path: ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json
+          path: |
+            ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json
+            ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.md
+            ${{ runner.temp }}/market-os-u7/cross-target-release-catalog-report.json
           if-no-files-found: error
 
   container-build:

@@ -81,6 +81,11 @@ The dependent U7-E catalog job downloads both target evidence bundles and writes
 `cross-target-release-catalog.json`. It requires both target indexes to pass,
 keeps known-good/candidate versions aligned across targets, requires unique
 archive hashes, and checks one consistent private/read-only/paper-only boundary.
+U7-F renders that validated catalog into `cross-target-release-catalog.md` and
+`cross-target-release-catalog-report.json`. The reporter rechecks the U7-E
+schema, target/version identity, four signed artifacts, unique archive hashes,
+mutable sidecar exclusion, and the same private/read-only/paper-only boundary
+before writing reviewer evidence.
 
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.

@@ -1,0 +1,37 @@
+{
+  "schema": "market-os.u7-f-cross-target-release-catalog-report-evidence@v1",
+  "milestone": "U7-F",
+  "status": "ci-verified",
+  "ci_run_id": "42408911326",
+  "scope": "offline reviewer Markdown and JSON report from the validated U7-E cross-target catalog",
+  "checks": {
+    "catalog_schema": true,
+    "catalog_status": true,
+    "targets_exact": true,
+    "release_versions_shared": true,
+    "artifacts_complete": true,
+    "signatures_verified": true,
+    "archive_hashes_unique": true,
+    "mutable_sidecar_state_excluded": true,
+    "boundary_verified": true
+  },
+  "implementation": {
+    "package_script": "apps/desktop/electron/package.json#release:catalog:report",
+    "reporter": "apps/desktop/electron/scripts/render-release-catalog-report.cjs",
+    "focused_test": "apps/desktop/electron/tests/release-catalog-report.test.cjs",
+    "workflow": ".github/workflows/ci.yml",
+    "uploaded_outputs": [
+      "cross-target-release-catalog.json",
+      "cross-target-release-catalog.md",
+      "cross-target-release-catalog-report.json"
+    ]
+  },
+  "deferred": [
+    "embedded Python runtime/native installer",
+    "mobile shell",
+    "credentials and provider access",
+    "live execution",
+    "U5.5 systemd/Tailscale owner-VM promotion"
+  ],
+  "next_gate": "select the next bounded U7 evaluation/report product or begin the separate U8 live-readiness decision"
+}
