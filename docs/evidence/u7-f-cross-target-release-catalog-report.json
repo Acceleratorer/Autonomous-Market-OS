@@ -1,8 +1,8 @@
 {
   "schema": "market-os.u7-f-cross-target-release-catalog-report-evidence@v1",
   "milestone": "U7-F",
-  "status": "implementation-pending-ci",
-  "ci_run_id": null,
+  "status": "ci-verified",
+  "ci_run_id": "42408911326",
   "scope": "offline reviewer Markdown and JSON report from the validated U7-E cross-target catalog",
   "checks": {
     "catalog_schema": true,
