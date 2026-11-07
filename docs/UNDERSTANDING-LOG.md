@@ -1776,3 +1776,18 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The next gate is the U6 read-only app-shell implementation over the shared
   Python, CLI, API, and Next.js semantics, after selecting a concrete platform.
   No VM, provider, credential, mutation, or live-trading path is enabled.
+
+## 2026-11-07 — U6.4-C and U7 release evidence closeout
+
+- U6.4-C passed on the matching Windows and Linux CI runners in run
+  `42380913496`: each target built two distinct signed artifacts, returned 200
+  from `/readyz`, `/healthz`, `/overview`, and `/runtime`, closed both loopback
+  ports, preserved the known-good slot, and completed promotion plus rollback.
+- U7-A adds offline validation for the downloaded CI bundle. U7-B renders the
+  validated result as `release-evidence-report.md` and
+  `release-evidence-report.json`; both reports are uploaded as CI evidence.
+  PRs #19 and #20 are merged, and `main` is clean and aligned with `origin/main`.
+- U5.5 local dry-run and validation remain green, but no owner VM or Tailscale
+  control plane was contacted. The next deployment gate still requires VM/access;
+  embedded Python/native installer, mobile, credentials, providers, mutations,
+  and live execution remain deferred.
