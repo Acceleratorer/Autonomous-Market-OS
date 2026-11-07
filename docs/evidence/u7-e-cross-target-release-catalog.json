@@ -1,7 +1,8 @@
 {
   "schema": "market-os.u7-e-cross-target-release-catalog@v1",
   "milestone": "U7-E",
-  "status": "implemented-awaiting-ci",
+  "status": "ci-verified",
+  "ci_run_id": "42406329172",
   "scope": "cross-target catalog of verified Windows/Linux release archives",
   "targets": [
     "windows-x64",
@@ -39,5 +40,5 @@
     "live execution",
     "U5.5 systemd/Tailscale owner-VM promotion"
   ],
-  "next_gate": "pass the pull-request CI matrix and record the catalog run evidence"
+  "next_gate": "select the next bounded U7 evaluation/report product or begin the separate U8 live-readiness decision"
 }
