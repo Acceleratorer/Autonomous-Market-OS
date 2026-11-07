@@ -1,26 +1,22 @@
 {
   "schema": "market-os.u6.4-release-hardening@v1",
   "milestone": "U6.4-C",
-  "status": "ci-verified-with-release-reports",
+  "status": "local-windows-verified-ci-matrix-configured",
   "date": "2026-11-07",
   "ci_matrix": {
     "windows-x64": {
       "runner": "windows-latest",
-      "status": "passed-in-ci",
+      "status": "passed-locally",
       "host": "win32",
-      "known_good_version": "0.1.0-ci.108.1",
-      "candidate_version": "0.1.0-ci.108.2",
-      "known_good_manifest_sha256": "47df910a60eedfae29ff371bb5ff9e2972ecba454724a1e4ad7172fee52f4654",
-      "candidate_manifest_sha256": "d3030b3b3b0c963ef97da195131b2e695d9bc7aa3cf13682ddf4eceb9e423bf1"
+      "known_good_version": "0.1.0-ci.1793993550152.1",
+      "candidate_version": "0.1.0-ci.1793993550152.2",
+      "known_good_manifest_sha256": "767704856d81a2e9dc653c5ef64171cfe16361573c4ac05c9a69832a9375cdfe",
+      "candidate_manifest_sha256": "5b0a4cd3cf539656516e0c41157977b41dc5d02d52ca04d82e712512c66392d5"
     },
     "linux-x64": {
       "runner": "ubuntu-latest",
-      "status": "passed-in-ci",
-      "host": "linux",
-      "known_good_version": "0.1.0-ci.108.1",
-      "candidate_version": "0.1.0-ci.108.2",
-      "known_good_manifest_sha256": "4ee7b91f5e5fc8c53d1d7cb3cacfa080ff64835f7e9750dbb5251b39495db384",
-      "candidate_manifest_sha256": "59287edfd10467f025f0930444f044c1c25e5645f64aceb0293ec01bf6dd009a"
+      "status": "configured-in-ci",
+      "verification": "same release:ci command and smoke/drill sequence runs on the matching Linux runner"
     }
   },
   "signed_smoke": {
@@ -80,13 +76,8 @@
   },
   "evidence": {
     "ci_workflow": ".github/workflows/ci.yml",
-    "ci_run_id": "42380913496",
-    "merged_pr": 20,
-    "required_checks_passed": 15,
     "package_script": "apps/desktop/electron/scripts/package.cjs",
     "ci_orchestrator": "apps/desktop/electron/scripts/ci-release.cjs",
-    "evidence_validator": "apps/desktop/electron/scripts/validate-ci-evidence.cjs",
-    "evidence_reporter": "apps/desktop/electron/scripts/render-ci-evidence-report.cjs",
     "release_drill": "apps/desktop/electron/scripts/release-drill.cjs",
     "uploaded_files": [
       "artifact-manifest.json",
@@ -94,10 +85,7 @@
       "release-signature.json",
       "smoke-*.json",
       "release-drill.json",
-      "ci-evidence.json",
-      "ci-evidence-validation.json",
-      "release-evidence-report.md",
-      "release-evidence-report.json"
+      "ci-evidence.json"
     ]
   },
   "deferred": [
