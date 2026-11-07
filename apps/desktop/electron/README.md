@@ -184,6 +184,13 @@ catalog after downloading both CI evidence directories:
 pnpm run release:catalog -- --windows ../../../output/u7/windows-x64 --linux ../../../output/u7/linux-x64 --output ../../../output/u7/cross-target-release-catalog.json
 ```
 
+Render a reviewer-friendly Markdown report and stable JSON summary from that
+cross-target catalog:
+
+```text
+pnpm run release:catalog:report -- --catalog ../../../output/u7/cross-target-release-catalog.json
+```
+
 Run the same local drill after a production build:
 
 ```text

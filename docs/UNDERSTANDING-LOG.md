@@ -1810,3 +1810,13 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The catalog requires both target indexes to pass, keeps known-good/candidate
   versions aligned, requires unique archive hashes, and verifies one consistent
   private loopback/read-only/paper-only/execution-disabled boundary.
+
+## 2026-11-08 — U7-F cross-target release catalog report
+
+- Added `release:catalog:report` and a focused report test. It consumes only a
+  passed U7-E catalog, rechecks schema, target/version identity, four signed
+  artifacts, unique archive hashes, mutable sidecar exclusion, and the private
+  loopback/read-only/paper-only/execution-disabled boundary.
+- CI now uploads the source catalog plus deterministic Markdown and JSON report
+  outputs. No VM, provider, credential, mutation, mobile, or live execution
+  path is enabled.
