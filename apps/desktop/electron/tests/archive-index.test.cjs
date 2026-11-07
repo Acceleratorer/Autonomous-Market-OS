@@ -46,11 +46,11 @@ test("U7-D indexes portable archives only when report and file hashes agree", as
     artifacts,
     checks: { boundary },
   });
-  for (const [role, name] of [["known-good", "known_good"], ["candidate", "candidate"]]) {
+  for (const [role, name, reportName] of [["known-good", "known_good", "known-good"], ["candidate", "candidate", "candidate"]]) {
     const archive = `market-os-linux-x64-${name}.tar.gz`;
     const bytes = Buffer.from(`${role} archive\n`, "utf8");
     await fsp.writeFile(path.join(root, archive), bytes);
-    await writeJson(path.join(root, `portable-archive-${name}.json`), {
+    await writeJson(path.join(root, `portable-archive-${reportName}.json`), {
       schema: "market-os.u7-c-portable-archive@v1",
       status: "passed",
       format: "tar.gz",

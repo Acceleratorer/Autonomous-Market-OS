@@ -80,14 +80,14 @@ async function indexArchives(options) {
   assertBoundary(validation.checks?.boundary, "validated CI evidence");
 
   const specs = [
-    ["known-good", "known_good"],
-    ["candidate", "candidate"],
+    ["known-good", "known_good", "known-good"],
+    ["candidate", "candidate", "candidate"],
   ];
   const archives = [];
-  for (const [role, name] of specs) {
+  for (const [role, name, reportName] of specs) {
     const expected = validation.artifacts?.[name];
     if (!expected?.version || !expected?.manifest_sha256) fail(`validated evidence is missing ${role} artifact`);
-    const report = await readJson(path.join(options.root, `portable-archive-${name}.json`), `${role} portable archive report`);
+    const report = await readJson(path.join(options.root, `portable-archive-${reportName}.json`), `${role} portable archive report`);
     const checked = assertArchiveReport(report, role, {
       target: evidence.target,
       version: expected.version,
