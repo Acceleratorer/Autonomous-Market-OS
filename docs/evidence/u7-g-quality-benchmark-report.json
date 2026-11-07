@@ -1,0 +1,56 @@
+{
+  "schema": "market-os.u7-g-quality-benchmark-report-evidence@v1",
+  "milestone": "U7-G",
+  "status": "local-verified",
+  "scope": "stable reviewer projection over the synthetic market-os.quality-benchmark.v2 fixture",
+  "fixture": {
+    "fixture_id": "m2.5-research-quality-corpus-v1",
+    "fixture_sha256": "0f6c4534fa75e5981e304825744d8c288d7ce79e4a1e3234d78e67258a157af6",
+    "cases": 36,
+    "evaluations": 36
+  },
+  "report": {
+    "schema": "market-os.u7-g-quality-benchmark-report@v1",
+    "benchmark_fingerprint": "13d935dda77553b8929d4713efab3f6437c00e548f43b1910a146261099d9f24",
+    "report_fingerprint": "5df5cac1993f523be89c9c82b8bb59d52272fba9e57e07ffbedb80f11eb8c605",
+    "status": "passed",
+    "promotion": "Not ready — specific failures remain",
+    "estimated_cost": null
+  },
+  "checks": {
+    "benchmark_schema": true,
+    "fingerprints_valid": true,
+    "replay_stable": true,
+    "benchmark_success": true,
+    "gate_correctness": true,
+    "lineage_complete": true,
+    "safety_boundary": true,
+    "cost_unavailable": true,
+    "latency_excluded_from_stable_projection": true
+  },
+  "implementation": {
+    "report_module": "market_os/quality_report.py",
+    "focused_test": "market_os/tests/test_quality_report.py",
+    "cli": "market-os benchmark report",
+    "workflow": ".github/workflows/ci.yml",
+    "uploaded_outputs": [
+      "quality-benchmark-report.md",
+      "quality-benchmark-report.json",
+      "benchmarks/artifacts/*.json"
+    ]
+  },
+  "safety": {
+    "read_only": true,
+    "trading_state_mutated": false,
+    "live_orders_created": false,
+    "external_provider_called": false
+  },
+  "deferred": [
+    "real model provider",
+    "credentials",
+    "network providers",
+    "live execution",
+    "U5.5 systemd/Tailscale owner-VM promotion"
+  ],
+  "next_gate": "select the next bounded U7 product or begin the separate U8 live-readiness decision"
+}

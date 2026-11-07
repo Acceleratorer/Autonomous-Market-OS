@@ -95,12 +95,12 @@ evidence in `docs/evidence/codebase-stack-understanding.json`.
 | Persistence | `store.py`, `portfolio_broker.py` | Append-only events, artifacts, checkpoints, recovery, and fingerprints |
 | Portfolio/risk | `portfolio_broker.py`, `portfolio_backup.py`, `portfolio_migration.py`, `schema_migration.py` | Paper wallet, shared strategy membership, portfolio-wide reservations, orders, approvals, limits, audit outcomes, backup, read-only retention/archive preflight, migration preflight, and local copy-on-write migration |
 | Execution | `paper_venue.py`, `portfolio_broker.py` | Synthetic market events and paper fills; no live venue |
-| Math/statistics | `btc_features.py`, `evaluation_protocol.py`, `btc_jev_evaluation.py`, `btc_question_evaluation.py`, `quality_benchmark.py` | Features, labels, baselines, calibration, metrics, replay and evaluation |
+| Math/statistics | `btc_features.py`, `evaluation_protocol.py`, `btc_jev_evaluation.py`, `btc_question_evaluation.py`, `quality_benchmark.py`, `quality_report.py` | Features, labels, baselines, calibration, metrics, replay, evaluation, and stable benchmark reviewer projections |
 | Strategy/accounting | `strategy.py`, `strategy_replay.py`, `accounting.py`, `synthetic_replay.py` | Signals, deterministic replay, PnL/accounting and synthetic simulation |
 | Data | `btc_history.py`, `btc_connectivity.py` | Canonical BTC rows, manifests, readiness, and bounded connectivity probes |
 | Providers | `adapters/` | Optional external runtimes behind fixture-first typed adapters |
 | Tests | `market_os/tests/`, `tests/` | Python behavior and TypeScript dashboard contract coverage |
-| Operations | `scripts/`, `apps/desktop/electron/scripts/`, `.github/workflows/`, `docs/evidence/` | CI checks, artifact smoke/release reports, validation and machine-readable evidence |
+| Operations | `scripts/`, `apps/desktop/electron/scripts/`, `.github/workflows/`, `docs/evidence/` | CI checks, artifact smoke/release reports, quality reports, validation and machine-readable evidence |
 
 Application surfaces are grouped under `apps/web`, `apps/cli`, and
 `apps/gateway`. Their names are the product-facing boundary; `market_os.api`

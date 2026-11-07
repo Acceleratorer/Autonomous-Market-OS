@@ -1820,3 +1820,15 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - CI now uploads the source catalog plus deterministic Markdown and JSON report
   outputs. No VM, provider, credential, mutation, mobile, or live execution
   path is enabled.
+
+## 2026-11-08 — U7-G deterministic quality benchmark report
+
+- Added `market-os benchmark report` and a stable
+  `market-os.u7-g-quality-benchmark-report@v1` projection over the existing
+  synthetic `market-os.quality-benchmark.v2` fixture. The report preserves
+  fixture/report fingerprints, replay stability, lineage, gate correctness,
+  safety, threshold decisions, and the explicit not-ready promotion status.
+- Machine-specific latency is omitted from the stable projection and cost stays
+  unavailable for the deterministic test double. CI uploads the Markdown,
+  JSON, and content-addressed benchmark artifact; no provider, credential,
+  network, mutation, mobile, or live execution path is enabled.

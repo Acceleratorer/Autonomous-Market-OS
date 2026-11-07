@@ -87,6 +87,15 @@ schema, target/version identity, four signed artifacts, unique archive hashes,
 mutable sidecar exclusion, and the same private/read-only/paper-only boundary
 before writing reviewer evidence.
 
+U7-G ([contract](U7-G-QUALITY-BENCHMARK-REPORT.md)) renders the synthetic
+`market-os.quality-benchmark.v2` fixture through `market-os benchmark report`.
+The stable projection keeps fixture and report
+fingerprints, replay and gate correctness, lineage, safety, threshold metrics,
+and the explicit `Not ready` promotion decision. Machine-specific latency is
+excluded from the stable projection, and deterministic test-double cost stays
+unavailable. CI uploads the JSON and Markdown report with the benchmark
+artifact; no provider, credential, network, mutation, or live path is used.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

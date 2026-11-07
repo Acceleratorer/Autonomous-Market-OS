@@ -40,6 +40,22 @@ jobs:
         run: python -m pytest -q -m integration
       - name: Full test suite
         run: python -m pytest -q
+      - name: Render U7-G quality benchmark report
+        run: >-
+          market-os benchmark report
+          --store-root "${{ runner.temp }}/market-os-u7-g/store"
+          --fixture market_os/tests/fixtures/quality/benchmark.json
+          --markdown "${{ runner.temp }}/market-os-u7-g/quality-benchmark-report.md"
+          --json "${{ runner.temp }}/market-os-u7-g/quality-benchmark-report.json"
+      - name: Upload U7-G quality benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-os-u7-g-quality-benchmark
+          path: |
+            ${{ runner.temp }}/market-os-u7-g/quality-benchmark-report.md
+            ${{ runner.temp }}/market-os-u7-g/quality-benchmark-report.json
+            ${{ runner.temp }}/market-os-u7-g/store/benchmarks/**
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON
