@@ -68,6 +68,8 @@ The CI job validates the evidence bundle before upload with
 `pnpm run release:validate`. The validator rechecks both signed artifact
 directories, manifest hashes, four-route smoke reports, and the promotion /
 rollback boundary without contacting a VM or provider.
+It then renders `release-evidence-report.md` and
+`release-evidence-report.json` for reviewer and tooling consumption.
 
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
