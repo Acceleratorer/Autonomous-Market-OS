@@ -177,6 +177,13 @@ and the unchanged private/read-only/paper-only boundary:
 pnpm run release:index -- --root ../../../output/u6.4-ci/windows-x64
 ```
 
+Combine the verified Windows and Linux archive indexes into one release
+catalog after downloading both CI evidence directories:
+
+```text
+pnpm run release:catalog -- --windows ../../../output/u7/windows-x64 --linux ../../../output/u7/linux-x64 --output ../../../output/u7/cross-target-release-catalog.json
+```
+
 Run the same local drill after a production build:
 
 ```text

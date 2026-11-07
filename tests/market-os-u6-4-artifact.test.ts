@@ -63,7 +63,7 @@ test("U6.4-B keeps signing and slot promotion outside the renderer", async () =>
 });
 
 test("U6.4-C packages target-native Python metadata and CI rollback evidence", async () => {
-  const [packager, runtime, smoke, drill, ci, validator, reporter, archiver, archiveIndexer, packageJson] = await Promise.all([
+  const [packager, runtime, smoke, drill, ci, validator, reporter, archiver, archiveIndexer, cataloger, packageJson] = await Promise.all([
     source("apps/desktop/electron/scripts/package.cjs"),
     source("apps/desktop/electron/src/runtime.cjs"),
     source("apps/desktop/electron/scripts/smoke-artifact.cjs"),
@@ -73,6 +73,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
     source("apps/desktop/electron/scripts/render-ci-evidence-report.cjs"),
     source("apps/desktop/electron/scripts/archive-artifact.cjs"),
     source("apps/desktop/electron/scripts/index-portable-archives.cjs"),
+    source("apps/desktop/electron/scripts/catalog-release.cjs"),
     source("apps/desktop/electron/package.json"),
   ]);
 
@@ -83,6 +84,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.equal(manifest.scripts["release:report"], "node scripts/render-ci-evidence-report.cjs");
   assert.equal(manifest.scripts["release:archive"], "node scripts/archive-artifact.cjs");
   assert.equal(manifest.scripts["release:index"], "node scripts/index-portable-archives.cjs");
+  assert.equal(manifest.scripts["release:catalog"], "node scripts/catalog-release.cjs");
   assert.match(packager, /target-native-source/);
   assert.match(packager, /python\/\.market_os/);
   assert.match(packager, /--version/);
@@ -108,4 +110,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.match(archiveIndexer, /archive_hashes_match_reports/);
   assert.match(archiveIndexer, /mutable_sidecar_state_excluded/);
   assert.match(archiveIndexer, /sha256File/);
+  assert.match(cataloger, /market-os\.u7-e-cross-target-release-catalog@v1/);
+  assert.match(cataloger, /boundaries_consistent/);
+  assert.match(cataloger, /archive_hashes_unique/);
 });

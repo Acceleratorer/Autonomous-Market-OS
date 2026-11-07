@@ -1802,3 +1802,11 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The generated `portable-archive-index.json` is uploaded with each Windows and
   Linux evidence bundle. No VM, provider, credential, mutation, mobile, or live
   execution path is enabled.
+
+## 2026-11-08 — U7-E cross-target release catalog
+
+- Added `release:catalog` and a dependent CI job that downloads the Windows and
+  Linux U7-D evidence bundles and emits one cross-target release catalog.
+- The catalog requires both target indexes to pass, keeps known-good/candidate
+  versions aligned, requires unique archive hashes, and verifies one consistent
+  private loopback/read-only/paper-only/execution-disabled boundary.
