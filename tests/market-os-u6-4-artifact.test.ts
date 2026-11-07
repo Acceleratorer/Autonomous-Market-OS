@@ -63,13 +63,14 @@ test("U6.4-B keeps signing and slot promotion outside the renderer", async () =>
 });
 
 test("U6.4-C packages target-native Python metadata and CI rollback evidence", async () => {
-  const [packager, runtime, smoke, drill, ci, validator, packageJson] = await Promise.all([
+  const [packager, runtime, smoke, drill, ci, validator, reporter, packageJson] = await Promise.all([
     source("apps/desktop/electron/scripts/package.cjs"),
     source("apps/desktop/electron/src/runtime.cjs"),
     source("apps/desktop/electron/scripts/smoke-artifact.cjs"),
     source("apps/desktop/electron/scripts/release-drill.cjs"),
     source("apps/desktop/electron/scripts/ci-release.cjs"),
     source("apps/desktop/electron/scripts/validate-ci-evidence.cjs"),
+    source("apps/desktop/electron/scripts/render-ci-evidence-report.cjs"),
     source("apps/desktop/electron/package.json"),
   ]);
 
@@ -77,6 +78,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.equal(manifest.scripts["release:drill"], "node scripts/release-drill.cjs");
   assert.equal(manifest.scripts["release:ci"], "node scripts/ci-release.cjs");
   assert.equal(manifest.scripts["release:validate"], "node scripts/validate-ci-evidence.cjs");
+  assert.equal(manifest.scripts["release:report"], "node scripts/render-ci-evidence-report.cjs");
   assert.match(packager, /target-native-source/);
   assert.match(packager, /python\/\.market_os/);
   assert.match(packager, /--version/);
@@ -93,4 +95,6 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.match(validator, /market-os\.u7-a-ci-evidence-validation@v1/);
   assert.match(validator, /verifyArtifact/);
   assert.match(validator, /rollback_available_before/);
+  assert.match(reporter, /market-os\.u7-b-release-evidence-report@v1/);
+  assert.match(reporter, /release-evidence-report\.md/);
 });

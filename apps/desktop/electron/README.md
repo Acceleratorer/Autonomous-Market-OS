@@ -154,6 +154,13 @@ The validator rechecks both Ed25519 signatures and manifest hashes, the four
 signed smoke routes, boundary markers, and promotion/rollback evidence before
 the bundle is treated as complete.
 
+Render a reviewer-friendly Markdown report and stable JSON summary from the
+validated bundle:
+
+```text
+pnpm run release:report -- --root ../../../output/u6.4-ci/windows-x64
+```
+
 Run the same local drill after a production build:
 
 ```text
