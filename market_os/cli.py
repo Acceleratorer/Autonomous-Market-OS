@@ -40,6 +40,11 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark_run = benchmark_commands.add_parser("run")
     benchmark_run.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
     benchmark_run.add_argument("--fixture", required=True)
+    benchmark_report = benchmark_commands.add_parser("report")
+    benchmark_report.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
+    benchmark_report.add_argument("--fixture", required=True)
+    benchmark_report.add_argument("--markdown", required=True)
+    benchmark_report.add_argument("--json", dest="json_path", required=True)
     benchmark_inspect = benchmark_commands.add_parser("inspect")
     benchmark_inspect.add_argument("benchmark_id")
     benchmark_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
@@ -232,6 +237,11 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.benchmark_command == "run":
             result = run_quality_benchmark(args.store_root, args.fixture)
+        elif args.benchmark_command == "report":
+            from .quality_report import render_quality_report
+
+            benchmark = run_quality_benchmark(args.store_root, args.fixture)
+            result = render_quality_report(benchmark, markdown_path=args.markdown, json_path=args.json_path)
         else:
             result = BenchmarkStore(args.store_root).inspect(args.benchmark_id, args.resource, args.item_id)
         print(json.dumps(result, indent=2, sort_keys=True))
