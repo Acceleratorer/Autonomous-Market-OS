@@ -70,6 +70,9 @@ directories, manifest hashes, four-route smoke reports, and the promotion /
 rollback boundary without contacting a VM or provider.
 It then renders `release-evidence-report.md` and
 `release-evidence-report.json` for reviewer and tooling consumption.
+The same CI job creates target-native `.tar.gz` archives for the known-good and
+candidate artifacts, re-extracts them, and verifies their signatures before
+upload. Mutable `python/.market_os` state is excluded from each archive.
 
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
