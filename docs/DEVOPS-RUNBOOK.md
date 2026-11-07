@@ -73,6 +73,10 @@ It then renders `release-evidence-report.md` and
 The same CI job creates target-native `.tar.gz` archives for the known-good and
 candidate artifacts, re-extracts them, and verifies their signatures before
 upload. Mutable `python/.market_os` state is excluded from each archive.
+After archiving, `release:index` writes `portable-archive-index.json` and
+rechecks both archive hashes against their reports, the validated manifest
+hashes, signatures, target/version identity, and the read-only paper-only
+boundary before the evidence is uploaded.
 
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.

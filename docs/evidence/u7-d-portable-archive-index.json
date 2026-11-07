@@ -1,0 +1,37 @@
+{
+  "schema": "market-os.u7-d-portable-archive-index@v1",
+  "milestone": "U7-D",
+  "status": "implemented-awaiting-ci",
+  "scope": "offline index of target-native signed portable archives",
+  "checks": {
+    "archives_present": true,
+    "archive_hashes_match_reports": true,
+    "manifests_match_validation": true,
+    "signatures_verified": true,
+    "mutable_sidecar_state_excluded": true,
+    "boundary": {
+      "loopback_only": true,
+      "synthetic": true,
+      "paper_only": true,
+      "read_only": true,
+      "credentials": false,
+      "provider_requests": 0,
+      "mutation_routes": false,
+      "live_trading": false
+    }
+  },
+  "implementation": {
+    "package_script": "apps/desktop/electron/package.json#release:index",
+    "indexer": "apps/desktop/electron/scripts/index-portable-archives.cjs",
+    "workflow": ".github/workflows/ci.yml",
+    "uploaded_output": "portable-archive-index.json"
+  },
+  "deferred": [
+    "embedded Python runtime/native installer",
+    "mobile shell",
+    "credentials and provider access",
+    "live execution",
+    "U5.5 systemd/Tailscale owner-VM promotion"
+  ],
+  "next_gate": "pass the pull-request CI matrix and replace implemented-awaiting-ci with the CI run evidence"
+}
