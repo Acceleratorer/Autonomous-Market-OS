@@ -161,6 +161,14 @@ validated bundle:
 pnpm run release:report -- --root ../../../output/u6.4-ci/windows-x64
 ```
 
+Create a portable signed archive from either validated artifact. The archive
+is re-extracted and signature-checked before the command succeeds; mutable
+`python/.market_os` state is excluded.
+
+```text
+pnpm run release:archive -- --artifact ../../../output/u6.4-ci/windows-x64/artifact-candidate --output ../../../output/u6.4-ci/windows-x64/market-os-windows-x64-candidate.tar.gz --report ../../../output/u6.4-ci/windows-x64/portable-archive-candidate.json
+```
+
 Run the same local drill after a production build:
 
 ```text

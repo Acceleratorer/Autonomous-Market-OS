@@ -163,6 +163,11 @@ jobs:
       - name: Validate U6.4-C evidence bundle
         working-directory: apps/desktop/electron
         run: pnpm run release:validate -- --root "${{ runner.temp }}/market-os-u6-4" --report "${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json"
+      - name: Archive target-native artifacts
+        working-directory: apps/desktop/electron
+        run: |
+          pnpm run release:archive -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-known-good" --output "${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz" --report "${{ runner.temp }}/market-os-u6-4/portable-archive-known-good.json"
+          pnpm run release:archive -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --output "${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz" --report "${{ runner.temp }}/market-os-u6-4/portable-archive-candidate.json"
       - name: Render U7-B release evidence report
         working-directory: apps/desktop/electron
         run: pnpm run release:report -- --root "${{ runner.temp }}/market-os-u6-4"
@@ -175,6 +180,9 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json
             ${{ runner.temp }}/market-os-u6-4/release-evidence-report.md
             ${{ runner.temp }}/market-os-u6-4/release-evidence-report.json
+            ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz
+            ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz
+            ${{ runner.temp }}/market-os-u6-4/portable-archive-*.json
             ${{ runner.temp }}/market-os-u6-4/release-drill.json
             ${{ runner.temp }}/market-os-u6-4/smoke-*.json
             ${{ runner.temp }}/market-os-u6-4/artifact-known-good/artifact-manifest.json
