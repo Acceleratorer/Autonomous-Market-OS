@@ -78,7 +78,7 @@ jobs:
       - name: Stage paper-only read-only dashboard
         run: python scripts/build_web_artifact.py --output site/market-os --manifest site/market-os.manifest.json
       - name: Upload dashboard artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: market-os-readonly-dashboard
           path: |
@@ -167,7 +167,7 @@ jobs:
         working-directory: apps/desktop/electron
         run: pnpm run release:report -- --root "${{ runner.temp }}/market-os-u6-4"
       - name: Upload U6.4-C CI evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: market-os-u6-4-${{ matrix.target }}
           path: |
