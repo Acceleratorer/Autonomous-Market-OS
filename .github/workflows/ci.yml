@@ -168,6 +168,9 @@ jobs:
         run: |
           pnpm run release:archive -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-known-good" --output "${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz" --report "${{ runner.temp }}/market-os-u6-4/portable-archive-known-good.json"
           pnpm run release:archive -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --output "${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz" --report "${{ runner.temp }}/market-os-u6-4/portable-archive-candidate.json"
+      - name: Index and verify portable archives
+        working-directory: apps/desktop/electron
+        run: pnpm run release:index -- --root "${{ runner.temp }}/market-os-u6-4"
       - name: Render U7-B release evidence report
         working-directory: apps/desktop/electron
         run: pnpm run release:report -- --root "${{ runner.temp }}/market-os-u6-4"
@@ -183,6 +186,7 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz
             ${{ runner.temp }}/market-os-u6-4/portable-archive-*.json
+            ${{ runner.temp }}/market-os-u6-4/portable-archive-index.json
             ${{ runner.temp }}/market-os-u6-4/release-drill.json
             ${{ runner.temp }}/market-os-u6-4/smoke-*.json
             ${{ runner.temp }}/market-os-u6-4/artifact-known-good/artifact-manifest.json

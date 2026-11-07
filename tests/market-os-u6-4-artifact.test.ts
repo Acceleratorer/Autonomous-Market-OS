@@ -63,7 +63,7 @@ test("U6.4-B keeps signing and slot promotion outside the renderer", async () =>
 });
 
 test("U6.4-C packages target-native Python metadata and CI rollback evidence", async () => {
-  const [packager, runtime, smoke, drill, ci, validator, reporter, archiver, packageJson] = await Promise.all([
+  const [packager, runtime, smoke, drill, ci, validator, reporter, archiver, archiveIndexer, packageJson] = await Promise.all([
     source("apps/desktop/electron/scripts/package.cjs"),
     source("apps/desktop/electron/src/runtime.cjs"),
     source("apps/desktop/electron/scripts/smoke-artifact.cjs"),
@@ -72,6 +72,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
     source("apps/desktop/electron/scripts/validate-ci-evidence.cjs"),
     source("apps/desktop/electron/scripts/render-ci-evidence-report.cjs"),
     source("apps/desktop/electron/scripts/archive-artifact.cjs"),
+    source("apps/desktop/electron/scripts/index-portable-archives.cjs"),
     source("apps/desktop/electron/package.json"),
   ]);
 
@@ -81,6 +82,7 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.equal(manifest.scripts["release:validate"], "node scripts/validate-ci-evidence.cjs");
   assert.equal(manifest.scripts["release:report"], "node scripts/render-ci-evidence-report.cjs");
   assert.equal(manifest.scripts["release:archive"], "node scripts/archive-artifact.cjs");
+  assert.equal(manifest.scripts["release:index"], "node scripts/index-portable-archives.cjs");
   assert.match(packager, /target-native-source/);
   assert.match(packager, /python\/\.market_os/);
   assert.match(packager, /--version/);
@@ -102,4 +104,8 @@ test("U6.4-C packages target-native Python metadata and CI rollback evidence", a
   assert.match(archiver, /market-os\.u7-c-portable-archive@v1/);
   assert.match(archiver, /python\/\.market_os/);
   assert.match(archiver, /verifyArtifact/);
+  assert.match(archiveIndexer, /market-os\.u7-d-portable-archive-index@v1/);
+  assert.match(archiveIndexer, /archive_hashes_match_reports/);
+  assert.match(archiveIndexer, /mutable_sidecar_state_excluded/);
+  assert.match(archiveIndexer, /sha256File/);
 });

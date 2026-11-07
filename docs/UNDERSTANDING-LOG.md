@@ -1791,3 +1791,14 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   control plane was contacted. The next deployment gate still requires VM/access;
   embedded Python/native installer, mobile, credentials, providers, mutations,
   and live execution remain deferred.
+
+## 2026-11-08 — U7-D portable archive index
+
+- Added `release:index` to the Electron release tooling and CI. It consumes the
+  validated evidence plus both U7-C archive reports, rehashes each `.tar.gz`,
+  checks target/version and manifest identity, requires verified signatures, and
+  preserves the private loopback/read-only/paper-only/execution-disabled
+  boundary.
+- The generated `portable-archive-index.json` is uploaded with each Windows and
+  Linux evidence bundle. No VM, provider, credential, mutation, mobile, or live
+  execution path is enabled.

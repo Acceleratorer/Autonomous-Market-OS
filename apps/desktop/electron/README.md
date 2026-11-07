@@ -169,6 +169,14 @@ is re-extracted and signature-checked before the command succeeds; mutable
 pnpm run release:archive -- --artifact ../../../output/u6.4-ci/windows-x64/artifact-candidate --output ../../../output/u6.4-ci/windows-x64/market-os-windows-x64-candidate.tar.gz --report ../../../output/u6.4-ci/windows-x64/portable-archive-candidate.json
 ```
 
+Index both portable archives after the CI evidence validator and archive steps.
+The index rechecks each archive SHA-256, target/version, signed manifest hash,
+and the unchanged private/read-only/paper-only boundary:
+
+```text
+pnpm run release:index -- --root ../../../output/u6.4-ci/windows-x64
+```
+
 Run the same local drill after a production build:
 
 ```text
