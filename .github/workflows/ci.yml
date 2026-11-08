@@ -88,6 +88,20 @@ jobs:
             ${{ runner.temp }}/market-os-u7-i/local-evidence-pack.md
             ${{ runner.temp }}/market-os-u7-i/local-evidence-pack.json
           if-no-files-found: error
+      - name: Render U7-J synthetic economic report
+        run: >-
+          market-os synthetic economic-report
+          --fixture market_os/tests/fixtures/economic/u7_j_synthetic_economic.json
+          --markdown "${{ runner.temp }}/market-os-u7-j/economic-report.md"
+          --json "${{ runner.temp }}/market-os-u7-j/economic-report.json"
+      - name: Upload U7-J synthetic economic evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u7-j-synthetic-economic
+          path: |
+            ${{ runner.temp }}/market-os-u7-j/economic-report.md
+            ${{ runner.temp }}/market-os-u7-j/economic-report.json
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON

@@ -63,8 +63,9 @@ current/known-good slot promotion, failed-launch restoration, and explicit
 rollback. U6.4-C runs target-native Windows/Linux CI packaging, signed smoke,
 and a two-version rollback drill. U7-G adds a deterministic quality-benchmark
 reviewer report, U7-H adds a synthetic-session accounting reviewer report, and
-U7-I adds a fail-closed local evidence pack index, all with stable JSON/Markdown
-output; real-model promotion and cost reporting remain deferred. Owner-VM
+U7-I adds a fail-closed local evidence pack index, and U7-J adds a synthetic
+economic observability report, all with stable JSON/Markdown output; real-model
+promotion and provider cost reporting remain deferred. Owner-VM
 promotion remains a separate U5.5 gate.
 
 ## Container quick start

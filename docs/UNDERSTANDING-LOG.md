@@ -1857,3 +1857,16 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - CI uploads the JSON and Markdown pack. It is an evidence index only; no
   deployment, profitability, live-readiness, provider, credential, mutation,
   mobile, or U5.5 owner-VM path is enabled.
+
+## 2026-11-08 — U7-J synthetic economic report
+
+- Added `market-os synthetic economic-report` with a stable
+  `market-os.u7-j-synthetic-economic-report@v1` projection over a checked-in
+  synthetic fixture. It applies ClawWork's local cost channels, token pricing,
+  score threshold, balance, and survival-status semantics without importing or
+  modifying the ClawWork runtime.
+- The report includes fixture/source fingerprints, per-task cost/income/net
+  values, deterministic channel totals, and an explicit private, synthetic,
+  paper-only, read-only, no-provider boundary. CI renders and uploads the JSON
+  and Markdown outputs; provider economics, credentials, payments, mutations,
+  live execution, mobile, and U5.5 owner-VM promotion remain deferred.

@@ -112,6 +112,14 @@ rechecks exact schemas/statuses, required checks, source hashes, reviewer
 lineage, and the shared private/synthetic/paper-only/read-only boundary. CI
 uploads the stable JSON and Markdown pack.
 
+U7-J ([contract](U7-J-SYNTHETIC-ECONOMIC-REPORT.md)) renders a deterministic
+ClawWork-shaped cost and work-income projection from the checked-in synthetic
+fixture with `market-os synthetic economic-report`. It validates the fixture
+fingerprint, token/API cost channels, score threshold, balance reconciliation,
+and the private/synthetic/paper-only/read-only boundary. CI uploads the JSON
+and Markdown report; the ClawWork runtime, providers, credentials, network,
+payments, mutations, and live execution remain disabled.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

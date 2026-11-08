@@ -3,7 +3,7 @@
 | Project | Primary role | Runtime shape | Key boundary | Fusion value |
 |---|---|---|---|---|
 | AI-Trader | Agent-native social/paper trading platform | TypeScript service, web assets, research/docs | `service/` | Market collaboration, signals, experiments |
-| ClawWork | Economic benchmark and paid work simulation | Python services, livebench, React frontend | `livebench/`, `clawmode_integration/` | Work tasks, cost accounting, evaluation |
+| ClawWork | Economic benchmark and paid work simulation | Python services, livebench, React frontend | `livebench/`, `clawmode_integration/` | U7-J synthetic cost/income semantics; runtime integration deferred |
 | CLI-Anything | Generate agent-native CLIs for existing software | Large Python/plugin ecosystem | per-app harness directories, `cli-anything-plugin/` | Tool adapters and artifact operations |
 | DeepCode | Agentic coding assistant | Python package with core, CLI, app server, desktop | `core/`, `cli/`, `app_server/` | Coding agent, skills, protocol, sandboxing |
 | DeepTutor | Personalized multi-agent tutor with RAG | Python package plus CLI/web | `deeptutor/`, `deeptutor_web/` | Planning, teaching, learner memory |

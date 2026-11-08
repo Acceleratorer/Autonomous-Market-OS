@@ -200,6 +200,10 @@ def build_parser() -> argparse.ArgumentParser:
     synthetic_report.add_argument("--session-id", default="synthetic-session")
     synthetic_report.add_argument("--markdown")
     synthetic_report.add_argument("--json", dest="json_path")
+    synthetic_economic = synthetic_commands.add_parser("economic-report")
+    synthetic_economic.add_argument("--fixture", required=True)
+    synthetic_economic.add_argument("--markdown", required=True)
+    synthetic_economic.add_argument("--json", dest="json_path", required=True)
     synthetic_serve = synthetic_commands.add_parser("serve")
     synthetic_serve.add_argument("--store-root", required=True)
     synthetic_serve.add_argument("--host", default="127.0.0.1")
@@ -311,6 +315,19 @@ def main(argv: list[str] | None = None) -> int:
                 )
             except (KeyError, OSError, TypeError, ValueError) as exc:
                 raise SystemExit(f"synthetic session report failed: {exc}") from exc
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
+        if args.synthetic_command == "economic-report":
+            from .synthetic_economic_report import render_synthetic_economic_report
+
+            try:
+                result = render_synthetic_economic_report(
+                    args.fixture,
+                    markdown_path=args.markdown,
+                    json_path=args.json_path,
+                )
+            except (OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic economic report failed: {exc}") from exc
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
         if args.synthetic_command == "serve":

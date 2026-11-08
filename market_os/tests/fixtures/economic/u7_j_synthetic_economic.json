@@ -1,0 +1,70 @@
+{
+  "fixture_fingerprint": "f5bdd1d1f4bc55cbf7ba4b280d1e651797d7fcd1227533784e4a1cd8cece32fb",
+  "fixture_id": "u7-j-clawwork-economic-v1",
+  "initial_balance_usd": 10.0,
+  "interpretation": "synthetic economic observability only; no real-world profitability or promotion claim",
+  "label": "synthetic local economic evaluation fixture; not real provider economics",
+  "license": {
+    "attribution": "Market OS generated fixture",
+    "classification": "synthetic-internal"
+  },
+  "min_evaluation_threshold": 0.6,
+  "schema": "market-os.u7-j.synthetic-economic-fixture@v1",
+  "source_reference": {
+    "commit": "9c73ac05fdb0bffdb23febdd971eb70f44dd46eb",
+    "imported_runtime": false,
+    "path": "livebench/agent/economic_tracker.py",
+    "repository": "ClawWork"
+  },
+  "synthetic_only": true,
+  "tasks": [
+    {
+      "api_calls": [
+        {
+          "api_name": "synthetic-search",
+          "channel": "search_api",
+          "price_per_1m_usd": 0.05,
+          "pricing_model": "per_token",
+          "tokens": 100
+        },
+        {
+          "api_name": "synthetic-ocr",
+          "channel": "ocr_api",
+          "cost_usd": 0.02,
+          "pricing_model": "flat_rate"
+        }
+      ],
+      "base_payment_usd": 3.0,
+      "evaluation_score": 0.8,
+      "llm": {
+        "input_tokens": 1000,
+        "output_tokens": 500
+      },
+      "task_id": "task-high-quality",
+      "wall_clock_seconds": 60.0
+    },
+    {
+      "api_calls": [
+        {
+          "api_name": "synthetic-search",
+          "channel": "search_api",
+          "price_per_1m_usd": 0.05,
+          "pricing_model": "per_token",
+          "tokens": 200
+        }
+      ],
+      "base_payment_usd": 2.0,
+      "evaluation_score": 0.4,
+      "llm": {
+        "input_tokens": 2000,
+        "output_tokens": 1000
+      },
+      "task_id": "task-low-quality",
+      "wall_clock_seconds": 120.0
+    }
+  ],
+  "token_pricing": {
+    "input_per_1m_usd": 2.5,
+    "output_per_1m_usd": 10.0
+  }
+}
