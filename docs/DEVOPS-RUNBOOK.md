@@ -106,6 +106,12 @@ explicit synthetic/paper/read-only/no-provider/no-network boundary with
 promotion disabled. CI uploads the JSON, Markdown, and validated session
 artifacts.
 
+U7-I ([contract](U7-I-LOCAL-EVIDENCE-PACK.md)) builds a fail-closed local
+evidence index over the committed U7-F, U7-G, and U7-H evidence products. It
+rechecks exact schemas/statuses, required checks, source hashes, reviewer
+lineage, and the shared private/synthetic/paper-only/read-only boundary. CI
+uploads the stable JSON and Markdown pack.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

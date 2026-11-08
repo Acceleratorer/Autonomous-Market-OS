@@ -1846,3 +1846,14 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   disabled and the report is observability only; providers, credentials,
   mutation, live execution, mobile, and U5.5 owner-VM promotion remain
   deferred.
+
+## 2026-11-08 — U7-I local evidence pack
+
+- Added `python -m market_os.evidence_pack` and the stable
+  `market-os.u7-i-local-evidence-pack@v1` index over the committed U7-F, U7-G,
+  and U7-H evidence products. The pack rechecks exact schemas/statuses,
+  required checks, source hashes, reviewer lineage, and one shared
+  private/synthetic/paper-only/read-only boundary.
+- CI uploads the JSON and Markdown pack. It is an evidence index only; no
+  deployment, profitability, live-readiness, provider, credential, mutation,
+  mobile, or U5.5 owner-VM path is enabled.
