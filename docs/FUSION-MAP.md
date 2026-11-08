@@ -28,7 +28,7 @@ Storage and operations
   concerns are tool invocation, skills, sessions, memory, and multi-agent
   execution.
 - **Knowledge subsystem:** use `LightRAG` as the graph-RAG foundation and `RAG-Anything` as multimodal ingestion. Keep `MiniRAG` as a benchmark/reference rather than a second production backend.
-- **Tool subsystem:** expose `CLI-Anything` harnesses through a registry and typed tool gateway. Do not let arbitrary generated CLIs receive unrestricted host access.
+- **Tool subsystem:** expose `CLI-Anything` harnesses through a registry and typed tool gateway. U7-K audits registry metadata and sandbox denials locally; generated CLIs still receive no execution permission or unrestricted host access.
 - **Finance subsystem:** keep `Vibe-Trading` as research/backtesting domain logic and `AI-Trader` as social/live signal and experiment logic. Define a shared instrument, portfolio, signal, and provenance schema.
 - **Work/evaluation subsystem:** use `ClawWork` for task catalogues, economic scoring, cost tracking, and evaluation; U7-J currently reuses only its cost/income semantics in a local synthetic report, while runtime/event-stream integration remains deferred.
 - **Content subsystem:** treat `Paper2Slides` and `ViMax` as artifact-producing workflows consuming common document, plan, asset, and render contracts.

@@ -120,6 +120,13 @@ and the private/synthetic/paper-only/read-only boundary. CI uploads the JSON
 and Markdown report; the ClawWork runtime, providers, credentials, network,
 payments, mutations, and live execution remain disabled.
 
+U7-K ([contract](U7-K-CLI-TOOL-REGISTRY-AUDIT.md)) renders a deterministic
+typed registry audit with `market-os tools report`. Enabled tools are limited
+to local inspect/report/read-artifact capabilities. Tools requiring external
+services, network, credentials, mutation, or live execution remain deferred
+and are recorded with `execution_enabled: false`. CI uploads the JSON and
+Markdown audit without invoking any generated CLI.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

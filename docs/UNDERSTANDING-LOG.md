@@ -1870,3 +1870,15 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   paper-only, read-only, no-provider boundary. CI renders and uploads the JSON
   and Markdown outputs; provider economics, credentials, payments, mutations,
   live execution, mobile, and U5.5 owner-VM promotion remain deferred.
+
+## 2026-11-09 — U7-K CLI tool registry audit
+
+- Added `market-os tools report` with a stable
+  `market-os.u7-k-cli-tool-registry-report@v1` projection over a synthetic
+  fixture shaped by CLI-Anything's registry/list contract. It validates typed
+  argv entry points, unique names, capability allowlists, sandbox flags, and
+  explicit deferred tools.
+- Enabled tools are limited to local inspect/report/read-artifact capabilities;
+  external-service, network, credential, mutation, and live capabilities are
+  recorded as denied and never executed. CI renders and uploads the JSON and
+  Markdown audit; generated CLI execution remains disabled.

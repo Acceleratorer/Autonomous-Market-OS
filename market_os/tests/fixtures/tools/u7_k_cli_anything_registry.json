@@ -1,0 +1,116 @@
+{
+  "allowed_capabilities": [
+    "inspect",
+    "read_artifact",
+    "report"
+  ],
+  "denied_capabilities": [
+    "credentials",
+    "execute",
+    "live_execution",
+    "mutate",
+    "network"
+  ],
+  "fixture_fingerprint": "0089359ef3785ef44a80d68bc9c8b39b3efafed1c7cb33f58f29e092ef67bb18",
+  "fixture_id": "u7-k-cli-anything-tool-registry-v1",
+  "interpretation": "synthetic tool registry audit only; no tool execution or live capability claim",
+  "label": "synthetic local CLI registry audit fixture; no generated CLI execution",
+  "license": {
+    "attribution": "Market OS generated fixture",
+    "classification": "synthetic-internal"
+  },
+  "schema": "market-os.u7-k.cli-tool-registry-fixture@v1",
+  "source_reference": {
+    "commit": "34f519533bc175d2fe287ab8316b0dd99bb9cc43",
+    "imported_runtime": false,
+    "path": "registry.json",
+    "repository": "CLI-Anything",
+    "semantic_source": "cli-anything-plugin/commands/list.md",
+    "source_sha256": "daf5393852daf8db79ed4ea0b9cb0f20109fd512f69c9a911944ee1ec6e469ef"
+  },
+  "synthetic_only": true,
+  "tools": [
+    {
+      "capabilities": [
+        "inspect",
+        "report"
+      ],
+      "category": "market-data",
+      "defer_reason": null,
+      "display_name": "Market OS BTC Catalog",
+      "entry_point": [
+        "market-os",
+        "btc-paper",
+        "catalog"
+      ],
+      "execution_enabled": false,
+      "name": "market-os-btc-catalog",
+      "requires": [],
+      "sandbox": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "read_only": true
+      },
+      "status": "enabled",
+      "version": "local"
+    },
+    {
+      "capabilities": [
+        "read_artifact",
+        "report"
+      ],
+      "category": "evaluation",
+      "defer_reason": null,
+      "display_name": "Market OS Synthetic Economic Report",
+      "entry_point": [
+        "market-os",
+        "synthetic",
+        "economic-report"
+      ],
+      "execution_enabled": false,
+      "name": "market-os-synthetic-economic-report",
+      "requires": [],
+      "sandbox": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "read_only": true
+      },
+      "status": "enabled",
+      "version": "local"
+    },
+    {
+      "capabilities": [
+        "inspect",
+        "mutate",
+        "network"
+      ],
+      "category": "web",
+      "defer_reason": "requires a local Chrome and DOMShell service; no external CLI runtime is enabled",
+      "display_name": "Browser",
+      "entry_point": [
+        "cli-anything-browser"
+      ],
+      "execution_enabled": false,
+      "name": "browser",
+      "requires": [
+        "Node.js",
+        "npx",
+        "Chrome",
+        "DOMShell extension"
+      ],
+      "sandbox": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": true,
+        "network_access": true,
+        "read_only": false
+      },
+      "status": "deferred",
+      "version": "1.0.0"
+    }
+  ]
+}

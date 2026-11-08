@@ -217,6 +217,12 @@ def build_parser() -> argparse.ArgumentParser:
     synthetic_compare.add_argument("--store-root", required=True)
     synthetic_compare.add_argument("--left", required=True)
     synthetic_compare.add_argument("--right", required=True)
+    tools = commands.add_parser("tools")
+    tools_commands = tools.add_subparsers(dest="tools_command", required=True)
+    tools_report = tools_commands.add_parser("report")
+    tools_report.add_argument("--fixture", required=True)
+    tools_report.add_argument("--markdown", required=True)
+    tools_report.add_argument("--json", dest="json_path", required=True)
     return parser
 
 
@@ -364,6 +370,19 @@ def main(argv: list[str] | None = None) -> int:
             result = replay_report.to_dict() if args.resource == "replay" else build_synthetic_accounting_report(replay_report).to_dict()
         except (TypeError, ValueError) as exc:
             raise SystemExit(f"invalid synthetic replay report: {exc}") from exc
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "tools":
+        from .tool_registry_report import render_tool_registry_report
+
+        try:
+            result = render_tool_registry_report(
+                args.fixture,
+                markdown_path=args.markdown,
+                json_path=args.json_path,
+            )
+        except (OSError, TypeError, ValueError) as exc:
+            raise SystemExit(f"tool registry report failed: {exc}") from exc
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.command == "btc-paper":
