@@ -34,6 +34,7 @@ Autonomous-Market-OS/
 │   ├── accounting.py          synthetic portfolio accounting reports
 │   ├── synthetic_session.py   synthetic session artifact creation
 │   ├── synthetic_session_api.py read-only session inspection
+│   ├── synthetic_session_report.py stable synthetic accounting reviewer report
 │   ├── synthetic_server.py    loopback synthetic HTTP server
 │   ├── synthetic_catalog.py   session catalog and comparison
 │   ├── synthetic_replay.py    generic synthetic replay helpers
@@ -95,7 +96,7 @@ evidence in `docs/evidence/codebase-stack-understanding.json`.
 | Persistence | `store.py`, `portfolio_broker.py` | Append-only events, artifacts, checkpoints, recovery, and fingerprints |
 | Portfolio/risk | `portfolio_broker.py`, `portfolio_backup.py`, `portfolio_migration.py`, `schema_migration.py` | Paper wallet, shared strategy membership, portfolio-wide reservations, orders, approvals, limits, audit outcomes, backup, read-only retention/archive preflight, migration preflight, and local copy-on-write migration |
 | Execution | `paper_venue.py`, `portfolio_broker.py` | Synthetic market events and paper fills; no live venue |
-| Math/statistics | `btc_features.py`, `evaluation_protocol.py`, `btc_jev_evaluation.py`, `btc_question_evaluation.py`, `quality_benchmark.py`, `quality_report.py` | Features, labels, baselines, calibration, metrics, replay, evaluation, and stable benchmark reviewer projections |
+| Math/statistics | `btc_features.py`, `evaluation_protocol.py`, `btc_jev_evaluation.py`, `btc_question_evaluation.py`, `quality_benchmark.py`, `quality_report.py`, `synthetic_session_report.py` | Features, labels, baselines, calibration, metrics, replay, evaluation, and stable reviewer projections |
 | Strategy/accounting | `strategy.py`, `strategy_replay.py`, `accounting.py`, `synthetic_replay.py` | Signals, deterministic replay, PnL/accounting and synthetic simulation |
 | Data | `btc_history.py`, `btc_connectivity.py` | Canonical BTC rows, manifests, readiness, and bounded connectivity probes |
 | Providers | `adapters/` | Optional external runtimes behind fixture-first typed adapters |

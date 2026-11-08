@@ -96,6 +96,16 @@ excluded from the stable projection, and deterministic test-double cost stays
 unavailable. CI uploads the JSON and Markdown report with the benchmark
 artifact; no provider, credential, network, mutation, or live path is used.
 
+U7-H ([contract](U7-H-SYNTHETIC-SESSION-ACCOUNTING-REPORT.md)) validates the
+checked-in B3.8 synthetic session through the immutable manifest, replay, and
+accounting store, then renders
+`market-os.u7-h-synthetic-session-accounting-report@v1`. It preserves the four
+artifact fingerprints, replay/accounting linkage, bounded counts,
+turnover/cost/PnL/final-state projections, deterministic replay, and an
+explicit synthetic/paper/read-only/no-provider/no-network boundary with
+promotion disabled. CI uploads the JSON, Markdown, and validated session
+artifacts.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

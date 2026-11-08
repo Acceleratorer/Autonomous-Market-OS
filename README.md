@@ -62,8 +62,9 @@ clean-directory smoke; U6.4-B adds external-key signing, hash-gated
 current/known-good slot promotion, failed-launch restoration, and explicit
 rollback. U6.4-C runs target-native Windows/Linux CI packaging, signed smoke,
 and a two-version rollback drill. U7-G adds a deterministic quality-benchmark
-reviewer report with stable JSON/Markdown output; real-model promotion and cost
-reporting remain deferred. Owner-VM promotion remains a separate U5.5 gate.
+reviewer report and U7-H adds a synthetic-session accounting reviewer report,
+both with stable JSON/Markdown output; real-model promotion and cost reporting
+remain deferred. Owner-VM promotion remains a separate U5.5 gate.
 
 ## Container quick start
 

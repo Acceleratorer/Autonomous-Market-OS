@@ -1832,3 +1832,17 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   unavailable for the deterministic test double. CI uploads the Markdown,
   JSON, and content-addressed benchmark artifact; no provider, credential,
   network, mutation, mobile, or live execution path is enabled.
+
+## 2026-11-08 — U7-H synthetic session accounting report
+
+- Added `market-os synthetic report` and the stable
+  `market-os.u7-h-synthetic-session-accounting-report@v1` projection over the
+  checked-in B3.8 synthetic session fixture. The report validates manifest,
+  replay, and accounting fingerprints plus replay/accounting linkage, bounded
+  observation/fill counts, deterministic replay, turnover/cost/PnL/final-state
+  metrics, and the explicit synthetic/paper/read-only/no-provider/no-network
+  boundary.
+- CI uploads the JSON, Markdown, and validated session artifacts. Promotion is
+  disabled and the report is observability only; providers, credentials,
+  mutation, live execution, mobile, and U5.5 owner-VM promotion remain
+  deferred.

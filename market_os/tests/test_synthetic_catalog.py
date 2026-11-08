@@ -64,6 +64,7 @@ def test_catalog_and_comparison_reject_unknown_duplicate_and_tampered_sessions(t
 def test_server_exposes_catalog_and_comparison_read_only(tmp_path: Path) -> None:
     store = make_store(tmp_path)
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_synthetic_handler(store))
+    server.daemon_threads = False
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:

@@ -1,0 +1,68 @@
+{
+  "schema": "market-os.u7-h-synthetic-session-accounting-report-evidence@v1",
+  "milestone": "U7-H",
+  "status": "local-verified",
+  "scope": "bounded reviewer projection over the checked-in B3.8 synthetic session fixture",
+  "fixture": {
+    "schema": "market-os.b3-8.synthetic-session-fixture@v1",
+    "fingerprint": "60036b1d078d55dd11ec5285176bd3b4a2b1399947f023a4db2b50a537e1c102",
+    "events": 3,
+    "signals": 2
+  },
+  "report": {
+    "schema": "market-os.u7-h-synthetic-session-accounting-report@v1",
+    "manifest_fingerprint": "95bc9cab3c58d78ad6f0f51ae6ee3eeb11837f66bf42f7e393eac152043c0814",
+    "replay_fingerprint": "f3e54d22d67b4f9c751ef486cb236316f6fcd5cc84f802bab000ff5034334891",
+    "accounting_fingerprint": "4cd20b277351fe89a6a381abd6674473bb0eab4e42be5df5e8b56e9b9b99a873",
+    "status": "passed",
+    "promotion_approved": false,
+    "observation_count": 3,
+    "fill_count": 2,
+    "total_pnl_usdt": -20.85198118811879,
+    "promotion_approved": false
+  },
+  "checks": {
+    "manifest_valid": true,
+    "replay_valid": true,
+    "accounting_valid": true,
+    "manifest_links_valid": true,
+    "replay_accounting_linkage": true,
+    "deterministic_replay": true,
+    "bounded_counts": true,
+    "synthetic_boundary": true,
+    "store_read_only": true,
+    "promotion_disabled": true
+  },
+  "implementation": {
+    "report_module": "market_os/synthetic_session_report.py",
+    "focused_test": "market_os/tests/test_synthetic_session_report.py",
+    "cli": "market-os synthetic report",
+    "workflow": ".github/workflows/ci.yml",
+    "uploaded_outputs": [
+      "synthetic-session-report.md",
+      "synthetic-session-report.json",
+      "session/manifest.json",
+      "session/strategy-replay.json",
+      "session/accounting.json"
+    ]
+  },
+  "boundary": {
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "network_access": false,
+    "provider_requests": 0,
+    "credentials": false,
+    "mutation_routes": false,
+    "live_execution": false
+  },
+  "interpretation": "observability only; no predictive evidence, profitability claim, or promotion approval",
+  "deferred": [
+    "providers",
+    "credentials",
+    "network access",
+    "live execution",
+    "mobile",
+    "U5.5 owner-VM promotion"
+  ]
+}
