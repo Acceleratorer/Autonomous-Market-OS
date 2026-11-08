@@ -56,6 +56,22 @@ jobs:
             ${{ runner.temp }}/market-os-u7-g/quality-benchmark-report.json
             ${{ runner.temp }}/market-os-u7-g/store/benchmarks/**
           if-no-files-found: error
+      - name: Render U7-H synthetic session accounting report
+        run: >-
+          market-os synthetic report
+          --fixture market_os/tests/fixtures/b38/synthetic_session.json
+          --output-dir "${{ runner.temp }}/market-os-u7-h/session"
+          --markdown "${{ runner.temp }}/market-os-u7-h/synthetic-session-report.md"
+          --json "${{ runner.temp }}/market-os-u7-h/synthetic-session-report.json"
+      - name: Upload U7-H synthetic session evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-os-u7-h-synthetic-session
+          path: |
+            ${{ runner.temp }}/market-os-u7-h/synthetic-session-report.md
+            ${{ runner.temp }}/market-os-u7-h/synthetic-session-report.json
+            ${{ runner.temp }}/market-os-u7-h/session/**
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON

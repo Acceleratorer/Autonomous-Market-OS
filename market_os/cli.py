@@ -194,6 +194,12 @@ def build_parser() -> argparse.ArgumentParser:
     synthetic_run = synthetic_commands.add_parser("run")
     synthetic_run.add_argument("--fixture", required=True)
     synthetic_run.add_argument("--output", required=True)
+    synthetic_report = synthetic_commands.add_parser("report")
+    synthetic_report.add_argument("--fixture", required=True)
+    synthetic_report.add_argument("--output-dir", required=True)
+    synthetic_report.add_argument("--session-id", default="synthetic-session")
+    synthetic_report.add_argument("--markdown")
+    synthetic_report.add_argument("--json", dest="json_path")
     synthetic_serve = synthetic_commands.add_parser("serve")
     synthetic_serve.add_argument("--store-root", required=True)
     synthetic_serve.add_argument("--host", default="127.0.0.1")
@@ -271,6 +277,7 @@ def main(argv: list[str] | None = None) -> int:
         from .synthetic_catalog import catalog_sessions, compare_sessions
         from .synthetic_session_api import SyntheticSessionStore
         from .synthetic_session import load_synthetic_fixture, run_synthetic_fixture, write_synthetic_session_run
+        from .synthetic_session_report import render_synthetic_session_report
         from .synthetic_server import serve_synthetic
 
         if args.synthetic_command == "run":
@@ -278,6 +285,32 @@ def main(argv: list[str] | None = None) -> int:
                 result = write_synthetic_session_run(run_synthetic_fixture(load_synthetic_fixture(args.fixture)), args.output)
             except (OSError, TypeError, ValueError) as exc:
                 raise SystemExit(f"synthetic session failed: {exc}") from exc
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
+        if args.synthetic_command == "report":
+            try:
+                root = Path(args.output_dir).resolve()
+                session_dir = root / args.session_id
+                fixture = load_synthetic_fixture(args.fixture)
+                first_run = run_synthetic_fixture(fixture)
+                second_run = run_synthetic_fixture(fixture)
+                deterministic_replay = (
+                    first_run.replay.fingerprint == second_run.replay.fingerprint
+                    and first_run.accounting.fingerprint == second_run.accounting.fingerprint
+                )
+                write_synthetic_session_run(
+                    first_run,
+                    session_dir,
+                )
+                result = render_synthetic_session_report(
+                    SyntheticSessionStore(root),
+                    args.session_id,
+                    markdown_path=args.markdown or root / "synthetic-session-report.md",
+                    json_path=args.json_path or root / "synthetic-session-report.json",
+                    deterministic_replay=deterministic_replay,
+                )
+            except (KeyError, OSError, TypeError, ValueError) as exc:
+                raise SystemExit(f"synthetic session report failed: {exc}") from exc
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
         if args.synthetic_command == "serve":
