@@ -25,6 +25,7 @@ from .contracts import (
 )
 from .providers import BacktestProvider, EvidenceProvider, ProviderCancelled, default_providers
 from .research import DeterministicResearchSynthesizer, research_synthesis_from_dict
+from .research_brief import render_research_brief
 from .model_summary import (
     ModelGatedSummary,
     SummaryModelProvider,
@@ -96,6 +97,7 @@ class MarketWorkflow:
             retrieval_artifact = None
             cited_research = None
             cited_research_artifact = None
+            research_brief_artifact = None
             model_summary = None
             model_summary_artifact = None
             if document_context is not None:
@@ -149,6 +151,21 @@ class MarketWorkflow:
                     {
                         "artifact_id": cited_research_artifact.artifact_id,
                         "coverage": asdict(cited_research.coverage),
+                    },
+                )
+                operation = "artifact.write"
+                research_brief_artifact = self.store.write_text_artifact(
+                    run.run_id,
+                    "research-brief",
+                    render_research_brief(cited_research),
+                    (cited_research_artifact.artifact_id,),
+                )
+                self._event(
+                    run,
+                    "research.brief-rendered",
+                    {
+                        "artifact_id": research_brief_artifact.artifact_id,
+                        "sha256": research_brief_artifact.sha256,
                     },
                 )
                 if self.summary_provider is not None:
@@ -232,6 +249,8 @@ class MarketWorkflow:
             artifact_ids = [research_artifact.artifact_id, backtest_artifact.artifact_id, order_artifact.artifact_id, risk_artifact.artifact_id]
             if cited_research_artifact is not None:
                 artifact_ids.extend((document_artifact.artifact_id, retrieval_artifact.artifact_id, cited_research_artifact.artifact_id))
+            if research_brief_artifact is not None:
+                artifact_ids.append(research_brief_artifact.artifact_id)
             if model_summary_artifact is not None:
                 artifact_ids.append(model_summary_artifact.artifact_id)
             self._event(run, "run.completed", {"artifact_ids": artifact_ids})
@@ -279,6 +298,18 @@ class MarketWorkflow:
                 raise KeyError(item_id or "artifact")
             artifact = artifacts[item_id]
             return {"run_id": run_id, "artifact": artifact, "lineage": [self._artifact_summary(artifacts[ref]) for ref in artifact.get("lineage", ()) if ref in artifacts]}
+        if resource == "research-brief":
+            artifact = next((item for item in inspected["artifacts"] if item["kind"] == "research-brief"), None)
+            if artifact is None:
+                raise ValueError("research brief artifact is unavailable")
+            cited_artifact = next((item for item in inspected["artifacts"] if item["kind"] == "cited-research"), None)
+            if cited is None or cited_artifact is None or artifact.get("lineage") != [cited_artifact["artifact_id"]]:
+                raise ValueError("research brief lineage is invalid")
+            synthesis = research_synthesis_from_dict(cited)
+            content = payloads["research-brief"]
+            if content != render_research_brief(synthesis):
+                raise ValueError("research brief content does not match cited research")
+            return {"run_id": run_id, "artifact": artifact, "research_brief": content}
         if resource in {"model-summary", "inferences"}:
             summary = self._validated_model_summary(model_summary, cited, artifacts)
             if resource == "model-summary":
@@ -366,7 +397,11 @@ class MarketWorkflow:
         for ref in artifact.get("lineage", ()):
             if ref.startswith("artifact-") and ref not in artifacts:
                 raise ValueError(f"artifact lineage is incomplete: {ref}")
-        return json.loads(raw)
+        if artifact.get("media_type") == "application/json":
+            return json.loads(raw)
+        if artifact.get("media_type") == "text/markdown":
+            return raw.decode("utf-8")
+        raise ValueError(f"unsupported artifact media type: {artifact.get('media_type')}")
 
     @staticmethod
     def _validated_model_summary(

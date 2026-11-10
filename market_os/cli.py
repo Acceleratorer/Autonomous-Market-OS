@@ -33,8 +33,12 @@ def build_parser() -> argparse.ArgumentParser:
     inspect = commands.add_parser("inspect")
     inspect.add_argument("run_id")
     inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_STORE_ROOT", ".market_os"))
-    inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "model-summary", "inferences", "lineage"), default="run")
+    inspect.add_argument("--resource", choices=("run", "documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "research-brief", "model-summary", "inferences", "lineage"), default="run")
     inspect.add_argument("--id", dest="item_id")
+    research_brief = commands.add_parser("research-brief")
+    research_brief.add_argument("--source", required=True, help="validated cited-research JSON artifact")
+    research_brief.add_argument("--markdown", required=True)
+    research_brief.add_argument("--json", dest="json_path", required=True)
     benchmark = commands.add_parser("benchmark")
     benchmark_commands = benchmark.add_subparsers(dest="benchmark_command", required=True)
     benchmark_run = benchmark_commands.add_parser("run")
@@ -246,6 +250,12 @@ def main(argv: list[str] | None = None) -> int:
             result = workflow.inspect_run(args.run_id)
         else:
             result = workflow.inspect_resource(args.run_id, args.resource, args.item_id)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.command == "research-brief":
+        from .research_brief import render_research_brief_files
+
+        result = render_research_brief_files(args.source, args.markdown, args.json_path)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.command == "benchmark":

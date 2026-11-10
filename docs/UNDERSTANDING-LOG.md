@@ -1882,3 +1882,16 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   external-service, network, credential, mutation, and live capabilities are
   recorded as denied and never executed. CI renders and uploads the JSON and
   Markdown audit; generated CLI execution remains disabled.
+
+## 2026-11-10 — U7-L Paper2Slides-ready research brief
+
+- Added deterministic Markdown export for validated cited research. Workflow
+  runs persist it as a content-addressed `text/markdown` artifact with lineage
+  to the cited-research JSON; read-only CLI/API inspection verifies its hash.
+- Added `market-os research-brief` for exporting a validated synthetic
+  cited-research JSON artifact to Markdown plus a stable evidence manifest.
+  CI uploads both outputs and records Paper2Slides' documented Markdown input
+  contract at commit `0785051d1f52814097e94c44751e3f12b83f7c8a`.
+- Paper2Slides model planning and image/video generation were not run. No
+  providers, credentials, network requests, portfolio mutations, or live
+  execution were added.

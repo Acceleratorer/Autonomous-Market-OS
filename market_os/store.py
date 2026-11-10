@@ -1,4 +1,4 @@
-"""Restart-safe JSONL events and immutable JSON artifacts."""
+"""Restart-safe JSONL events and immutable content-addressed artifacts."""
 from __future__ import annotations
 
 import hashlib
@@ -51,9 +51,24 @@ class RunStore:
 
     def write_artifact(self, run_id: str, kind: str, payload: Any, lineage: tuple[str, ...] = ()) -> Artifact:
         raw = json.dumps(payload, sort_keys=True, indent=2).encode()
+        return self._write_artifact(run_id, kind, raw, "application/json", "json", lineage)
+
+    def write_text_artifact(self, run_id: str, kind: str, content: str, lineage: tuple[str, ...] = ()) -> Artifact:
+        raw = content.encode("utf-8")
+        return self._write_artifact(run_id, kind, raw, "text/markdown", "md", lineage)
+
+    def _write_artifact(
+        self,
+        run_id: str,
+        kind: str,
+        raw: bytes,
+        media_type: str,
+        extension: str,
+        lineage: tuple[str, ...],
+    ) -> Artifact:
         digest = hashlib.sha256(raw).hexdigest()
-        path = self.artifacts / f"{run_id}-{kind}-{digest[:12]}.json"
-        artifact = Artifact(f"artifact-{digest[:16]}", run_id, kind, "application/json", str(path), datetime.now(timezone.utc).isoformat(), digest, lineage)
+        path = self.artifacts / f"{run_id}-{kind}-{digest[:12]}.{extension}"
+        artifact = Artifact(f"artifact-{digest[:16]}", run_id, kind, media_type, str(path), datetime.now(timezone.utc).isoformat(), digest, lineage)
         self.last_artifact_attempt = artifact
         if not path.exists():
             path.write_bytes(raw)

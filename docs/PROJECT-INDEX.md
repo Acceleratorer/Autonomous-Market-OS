@@ -11,7 +11,7 @@
 | MiniRAG | Minimal RAG research implementation | Python package and experiments | `minirag/` | Small reference implementation and baseline |
 | nanobot | Lightweight personal assistant | Python package, TUI, web UI, channel integrations | `nanobot/`, `tui/`, `webui/` | Small deployable agent runtime |
 | OpenHarness | Agent infrastructure and `ohmo` assistant | Python package, CLI, frontend/dashboard | `src/`, `ohmo/` | Tools, skills, memory, multi-agent coordination |
-| Paper2Slides | Paper/report to slides and posters | Python API plus frontend | `paper2slides/`, `api/`, `frontend/` | Document ingestion and presentation artifacts |
+| Paper2Slides | Paper/report to slides and posters | Python API plus frontend | `paper2slides/`, `api/`, `frontend/` | U7-L consumes its documented Markdown input; LLM/media pipeline remains deferred |
 | RAG-Anything | Multimodal RAG built on LightRAG | Python package and examples | `raganything/` | Multimodal document understanding |
 | Vibe-Trading | Natural-language finance research/backtesting agent | Python FastAPI agent plus React frontend | `agent/`, `frontend/` | Research, brokers, backtests, reports |
 | ViMax | Agentic video generation | Python pipelines, agents, UI/web | `pipelines/`, `agents/`, `web/` | Story/media planning and rendering |

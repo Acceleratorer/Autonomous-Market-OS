@@ -116,6 +116,20 @@ jobs:
             ${{ runner.temp }}/market-os-u7-k/tool-registry.md
             ${{ runner.temp }}/market-os-u7-k/tool-registry.json
           if-no-files-found: error
+      - name: Render U7-L Paper2Slides research brief
+        run: >-
+          market-os research-brief
+          --source market_os/tests/fixtures/research/u7_l_cited_research.json
+          --markdown "${{ runner.temp }}/market-os-u7-l/research-brief.md"
+          --json "${{ runner.temp }}/market-os-u7-l/research-brief-evidence.json"
+      - name: Upload U7-L research brief evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u7-l-paper2slides-research-brief
+          path: |
+            ${{ runner.temp }}/market-os-u7-l/research-brief.md
+            ${{ runner.temp }}/market-os-u7-l/research-brief-evidence.json
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON

@@ -1688,7 +1688,7 @@ def make_handler(
                 elif len(parts) in {3, 4} and parts[1] == "research":
                     resource = parts[2]
                     item_id = parts[3] if len(parts) == 4 else None
-                    if resource not in {"documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "model-summary", "inferences", "lineage"}:
+                    if resource not in {"documents", "passages", "claims", "unsupported-claims", "passage-claims", "citations", "research-brief", "model-summary", "inferences", "lineage"}:
                         self._send(404, {"error": "research resource not found"})
                         self._audit(404)
                         return
