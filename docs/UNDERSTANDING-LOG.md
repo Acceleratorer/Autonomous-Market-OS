@@ -1955,3 +1955,13 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   renders and uploads `market-os-u7-o-evidence-catalog`. U5.5 owner-VM
   promotion, embedded Python/native installer, mobile, credentials, providers,
   mutation routes, and live execution remain deferred.
+
+## 2026-11-12 — U7-O hosted CI confirmation
+
+- GitHub CI run `43090213351` passed on commit `65a37aa`, including offline-tests,
+  Windows/Linux U6.4-C packaging, U7-M release catalog, DevSecOps, and security
+  checks.
+- The downloaded `market-os-u7-o-evidence-catalog` artifact matched the
+  committed catalog with fingerprint
+  `5c484710bc7007f90406352b660e5dbe4492c7662d6cdf9875a278c77649655e2` and the
+  same normalized private/read-only/paper-only boundary.
