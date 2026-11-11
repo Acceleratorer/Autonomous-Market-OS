@@ -86,14 +86,14 @@
     "docs/LOCAL-EXIT-GATE-REPORT.md"
   ],
   "graph": {
-    "knowledge_nodes": 1991,
-    "knowledge_edges": 5025,
+    "knowledge_nodes": 1944,
+    "knowledge_edges": 3438,
     "domain_nodes": 88,
     "domain_edges": 96,
     "validated": true,
     "graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
-    "refresh_note": "Knowledge and domain graphs were refreshed against main HEAD 849a4c2. The domain derivation adds current U6 bounded CLI and Next operator flows; graph validation and endpoint checks passed."
+    "refresh_note": "Knowledge graph refreshed against the current clean main commit for U7-M planning; the graph contains 1,944 nodes, 3,438 edges, 7 layers, and a 10-step tour."
   },
-  "next_gate": "U6.4-B signed metadata, sidecar distribution, and hash-gated rollback"
+  "next_gate": "U7-M locally complete; next optional work is selective U7 evaluation, while U5.5 waits for owner VM/access"
 }

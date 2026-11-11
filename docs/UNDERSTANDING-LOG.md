@@ -1895,3 +1895,25 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Paper2Slides model planning and image/video generation were not run. No
   providers, credentials, network requests, portfolio mutations, or live
   execution were added.
+
+## 2026-11-11 — U7-M release evidence drift audit
+
+- Added `apps/desktop/electron/scripts/audit-release-drift.cjs` and the
+  `release:drift` package command. U7-M traces each target's U6.4-C raw evidence
+  through U7-A validation, U7-B report, U7-D archive index, and the U7-E
+  cross-target catalog.
+- The audit compares shared Windows/Linux invariants: role versions, schema and
+  status, manifest provenance, signatures, four-route smoke and cleanup,
+  promotion/rollback metadata, archive-index checks, and the private,
+  synthetic, paper-only, read-only, execution-disabled boundary. Target-native
+  manifest/archive hashes are recorded as expected variance and are not required
+  to match across operating systems.
+- Focused U7-M coverage passed 4 tests, including pass, boundary drift,
+  manifest provenance drift, and signed smoke route failure. All failures are
+  reported deterministically and exit non-zero.
+- CI now runs U7-M after U7-E/F in `u7-release-catalog` and uploads
+  `release-evidence-drift.json` plus `release-evidence-drift.md`.
+- Local verification is complete; hosted target evidence remains the next
+  confirmation. U5.5 owner-VM promotion, embedded Python/native installer,
+  mobile, credentials, providers, mutation routes, and live execution remain
+  deferred.

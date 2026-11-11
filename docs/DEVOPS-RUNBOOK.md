@@ -127,6 +127,25 @@ services, network, credentials, mutation, or live execution remain deferred
 and are recorded with `execution_enabled: false`. CI uploads the JSON and
 Markdown audit without invoking any generated CLI.
 
+U7-L ([contract](U7-L-PAPER2SLIDES-RESEARCH-BRIEF.md)) exports the validated
+cited-research artifact as a hash-checked Markdown brief and evidence manifest.
+The output is a Paper2Slides-compatible input artifact; the model/media
+pipeline is not run and no provider, credential, network, mutation, or live
+execution path is enabled.
+
+U7-M ([contract](U7-M-RELEASE-EVIDENCE-DRIFT-AUDIT.md)) runs after U7-E/F in
+the existing `u7-release-catalog` job. `release:drift` consumes both target
+evidence directories and `cross-target-release-catalog.json`, then traces
+`ci-evidence.json` through U7-A validation, U7-B report, U7-D archive index,
+and the U7-E catalog. It fails closed on missing files, schema/status drift,
+raw-to-derived manifest or signature mismatch, failed `/readyz`, `/healthz`,
+`/overview`, or `/runtime` smoke, inconsistent promotion/rollback metadata,
+or an unsafe/private-boundary change. Windows/Linux archive and manifest hash
+differences are recorded as expected target variance while each target's
+provenance chain must remain internally consistent. CI uploads
+`release-evidence-drift.json` and `release-evidence-drift.md` beside the
+cross-target catalog.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

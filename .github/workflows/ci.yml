@@ -325,6 +325,15 @@ jobs:
           --catalog "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json"
           --markdown "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.md"
           --json "${{ runner.temp }}/market-os-u7/cross-target-release-catalog-report.json"
+      - name: Audit U7-M release evidence drift
+        working-directory: apps/desktop/electron
+        run: >-
+          pnpm run release:drift --
+          --windows "${{ runner.temp }}/market-os-u7/windows-x64"
+          --linux "${{ runner.temp }}/market-os-u7/linux-x64"
+          --catalog "${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json"
+          --markdown "${{ runner.temp }}/market-os-u7/release-evidence-drift.md"
+          --json "${{ runner.temp }}/market-os-u7/release-evidence-drift.json"
       - name: Upload cross-target release catalog
         uses: actions/upload-artifact@v7
         with:
@@ -333,6 +342,8 @@ jobs:
             ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.json
             ${{ runner.temp }}/market-os-u7/cross-target-release-catalog.md
             ${{ runner.temp }}/market-os-u7/cross-target-release-catalog-report.json
+            ${{ runner.temp }}/market-os-u7/release-evidence-drift.md
+            ${{ runner.temp }}/market-os-u7/release-evidence-drift.json
           if-no-files-found: error
 
   container-build:

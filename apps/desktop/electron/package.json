@@ -18,6 +18,7 @@
     "release:index": "node scripts/index-portable-archives.cjs",
     "release:catalog": "node scripts/catalog-release.cjs",
     "release:catalog:report": "node scripts/render-release-catalog-report.cjs",
+    "release:drift": "node scripts/audit-release-drift.cjs",
     "release:inspect": "node scripts/release-slots.cjs inspect",
     "release:promote": "node scripts/release-slots.cjs promote",
     "release:rollback": "node scripts/release-slots.cjs rollback",

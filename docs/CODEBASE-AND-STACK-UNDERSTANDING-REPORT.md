@@ -120,14 +120,12 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-U6.2 selects Electron for the first read-only Windows/Linux desktop container.
-U6.3 now verifies one local lifecycle/security slice over the completed CLI,
-HTTP API, and Next.js projections. The next safe action is U6.4-B: extend the
-verified U6.4-A unsigned artifact with signed metadata, sidecar distribution,
-and hash-gated rollback. U6.4-A already packages the renderer and source
-sidecar reproducibly; U6.4-B adds signing and explicit rollback. Keep the three surfaces
-semantically aligned; keep mutation, providers, credentials, and connected
-access disabled. U5.5 promotion remains a separate gate for a future owner VM.
+U7-M is complete locally and adds a fail-closed same-run Windows/Linux release
+evidence drift audit over the U6.4-C/U7-A/U7-B/U7-D/U7-E chain. The next safe
+local action is selective U7 evaluation or another evidence product that reuses
+the existing contracts. Keep mutation, providers, credentials, and connected
+access disabled. U5.5 owner-VM promotion remains a separate gate for a future
+VM and access path.
 
 ## Graph-backed contract boundary
 

@@ -1,0 +1,61 @@
+{
+  "schema": "market-os.u7-m-release-evidence-drift-evidence@v1",
+  "milestone": "U7-M",
+  "status": "local-verified",
+  "scope": "same-run Windows/Linux CI evidence provenance and shared-boundary drift audit",
+  "checks": {
+    "windows_bundle_present": true,
+    "linux_bundle_present": true,
+    "release_versions_shared": true,
+    "candidate_current_roles_valid": true,
+    "manifest_hashes_match": true,
+    "signatures_verified": true,
+    "smoke_routes_complete": true,
+    "promotion_metadata_consistent": true,
+    "rollback_metadata_consistent": true,
+    "boundaries_consistent": true,
+    "fail_closed_drift_reporting": true
+  },
+  "implementation": {
+    "package_script": "apps/desktop/electron/package.json#release:drift",
+    "auditor": "apps/desktop/electron/scripts/audit-release-drift.cjs",
+    "focused_test": "apps/desktop/electron/tests/release-drift.test.cjs",
+    "workflow": ".github/workflows/ci.yml",
+    "uploaded_outputs": [
+      "release-evidence-drift.md",
+      "release-evidence-drift.json"
+    ]
+  },
+  "verification": {
+    "focused_tests": 4,
+    "focused_failures": 0,
+    "fixture_cases": [
+      "pass",
+      "boundary drift",
+      "manifest provenance drift",
+      "signed smoke route failure"
+    ]
+  },
+  "boundary": {
+    "private": true,
+    "synthetic_only": true,
+    "paper_only": true,
+    "read_only": true,
+    "network_access": false,
+    "provider_requests": 0,
+    "credentials": false,
+    "mutation_routes": false,
+    "live_execution": false
+  },
+  "interpretation": "local U7-M implementation and fail-closed fixture verification; CI target evidence is required for the milestone's hosted status",
+  "deferred": [
+    "embedded Python runtime/native installer",
+    "mobile",
+    "providers",
+    "credentials",
+    "network access",
+    "live execution",
+    "U5.5 owner-VM promotion"
+  ],
+  "next_gate": "Run the existing CI release catalog job and retain the U7-M Windows/Linux drift report."
+}

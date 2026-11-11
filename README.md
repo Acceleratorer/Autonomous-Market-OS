@@ -64,8 +64,9 @@ rollback. U6.4-C runs target-native Windows/Linux CI packaging, signed smoke,
 and a two-version rollback drill. U7-G adds a deterministic quality-benchmark
 reviewer report, U7-H adds a synthetic-session accounting reviewer report, and
 U7-I adds a fail-closed local evidence pack index, U7-J adds a synthetic
-economic observability report, and U7-K adds a typed CLI tool registry audit,
-all with stable JSON/Markdown output; real-model
+economic observability report, U7-K adds a typed CLI tool registry audit, and
+U7-M adds a fail-closed Windows/Linux release evidence drift audit, all with
+stable JSON/Markdown output; real-model
 promotion and provider cost reporting remain deferred. Owner-VM
 promotion remains a separate U5.5 gate.
 

@@ -26,4 +26,14 @@ These remain documented decisions, not hidden bugs: partial fills and expiry sem
 
 ## Next gate
 
-The local exit gate is cleared for continued local-only work. U5.24 remains the latest web slice; U6 adds read-only BTC dataset, ingestion-manifest, and B2/B3 research catalog/detail CLI projections, U6.1 verifies the Next.js shell, U6.2 selects Electron, U6.3 verifies the local Electron lifecycle/security slice, U6.4-A verifies an unsigned clean-directory artifact, and U6.4-B verifies external-key signing, current/known-good promotion, failed-launch restoration, and hash-gated rollback. Platform-specific sidecar distribution and U5.5 owner-VM promotion remain separate pending gates. B4.18 copy-on-write schema migration, B4.19 local capability authorization, and B4.20 read-only retention/archive preflight are implemented locally. U5.5 runtime/identity contract v1 is defined and locally verified but not enabled on the owner VM; its promotion matrix remains open. The disconnected DirectAdmin static preview is deployed and verified separately; it contains no portfolio state, Python gateway, Next.js runtime, credentials, or mutation route. Preserve current scratch, probe, Playwright, output, and unrelated worktree artifacts.
+U7-M is complete locally. The release catalog CI job now audits the full
+Windows/Linux evidence chain from U6.4-C through U7-A/U7-B/U7-D/U7-E and emits
+a fail-closed drift report for schema/status, manifest provenance, signatures,
+four-route smoke, promotion/rollback, and the shared private/read-only/
+paper-only/execution-disabled boundary. Target-native archive and manifest
+hash differences remain expected variance when each target is internally
+consistent.
+
+The next optional work is a selective local U7 evaluation/evidence product.
+U5.5 owner-VM promotion, embedded Python/native installer, mobile, credentials,
+providers, mutation routes, and live execution remain deferred.
