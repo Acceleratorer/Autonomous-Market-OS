@@ -13,6 +13,12 @@ _MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()#+.!|<>~:/])")
 _PAPER2SLIDES_COMMIT = "0785051d1f52814097e94c44751e3f12b83f7c8a"
 
 
+def _source_sha256(raw: bytes) -> str:
+    """Hash source bytes with platform line endings normalized."""
+    normalized = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def _markdown_text(value: str) -> str:
     escaped = _MARKDOWN_SPECIAL.sub(r"\\\1", value)
     return re.sub(r"(?m)^(- )", r"\\- ", escaped)
@@ -217,7 +223,7 @@ def render_research_brief_files(
     markdown = render_research_brief(synthesis)
     evidence = build_research_brief_evidence(
         synthesis,
-        hashlib.sha256(source_bytes).hexdigest(),
+        _source_sha256(source_bytes),
         markdown,
     )
     if not all(evidence["checks"].values()) or not evidence["boundary"]["synthetic_only"]:

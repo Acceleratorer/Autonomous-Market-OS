@@ -44,6 +44,14 @@ def test_u7_j_is_stable_and_applies_quality_threshold() -> None:
     assert first["source_reference"]["imported_runtime"] is False
 
 
+def test_u7_j_source_hash_is_line_ending_independent(tmp_path: Path) -> None:
+    windows_fixture = tmp_path / FIXTURE.name
+    normalized = FIXTURE.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    windows_fixture.write_bytes(normalized.replace(b"\n", b"\r\n"))
+
+    assert build_synthetic_economic_report(windows_fixture) == build_synthetic_economic_report(FIXTURE)
+
+
 def test_u7_j_rejects_tampered_fixture(tmp_path: Path) -> None:
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
     payload = copy.deepcopy(payload)

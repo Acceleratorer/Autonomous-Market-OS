@@ -69,7 +69,8 @@ Autonomous-Market-OS/
 │   ├── cli/                   CLI application entrypoint
 │   ├── gateway/               local HTTP service entrypoint
 │   └── desktop/electron/      local Electron shell and release evidence tooling
-│                              including U7-M drift audit and U7-N register
+│                              including U7-M drift audit, U7-N register,
+│                              and U7-O evidence catalog
 ├── tests/                     TypeScript static dashboard contract tests
 ├── scripts/                   CI checks and bounded smoke harnesses
 ├── docs/                      roadmap, contracts, ADRs, reports, evidence, operations
@@ -105,7 +106,7 @@ evidence in `docs/evidence/codebase-stack-understanding.json`.
 | Data | `btc_history.py`, `btc_connectivity.py` | Canonical BTC rows, manifests, readiness, and bounded connectivity probes |
 | Providers | `adapters/` | Optional external runtimes behind fixture-first typed adapters |
 | Tests | `market_os/tests/`, `tests/` | Python behavior and TypeScript dashboard contract coverage |
-| Operations | `scripts/`, `apps/desktop/electron/scripts/`, `.github/workflows/`, `docs/evidence/` | CI checks, artifact smoke/release reports, U7-M drift auditing, U7-N evidence registration, quality reports, validation and machine-readable evidence |
+| Operations | `scripts/`, `apps/desktop/electron/scripts/`, `.github/workflows/`, `docs/evidence/` | CI checks, artifact smoke/release reports, U7-M drift auditing, U7-N registration, U7-O cataloging, quality reports, validation and machine-readable evidence |
 
 Application surfaces are grouped under `apps/web`, `apps/cli`, and
 `apps/gateway`. Their names are the product-facing boundary; `market_os.api`

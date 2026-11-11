@@ -59,6 +59,14 @@ def test_u7_k_audit_is_stable_and_blocks_external_tools() -> None:
     assert first["source_reference"]["imported_runtime"] is False
 
 
+def test_u7_k_source_hash_is_line_ending_independent(tmp_path: Path) -> None:
+    windows_fixture = tmp_path / FIXTURE.name
+    normalized = FIXTURE.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    windows_fixture.write_bytes(normalized.replace(b"\n", b"\r\n"))
+
+    assert build_tool_registry_report(windows_fixture) == build_tool_registry_report(FIXTURE)
+
+
 def test_u7_k_rejects_tampered_fixture(tmp_path: Path) -> None:
     payload = copy.deepcopy(json.loads(FIXTURE.read_text(encoding="utf-8")))
     payload["tools"][0]["entry_point"] = ["market-os", ";", "unsafe"]

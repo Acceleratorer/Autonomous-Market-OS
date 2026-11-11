@@ -154,6 +154,14 @@ the normalized private/read-only/paper-only/execution-disabled boundary. CI
 uploads `unified-evidence-register.json` and `unified-evidence-register.md`
 without contacting a VM, provider, credential store, or live execution path.
 
+U7-O ([contract](U7-O-EVIDENCE-CATALOG.md)) runs after the hosted U7-N, U7-J,
+U7-K, and U7-L renders. `python -m market_os.u7_evidence_catalog` checks the
+complete local evidence surface for exact schemas/statuses, normalized source
+hashes, report fingerprints, lineage, one private/synthetic/paper-only/read-
+only/no-network boundary, and disabled promotion or execution. CI uploads
+`evidence-catalog.json` and `evidence-catalog.md` as
+`market-os-u7-o-evidence-catalog`.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

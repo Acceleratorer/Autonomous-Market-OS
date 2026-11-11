@@ -120,11 +120,11 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-U7-N is the next local evidence slice: it joins the committed U7-I pack with
-hosted-verified U7-M release provenance in one deterministic register. The
-slice remains offline and reuses the existing contracts. Keep mutation,
-providers, credentials, and connected access disabled. U5.5 owner-VM promotion
-remains a separate gate for a future VM and access path.
+U7-O is the current local evidence slice: it catalogs the committed U7-N
+register with U7-J/U7-K/U7-L evidence in one deterministic, fail-closed
+catalog. The slice remains offline and reuses the existing contracts. Keep
+mutation, providers, credentials, and connected access disabled. U5.5
+owner-VM promotion remains a separate gate for a future VM and access path.
 
 ## Graph-backed contract boundary
 

@@ -46,6 +46,12 @@ def _fingerprint(value: Any) -> str:
     return hashlib.sha256(_canonical(value)).hexdigest()
 
 
+def _source_sha256(raw: bytes) -> str:
+    """Hash fixture bytes with platform line endings normalized."""
+    normalized = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def _fail(message: str) -> None:
     raise SyntheticEconomicReportError(message)
 
@@ -144,7 +150,7 @@ def _load_fixture(path: str | Path) -> tuple[dict[str, Any], str, str]:
                 _number(record.get("cost_usd"), f"tasks[{index}].api_calls[{call_index}].cost_usd")
             if "api_name" in record:
                 _text(record.get("api_name"), f"tasks[{index}].api_calls[{call_index}].api_name")
-    return payload, actual, hashlib.sha256(raw).hexdigest()
+    return payload, actual, _source_sha256(raw)
 
 
 def _task_cost(task: Mapping[str, Any], pricing: Mapping[str, Any]) -> tuple[dict[str, float], list[dict[str, Any]]]:

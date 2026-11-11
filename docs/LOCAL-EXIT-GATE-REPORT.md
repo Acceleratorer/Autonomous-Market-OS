@@ -35,7 +35,10 @@ paper-only/execution-disabled boundary. Target-native archive and manifest
 hash differences remain expected variance when each target is internally
 consistent.
 
-The next optional work is to let CI verify the U7-N unified evidence register,
-then select another bounded local U7 evaluation/evidence product.
+U7-N is now hosted-verified in CI, and U7-O catalogs the committed U7-N/J/K/L
+evidence surface with normalized source/report fingerprints and one shared
+boundary. The next optional work is another bounded local U7 product only if a
+documented gap justifies it; otherwise the separate U8 live-readiness decision
+remains the next phase gate.
 U5.5 owner-VM promotion, embedded Python/native installer, mobile, credentials,
 providers, mutation routes, and live execution remain deferred.

@@ -1941,3 +1941,17 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - CI renders and uploads the U7-N JSON/Markdown register from `offline-tests`.
   U5.5 owner-VM promotion, embedded Python/native installer, mobile,
   credentials, providers, mutation routes, and live execution remain deferred.
+
+## 2026-11-12 — U7-O evidence catalog
+
+- Added `market_os/u7_evidence_catalog.py` and focused coverage for a
+  fail-closed catalog joining U7-N with the U7-J economic report, U7-K CLI
+  registry audit, and U7-L research-brief evidence.
+- The catalog rechecks exact schemas/statuses, normalized source hashes, report
+  fingerprints, lineage, the shared private/synthetic/paper-only/read-only/no-
+  network boundary, and disabled promotion or execution. U7-J/U7-K/U7-L
+  fixture hashes now normalize line endings so Windows and Linux evidence agree.
+- Committed U7-J/U7-K/U7-L evidence JSON and U7-O JSON/Markdown outputs; CI
+  renders and uploads `market-os-u7-o-evidence-catalog`. U5.5 owner-VM
+  promotion, embedded Python/native installer, mobile, credentials, providers,
+  mutation routes, and live execution remain deferred.

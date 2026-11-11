@@ -1,0 +1,135 @@
+{
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "predictive_evidence": false,
+    "private": true,
+    "promotion_approved": false,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "checks": {
+    "accounting_balanced": true,
+    "deterministic_replay": true,
+    "fixture_valid": true,
+    "promotion_disabled": true,
+    "synthetic_boundary": true,
+    "threshold_applied": true
+  },
+  "deferred": [
+    "real providers",
+    "credentials",
+    "network access",
+    "live execution",
+    "external payment"
+  ],
+  "economics": {
+    "final_balance_usd": 12.957485,
+    "initial_balance_usd": 10.0,
+    "net_per_hour_usd": 59.1497,
+    "net_usd": 2.957485,
+    "survival_status": "struggling",
+    "tasks_completed": 2,
+    "tasks_paid": 1,
+    "tasks_rejected": 1,
+    "total_costs_usd": {
+      "llm_tokens": 0.0225,
+      "ocr_api": 0.02,
+      "other_api": 0.0,
+      "search_api": 1.5e-05,
+      "total": 0.042515
+    },
+    "total_income_usd": 3.0,
+    "wall_clock_seconds": 180.0
+  },
+  "fixture": {
+    "fixture_fingerprint": "f5bdd1d1f4bc55cbf7ba4b280d1e651797d7fcd1227533784e4a1cd8cece32fb",
+    "fixture_id": "u7-j-clawwork-economic-v1",
+    "label": "synthetic local economic evaluation fixture; not real provider economics",
+    "schema": "market-os.u7-j.synthetic-economic-fixture@v1",
+    "source_sha256": "318580d84f753e0cf60d1cc16c8f585c2ccedf945f12a1845e6293cd79bd66b8",
+    "task_count": 2
+  },
+  "interpretation": "synthetic economic observability only; no real-world profitability or promotion claim",
+  "promotion": {
+    "approved": false,
+    "reasons": [
+      "fixture costs and rewards are synthetic",
+      "real provider usage and payment authorization are deferred"
+    ],
+    "status": "Not ready \u2014 synthetic economics only"
+  },
+  "report_fingerprint": "0e2110d9f75ddb1fbc64ca0a29583ee80cb857629e04cbcf68fdfd0594f86d52",
+  "schema": "market-os.u7-j-synthetic-economic-report@v1",
+  "source_reference": {
+    "commit": "9c73ac05fdb0bffdb23febdd971eb70f44dd46eb",
+    "imported_runtime": false,
+    "path": "livebench/agent/economic_tracker.py",
+    "repository": "ClawWork"
+  },
+  "status": "passed",
+  "tasks": [
+    {
+      "api_calls": [
+        {
+          "api_name": "synthetic-search",
+          "channel": "search_api",
+          "cost_usd": 5e-06,
+          "pricing_model": "per_token"
+        },
+        {
+          "api_name": "synthetic-ocr",
+          "channel": "ocr_api",
+          "cost_usd": 0.02,
+          "pricing_model": "flat_rate"
+        }
+      ],
+      "balance_after_usd": 12.972495,
+      "base_payment_usd": 3.0,
+      "costs_usd": {
+        "llm_tokens": 0.0075,
+        "ocr_api": 0.02,
+        "other_api": 0.0,
+        "search_api": 5e-06
+      },
+      "evaluation_score": 0.8,
+      "income_usd": 3.0,
+      "net_usd": 2.972495,
+      "payment_awarded": true,
+      "payment_threshold": 0.6,
+      "task_id": "task-high-quality",
+      "total_cost_usd": 0.027505,
+      "wall_clock_seconds": 60.0
+    },
+    {
+      "api_calls": [
+        {
+          "api_name": "synthetic-search",
+          "channel": "search_api",
+          "cost_usd": 1e-05,
+          "pricing_model": "per_token"
+        }
+      ],
+      "balance_after_usd": 12.957485,
+      "base_payment_usd": 2.0,
+      "costs_usd": {
+        "llm_tokens": 0.015,
+        "ocr_api": 0.0,
+        "other_api": 0.0,
+        "search_api": 1e-05
+      },
+      "evaluation_score": 0.4,
+      "income_usd": 0.0,
+      "net_usd": -0.01501,
+      "payment_awarded": false,
+      "payment_threshold": 0.6,
+      "task_id": "task-low-quality",
+      "total_cost_usd": 0.01501,
+      "wall_clock_seconds": 120.0
+    }
+  ]
+}

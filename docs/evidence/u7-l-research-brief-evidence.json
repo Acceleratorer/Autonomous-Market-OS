@@ -1,0 +1,53 @@
+{
+  "artifact": {
+    "artifact_id": "artifact-93ce05a12d8ec8c0",
+    "kind": "research-brief",
+    "lineage": [
+      "artifact-retrieval-u7-l",
+      "artifact-evidence-u7-l",
+      "artifact-documents-u7-l"
+    ],
+    "media_type": "text/markdown",
+    "sha256": "93ce05a12d8ec8c032da0c47531aa00820d71d40c4d215d2ab7bf1ed88436cda"
+  },
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "private": true,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "checks": {
+    "boundary_verified": true,
+    "citations_preserved": true,
+    "lineage_complete": true,
+    "output_hash_valid": true,
+    "source_hash_valid": true,
+    "support_quotes_preserved": true,
+    "synthesis_validated": true
+  },
+  "deferred": [
+    "Paper2Slides model-based planning",
+    "image and video provider generation",
+    "credentials and live execution"
+  ],
+  "paper2slides": {
+    "commit": "0785051d1f52814097e94c44751e3f12b83f7c8a",
+    "markdown_input_documented": true,
+    "pipeline_executed": false,
+    "repository": "HKUDS/Paper2Slides"
+  },
+  "report_fingerprint": "542fba3e8cb6bb76f1c5e7ff2dcf07a5e55aae35ebed6fd4c6b1cf70ee0e0dd9",
+  "schema": "market-os.u7-l-research-brief-evidence@v1",
+  "scope": "Markdown export operation",
+  "source": {
+    "api_version": "market-os.research.v1",
+    "sha256": "5819f93bd962546e5ff63f7867febe63d2388ec00109a8680c8b2f8b044467c0",
+    "synthesis_fingerprint": "bc7d054a958536a15f6154040f8c0f6227ddcf80d880302fefba2b15b46d54f9"
+  },
+  "status": "passed"
+}

@@ -64,6 +64,12 @@ def _fingerprint(value: Any) -> str:
     return hashlib.sha256(_canonical(value)).hexdigest()
 
 
+def _source_sha256(raw: bytes) -> str:
+    """Hash fixture bytes with platform line endings normalized."""
+    normalized = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def _mapping(value: Any, field: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         _fail(f"{field} must be an object")
@@ -174,7 +180,7 @@ def _load_fixture(path: str | Path) -> tuple[dict[str, Any], str, str]:
     if len(names) != len(set(names)):
         _fail("tool names must be unique")
     payload["_normalized_tools"] = normalized
-    return payload, actual, hashlib.sha256(raw).hexdigest()
+    return payload, actual, _source_sha256(raw)
 
 
 def build_tool_registry_report(path: str | Path) -> dict[str, Any]:

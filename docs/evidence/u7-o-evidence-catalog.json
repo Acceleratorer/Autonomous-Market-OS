@@ -1,0 +1,173 @@
+{
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "private": true,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "catalog_fingerprint": "5c484710bc7007f90406352b660e5dbe4492c7662d6cdf9875a278c77649655e",
+  "checks": {
+    "boundaries_consistent": true,
+    "lineage_present": true,
+    "no_mutation_or_live_execution": true,
+    "no_provider_network_credentials": true,
+    "private_read_only_paper_only": true,
+    "promotion_disabled": true,
+    "report_fingerprints_valid": true,
+    "schemas_statuses_exact": true,
+    "source_hashes_valid": true
+  },
+  "deferred": [
+    "Paper2Slides model-based planning",
+    "U5.5 owner-VM promotion",
+    "credentials",
+    "credentials and live execution",
+    "embedded Python runtime/native installer",
+    "external payment",
+    "external services",
+    "generated CLI execution",
+    "image and video provider generation",
+    "live execution",
+    "mobile",
+    "mutation routes",
+    "network access",
+    "providers",
+    "real providers"
+  ],
+  "interpretation": "U7-N, U7-J, U7-K, and U7-L evidence are cataloged without deployment, generated-tool execution, provider access, or live-readiness claims.",
+  "items": [
+    {
+      "boundary": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "paper_only": true,
+        "private": true,
+        "provider_requests": 0,
+        "read_only": true,
+        "synthetic_only": true
+      },
+      "deferred": [
+        "U5.5 owner-VM promotion",
+        "credentials",
+        "embedded Python runtime/native installer",
+        "live execution",
+        "mobile",
+        "network access",
+        "providers"
+      ],
+      "fixture_or_source_sha256": "4efc7f46f1ec7e037c40b416046a3ec7f2dfba2b59afab2d9d2772987da96370",
+      "id": "register",
+      "lineage": {
+        "register_fingerprint": "4efc7f46f1ec7e037c40b416046a3ec7f2dfba2b59afab2d9d2772987da96370"
+      },
+      "milestone": "U7-N",
+      "schema": "market-os.u7-n-unified-evidence-register@v1",
+      "source_artifact": "unified-evidence-register.json",
+      "source_sha256": "1c4c033cc882793cac9f1d18d031b560be5b0ee91c4844a6bf74a2065a10cc6d",
+      "status": "passed"
+    },
+    {
+      "boundary": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "paper_only": true,
+        "private": true,
+        "provider_requests": 0,
+        "read_only": true,
+        "synthetic_only": true
+      },
+      "deferred": [
+        "credentials",
+        "external payment",
+        "live execution",
+        "network access",
+        "real providers"
+      ],
+      "fixture_or_source_sha256": "318580d84f753e0cf60d1cc16c8f585c2ccedf945f12a1845e6293cd79bd66b8",
+      "id": "economic",
+      "lineage": {
+        "fixture_fingerprint": "f5bdd1d1f4bc55cbf7ba4b280d1e651797d7fcd1227533784e4a1cd8cece32fb",
+        "report_fingerprint": "0e2110d9f75ddb1fbc64ca0a29583ee80cb857629e04cbcf68fdfd0594f86d52"
+      },
+      "milestone": "U7-J",
+      "schema": "market-os.u7-j-synthetic-economic-report@v1",
+      "source_artifact": "economic-report.json",
+      "source_sha256": "86090c314f8d3a51375b70595f2d4b653ed3583b04bfbd5e3e10142d5712007e",
+      "status": "passed"
+    },
+    {
+      "boundary": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "paper_only": true,
+        "private": true,
+        "provider_requests": 0,
+        "read_only": true,
+        "synthetic_only": true
+      },
+      "deferred": [
+        "credentials",
+        "external services",
+        "generated CLI execution",
+        "live execution",
+        "mutation routes",
+        "network access"
+      ],
+      "fixture_or_source_sha256": "40a923ec15c2981f6b127da01d1093848893056ee1110c73bb07a0a0d1a09441",
+      "id": "tools",
+      "lineage": {
+        "fixture_fingerprint": "0089359ef3785ef44a80d68bc9c8b39b3efafed1c7cb33f58f29e092ef67bb18",
+        "report_fingerprint": "90f20c77e7189d5df677d6212e3c900a902814cf8d37328ba3d52a5f36f5b9a4"
+      },
+      "milestone": "U7-K",
+      "schema": "market-os.u7-k-cli-tool-registry-report@v1",
+      "source_artifact": "tool-registry.json",
+      "source_sha256": "a179165e97b266eadb44b53b7f1cc96b9e26defb5a0f63538b26ab5f527ea3ed",
+      "status": "passed"
+    },
+    {
+      "boundary": {
+        "credentials": false,
+        "live_execution": false,
+        "mutation_routes": false,
+        "network_access": false,
+        "paper_only": true,
+        "private": true,
+        "provider_requests": 0,
+        "read_only": true,
+        "synthetic_only": true
+      },
+      "deferred": [
+        "Paper2Slides model-based planning",
+        "credentials and live execution",
+        "image and video provider generation"
+      ],
+      "fixture_or_source_sha256": "5819f93bd962546e5ff63f7867febe63d2388ec00109a8680c8b2f8b044467c0",
+      "id": "research",
+      "lineage": {
+        "artifact_sha256": "93ce05a12d8ec8c032da0c47531aa00820d71d40c4d215d2ab7bf1ed88436cda",
+        "report_fingerprint": "542fba3e8cb6bb76f1c5e7ff2dcf07a5e55aae35ebed6fd4c6b1cf70ee0e0dd9",
+        "synthesis_fingerprint": "bc7d054a958536a15f6154040f8c0f6227ddcf80d880302fefba2b15b46d54f9"
+      },
+      "milestone": "U7-L",
+      "schema": "market-os.u7-l-research-brief-evidence@v1",
+      "source_artifact": "research-brief-evidence.json",
+      "source_sha256": "9aae7b8cfa69816ef50529510d0e1d26ab6b3d351c7a5767a14bcee63875fa50",
+      "status": "passed"
+    }
+  ],
+  "next_gate": "Select the next bounded local U7 evaluation/evidence product; U5.5 remains gated on owner VM/access.",
+  "schema": "market-os.u7-o-evidence-catalog@v1",
+  "status": "passed"
+}

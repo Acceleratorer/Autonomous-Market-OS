@@ -161,6 +161,22 @@ def test_research_brief_cli_writes_hash_bound_paper2slides_input(tmp_path: Path)
     assert report["paper2slides"]["pipeline_executed"] is False
     assert report["boundary"]["synthetic_only"] is True
 
+    windows_source = tmp_path / "cited-research-crlf.json"
+    normalized_source = source.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    windows_source.write_bytes(normalized_source.replace(b"\n", b"\r\n"))
+    windows_markdown = tmp_path / "crlf-brief.md"
+    windows_evidence = tmp_path / "crlf-evidence.json"
+    assert cli.main([
+        "research-brief",
+        "--source",
+        str(windows_source),
+        "--markdown",
+        str(windows_markdown),
+        "--json",
+        str(windows_evidence),
+    ]) == 0
+    assert json.loads(windows_evidence.read_text(encoding="utf-8"))["report_fingerprint"] == report["report_fingerprint"]
+
     second_markdown = tmp_path / "other-name.md"
     second_evidence = tmp_path / "other-evidence.json"
     assert cli.main(["research-brief", "--source", str(source), "--markdown", str(second_markdown), "--json", str(second_evidence)]) == 0

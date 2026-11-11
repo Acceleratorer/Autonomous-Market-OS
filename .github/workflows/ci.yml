@@ -145,6 +145,23 @@ jobs:
             ${{ runner.temp }}/market-os-u7-l/research-brief.md
             ${{ runner.temp }}/market-os-u7-l/research-brief-evidence.json
           if-no-files-found: error
+      - name: Render U7-O evidence catalog
+        run: >-
+          python -m market_os.u7_evidence_catalog
+          --register "${{ runner.temp }}/market-os-u7-n/unified-evidence-register.json"
+          --economic "${{ runner.temp }}/market-os-u7-j/economic-report.json"
+          --tools "${{ runner.temp }}/market-os-u7-k/tool-registry.json"
+          --research "${{ runner.temp }}/market-os-u7-l/research-brief-evidence.json"
+          --markdown "${{ runner.temp }}/market-os-u7-o/evidence-catalog.md"
+          --json "${{ runner.temp }}/market-os-u7-o/evidence-catalog.json"
+      - name: Upload U7-O evidence catalog
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u7-o-evidence-catalog
+          path: |
+            ${{ runner.temp }}/market-os-u7-o/evidence-catalog.md
+            ${{ runner.temp }}/market-os-u7-o/evidence-catalog.json
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON
