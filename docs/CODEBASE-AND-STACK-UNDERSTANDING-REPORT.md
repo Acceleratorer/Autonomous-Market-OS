@@ -120,12 +120,11 @@ blocked by contract rather than missing implementation.
 
 ## Exact next gate
 
-U7-M is complete locally and adds a fail-closed same-run Windows/Linux release
-evidence drift audit over the U6.4-C/U7-A/U7-B/U7-D/U7-E chain. The next safe
-local action is selective U7 evaluation or another evidence product that reuses
-the existing contracts. Keep mutation, providers, credentials, and connected
-access disabled. U5.5 owner-VM promotion remains a separate gate for a future
-VM and access path.
+U7-N is the next local evidence slice: it joins the committed U7-I pack with
+hosted-verified U7-M release provenance in one deterministic register. The
+slice remains offline and reuses the existing contracts. Keep mutation,
+providers, credentials, and connected access disabled. U5.5 owner-VM promotion
+remains a separate gate for a future VM and access path.
 
 ## Graph-backed contract boundary
 

@@ -88,6 +88,21 @@ jobs:
             ${{ runner.temp }}/market-os-u7-i/local-evidence-pack.md
             ${{ runner.temp }}/market-os-u7-i/local-evidence-pack.json
           if-no-files-found: error
+      - name: Render U7-N unified evidence register
+        run: >-
+          python -m market_os.u7_evidence_register
+          --pack docs/evidence/u7-i-local-evidence-pack.json
+          --drift docs/evidence/u7-m-release-evidence-drift.json
+          --markdown "${{ runner.temp }}/market-os-u7-n/unified-evidence-register.md"
+          --json "${{ runner.temp }}/market-os-u7-n/unified-evidence-register.json"
+      - name: Upload U7-N unified evidence register
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u7-n-unified-evidence-register
+          path: |
+            ${{ runner.temp }}/market-os-u7-n/unified-evidence-register.md
+            ${{ runner.temp }}/market-os-u7-n/unified-evidence-register.json
+          if-no-files-found: error
       - name: Render U7-J synthetic economic report
         run: >-
           market-os synthetic economic-report

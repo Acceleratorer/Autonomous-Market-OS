@@ -1,0 +1,57 @@
+{
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "private": true,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "checks": {
+    "boundaries_consistent": true,
+    "lineage_present": true,
+    "no_mutation_or_live_execution": true,
+    "no_provider_network_credentials": true,
+    "private_read_only_paper_only": true,
+    "u7_i_pack_passed": true,
+    "u7_i_schema_status": true,
+    "u7_m_checks_all_true": true,
+    "u7_m_drift_count_zero": true,
+    "u7_m_schema_status": true
+  },
+  "deferred": [
+    "U5.5 owner-VM promotion",
+    "credentials",
+    "embedded Python runtime/native installer",
+    "live execution",
+    "mobile",
+    "network access",
+    "providers"
+  ],
+  "interpretation": "Committed U7-I evidence and hosted U7-M release drift evidence are joined without deployment or live-readiness claims.",
+  "items": [
+    {
+      "id": "u7-i",
+      "milestone": "U7-I",
+      "schema": "market-os.u7-i-local-evidence-pack-evidence@v1",
+      "source_artifact": "u7-i-local-evidence-pack.json",
+      "source_sha256": "1ac9f030a74b55307e87818725ecfa6700d02e62c1698e774a9cf153cfa3b1d4",
+      "status": "local-verified"
+    },
+    {
+      "id": "u7-m",
+      "milestone": "U7-M",
+      "schema": "market-os.u7-m-release-evidence-drift-evidence@v1",
+      "source_artifact": "u7-m-release-evidence-drift.json",
+      "source_sha256": "1dce6fda63aada0e0c5906c73c734bb8a9b98a313e94bb0c51e06db9fbe63fc1",
+      "status": "ci-verified"
+    }
+  ],
+  "next_gate": "Select the next bounded local U7 evaluation/evidence product; U5.5 remains gated on owner VM/access.",
+  "register_fingerprint": "b3037f14d11ae82cad2d504d580ba00f4891bc148f41320ac15629e92fa33129",
+  "schema": "market-os.u7-n-unified-evidence-register@v1",
+  "status": "passed"
+}

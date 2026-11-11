@@ -1929,3 +1929,15 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   local U7 evaluation/evidence product; U5.5 owner-VM promotion, embedded
   Python/native installer, mobile, credentials, providers, mutation routes,
   and live execution remain deferred.
+
+## 2026-11-12 — U7-N unified evidence register
+
+- Added `market_os/u7_evidence_register.py` and focused coverage for a
+  fail-closed register joining the committed U7-I pack with the hosted-verified
+  U7-M evidence summary.
+- The register hashes both source files, requires exact schemas/statuses, zero
+  U7-M drift, two shared target versions, and a normalized private, synthetic,
+  paper-only, read-only, execution-disabled boundary.
+- CI renders and uploads the U7-N JSON/Markdown register from `offline-tests`.
+  U5.5 owner-VM promotion, embedded Python/native installer, mobile,
+  credentials, providers, mutation routes, and live execution remain deferred.

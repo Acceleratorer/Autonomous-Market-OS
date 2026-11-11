@@ -95,5 +95,5 @@
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "refresh_note": "Knowledge graph refreshed against the current clean main commit for U7-M planning; the graph contains 1,944 nodes, 3,438 edges, 7 layers, and a 10-step tour."
   },
-  "next_gate": "U7-M hosted CI verified; next optional work is selective U7 evaluation, while U5.5 waits for owner VM/access"
+  "next_gate": "U7-N unified evidence register; U5.5 waits for owner VM/access"
 }

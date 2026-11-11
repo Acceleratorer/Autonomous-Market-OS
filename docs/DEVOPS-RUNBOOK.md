@@ -146,6 +146,14 @@ provenance chain must remain internally consistent. CI uploads
 `release-evidence-drift.json` and `release-evidence-drift.md` beside the
 cross-target catalog.
 
+U7-N ([contract](U7-N-UNIFIED-EVIDENCE-REGISTER.md)) runs in `offline-tests`
+over the committed U7-I local evidence pack and the hosted-verified U7-M
+summary. `python -m market_os.u7_evidence_register` checks exact schemas and
+statuses, source hashes, zero release drift, two shared target versions, and
+the normalized private/read-only/paper-only/execution-disabled boundary. CI
+uploads `unified-evidence-register.json` and `unified-evidence-register.md`
+without contacting a VM, provider, credential store, or live execution path.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

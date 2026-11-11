@@ -8,6 +8,16 @@
     "job": "u7-release-catalog",
     "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/43056896652"
   },
+  "targets": [
+    "windows-x64",
+    "linux-x64"
+  ],
+  "release_versions": [
+    "0.1.0-ci.157.1",
+    "0.1.0-ci.157.2"
+  ],
+  "drift": [],
+  "drift_count": 0,
   "scope": "same-run Windows/Linux CI evidence provenance and shared-boundary drift audit",
   "checks": {
     "windows_bundle_present": true,

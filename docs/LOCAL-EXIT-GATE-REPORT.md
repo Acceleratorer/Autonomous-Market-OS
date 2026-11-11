@@ -35,6 +35,7 @@ paper-only/execution-disabled boundary. Target-native archive and manifest
 hash differences remain expected variance when each target is internally
 consistent.
 
-The next optional work is a selective local U7 evaluation/evidence product.
+The next optional work is to let CI verify the U7-N unified evidence register,
+then select another bounded local U7 evaluation/evidence product.
 U5.5 owner-VM promotion, embedded Python/native installer, mobile, credentials,
 providers, mutation routes, and live execution remain deferred.
