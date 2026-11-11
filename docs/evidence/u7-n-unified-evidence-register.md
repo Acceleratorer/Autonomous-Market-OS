@@ -1,15 +1,15 @@
 # U7-N Unified Evidence Register
 
 - Status: **PASSED**
-- Register fingerprint: `b3037f14d11ae82cad2d504d580ba00f4891bc148f41320ac15629e92fa33129`
+- Register fingerprint: `4efc7f46f1ec7e037c40b416046a3ec7f2dfba2b59afab2d9d2772987da96370`
 - Scope: committed U7-I evidence joined with hosted U7-M provenance evidence
 
 ## Evidence items
 
 | Milestone | Schema | Status | Source SHA-256 |
 | --- | --- | --- | --- |
-| U7-I | `market-os.u7-i-local-evidence-pack-evidence@v1` | local-verified | `1ac9f030a74b55307e87818725ecfa6700d02e62c1698e774a9cf153cfa3b1d4` |
-| U7-M | `market-os.u7-m-release-evidence-drift-evidence@v1` | ci-verified | `1dce6fda63aada0e0c5906c73c734bb8a9b98a313e94bb0c51e06db9fbe63fc1` |
+| U7-I | `market-os.u7-i-local-evidence-pack-evidence@v1` | local-verified | `0f8c12c476990a27b76c219286d1358300b11cc0df09dbfa035b992fc7e11b5e` |
+| U7-M | `market-os.u7-m-release-evidence-drift-evidence@v1` | ci-verified | `849e33c9fbeb9a8fc800a7eb16f2cda0887b2cdcc09487a61119d7ef6b2772d0` |
 
 ## Register checks
 

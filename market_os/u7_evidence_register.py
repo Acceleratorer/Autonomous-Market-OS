@@ -55,6 +55,11 @@ def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def _source_sha256(value: bytes) -> str:
+    """Hash source bytes with platform line endings normalized."""
+    return _sha256(value.replace(b"\r\n", b"\n").replace(b"\r", b"\n"))
+
+
 def _require_schema_status(payload: Mapping[str, Any], schema: str, status: str, label: str) -> None:
     if payload.get("schema") != schema:
         _fail(f"{label} schema is invalid")
@@ -165,7 +170,7 @@ def _read_input(path: str | Path, label: str) -> tuple[Mapping[str, Any], str, s
         payload = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         _fail(f"cannot read {label}: {exc}")
-    return _object(payload, label), source.name, _sha256(raw)
+    return _object(payload, label), source.name, _source_sha256(raw)
 
 
 def build_register_from_files(pack_path: str | Path, drift_path: str | Path) -> dict[str, Any]:

@@ -1935,7 +1935,7 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - Added `market_os/u7_evidence_register.py` and focused coverage for a
   fail-closed register joining the committed U7-I pack with the hosted-verified
   U7-M evidence summary.
-- The register hashes both source files, requires exact schemas/statuses, zero
+- The register hashes newline-normalized source files, requires exact schemas/statuses, zero
   U7-M drift, two shared target versions, and a normalized private, synthetic,
   paper-only, read-only, execution-disabled boundary.
 - CI renders and uploads the U7-N JSON/Markdown register from `offline-tests`.

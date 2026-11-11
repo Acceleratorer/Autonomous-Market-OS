@@ -32,7 +32,7 @@ The output schema is
 `market-os.u7-n-unified-evidence-register@v1`. It records:
 
 - exact U7-I/U7-M source schemas and statuses;
-- raw source SHA-256 hashes and a deterministic register fingerprint;
+- newline-normalized source SHA-256 hashes and a deterministic register fingerprint;
 - all required U7-I checks and all U7-M checks;
 - zero U7-M drift and two shared target release versions;
 - normalized shared private, synthetic, paper-only, read-only,

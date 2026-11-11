@@ -38,7 +38,7 @@
       "milestone": "U7-I",
       "schema": "market-os.u7-i-local-evidence-pack-evidence@v1",
       "source_artifact": "u7-i-local-evidence-pack.json",
-      "source_sha256": "1ac9f030a74b55307e87818725ecfa6700d02e62c1698e774a9cf153cfa3b1d4",
+      "source_sha256": "0f8c12c476990a27b76c219286d1358300b11cc0df09dbfa035b992fc7e11b5e",
       "status": "local-verified"
     },
     {
@@ -46,12 +46,12 @@
       "milestone": "U7-M",
       "schema": "market-os.u7-m-release-evidence-drift-evidence@v1",
       "source_artifact": "u7-m-release-evidence-drift.json",
-      "source_sha256": "1dce6fda63aada0e0c5906c73c734bb8a9b98a313e94bb0c51e06db9fbe63fc1",
+      "source_sha256": "849e33c9fbeb9a8fc800a7eb16f2cda0887b2cdcc09487a61119d7ef6b2772d0",
       "status": "ci-verified"
     }
   ],
   "next_gate": "Select the next bounded local U7 evaluation/evidence product; U5.5 remains gated on owner VM/access.",
-  "register_fingerprint": "b3037f14d11ae82cad2d504d580ba00f4891bc148f41320ac15629e92fa33129",
+  "register_fingerprint": "4efc7f46f1ec7e037c40b416046a3ec7f2dfba2b59afab2d9d2772987da96370",
   "schema": "market-os.u7-n-unified-evidence-register@v1",
   "status": "passed"
 }

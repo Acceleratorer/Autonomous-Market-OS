@@ -49,3 +49,17 @@ def test_u7_n_register_fails_on_invalid_input_schema(tmp_path: Path) -> None:
 
     with pytest.raises(EvidenceRegisterError, match="status"):
         build_register_from_files(pack, DRIFT)
+
+
+def test_u7_n_register_fingerprint_is_line_ending_independent(tmp_path: Path) -> None:
+    pack_path = tmp_path / "pack" / PACK.name
+    drift_path = tmp_path / "drift" / DRIFT.name
+    for source, destination in ((PACK, pack_path), (DRIFT, drift_path)):
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        normalized = source.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        destination.write_bytes(normalized.replace(b"\n", b"\r\n"))
+
+    expected = build_register_from_files(PACK, DRIFT)
+    actual = build_register_from_files(pack_path, drift_path)
+
+    assert actual["register_fingerprint"] == expected["register_fingerprint"]
