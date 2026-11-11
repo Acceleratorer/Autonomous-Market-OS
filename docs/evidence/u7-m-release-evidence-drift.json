@@ -1,7 +1,13 @@
 {
   "schema": "market-os.u7-m-release-evidence-drift-evidence@v1",
   "milestone": "U7-M",
-  "status": "local-verified",
+  "status": "ci-verified",
+  "ci_run": {
+    "id": 43056896652,
+    "head_sha": "7d33e085c1cc6ecad1159568602b467f18fd2ebc",
+    "job": "u7-release-catalog",
+    "url": "https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/43056896652"
+  },
   "scope": "same-run Windows/Linux CI evidence provenance and shared-boundary drift audit",
   "checks": {
     "windows_bundle_present": true,
@@ -29,6 +35,12 @@
   "verification": {
     "focused_tests": 4,
     "focused_failures": 0,
+    "hosted_status": "passed",
+    "hosted_drift_count": 0,
+    "hosted_release_versions": [
+      "0.1.0-ci.157.1",
+      "0.1.0-ci.157.2"
+    ],
     "fixture_cases": [
       "pass",
       "boundary drift",
@@ -47,7 +59,7 @@
     "mutation_routes": false,
     "live_execution": false
   },
-  "interpretation": "local U7-M implementation and fail-closed fixture verification; CI target evidence is required for the milestone's hosted status",
+  "interpretation": "U7-M implementation, fixture verification, and hosted Windows/Linux CI evidence passed with zero drift",
   "deferred": [
     "embedded Python runtime/native installer",
     "mobile",
@@ -57,5 +69,5 @@
     "live execution",
     "U5.5 owner-VM promotion"
   ],
-  "next_gate": "Run the existing CI release catalog job and retain the U7-M Windows/Linux drift report."
+  "next_gate": "Select the next bounded local U7 evaluation/evidence product; U5.5 remains gated on owner VM/access."
 }

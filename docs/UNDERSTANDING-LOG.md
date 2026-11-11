@@ -1917,3 +1917,15 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   confirmation. U5.5 owner-VM promotion, embedded Python/native installer,
   mobile, credentials, providers, mutation routes, and live execution remain
   deferred.
+
+## 2026-11-12 — U7-M hosted CI confirmation
+
+- GitHub CI run `43056896652` passed on commit `7d33e08`.
+- The `u7-release-catalog` job completed both target-native U6.4-C release
+  hardening jobs, built the U7-E catalog, rendered U7-F, and ran U7-M with
+  `status: passed` and `drift_count: 0`.
+- Hosted U7-M JSON and Markdown reports are retained in the
+  `market-os-u7-release-catalog` artifact. The next work remains a bounded
+  local U7 evaluation/evidence product; U5.5 owner-VM promotion, embedded
+  Python/native installer, mobile, credentials, providers, mutation routes,
+  and live execution remain deferred.

@@ -1,6 +1,6 @@
 # U7-M: Release Evidence Drift Audit
 
-**Status:** implemented locally; CI integration pending the next green run
+**Status:** hosted CI verified on commit `7d33e08`
 
 ## Purpose
 
