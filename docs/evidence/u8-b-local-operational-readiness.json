@@ -1,0 +1,105 @@
+{
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "private": true,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "classification": "local_operational_controls_passed_production_operations_not_verified",
+  "deferred": [
+    "connected reconciliation",
+    "credentials and providers",
+    "live execution authorization",
+    "mutation routes",
+    "operator on-call and review",
+    "owner VM failure drill",
+    "production log retention and alerting"
+  ],
+  "execution_boundary_change": false,
+  "external_gates": {
+    "connected_reconciliation": {
+      "blocking": true,
+      "reason": "connected broker/provider reconciliation is disabled",
+      "status": "blocked"
+    },
+    "live_execution_authorization": {
+      "blocking": true,
+      "reason": "live execution remains separately gated",
+      "status": "blocked"
+    },
+    "operator_on_call_and_review": {
+      "blocking": true,
+      "reason": "owner/operator review and incident acknowledgement are not verified",
+      "status": "blocked"
+    },
+    "owner_vm_failure_drill": {
+      "blocking": true,
+      "reason": "owner VM access and host failure drill are not available",
+      "status": "blocked"
+    },
+    "production_log_retention_and_alerting": {
+      "blocking": true,
+      "reason": "production retention, alert ownership, and alert delivery are not verified",
+      "status": "blocked"
+    }
+  },
+  "interpretation": "U8-B verifies local operational controls and preserves the paper-only boundary; production operations and connected reconciliation remain gated.",
+  "items": [
+    {
+      "id": "observability",
+      "schema": "market-os.u5.3-deployment-access-observability@v1",
+      "source_artifact": "u5-3-deployment-access-observability.json",
+      "source_sha256": "cd035f2cd36caa2fe39901c650cf9268f9d40ac409c299bed18344111bbaad22",
+      "status": "implemented-local"
+    },
+    {
+      "id": "retention",
+      "schema": "market-os.b4-20.retention-archive-preflight-evidence@v1",
+      "source_artifact": "b4-20-retention-archive-preflight.json",
+      "source_sha256": "e2d3b7e36576246dcc2b1617b95038d20a20c94a77ebaec9e9642dab099f3578",
+      "status": "implemented"
+    },
+    {
+      "id": "platform",
+      "schema": "market-os.platform-toolchain-readiness@v1",
+      "source_artifact": "platform-toolchain-readiness.json",
+      "source_sha256": "4bda78eade3322152e847e5af6f503fa3d1feecda3bf91212be015f49bb8b670",
+      "status": "locally-scaffolded-not-promoted"
+    },
+    {
+      "id": "release",
+      "schema": "market-os.u6.4-release-hardening@v1",
+      "source_artifact": "u6-4-release-hardening.json",
+      "source_sha256": "07cf8a96a68b65fa1146b3b20216cdee0daa1988a7069afda883674b3215fcd7",
+      "status": "ci-verified-with-release-reports"
+    },
+    {
+      "id": "u8a",
+      "schema": "market-os.u8-a-live-readiness-decision@v1",
+      "source_artifact": "u8-a-live-readiness-decision.json",
+      "source_sha256": "da64f136af2159c3dce6161ebc801afe638bb4145e6830d75a07d6cdfd70bd05",
+      "status": "gated"
+    }
+  ],
+  "local_checks": {
+    "atomic_backup_restore_evidence": true,
+    "bounded_metrics_labels": true,
+    "loopback_access_boundary": true,
+    "private_observability_profile": true,
+    "read_only_retention_preflight": true,
+    "request_correlation_and_redaction": true,
+    "signed_release_rollback_evidence": true,
+    "u8a_boundary_chain": true
+  },
+  "next_gate": "Owner VM/access plus production observability and reconciliation evidence before any connected or live-readiness change.",
+  "operations_fingerprint": "2c5b46000f88076f578bf9dfb4f2a75539db91c7f974737d29c2217d09f461a4",
+  "owner_decision_required": true,
+  "paper_only_default": true,
+  "schema": "market-os.u8-b-local-operational-readiness@v1",
+  "status": "gated"
+}

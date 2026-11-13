@@ -1,5 +1,19 @@
 # Understanding log
 
+## 2026-11-14 — U8-B local operational-readiness pack
+
+- Added `market_os/u8b_operations.py` and the
+  `market-os.u8-b-local-operational-readiness@v1` JSON/Markdown evidence pack.
+- The pack joins U5.3 observability, B4.20 retention, platform toolchain,
+  U6.4-C release rollback, and U8-A. Local request correlation/redaction,
+  loopback access, bounded metrics, private observability, read-only
+  retention, backup/restore, and signed rollback all pass.
+- The result is `gated` with classification
+  `local_operational_controls_passed_production_operations_not_verified`.
+  Production retention/alerting, operator review, owner-VM failure handling,
+  connected reconciliation, credentials, and live authorization remain
+  blocked. CI renders and uploads `market-os-u8-b-local-operational-readiness`.
+
 ## 2026-11-14 — U8-A local live-readiness decision pack
 
 - Added `market_os/u8a_readiness.py` and the

@@ -181,6 +181,24 @@ jobs:
             ${{ runner.temp }}/market-os-u8-a/live-readiness-decision.md
             ${{ runner.temp }}/market-os-u8-a/live-readiness-decision.json
           if-no-files-found: error
+      - name: Render U8-B local operational readiness pack
+        run: >-
+          python -m market_os.u8b_operations
+          --observability docs/evidence/u5-3-deployment-access-observability.json
+          --retention docs/evidence/b4-20-retention-archive-preflight.json
+          --platform docs/evidence/platform-toolchain-readiness.json
+          --release docs/evidence/u6-4-release-hardening.json
+          --u8-a "${{ runner.temp }}/market-os-u8-a/live-readiness-decision.json"
+          --markdown "${{ runner.temp }}/market-os-u8-b/local-operational-readiness.md"
+          --json "${{ runner.temp }}/market-os-u8-b/local-operational-readiness.json"
+      - name: Upload U8-B local operational readiness pack
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u8-b-local-operational-readiness
+          path: |
+            ${{ runner.temp }}/market-os-u8-b/local-operational-readiness.md
+            ${{ runner.temp }}/market-os-u8-b/local-operational-readiness.json
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON

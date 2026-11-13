@@ -38,10 +38,11 @@ consistent.
 
 U7-N is now hosted-verified in CI, and U7-O catalogs the committed U7-N/J/K/L
 evidence surface with normalized source/report fingerprints and one shared
-boundary. U8-A now records the local live-readiness decision pack: local
-preflight passed, but connected runtime and live execution are not verified.
-The result is gated with paper-only as the default and no execution-boundary
-change. Owner VM/access, Tailscale Serve, connected promotion/rollback,
-production observability, credentials/provider approval, and live authorization
-remain blocked. Embedded Python/native installer, mobile, mutation routes, and
-providers remain deferred.
+boundary. U8-A records the local live-readiness decision pack and U8-B records
+the local operational-readiness pack: local preflight and operational controls
+pass, but connected runtime and production operations are not verified. Both
+results are gated with paper-only as the default and no execution-boundary
+change. Owner VM/access, Tailscale Serve, production retention/alerting,
+connected promotion/reconciliation, credentials/provider approval, and live
+authorization remain blocked. Embedded Python/native installer, mobile,
+mutation routes, and providers remain deferred.

@@ -172,6 +172,16 @@ rollback, production observability, credentials/provider approval, and live
 authorization remain blocked. No CI step changes the private, read-only,
 paper-only, execution-disabled boundary.
 
+U8-B ([contract](U8-B-LOCAL-OPERATIONAL-READINESS.md)) runs after U8-A in
+`offline-tests`. It joins the U5.3 observability, B4.20 retention, platform,
+U6.4-C release, and U8-A evidence into a deterministic local operational pack.
+Request correlation/redaction, loopback access, bounded metrics labels,
+private observability, read-only retention, backup/restore, and signed
+rollback pass locally. Production retention/alerting, operator on-call,
+owner-VM failure handling, connected reconciliation, and live authorization
+remain blocked. CI uploads both outputs as
+`market-os-u8-b-local-operational-readiness`.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 
