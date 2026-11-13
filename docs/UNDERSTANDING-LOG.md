@@ -1,5 +1,17 @@
 # Understanding log
 
+## 2026-11-14 — U8-C permanent paper-only decision
+
+- Added `market_os/u8c_paper_mode.py` and the
+  `market-os.u8-c-permanent-paper-only@v1` JSON/Markdown decision pack.
+- Recorded the owner's decision to keep paper-only mode permanently while
+  U8-A/U8-B external gates remain blocked. The pack rechecks both source
+  schemas/statuses, blocked gates, and the canonical private/synthetic/
+  read-only/no-network/execution-disabled boundary.
+- Reopening connected or live-readiness work now requires a new explicit owner
+  decision and a complete U8 review. No credentials, providers, mutation
+  routes, VM promotion, or live execution were enabled.
+
 ## 2026-11-14 — U8-B local operational-readiness pack
 
 - Added `market_os/u8b_operations.py` and the

@@ -189,6 +189,14 @@ owner-VM failure handling, connected reconciliation, and live authorization
 remain blocked. CI uploads both outputs as
 `market-os-u8-b-local-operational-readiness`.
 
+U8-C ([contract](U8-C-PERMANENT-PAPER-ONLY.md)) runs after U8-A and U8-B in
+`offline-tests`. It records the owner's permanent paper-only decision,
+rechecks both packs' gated status and blocked external gates, and preserves
+the canonical private/synthetic/paper-only/read-only boundary. It does not
+enable a connected runtime, credentials, providers, mutation routes, or live
+execution. CI uploads the JSON/Markdown output as
+`market-os-u8-c-permanent-paper-only`.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

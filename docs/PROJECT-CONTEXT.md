@@ -230,6 +230,16 @@ rollback pass locally. Production retention/alerting, operator review,
 owner-VM failure handling, connected reconciliation, credentials, and live
 authorization remain blocked; the paper-only boundary is unchanged.
 
+## U8-C permanent paper-only decision (2026-11-14)
+
+U8-C records the owner decision to keep the system in permanent paper-only
+mode in [U8-C-PERMANENT-PAPER-ONLY.md](U8-C-PERMANENT-PAPER-ONLY.md) and
+[u8-c-permanent-paper-only.json](evidence/u8-c-permanent-paper-only.json).
+The pack verifies that U8-A and U8-B remain gated, every inherited external
+gate remains blocked, and the canonical private/synthetic/paper-only/read-only
+boundary is unchanged. Reopening connected or live-readiness work requires a
+new explicit owner decision and a complete U8 review.
+
 ## U6.4-D offline installer preflight (2026-11-14)
 
 U6.4-D adds a signed-artifact installer preflight in

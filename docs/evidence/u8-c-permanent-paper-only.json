@@ -1,0 +1,130 @@
+{
+  "boundary": {
+    "credentials": false,
+    "live_execution": false,
+    "mutation_routes": false,
+    "network_access": false,
+    "paper_only": true,
+    "private": true,
+    "provider_requests": 0,
+    "read_only": true,
+    "synthetic_only": true
+  },
+  "checks": {
+    "boundary_consistent": true,
+    "credentials_disabled": true,
+    "execution_boundary_unchanged": true,
+    "live_execution_disabled": true,
+    "mutation_routes_disabled": true,
+    "paper_only_default": true,
+    "provider_requests_zero": true,
+    "u8a_external_gates_blocked": true,
+    "u8a_gated": true,
+    "u8b_external_gates_blocked": true,
+    "u8b_gated": true
+  },
+  "classification": "permanent_paper_only_by_owner_decision",
+  "decision": {
+    "execution_boundary_change": false,
+    "id": "permanent-paper-only",
+    "owner_decision_required": false,
+    "paper_only_permanent": true,
+    "rationale": "Owner selected permanent paper-only mode while connected runtime and live-readiness gates remain unavailable.",
+    "status": "accepted"
+  },
+  "decision_fingerprint": "2b83b173b851c4481775c2007066537f639afd402f7bc41254d7f2cda415b311",
+  "external_gates": {
+    "u8a": {
+      "credentials_provider_approval": {
+        "blocking": true,
+        "reason": "credentials and provider approval remain disabled",
+        "status": "blocked"
+      },
+      "live_execution_authorization": {
+        "blocking": true,
+        "reason": "live execution is disabled and separately gated",
+        "status": "blocked"
+      },
+      "owner_tailscale": {
+        "blocking": true,
+        "reason": "owner-only Tailscale Serve probe has not run",
+        "status": "blocked"
+      },
+      "owner_vm_access": {
+        "blocking": true,
+        "reason": "owner VM/access is not available",
+        "status": "blocked"
+      },
+      "owner_vm_health": {
+        "blocking": true,
+        "reason": "owner VM health probe has not run",
+        "status": "blocked"
+      },
+      "owner_vm_promotion_and_rollback": {
+        "blocking": true,
+        "reason": "connected promotion and rollback remain pending",
+        "status": "blocked"
+      },
+      "production_observability": {
+        "blocking": true,
+        "reason": "production retention, alerting, and operator review are not verified",
+        "status": "blocked"
+      }
+    },
+    "u8b": {
+      "connected_reconciliation": {
+        "blocking": true,
+        "reason": "connected broker/provider reconciliation is disabled",
+        "status": "blocked"
+      },
+      "live_execution_authorization": {
+        "blocking": true,
+        "reason": "live execution remains separately gated",
+        "status": "blocked"
+      },
+      "operator_on_call_and_review": {
+        "blocking": true,
+        "reason": "owner/operator review and incident acknowledgement are not verified",
+        "status": "blocked"
+      },
+      "owner_vm_failure_drill": {
+        "blocking": true,
+        "reason": "owner VM access and host failure drill are not available",
+        "status": "blocked"
+      },
+      "production_log_retention_and_alerting": {
+        "blocking": true,
+        "reason": "production retention, alert ownership, and alert delivery are not verified",
+        "status": "blocked"
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "u8a",
+      "schema": "market-os.u8-a-live-readiness-decision@v1",
+      "source_artifact": "u8-a-live-readiness-decision.json",
+      "source_sha256": "da64f136af2159c3dce6161ebc801afe638bb4145e6830d75a07d6cdfd70bd05",
+      "status": "gated"
+    },
+    {
+      "id": "u8b",
+      "schema": "market-os.u8-b-local-operational-readiness@v1",
+      "source_artifact": "u8-b-local-operational-readiness.json",
+      "source_sha256": "a36b295078428e278117c31960cd5c3abd275c68043963a77cbb6d6ba2a9865b",
+      "status": "gated"
+    }
+  ],
+  "next_gate": "No connected or live-readiness work is authorized; reopening requires a new explicit owner decision and a complete U8 review.",
+  "reopen_requirements": [
+    "new explicit owner decision",
+    "owner VM/access and health evidence",
+    "owner-only Tailscale Serve verification",
+    "production observability retention and alerting evidence",
+    "connected reconciliation evidence",
+    "credentials and provider approval",
+    "live execution authorization"
+  ],
+  "schema": "market-os.u8-c-permanent-paper-only@v1",
+  "status": "accepted"
+}
