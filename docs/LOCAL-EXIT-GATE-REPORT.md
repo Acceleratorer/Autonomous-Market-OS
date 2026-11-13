@@ -46,3 +46,18 @@ change. Owner VM/access, Tailscale Serve, production retention/alerting,
 connected promotion/reconciliation, credentials/provider approval, and live
 authorization remain blocked. Embedded Python/native installer, mobile,
 mutation routes, and providers remain deferred.
+
+## U8-B hosted confirmation (2026-11-14)
+
+The U8-B local operational-readiness pack was verified on commit `db8c8dd`.
+The full local suite passed `659 passed, 0 failed, 7 skipped`; evidence
+validation covered 83 JSON files. GitHub CI `43485964489`, DevSecOps
+`43485964548`, and Security/package checks `43485964375` all passed. The
+hosted U8-B JSON and Markdown artifacts matched the committed evidence
+exactly, including operations fingerprint
+`2c5b46000f88076f578bf9dfb4f2a75539db91c7f974737d29c2217d09f461a4`.
+
+This confirms local operational controls only. Owner VM/access, production
+retention and alerting, connected reconciliation, credentials, and live
+authorization remain blocked; the private, synthetic, read-only, paper-only,
+execution-disabled boundary is unchanged.

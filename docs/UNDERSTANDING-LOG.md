@@ -1994,3 +1994,16 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   committed catalog with fingerprint
   `5c484710bc7007f90406352b660e5dbe4492c7662d6cdf9875a278c77649655e2` and the
   same normalized private/read-only/paper-only boundary.
+
+## 2026-11-14 — U8-B hosted CI confirmation
+
+- U8-B local operational readiness is now hosted-verified on commit `db8c8dd`.
+  The full suite passed `659 passed, 0 failed, 7 skipped`; evidence validation
+  covered 83 JSON files, and compile, secret, MLOps, and diff checks passed.
+- CI `43485964489`, DevSecOps `43485964548`, and Security/package checks
+  `43485964375` passed. The hosted U8-B JSON and Markdown artifacts matched
+  the committed evidence exactly, with operations fingerprint
+  `2c5b46000f88076f578bf9dfb4f2a75539db91c7f974737d29c2217d09f461a4`.
+- The result remains `gated`: local controls pass, while owner VM/access,
+  production operations, connected reconciliation, credentials, and live
+  authorization remain blocked. No execution boundary changed.
