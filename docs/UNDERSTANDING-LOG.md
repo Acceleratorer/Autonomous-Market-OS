@@ -1,5 +1,20 @@
 # Understanding log
 
+## 2026-11-14 — U8-A local live-readiness decision pack
+
+- Added `market_os/u8a_readiness.py` and the
+  `market-os.u8-a-live-readiness-decision@v1` JSON/Markdown evidence pack.
+- The pack rechecks local exit, U5.5 identity/storage/session/audit contracts,
+  U6.4-C signed smoke and rollback, U5.5 browser denial checks, and U7-O's
+  shared private/synthetic/paper-only/read-only boundary.
+- Local preflight is green and the decision is `gated` with
+  `local_preflight_passed_connected_runtime_not_verified`; paper-only remains
+  the default and the execution boundary is unchanged.
+- Owner VM/access, Tailscale Serve, connected promotion/rollback, production
+  observability, credentials/provider approval, and live authorization remain
+  blocked. CI renders and uploads `market-os-u8-a-live-readiness-decision`
+  after U7-O.
+
 ## 2026-11-07 — U6.4-C target-native CI hardening
 
 - Added target-native source-sidecar metadata. Windows artifacts launch with

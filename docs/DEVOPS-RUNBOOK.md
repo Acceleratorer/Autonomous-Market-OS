@@ -162,6 +162,16 @@ only/no-network boundary, and disabled promotion or execution. CI uploads
 `evidence-catalog.json` and `evidence-catalog.md` as
 `market-os-u7-o-evidence-catalog`.
 
+U8-A ([contract](U8-A-LIVE-READINESS-DECISION-PACK.md)) runs after U7-O in
+`offline-tests`. It renders `market-os.u8-a-live-readiness-decision@v1` from
+the local exit, U5.5, U6.4-C, and hosted U7-O evidence, then uploads
+`market-os-u8-a-live-readiness-decision`. The pack is deliberately `gated`:
+local identity, storage, session, audit, release rollback, and paper-only
+checks pass, while owner VM access/health, Tailscale, connected promotion and
+rollback, production observability, credentials/provider approval, and live
+authorization remain blocked. No CI step changes the private, read-only,
+paper-only, execution-disabled boundary.
+
 Deployments use GitHub Secrets only. Never place DirectAdmin credentials,
 Tailscale secrets, assertion secrets, or backup recipients in the repository.
 

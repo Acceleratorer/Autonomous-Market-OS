@@ -162,6 +162,25 @@ jobs:
             ${{ runner.temp }}/market-os-u7-o/evidence-catalog.md
             ${{ runner.temp }}/market-os-u7-o/evidence-catalog.json
           if-no-files-found: error
+      - name: Render U8-A live-readiness decision pack
+        run: >-
+          python -m market_os.u8a_readiness
+          --local-exit docs/evidence/local-exit-gate.json
+          --stack docs/evidence/u5-5-stack-runtime-review.json
+          --promotion docs/evidence/u5-5-promotion-evidence.json
+          --browser docs/evidence/u5-5-connected-browser-smoke.json
+          --release docs/evidence/u6-4-release-hardening.json
+          --u7 "${{ runner.temp }}/market-os-u7-o/evidence-catalog.json"
+          --markdown "${{ runner.temp }}/market-os-u8-a/live-readiness-decision.md"
+          --json "${{ runner.temp }}/market-os-u8-a/live-readiness-decision.json"
+      - name: Upload U8-A live-readiness decision pack
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-u8-a-live-readiness-decision
+          path: |
+            ${{ runner.temp }}/market-os-u8-a/live-readiness-decision.md
+            ${{ runner.temp }}/market-os-u8-a/live-readiness-decision.json
+          if-no-files-found: error
       - name: Compile Python sources
         run: python -m compileall -q market_os
       - name: Evidence JSON
