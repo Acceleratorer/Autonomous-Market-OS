@@ -2007,3 +2007,19 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The result remains `gated`: local controls pass, while owner VM/access,
   production operations, connected reconciliation, credentials, and live
   authorization remain blocked. No execution boundary changed.
+
+## 2026-11-14 — U6.4-D installer preflight
+
+- Added the installer preflight script and package command. It validates signed
+  target-native artifacts, entrypoints, Python source-sidecar layout,
+  artifact-local storage, slot metadata, and the private/read-only/paper-only
+  boundary without writing a destination or changing release state.
+- Added focused tests for the accepting path, source/destination separation,
+  and mutation-boundary rejection. The Electron suite passed 18/18 tests,
+  including the new preflight tests.
+- CI now runs U6.4-D on both matching Windows/Linux U6.4-C runners and uploads
+  install-preflight JSON and Markdown. Local Windows evidence is recorded in
+  docs/evidence/u6-4-install-preflight.json with fingerprint
+  f8148b818aa0f2d7768c181bac7344a4597aefcb99eccb85846ea50c76ca2250.
+- Embedded Python, native installer/service registration, owner-VM promotion,
+  credentials, providers, mutation routes, and live execution remain deferred.

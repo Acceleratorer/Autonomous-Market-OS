@@ -203,3 +203,24 @@ The command needs the matching host platform, a built Next.js renderer, and
 Python 3.11+ with the project dependencies. On a headless Linux host, prefix
 it with `xvfb-run -a`. It never enables credentials,
 provider access, mutation routes, public listeners, or live execution.
+
+## U6.4-D installer preflight
+
+The installer preflight checks an unpacked target-native artifact without
+installing a service, embedding Python, changing release slots, or creating a
+destination:
+
+```text
+pnpm run install:preflight -- \
+  --artifact ../../../output/u6.4-ci/windows-x64/artifact-candidate \
+  --target windows-x64 \
+  --require-signed \
+  --json ../../../output/u6.4-ci/windows-x64/install-preflight.json \
+  --markdown ../../../output/u6.4-ci/windows-x64/install-preflight.md
+```
+
+It verifies the manifest digest, optional Ed25519 signature, target-native
+Electron binary, Python source sidecar, local storage root, slot metadata,
+and the private/read-only/paper-only boundary. The current slice remains a
+preflight only; embedded Python, native installers, service registration, and
+U5.5 owner-VM promotion stay deferred.

@@ -1,0 +1,44 @@
+{
+  "schema": "market-os.u6.4-install-preflight@v1",
+  "status": "passed",
+  "target": "windows-x64",
+  "version": "0.1.0-ci.1793993550152.2",
+  "artifact_manifest_sha256": "5b0a4cd3cf539656516e0c41157977b41dc5d02d52ca04d82e712512c66392d5",
+  "signature_status": "verified",
+  "checks": {
+    "manifest_schema": true,
+    "target_matches_host": true,
+    "signature_or_unsigned_state": true,
+    "electron_binary": true,
+    "python_sidecar": true,
+    "storage_isolation": true,
+    "slot_metadata": true,
+    "runtime_boundary": true,
+    "destination_separate": true
+  },
+  "boundary": {
+    "loopback_only": true,
+    "synthetic": true,
+    "paper_only": true,
+    "read_only": true,
+    "credentials": false,
+    "provider_requests": 0,
+    "mutation_routes": false,
+    "live_trading": false
+  },
+  "installation": {
+    "performed": false,
+    "embedded_python": false,
+    "native_service": false,
+    "destination": null
+  },
+  "deferred": [
+    "embedded Python runtime",
+    "native service installation",
+    "credentials",
+    "providers",
+    "mutation routes",
+    "live execution"
+  ],
+  "preflight_fingerprint": "f8148b818aa0f2d7768c181bac7344a4597aefcb99eccb85846ea50c76ca2250"
+}

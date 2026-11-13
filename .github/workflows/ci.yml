@@ -322,6 +322,9 @@ jobs:
       - name: Validate U6.4-C evidence bundle
         working-directory: apps/desktop/electron
         run: pnpm run release:validate -- --root "${{ runner.temp }}/market-os-u6-4" --report "${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json"
+      - name: Run U6.4-D installer preflight
+        working-directory: apps/desktop/electron
+        run: pnpm run install:preflight -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --target "${{ matrix.target }}" --require-signed --json "${{ runner.temp }}/market-os-u6-4/install-preflight.json" --markdown "${{ runner.temp }}/market-os-u6-4/install-preflight.md"
       - name: Archive target-native artifacts
         working-directory: apps/desktop/electron
         run: |
@@ -342,6 +345,8 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json
             ${{ runner.temp }}/market-os-u6-4/release-evidence-report.md
             ${{ runner.temp }}/market-os-u6-4/release-evidence-report.json
+            ${{ runner.temp }}/market-os-u6-4/install-preflight.json
+            ${{ runner.temp }}/market-os-u6-4/install-preflight.md
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz
             ${{ runner.temp }}/market-os-u6-4/portable-archive-*.json

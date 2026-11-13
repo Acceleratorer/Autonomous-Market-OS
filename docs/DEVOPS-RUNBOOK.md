@@ -70,6 +70,13 @@ directories, manifest hashes, four-route smoke reports, and the promotion /
 rollback boundary without contacting a VM or provider.
 It then renders `release-evidence-report.md` and
 `release-evidence-report.json` for reviewer and tooling consumption.
+The same job runs `pnpm run install:preflight` against the signed candidate
+artifact on each matching runner. The preflight checks the target-native
+Electron binary, Python source sidecar, artifact-local storage root, slot
+metadata, signature state, and the unchanged private/read-only/paper-only
+boundary. It only reads the unpacked artifact and emits
+`install-preflight.json` plus `install-preflight.md`; it does not install a
+service, embed Python, create a destination, or modify release slots.
 The same CI job creates target-native `.tar.gz` archives for the known-good and
 candidate artifacts, re-extracts them, and verifies their signatures before
 upload. Mutable `python/.market_os` state is excluded from each archive.
@@ -219,3 +226,23 @@ Use `--target linux-x64` on Linux. Keep the generated output local; CI is the
 evidence store for target artifacts and public signature metadata. The Linux CI
 step wraps the drill with `xvfb-run -a` because Electron's signed smoke needs a
 headless display server; no public listener or execution boundary changes.
+
+## U6.4-D installer preflight
+
+After U6.4-C signs and validates the candidate artifact, run:
+
+~~~text
+cd apps/desktop/electron
+pnpm run install:preflight -- \
+  --artifact ../../../output/u6.4-ci/windows-x64/artifact-candidate \
+  --target windows-x64 \
+  --require-signed \
+  --json ../../../output/u6.4-ci/windows-x64/install-preflight.json \
+  --markdown ../../../output/u6.4-ci/windows-x64/install-preflight.md
+~~~
+
+The preflight checks the target-native binary, Python source sidecar,
+artifact-local storage, slot metadata, signature state, and the unchanged
+private/read-only/paper-only boundary. It only reads the unpacked artifact.
+It does not install a service, embed Python, create a destination, or modify
+release slots.

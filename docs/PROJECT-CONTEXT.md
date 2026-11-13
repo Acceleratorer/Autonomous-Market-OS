@@ -229,3 +229,13 @@ private observability profile, read-only retention, backup/restore, and signed
 rollback pass locally. Production retention/alerting, operator review,
 owner-VM failure handling, connected reconciliation, credentials, and live
 authorization remain blocked; the paper-only boundary is unchanged.
+
+## U6.4-D offline installer preflight (2026-11-14)
+
+U6.4-D adds a signed-artifact installer preflight in
+apps/desktop/electron/scripts/install-preflight.cjs. It validates the
+target-native binary, source Python sidecar, artifact-local storage, slot
+metadata, and the private/read-only/paper-only boundary without installing a
+service, embedding Python, changing release slots, or changing execution
+behavior. Local evidence is recorded in
+docs/evidence/u6-4-install-preflight.json.
