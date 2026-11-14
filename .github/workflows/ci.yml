@@ -341,6 +341,9 @@ jobs:
       - name: Run U6.4-D installer preflight
         working-directory: apps/desktop/electron
         run: pnpm run install:preflight -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --target "${{ matrix.target }}" --require-signed --json "${{ runner.temp }}/market-os-u6-4/install-preflight.json" --markdown "${{ runner.temp }}/market-os-u6-4/install-preflight.md"
+      - name: Run U6.4-E offline install simulation
+        working-directory: apps/desktop/electron
+        run: pnpm run install:simulate -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --destination "${{ runner.temp }}/market-os-u6-4/installed-candidate" --json "${{ runner.temp }}/market-os-u6-4/install-simulation.json" --markdown "${{ runner.temp }}/market-os-u6-4/install-simulation.md"
       - name: Archive target-native artifacts
         working-directory: apps/desktop/electron
         run: |
@@ -363,6 +366,8 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/release-evidence-report.json
             ${{ runner.temp }}/market-os-u6-4/install-preflight.json
             ${{ runner.temp }}/market-os-u6-4/install-preflight.md
+            ${{ runner.temp }}/market-os-u6-4/install-simulation.json
+            ${{ runner.temp }}/market-os-u6-4/install-simulation.md
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz
             ${{ runner.temp }}/market-os-u6-4/portable-archive-*.json

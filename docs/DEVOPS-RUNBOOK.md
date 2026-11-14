@@ -254,3 +254,16 @@ artifact-local storage, slot metadata, signature state, and the unchanged
 private/read-only/paper-only boundary. It only reads the unpacked artifact.
 It does not install a service, embed Python, create a destination, or modify
 release slots.
+
+## U6.4-E offline install simulation
+
+After U6.4-D, CI runs `pnpm run install:simulate` against the signed candidate
+on each matching Windows/Linux runner. It copies through a sibling staging
+directory, publishes with one rename, excludes mutable `python/.market_os`
+state, creates a fresh empty storage root, and revalidates the destination's
+manifest, signature, full tree digest, entrypoints, slot metadata, and
+private/read-only/paper-only boundary. Existing or nested destinations and
+unsigned artifacts fail closed. The simulation does not register a service,
+embed Python, promote release slots, or change the execution boundary. CI
+uploads `install-simulation.json` and `install-simulation.md` with the U6.4-C
+evidence bundle.

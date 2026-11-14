@@ -224,3 +224,23 @@ Electron binary, Python source sidecar, local storage root, slot metadata,
 and the private/read-only/paper-only boundary. The current slice remains a
 preflight only; embedded Python, native installers, service registration, and
 U5.5 owner-VM promotion stay deferred.
+
+## U6.4-E offline install simulation
+
+The offline install simulation publishes a signed artifact into a new
+destination through a sibling staging directory and one rename:
+
+```text
+pnpm run install:simulate -- \
+  --artifact ../../../output/u6.4-ci/windows-x64/artifact-candidate \
+  --destination ../../../output/u6.4-ci/windows-x64/installed-candidate \
+  --json ../../../output/u6.4-ci/windows-x64/install-simulation.json \
+  --markdown ../../../output/u6.4-ci/windows-x64/install-simulation.md
+```
+
+It rechecks the copied artifact, signature, full tree digest, entrypoints,
+slot metadata, and runtime boundary. Mutable `python/.market_os` state is
+excluded from the copy and recreated empty. The destination must be new and
+separate from the artifact source. No service, embedded Python runtime,
+release-slot promotion, credentials, providers, mutation routes, or live
+execution are enabled.

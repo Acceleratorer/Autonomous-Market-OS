@@ -249,3 +249,16 @@ metadata, and the private/read-only/paper-only boundary without installing a
 service, embedding Python, changing release slots, or changing execution
 behavior. Local evidence is recorded in
 docs/evidence/u6-4-install-preflight.json.
+
+## U6.4-E offline install simulation (2026-11-14)
+
+U6.4-E adds `apps/desktop/electron/scripts/install-simulate.cjs`. It copies a
+signed target-native artifact through a sibling staging directory and one
+rename, excludes mutable `python/.market_os` state, creates a fresh empty
+storage root, and revalidates the staged and published artifact with the
+U6.4-D preflight, signature, manifest hash, full tree digest, entrypoints,
+slot metadata, and runtime boundary checks. Existing or nested destinations and
+unsigned artifacts fail closed. No service, embedded Python runtime,
+credentials, provider, mutation, release-slot, VM, or live-execution behavior
+is enabled. Local evidence is recorded in
+docs/evidence/u6-4-install-simulation.json.

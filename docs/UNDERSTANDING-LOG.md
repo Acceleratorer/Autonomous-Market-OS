@@ -1,5 +1,22 @@
 # Understanding log
 
+## 2026-11-14 — U6.4-E offline install simulation
+
+- Added `apps/desktop/electron/scripts/install-simulate.cjs` and the
+  `install:simulate` package command. The simulation requires a signed
+  target-native artifact by default, copies through sibling staging, publishes
+  with one rename, excludes mutable `python/.market_os`, and creates a fresh
+  empty storage root.
+- The destination is rechecked with U6.4-D preflight, signature verification,
+  manifest hash, full artifact-tree digest, entrypoints, slot metadata, and the
+  private/read-only/paper-only/execution-disabled boundary. Existing or nested
+  destinations and unsigned artifacts fail closed.
+- Added CI evidence upload for Windows/Linux and focused tests for atomic
+  publish, source/destination separation, existing-destination protection,
+  unsigned rejection, and mutable-storage reset. No service, embedded Python,
+  credentials, providers, VM promotion, mutation routes, or live execution
+  were enabled.
+
 ## 2026-11-14 — U8-C permanent paper-only decision
 
 - Added `market_os/u8c_paper_mode.py` and the

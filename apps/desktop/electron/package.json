@@ -13,6 +13,7 @@
     "release:drill": "node scripts/release-drill.cjs",
     "release:ci": "node scripts/ci-release.cjs",
     "install:preflight": "node scripts/install-preflight.cjs",
+    "install:simulate": "node scripts/install-simulate.cjs",
     "release:validate": "node scripts/validate-ci-evidence.cjs",
     "release:report": "node scripts/render-ci-evidence-report.cjs",
     "release:archive": "node scripts/archive-artifact.cjs",

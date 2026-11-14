@@ -21,7 +21,7 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 | U3 synthetic surfaces | B3.8–B3.14 | Synthetic session artifacts, local API/dashboard, catalog/comparison, CLI inspection, and acceptance harness | Complete locally; synthetic-only |
 | U4 — Paper portfolio | M3 + B4 | Shared virtual broker, portfolio ledger, costs, fills, risk policy, approvals, and paper-only shadow mode | B4.20 read-only retention/archive preflight is implemented; retention deletion, connected identity, and distributed ownership remain separate gates |
 | U5 — Web operations | M4 web + B5 | Web deployment of the existing API with BTC data, experiment, report, and paper-portfolio views | U5.24 and the local exit gate are complete on the TypeScript/React/Node.js/Next.js/Tailwind operator. U5.5 selects a private Linux VM + systemd + owner-only Tailscale Serve and is locally verified but not enabled; owner-VM promotion and rollback remain pending. |
-| U6 — CLI and app surfaces | B6–B7 + M4 CLI/app | One versioned CLI and thin desktop/mobile shells using the shared API | U6.1–U6.4-D local/CI release hardening and installer preflight plus U7-A/B/C/D/E/F/G/H/I/J/K/L/M/N/O evidence products are implemented; embedded Python/native installer, owner-VM promotion, and mobile remain pending |
+| U6 — CLI and app surfaces | B6–B7 + M4 CLI/app | One versioned CLI and thin desktop/mobile shells using the shared API | U6.1–U6.4-E local/CI release hardening, installer preflight, and offline install simulation plus U7-A/B/C/D/E/F/G/H/I/J/K/L/M/N/O evidence products are implemented; embedded Python/native installer, owner-VM promotion, and mobile remain pending |
 | U7 — Evaluation and artifact products | M5 + selected M7 | Cost/quality reports, education, slides, media, and tool integrations that consume stable artifacts | U7-A/B/C/D/E/F release products plus U7-G quality, U7-H synthetic accounting, U7-I evidence pack, U7-J synthetic economic reporting, U7-K CLI tool registry auditing, U7-L cited-research brief export, U7-M release/evidence drift auditing, U7-N unified evidence registration, and U7-O evidence cataloging are complete; further products remain selective |
 | U8 — Live readiness or permanent paper mode | M6 | A separate security, compliance, broker, reconciliation, and approval gate; paper mode may remain the permanent decision | U8-A/U8-B local decision packs are gated and U8-C records the owner decision for permanent paper-only mode; production operations, connected runtime, reconciliation, and live execution remain disabled; never automatic |
 
@@ -46,8 +46,10 @@ The original roadmap has eight M phases (`M0` through `M7`). It does not need ad
 
 U6.4-D adds a fail-closed signed-artifact installer preflight for the target
 binary, source sidecar, artifact-local storage, slot metadata, and boundary.
-It performs no installation, service registration, embedded Python packaging,
-or execution-boundary change.
+U6.4-E adds an offline install simulation that publishes through staging and
+one rename, resets mutable artifact-local storage, and revalidates the copied
+artifact without service registration, embedded Python packaging, release-slot
+promotion, or execution-boundary change.
 
 ## Exit gates
 
