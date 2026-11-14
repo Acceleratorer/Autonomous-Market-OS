@@ -31,6 +31,6 @@
     "node": ">=20.9.0"
   },
   "devDependencies": {
-    "electron": "45.2.3"
+    "electron": "45.3.0"
   }
 }
