@@ -119,8 +119,8 @@ async function renderEvidence(options) {
     }
     if (!verificationFailureRecovered) fail("verification failure did not leave the current app intact");
     const retry = await installPortable({ artifactRoot: options.artifact, destination });
-    const upgrade = await installPortable({ artifactRoot: upgradeArtifact, destination });
     await fsp.rm(`${destination}.rollback`, { recursive: true, force: true });
+    const upgrade = await installPortable({ artifactRoot: upgradeArtifact, destination });
     const uninstall = await uninstallPortable({ destination });
     const reinstall = await installPortable({ artifactRoot: options.artifact, destination });
     const retained = JSON.parse(await fsp.readFile(state, "utf8"));

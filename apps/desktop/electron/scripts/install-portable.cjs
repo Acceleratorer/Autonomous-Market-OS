@@ -185,7 +185,7 @@ async function installPortable({ artifactRoot, destination = null, requireSigned
   const sourcePreflight = await inspectInstallPreflight({ artifactRoot: source, destination: target, requireSigned });
   const sourceVerification = await verifyArtifact(source, { requireSignature: requireSigned });
   const sourceRuntime = await embeddedRuntimeIdentity(source, sourceVerification.manifest);
-  const sourceTree = await digestTree(source);
+  const sourceTreeSha256 = await digestTree(source);
   const rollback = `${target}${ROLLBACK_SUFFIX}`;
   const retainedData = `${target}${RETAINED_DATA_SUFFIX}`;
   const hadExisting = await exists(target);
@@ -207,8 +207,8 @@ async function installPortable({ artifactRoot, destination = null, requireSigned
     const stagedPreflight = await inspectInstallPreflight({ artifactRoot: staging, destination: source, requireSigned });
     const stagedVerification = await verifyArtifact(staging, { requireSignature: requireSigned });
     const stagedRuntime = await embeddedRuntimeIdentity(staging, stagedVerification.manifest);
-    const stagedTree = await digestTree(staging);
-    if (stagedTree.sha256 !== sourceTree.sha256) fail("staged artifact tree does not match source artifact");
+    const stagedTreeSha256 = await digestTree(staging);
+    if (stagedTreeSha256 !== sourceTreeSha256) fail("staged artifact tree does not match source artifact");
     if (stagedRuntime.tree_sha256 !== sourceRuntime.tree_sha256) fail("staged Python runtime does not match source artifact");
 
     if (hadExisting) {
@@ -220,9 +220,9 @@ async function installPortable({ artifactRoot, destination = null, requireSigned
     const destinationPreflight = await inspectInstallPreflight({ artifactRoot: target, destination: source, requireSigned });
     const destinationVerification = await verifyArtifact(target, { requireSignature: requireSigned });
     const destinationRuntime = await embeddedRuntimeIdentity(target, destinationVerification.manifest);
-    const destinationTree = await digestTree(target);
+    const destinationTreeSha256 = await digestTree(target);
     if (destinationVerification.manifestSha256 !== sourceVerification.manifestSha256) fail("destination manifest hash does not match source artifact");
-    if (destinationTree.sha256 !== sourceTree.sha256) fail("destination artifact tree does not match source artifact");
+    if (destinationTreeSha256 !== sourceTreeSha256) fail("destination artifact tree does not match source artifact");
     if (destinationRuntime.tree_sha256 !== sourceRuntime.tree_sha256) fail("destination Python runtime does not match source artifact");
 
     return {
@@ -235,8 +235,8 @@ async function installPortable({ artifactRoot, destination = null, requireSigned
       version: destinationPreflight.version,
       source_manifest_sha256: sourceVerification.manifestSha256,
       destination_manifest_sha256: destinationVerification.manifestSha256,
-      source_tree_sha256: sourceTree.sha256,
-      destination_tree_sha256: destinationTree.sha256,
+      source_tree_sha256: sourceTreeSha256,
+      destination_tree_sha256: destinationTreeSha256,
       destination: target,
       runtime: destinationRuntime,
       storage: { root: MUTABLE_STORAGE, preserved, reset: !preserved },
