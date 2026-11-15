@@ -82,7 +82,7 @@ async function makeArtifact(version) {
       root: "python/runtime",
       manifest: "python/runtime/runtime-manifest.json",
       interpreter: `runtime/${runtimeInterpreter}`,
-      tree_sha256: runtimeTree.sha256,
+      tree_sha256: runtimeTree,
       dependencies: ["duckdb>=1.4,<3", "pyarrow>=18,<27"],
     },
     storage: { root: "python/.market_os", scope: "artifact-local", shared_host_root: false },
