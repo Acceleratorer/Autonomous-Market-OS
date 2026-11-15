@@ -76,7 +76,9 @@ async function embeddedRuntimeIdentity(root, manifest) {
   const runtimeManifestSha256 = await sha256File(runtimeManifestPath);
   if (manifest.runtime.manifest_sha256 !== runtimeManifestSha256) fail("embedded Python runtime manifest hash does not match artifact manifest");
   const runtimeTree = await digestTree(path.join(root, manifest.runtime.root), { excludeRelative: "runtime-manifest.json" });
-  if (runtimeTree.sha256 !== manifest.runtime.tree_sha256) fail("embedded Python runtime tree hash does not match artifact manifest");
+  if (runtimeTree.sha256 !== manifest.runtime.tree_sha256) {
+    fail(`embedded Python runtime tree hash does not match artifact manifest: expected ${manifest.runtime.tree_sha256}, got ${runtimeTree.sha256}`);
+  }
   return {
     schema: runtime.schema,
     distribution: runtime.distribution,
