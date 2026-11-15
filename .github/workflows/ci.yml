@@ -376,6 +376,7 @@ jobs:
           make -j"$(nproc)"
           make install
           "$runtime/bin/python3.11" -m pip install --disable-pip-version-check "duckdb>=1.4,<3" "pyarrow>=18,<27"
+          cd "$GITHUB_WORKSPACE/apps/desktop/electron"
           pnpm run runtime:prepare -- --runtime-root "$runtime" --target linux-x64 --version "$runtime_version" --source-url "$source_url" --archive "$archive" --expected-sha256 "$expected" --interpreter bin/python3.11
       - name: Download target-native Electron runtime
         working-directory: apps/desktop/electron
