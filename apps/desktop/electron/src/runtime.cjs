@@ -260,6 +260,9 @@ class LocalRuntime {
       MARKET_OS_RELEASE_ROLLBACK: String(releaseState?.rollbackAvailable ?? this.artifactManifest?.release_state?.rollback_available ?? false),
       PYTHONPATH: [this.pythonRoot, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
     };
+    if (this.artifactManifest?.sidecar?.distribution === "target-native-embedded-cpython") {
+      childEnv.PYTHONDONTWRITEBYTECODE = "1";
+    }
     if (storageRoot) childEnv.MARKET_OS_STORE_ROOT = storageRoot;
     try {
       this.children = [this.spawn(this.specs.gateway, childEnv), this.spawn(this.specs.next, childEnv)];
