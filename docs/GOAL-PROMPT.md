@@ -29,19 +29,19 @@ live status is authoritative.
   mutable state, manual rollback, and no native service. Read
   `docs/NEXT-WORK-HANDOFF.md` and verify the local slice before extending CI.
 - The full Vietnamese Understand graph is available at `.ua/knowledge-graph.json`:
-  611 scanned files, 2,251 nodes, 4,016 edges, 8 layers, and 10 tour steps.
+  616 scanned files, 2,274 nodes, 4,062 edges, 8 layers, and 11 tour steps.
   Check `.ua/meta.json` and fingerprints against the live source and docs first.
 - U6.4-F is merged under accepted ADR-0055: portable signed install,
   embedded-runtime identity, state preservation, rollback, uninstall retention,
   and evidence rendering. Hosted Windows/Linux evidence is complete and
   retained in `docs/evidence/u6-4-f-hosted-installation.json`.
-- U7-P is the current local reproducibility gate. It regenerates U7-N/J/K/L
+- U7-P is complete and remains a local regression gate. It regenerates U7-N/J/K/L
   twice and compares the results with committed U7-O evidence.
 
 ## Objective
 
-Continue from merged U6.4-F commit `19367f4` and completed U7-P evidence
-reproducibility audit. The hosted Windows/Linux gate is closed and its evidence
+Continue from merged U6.4-F commit `19367f4` and checkpoint `80460a7`; the
+U7-P evidence reproducibility audit is complete. The hosted Windows/Linux gate is closed and its evidence
 is retained in `docs/evidence/u6-4-f-hosted-installation.json`. Choose the next
 scoped local, offline, synthetic, paper-only slice while keeping Python
 authoritative and Electron as a thin adapter over the existing release artifact

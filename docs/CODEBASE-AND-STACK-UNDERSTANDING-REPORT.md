@@ -1,8 +1,8 @@
 # Codebase and stack understanding report
 
-**Date:** 2026-11-15
+**Date:** 2026-11-16
 
-**Source checkpoint:** `19367f4` (`main`; U6.4-F hosted evidence is retained in the current documentation refresh)
+**Source checkpoint:** current branch checkpoint 80460a7 (U7-P evidence and deterministic graph refresh)
 
 **Scope:** local deterministic system, synthetic paper portfolio, read-only
 operator surfaces, desktop release/install path, and the permanent paper-only
@@ -149,28 +149,29 @@ The target-specific runner images and CPython provenance are recorded in
 the local contract validator remains the guard against reopened decisions or a
 changed paper-only boundary. No U6.4-F work remains open.
 
+U7-P is complete locally and its reproducibility fingerprint is
+146c332a386d83ece76a02d717aea658d09d687b0f336f41ced1706efb3d5d2d.
+
 The next work must be a separately scoped local, offline, synthetic,
 paper-only slice. Connected promotion, providers, credentials, mutation, and
 live execution remain closed by U8-C.
 
 ## Verification snapshot
 
-The latest documented full suite passed `659 passed, 0 failed, 7 skipped` on
-U8-B commit `db8c8dd`. Later U8-C and U6.4-D/E changes were committed after
-that run; do not report the full-suite result as covering them. U6.4-D/E have
-separate local evidence files under `docs/evidence/`, and CI is configured to
-run the install checks on matching Windows/Linux runners. The current Electron
-suite passed `34 passed, 0 failed`, including the U6.4-F runtime and installer
-tests; the Python full suite was not rerun. Hosted CI run `43740383177` passed
+The latest documented full suite passed `669 passed, 0 failed, 7 skipped` on
+the U7-P checkpoint `80460a7`. The U8-B result remains historical; U8-C and
+U6.4-D/E have separate local evidence files under `docs/evidence/`. The
+current Electron suite passed `34 passed, 0 failed`, including the U6.4-F
+runtime and installer tests. Hosted CI run `43740383177` passed
 15 checks with 0 failures, including both U6.4-F Windows/Linux hardening legs.
 
-The working-tree Understand Anything graph covers all 611 scanned files: 2,251
-nodes, 4,016 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
+The working-tree Understand Anything graph covers all 616 scanned files: 2,274
+nodes, 4,062 edges, 8 Vietnamese architecture layers, and an 11-step Vietnamese
 tour.
 Deterministic validation found no structural issues; it reported 125 nodes with
 no incident edges as warnings. The graph and freshness metadata are in
 `.ua/knowledge-graph.json` and `.ua/meta.json`.
-Fingerprint generation succeeded for all 611 files; the multi-document
+Fingerprint generation succeeded for all 616 files; the multi-document
 Kubernetes YAML manifest used the documented regex fallback after a parser
 warning.
 

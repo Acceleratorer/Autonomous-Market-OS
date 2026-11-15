@@ -81,11 +81,12 @@ run `43740383177`; see
 [`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json)
 for exact runner images and runtime hashes.
 
-The full Understand Anything graph now covers 611 scanned files and has 2,251
-nodes, 4,016 edges, 8 Vietnamese layers, and a 10-step tour. Structural
-validation passed with 125 no-edge node warnings. The graph and metadata live
-under `.ua/`. The Electron suite passed 34 tests, including the U6.4-F
-runtime and portable-install checks; the Python full suite was not rerun.
+The full Understand Anything graph now covers 616 scanned files and has 2,274
+nodes, 4,062 edges, 8 Vietnamese layers, and an 11-step tour. Structural
+validation passed with 0 issues; 125 pre-existing no-edge node warnings remain.
+The graph and metadata live under `.ua/`. The Electron suite passed 34 tests,
+including the U6.4-F runtime and portable-install checks; the Python full suite
+passed 669 tests with 0 failures and 7 skips.
 
 ## U6.4-F hosted installation confirmation (2026-11-16)
 
@@ -99,3 +100,13 @@ runtime hashes, and candidate archive hashes are recorded in
 
 The U6.4-F gate is closed. The connected/live track remains permanently
 paper-only under U8-C.
+
+## U7-P reproducibility confirmation (2026-11-16)
+
+The U7-P local audit regenerated U7-N/J/K/L twice from committed offline inputs,
+rebuilt U7-O twice, and matched the committed catalog body, fingerprint, source
+hashes, lineage, and shared private/synthetic/read-only/paper-only boundary.
+The reproducibility evidence fingerprint is
+146c332a386d83ece76a02d717aea658d09d687b0f336f41ced1706efb3d5d2d; the
+focused U7 suite passed 13 tests and the full Python suite passed 669 tests with
+0 failures and 7 skips. This remains a local, synthetic, paper-only check.
