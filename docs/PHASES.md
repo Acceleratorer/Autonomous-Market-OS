@@ -82,6 +82,10 @@ nodes, 4,016 edges, 8 Vietnamese layers, and 10 tour steps. Structural
 validation found no issues and 125 no-edge node warnings; see `.ua/` and the
 codebase understanding report for the current graph snapshot.
 
+U7-P adds a local reproducibility audit that regenerates U7-N/J/K/L twice,
+rebuilds U7-O, and compares fingerprints, catalog bodies, source hashes, and
+the shared offline paper-only boundary with the committed evidence.
+
 U6.4-F is implemented within its decision matrix and ADR, with matching hosted
 Windows/Linux evidence retained in
 `docs/evidence/u6-4-f-hosted-installation.json`. Service registration, connected

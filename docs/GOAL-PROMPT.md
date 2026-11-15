@@ -35,15 +35,17 @@ live status is authoritative.
   embedded-runtime identity, state preservation, rollback, uninstall retention,
   and evidence rendering. Hosted Windows/Linux evidence is complete and
   retained in `docs/evidence/u6-4-f-hosted-installation.json`.
+- U7-P is the current local reproducibility gate. It regenerates U7-N/J/K/L
+  twice and compares the results with committed U7-O evidence.
 
 ## Objective
 
-Continue from merged U6.4-F commit `19367f4`. The hosted Windows/Linux gate is
-closed and its evidence is retained in
-`docs/evidence/u6-4-f-hosted-installation.json`. Choose the next scoped local,
-offline, synthetic, paper-only slice while keeping Python authoritative and
-Electron as a thin adapter over the existing release artifact and validation
-contracts.
+Continue from merged U6.4-F commit `19367f4` and completed U7-P evidence
+reproducibility audit. The hosted Windows/Linux gate is closed and its evidence
+is retained in `docs/evidence/u6-4-f-hosted-installation.json`. Choose the next
+scoped local, offline, synthetic, paper-only slice while keeping Python
+authoritative and Electron as a thin adapter over the existing release artifact
+and validation contracts.
 
 ## Execution rules
 

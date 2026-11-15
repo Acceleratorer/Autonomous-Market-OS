@@ -16,7 +16,7 @@ This is the forward roadmap for the fusion repository. It merges the original pl
 | U4 | M3 + B4 | Shared paper portfolio, virtual broker, costs, fills, risk, approvals, and shadow mode | B4.20 read-only retention/archive preflight is implemented without deletion or mutation routes; retention deletion, connected identity, and distributed ownership remain separate gates |
 | U5 | M4 web + B5 | Web deployment and operator views over the shared API | U5.24 and the local exit gate are complete on the selected TypeScript/React/Node.js/Next.js/Tailwind stack. U5.5 selects a private Linux VM + systemd + owner-only Tailscale Serve and is locally verified but not enabled; owner-VM promotion and rollback remain pending. |
 | U6 | M4 CLI/app + B6–B7 | Mature CLI, then desktop/mobile shell over the same contracts | B6 projections, U6.1–U6.4-F target-native hardening, embedded CPython portable installation, installer preflight, offline simulation, and U7-A/B/C/D/E/F/G/H/I/J/K/L/M/N/O release/evaluation evidence products are complete; owner-VM promotion and mobile remain pending |
-| U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | U7-A/B/C/D/E/F release evidence, reports, portable archives, per-target indexes, cross-target catalog, catalog report, U7-G quality report, U7-H synthetic accounting report, U7-I evidence pack, U7-J synthetic economic report, U7-K CLI tool registry audit, U7-L Paper2Slides-ready cited research brief, U7-M release/evidence drift audit, U7-N unified evidence register, and U7-O evidence catalog are complete; further evaluation products remain selective |
+| U7 | M5 + selected M7 | Evaluation, education, reports, slides, media, and safe tool integrations | U7-A/B/C/D/E/F release evidence, reports, portable archives, per-target indexes, cross-target catalog, catalog report, U7-G quality report, U7-H synthetic accounting report, U7-I evidence pack, U7-J synthetic economic report, U7-K CLI tool registry audit, U7-L Paper2Slides-ready cited research brief, U7-M release/evidence drift audit, U7-N unified evidence register, U7-O evidence catalog, and U7-P reproducibility audit are complete; further evaluation products remain selective |
 | U8 | M6 | Separate live-readiness review or explicit permanent paper mode | U8-A/U8-B packs are gated after local preflight and U8-C records the owner decision for permanent paper-only mode; connected runtime, production operations, reconciliation, credentials, mutation routes, and live execution remain disabled |
 
 ## Execution order
@@ -134,7 +134,7 @@ Local-first exit evidence is recorded in `docs/LOCAL-EXIT-GATE-REPORT.md` and `d
 ## Current continuation checkpoint (2026-11-16)
 
 U6.4-D installer preflight and U6.4-E offline install simulation are complete.
-U7-A–U7-O are complete. U8-C records the accepted permanent paper-only
+U7-A–U7-P are complete. U8-C records the accepted permanent paper-only
 decision; it closes the connected/live-readiness track unless a new explicit
 owner decision reopens it. The latest full-suite result remains the U8-B run
 on `db8c8dd`; later U8-C and U6.4-D/E work has separate focused evidence and
@@ -154,5 +154,6 @@ no-edge node warnings recorded for review.
 
 U6.4-F has an accepted ADR-0055, a machine-readable contract, and matching
 hosted Windows/Linux evidence from CI run `43740383177`. No U6.4-F gate remains
-open; future work stays offline and paper-only unless a new owner decision
-changes the boundary.
+open; U7-P now proves deterministic regeneration of the U7-O evidence catalog.
+Future work stays offline and paper-only unless a new owner decision changes
+the boundary.

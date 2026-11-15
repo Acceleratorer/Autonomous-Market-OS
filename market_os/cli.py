@@ -227,6 +227,13 @@ def build_parser() -> argparse.ArgumentParser:
     tools_report.add_argument("--fixture", required=True)
     tools_report.add_argument("--markdown", required=True)
     tools_report.add_argument("--json", dest="json_path", required=True)
+    u7 = commands.add_parser("u7")
+    u7_commands = u7.add_subparsers(dest="u7_command", required=True)
+    u7_repro = u7_commands.add_parser("evidence-repro")
+    for name in ("catalog", "pack", "drift", "economic", "tools", "research"):
+        u7_repro.add_argument(f"--{name}", required=True)
+    u7_repro.add_argument("--markdown", required=True)
+    u7_repro.add_argument("--json", dest="json_path", required=True)
     return parser
 
 
@@ -395,6 +402,24 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit(f"tool registry report failed: {exc}") from exc
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
+    if args.command == "u7":
+        from .u7_evidence_reproducibility import render_reproducibility_report
+
+        try:
+            result = render_reproducibility_report(
+                catalog=args.catalog,
+                pack=args.pack,
+                drift=args.drift,
+                economic=args.economic,
+                tools=args.tools,
+                research=args.research,
+                markdown_path=args.markdown,
+                json_path=args.json_path,
+            )
+        except (OSError, TypeError, ValueError) as exc:
+            raise SystemExit(f"U7 evidence reproducibility audit failed: {exc}") from exc
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0 if result["status"] == "passed" else 1
     if args.command == "btc-paper":
         from dataclasses import asdict
         from pathlib import Path

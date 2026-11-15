@@ -169,6 +169,13 @@ only/no-network boundary, and disabled promotion or execution. CI uploads
 `evidence-catalog.json` and `evidence-catalog.md` as
 `market-os-u7-o-evidence-catalog`.
 
+U7-P ([contract](U7-P-EVIDENCE-REPRODUCIBILITY.md)) runs locally after U7-O.
+`python -m market_os.cli u7 evidence-repro` regenerates U7-N/J/K/L twice in a
+temporary directory, rebuilds U7-O, and compares both fingerprints, catalog
+bodies, source hashes, and the shared execution-disabled boundary with the
+committed U7-O artifact. A mismatch is fail-closed and leaves source evidence
+unchanged.
+
 U8-A ([contract](U8-A-LIVE-READINESS-DECISION-PACK.md)) runs after U7-O in
 `offline-tests`. It renders `market-os.u8-a-live-readiness-decision@v1` from
 the local exit, U5.5, U6.4-C, and hosted U7-O evidence, then uploads
