@@ -118,6 +118,7 @@ async function renderEvidence(options) {
       verificationFailureRecovered = (await fsp.readFile(path.join(destination, "artifact-manifest.json"), "utf8")).includes(`\"version\": \"${manifest.version}\"`);
     }
     if (!verificationFailureRecovered) fail("verification failure did not leave the current app intact");
+    await fsp.rm(`${destination}.rollback`, { recursive: true, force: true });
     const retry = await installPortable({ artifactRoot: options.artifact, destination });
     await fsp.rm(`${destination}.rollback`, { recursive: true, force: true });
     const upgrade = await installPortable({ artifactRoot: upgradeArtifact, destination });
