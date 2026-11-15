@@ -5,11 +5,18 @@
 ## Current position
 
 - Repository: `D:\Code\Github\HKUDS\Autonomous-Market-OS`.
+- **Continuation checkpoint (2026-11-15):** the base `main` commit is
+  `5dad8b3`; the later local documentation and graph refresh changes are part
+  of this handoff and must be inspected with live `git status`. U6.4-D and
+  U6.4-E have passed their local evidence checks, U7-A–U7-O are complete, and
+  U8-C records the permanent paper-only decision. Start from
+  [NEXT-WORK-HANDOFF.md](NEXT-WORK-HANDOFF.md); U6.4-F is now authorized only
+  within its accepted offline portable-install contract.
 - The initial B3.10–B3.14, B4.11–B4.17, application-surface, and U5.2–U5.22 snapshot was reviewed and pushed in `d01f12b`; later work is on the current `main` and should be reviewed relative to that current branch tip.
 - B3 remains offline, fixture-backed, recorded-response-only where applicable, and not promoted.
 - B3.8–B3.14 form a local synthetic observability stack: session artifacts, loopback read-only API/dashboard, catalog and comparison, CLI inspection, and the cross-surface acceptance harness.
 - The historical worktree audit preserved local scratch/probe data, Playwright fixtures, and the pre-existing `API.md`. The six top-level scratch/workspace files were moved, without deletion, to `D:\Code\Github\HKUDS\Autonomous-Market-OS-local-scratch-2026-11-02`; the live repository is now clean.
-- U6 now has local-only read-only CLI projections for the BTC dataset catalog (`market-os btc-paper catalog`), bounded ingestion manifests (`manifests`, `manifest`, and `manifest-records`), B2/B3 research-run catalogs (`market-os btc-paper b2 catalog` / `b3 catalog`), and B2/B3 research details (`b2 detail` / `b3 detail`). U6.1 adds a parity-tested Next.js shell slice for gateway status, overview, and BTC dataset catalog. U6.2 selects Electron in [ADR-0053](decisions/ADR-0053-u6-native-platform-selection.md) for the first Windows/Linux desktop container. U6.3 verifies an isolated local Electron lifecycle/security shell slice that loads the existing Next.js renderer. U6.4-A verifies an unsigned artifact with a source Python sidecar, component hashes, and slot metadata. U6.4-B verifies external-key signing, hash-gated current/known-good promotion, failed-launch restoration, and rollback locally. U6.4-C adds target-native source-sidecar packaging on matching Windows/Linux CI runners, signed four-route smoke, and two-version promotion/rollback evidence; U7-G adds a stable deterministic quality-benchmark reviewer report, U7-H adds a synthetic-session accounting reviewer report, U7-I adds a fail-closed local evidence pack index over those products, U7-J adds a ClawWork-shaped synthetic economic observability report, and U7-K adds a typed CLI registry/sandbox audit; U7-L exports a hash-checked cited-research brief for Paper2Slides input; U7-M adds a fail-closed same-run Windows/Linux release evidence drift audit, U7-N joins the committed U7-I pack with hosted U7-M provenance in one deterministic register, and U7-O catalogs the U7-N/J/K/L evidence surface with normalized fingerprints and boundaries. U8-A adds a local fail-closed live-readiness decision pack and U8-B adds a local operational-readiness pack; both remain gated with a paper-only default while connected runtime, production operations, owner-VM promotion, credentials, providers, mutation routes, live execution, embedded Python/native installer, and mobile remain deferred. The shell reuses the versioned Python/API/CLI contracts, preserves bounded 1–100 paging, exclusive cursors, ordering, empty-store behavior, and invalid-input rejection, and remains local, synthetic, paper-only, and GET-only.
+- U6 now has local-only read-only CLI projections for the BTC dataset catalog (`market-os btc-paper catalog`), bounded ingestion manifests (`manifests`, `manifest`, and `manifest-records`), B2/B3 research-run catalogs (`market-os btc-paper b2 catalog` / `b3 catalog`), and B2/B3 research details (`b2 detail` / `b3 detail`). U6.1 adds a parity-tested Next.js shell slice for gateway status, overview, and BTC dataset catalog. U6.2 selects Electron in [ADR-0053](decisions/ADR-0053-u6-native-platform-selection.md) for the first Windows/Linux desktop container. U6.3 verifies an isolated local Electron lifecycle/security shell slice that loads the existing Next.js renderer. U6.4-A verifies an unsigned artifact with a source Python sidecar, component hashes, and slot metadata. U6.4-B verifies external-key signing, hash-gated current/known-good promotion, failed-launch restoration, and rollback locally. U6.4-C adds target-native source-sidecar packaging on matching Windows/Linux CI runners, signed four-route smoke, and two-version promotion/rollback evidence. U6.4-F now adds a signed portable per-user install with target-native CPython 3.11.x, state preservation, manual rollback, and no native service. U7-G adds a stable deterministic quality-benchmark reviewer report, U7-H adds a synthetic-session accounting reviewer report, U7-I adds a fail-closed local evidence pack index over those products, U7-J adds a ClawWork-shaped synthetic economic observability report, and U7-K adds a typed CLI registry/sandbox audit; U7-L exports a hash-checked cited-research brief for Paper2Slides input; U7-M adds a fail-closed same-run Windows/Linux release evidence drift audit, U7-N joins the committed U7-I pack with hosted U7-M provenance in one deterministic register, and U7-O catalogs the U7-N/J/K/L evidence surface with normalized fingerprints and boundaries. U8-A adds a local fail-closed live-readiness decision pack and U8-B adds a local operational-readiness pack; both remain gated with a paper-only default while connected runtime, production operations, owner-VM promotion, credentials, providers, mutation routes, live execution, and mobile remain deferred. The shell reuses the versioned Python/API/CLI contracts, preserves bounded 1–100 paging, exclusive cursors, ordering, empty-store behavior, and invalid-input rejection, and remains local, synthetic, paper-only, and GET-only.
 - The local U5 read-only operator is complete through U5.24, and the backend/recovery/CI local exit gate is closed. Local B1 outcome/gap/provenance details, the cross-domain operator overview, bounded candle visualization, bounded portfolio equity history, responsive operator navigation, and compact mobile gateway status are complete; U4/B4 remains synthetic and paper-only. The owner selected a private single-tenant future preview and the TypeScript/React/Node.js/Next.js/Tailwind CSS web stack. ADR-0046 selects DirectAdmin for the disconnected static preview only; the Next.js operator remains loopback-only until identity, authorization, isolation, and operations gates close.
 - U5.5 scope and stack selection are recorded in [ADR-0045](decisions/ADR-0045-u5-5-private-single-tenant-preview.md) and ADR-0050. On 2026-10-30 the owner selected a private Linux VM with systemd, owner-only Tailscale Serve access, subject `owner-only`, portfolio `paper-main`, and storage root `/var/lib/autonomous-market-os/portfolios`. The contract and local promotion simulation are verified, but the runtime remains disabled; owner-VM promotion and rollback are pending. Evidence: [u5-5-promotion-evidence.json](evidence/u5-5-promotion-evidence.json).
 - The static preview deploy pipeline is defined in `.github/workflows/deploy-market-os.yml` and `scripts/deploy_market_os_directadmin.sh`. It targets `/domains/accel.io.vn/public_html/market-os`, stages outside `public_html`, checks `/`, `/waifu/`, and `/wuwa-map/`, and retains/rolls back one prior Market OS release. A read-only recheck on 2026-11-01 confirmed `/market-os/` returns 200 with a SHA-256 matching `apps/web/public/index.html`; the preserved routes return 200 and `DEPLOYMENT.txt` returns 403. The workflow remains manual-only on `main`; the public static artifact contains no portfolio data, Python gateway, or private Next.js operator.
@@ -216,8 +223,9 @@ matrix, and U7-O catalog pass their checks. The result is `gated`:
 `local_preflight_passed_connected_runtime_not_verified`, with paper-only as the
 default and no execution-boundary change. Owner VM/access, Tailscale, connected
 promotion/rollback, production observability, credentials/provider approval, and
-live authorization remain blocked; mobile, mutation routes, and embedded
-Python/native installation remain deferred.
+live authorization remain blocked; mobile and mutation routes remain deferred.
+U6.4-F installer work is implemented locally under the accepted offline
+contract and does not alter that boundary.
 
 ## U8-B local operational-readiness pack (2026-11-14)
 
@@ -262,3 +270,31 @@ unsigned artifacts fail closed. No service, embedded Python runtime,
 credentials, provider, mutation, release-slot, VM, or live-execution behavior
 is enabled. Local evidence is recorded in
 docs/evidence/u6-4-install-simulation.json.
+
+## Continuation checkpoint (2026-11-15)
+
+The latest source checkpoint before this documentation refresh is commit
+`5dad8b3` on `main`. The latest full-suite result recorded by the repository is
+the U8-B run on `db8c8dd` (`659 passed, 0 failed, 7 skipped`); do not attribute
+that run to later U8-C or U6.4-D/E commits. U6.4-D/E have separate local
+evidence, and the current install workflow targets both Windows and Linux CI
+runners. The accepted U8-C decision keeps all connected and live-readiness
+gates closed. U6.4-F is authorized only for the accepted offline portable
+installer and embedded CPython contract; native service registration,
+connected access, and live execution remain disabled.
+
+The full Understand Anything graph covers all 610 scanned files and contains
+2,250 nodes, 4,014 edges, 8 Vietnamese architecture layers, and a 10-step
+Vietnamese tour. Deterministic validation found no structural issues and 125
+nodes without incident edges; those remain visible as graph warnings. The graph
+is at `.ua/knowledge-graph.json`, with its analyzed commit, timestamp, and
+fingerprint baseline under `.ua/`. See [NEXT-WORK-HANDOFF.md](NEXT-WORK-HANDOFF.md)
+for the next-session checklist.
+
+U6.4-F is now captured in
+[`U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md`](U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md),
+proposed [`ADR-0055`](decisions/ADR-0055-u6-4-f-installer-planning.md), and
+[`u6-4-f-installation-contract.json`](evidence/u6-4-f-installation-contract.json).
+These artifacts authorize only the accepted portable per-user installer and
+embedded CPython 3.11.x slice; they do not authorize service registration,
+connected access, mutation, or live execution.

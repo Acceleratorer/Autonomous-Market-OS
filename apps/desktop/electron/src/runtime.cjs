@@ -107,7 +107,10 @@ async function waitForHttp(url, { timeoutMs = DEFAULT_READY_TIMEOUT_MS, interval
 }
 
 function defaultSpecs({ repoRoot, pythonRoot, webRoot, apiPort, nextPort, pythonCommand }) {
-  const python = process.env.MARKET_OS_PYTHON || pythonCommand || (process.platform === "win32" ? "python" : "python3");
+  const packagedPython = pythonCommand && (path.isAbsolute(pythonCommand) || pythonCommand.includes("/") || pythonCommand.includes("\\"))
+    ? path.resolve(pythonRoot, pythonCommand)
+    : pythonCommand;
+  const python = process.env.MARKET_OS_PYTHON || packagedPython || (process.platform === "win32" ? "python" : "python3");
   const nextNode = process.env.MARKET_OS_NEXT_NODE || (process.versions.electron ? "node" : process.execPath);
   const nextCommand = process.env.MARKET_OS_NEXT_COMMAND || nextNode;
   const nextCli = path.join(webRoot, "node_modules", "next", "dist", "bin", "next");

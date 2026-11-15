@@ -51,8 +51,8 @@ These gates are intentionally explicit and fail closed:
 - credentials and provider approval
 - live execution authorization
 
-Mobile, mutation routes, and an embedded Python/native installer remain
-separate deferred work.
+Mobile, mutation routes, and live execution remain separate deferred work;
+U6.4-F portable installation is handled by its accepted offline contract.
 
 ## Reproducible command
 

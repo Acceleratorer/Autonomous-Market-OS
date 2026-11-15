@@ -44,5 +44,5 @@ failed source checks, non-zero U7-M drift, invalid target versions, or a
 boundary mismatch. CI renders and uploads the JSON/Markdown register in the
 `market-os-u7-n-unified-evidence-register` artifact.
 
-U5.5 owner-VM promotion, embedded Python/native installer, mobile, providers,
-credentials, mutation routes, and live execution remain deferred.
+U5.5 owner-VM promotion, mobile, providers, credentials, mutation routes, and
+live execution remain deferred.

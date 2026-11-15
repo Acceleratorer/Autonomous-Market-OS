@@ -1,149 +1,187 @@
 # Codebase and stack understanding report
 
-**Date:** 2026-11-02
-**Scope:** Current local worktree, synthetic paper system, local operator, and
-future connected-preview gate
+**Date:** 2026-11-15
+
+**Source checkpoint:** `5dad8b3` (`main`; inspect live `git status` for this documentation refresh)
+
+**Scope:** local deterministic system, synthetic paper portfolio, read-only
+operator surfaces, desktop release/install path, and the permanent paper-only
+decision.
 
 ## Executive result
 
-The repository already has a coherent backend-first architecture. Python owns
-portfolio accounting, risk, reservations, persistence, recovery, replay, and
-audit. The gateway and CLI are thin Python surfaces. The Next.js application is
-a server-rendered, read-only adapter over the loopback gateway. The static
-preview is a separate artifact with no portfolio state or API connection.
+Autonomous-Market-OS has one domain authority: the Python `market_os` package.
+It owns portfolio accounting, risk, reservations, persistence, recovery,
+replay, audit, and deterministic evidence generation. The CLI, loopback
+gateway, Next.js operator, static preview, and Electron shell are adapters that
+present or package those capabilities. They should not reproduce domain or
+risk behavior.
 
-The local exit gate is complete for continued local-only work. The disconnected
-DirectAdmin static preview is deployed and read-only verified; the private
-Next.js/Python runtime is not promoted. U6 now includes bounded CLI projections
-for BTC datasets, ingestion manifests, and B2/B3 research inspection; the next
-implementation step is a thin read-only app shell over those shared contracts.
-No connected host or identity provider is available today.
+U6.4-D validates a signed target-native artifact. U6.4-E simulates an offline
+installation using staging, atomic publication, fresh mutable storage, and
+post-copy verification. Neither bundles Python nor registers an operating
+system service. U7-A–U7-O evidence products are complete. U8-A/U8-B remain
+gated, and U8-C records the accepted permanent paper-only decision. Connected
+and live-readiness work therefore stays closed unless a new explicit owner
+decision reopens it.
 
-## Execution flow traced from code
+## Execution paths
+
+### Domain and inspection path
 
 ```text
-local JSON/JSONL portfolio store
-  -> B41Broker recovery and validation
-  -> accounting, risk, reservations, paper fills, audit, checkpoints
-  -> bounded inspection resources in market_os.api
-  -> apps/gateway (loopback 127.0.0.1)
-  -> apps/web/operator or apps/web/next-operator
-  -> read-only operator views
+fixture or bounded local input
+  -> typed contract / deterministic workflow
+  -> evaluation, accounting, risk, or paper execution in market_os
+  -> append-only events and content-addressed artifacts
+  -> CLI, loopback gateway, local HTML, Next.js, or static preview
 ```
 
-The CLI delegates to `market_os.cli`. The gateway delegates to the existing
-`serve` command. The Next.js server-only client calls only GET resources on
-`http://127.0.0.1:<port>` and validates response shapes before rendering.
+The Next.js server-side client reads bounded GET resources from the loopback
+Python gateway. The static artifact is disconnected from portfolio state and
+the gateway. The CLI and gateway remain compatibility entrypoints around the
+same Python contracts.
+
+### Desktop release/install path
+
+```text
+matching Windows/Linux CI runner
+  -> target-native Electron + Python source-sidecar artifact (U6.4-C)
+  -> signature/manifest/storage/runtime preflight (U6.4-D)
+  -> offline staging, publish, storage reset, and revalidation simulation (U6.4-E)
+```
+
+U6.4-E remains the source-sidecar installation simulation. U6.4-F now adds the
+accepted portable adapter: signed embedded CPython 3.11.x, per-user staging and
+atomic publish, state preservation, manual rollback, verification-failure
+recovery, and uninstall retention. Native service registration and package
+manager integration remain disabled; hosted Windows/Linux evidence is the next
+gate.
 
 ## Responsibility map
 
-| Capability | Authority | Current status |
+| Capability | Module / adapter | Responsibility |
 |---|---|---|
-| Decimal accounting and fills | `market_os/portfolio_broker.py`, `paper_venue.py` | Implemented, synthetic paper-only |
-| Shared membership and reservations | `market_os/portfolio_broker.py` | Implemented and recovered with invariants |
-| Ledger/checkpoint/fingerprints/replay | `market_os/portfolio_broker.py` | Implemented and regression-tested |
-| Backup/restore/archive preflight | `market_os/portfolio_backup.py` | Implemented locally; deletion disabled |
-| Schema migration | `market_os/schema_migration.py` | Implemented copy-on-write v2 locally |
-| Local mutation authorization | `market_os/local_mutation.py` | Implemented as in-memory HMAC seam; no HTTP/CLI mutation |
-| HTTP inspection | `market_os/api.py` | Loopback, bounded, mostly GET-only inspection |
-| CLI inspection | `market_os/cli.py`, `apps/cli/` | Local compatibility surface |
-| HTML operator | `apps/web/operator/` | Local GET-only shell |
-| Next.js operator | `apps/web/next-operator/` | Local server-rendered GET-only UI |
-| Static preview | `apps/web/public/` | Disconnected, paper-only artifact |
-| CI and evidence | `.github/workflows/`, `scripts/ci_checks.py` | Tests, typecheck/build, security, evidence gates |
+| Domain orchestration | `market_os.workflow`, `market_os.orchestration/` | Run lifecycle, recovery, and provider composition |
+| Portfolio, risk, recovery | `market_os.portfolio_broker`, `paper_venue`, `portfolio_backup`, `schema_migration` | Synthetic paper fills, ledger, reservations, recovery, backup, and migration |
+| Research and evaluation | `market_os.research`, `btc_*`, `evaluation_protocol`, `quality_*` | Deterministic research, BTC features/evaluation, and quality evidence |
+| Evidence products | `market_os/u7_*`, `u8a_readiness`, `u8b_operations`, `u8c_paper_mode` | Fail-closed reports, catalogs, readiness packs, and paper-mode decision evidence |
+| CLI | `market_os.cli`, `apps/cli/` | Parse and dispatch commands against shared Python contracts |
+| Local gateway | `market_os.api`, `apps/gateway/` | Loopback HTTP and bounded read-only inspection |
+| Web operator | `apps/web/operator`, `apps/web/next-operator` | Local GET-only views over the shared API |
+| Static preview | `apps/web/public/` | Disconnected read-only artifact; no private runtime connection |
+| Desktop shell and release | `apps/desktop/electron/` | Electron lifecycle, target-native artifact packaging, signing, promotion, rollback, and U6.4-D/E tooling |
+| CI and evidence | `.github/workflows/`, `scripts/`, `docs/evidence/` | Offline checks, matching-target release jobs, and machine-readable evidence |
 
-## Stack decisions
+## Module depth and seams
+
+- The Python package is the main deep module: transport adapters use its
+  versioned contracts while calculation, persistence, replay, and policy stay
+  inside the implementation.
+- `market_os.api` and `market_os.cli` are stable seams used by multiple
+  surfaces. Keep request parsing, bounds, and serialization at those seams;
+  pass domain work into the Python implementation.
+- The Electron release path has a practical seam at the signed artifact and
+  its manifest. U6.4-D is the validation adapter, U6.4-E is the copy/publish
+  simulation, and U6.4-F is the portable per-user installation adapter. One
+  shared adapter covers both accepted targets; a platform-specific installer
+  abstraction remains unnecessary until the contract requires different
+  mechanics.
+- The interface is also the test surface: callers should be able to verify
+  artifact identity, storage isolation, publish outcome, and failure behavior
+  through the install result without reaching through into unrelated domain
+  modules.
+
+## Stack and boundary decisions
 
 ### Keep
 
-- **Python 3.11+** for domain, persistence, recovery, replay, accounting,
-  risk, and audit.
-- **Python stdlib HTTP** for the local gateway while the boundary is loopback
-  and read-only.
-- **TypeScript + React + Next.js App Router + Node.js 20.9+ + Tailwind CSS**
-  for the local/private operator surface. Keep it thin and server-side.
-- **JSONL ledger plus JSON metadata/checkpoint** as the current integrity
-  authority. Do not introduce a second database without a measured need and a
-  new recovery contract.
-- **pytest, compileall, TypeScript checks, Next build, Playwright, and CI
-  evidence** as the verification stack.
+- Python 3.11+ as the domain, accounting, recovery, replay, risk, and audit
+  authority.
+- Python stdlib HTTP for the local gateway while it stays loopback-only and
+  read-only.
+- TypeScript, React, Next.js, Node.js, Tailwind, and Electron as thin local
+  application adapters.
+- JSONL plus JSON metadata/checkpoints as the current portfolio integrity
+  authority; add no second database without a measured need and a recovery
+  contract.
+- Signed manifests, hashes, bounded resources, offline CI, and machine-readable
+  evidence for packaging and review.
 
-### Do not add yet
+### Keep closed
 
-- a database or ORM;
-- a second accounting implementation in TypeScript;
-- a generic `apps/app` bucket;
-- a public API gateway or client-side authorization;
-- HTTP/CLI mutation routes;
-- provider credentials, Binance, live execution, or production infrastructure.
+- Connected/private runtime promotion, public hosting of the operator, and
+  externally exposed mutation.
+- Credentials, provider requests, Binance/network execution, and live trading.
+- Retention deletion, distributed broker ownership, and unapproved lifecycle
+  expansion.
+- A second accounting/risk implementation in TypeScript or Electron.
+
+U8-C accepts permanent paper-only mode. Reopening connected or live-readiness
+work requires a new explicit owner decision and a complete U8 review.
 
 ## Gap classification
 
-### Implemented and verified
+### Implemented and evidenced
 
-- B4.1–B4.20 local broker/recovery hardening;
-- U5.2–U5.24 local/static operator slices;
-- shared portfolio membership, reservations, stale-writer handling,
-  idempotency, audit, migration, and archive preflight;
-- the current live worktree at the `main` tip: zero tracked changes and zero
-  untracked paths after archiving the six preserved top-level workspace files;
-- the current knowledge graph contains 1,991 nodes and 5,025 edges, and the
-  refreshed domain graph contains 88 nodes and 96 edges with all edge targets
-  resolving;
-- the latest full local pack passed 613 tests, 0 failed, and 7 skipped; evidence,
-  M2.8, MLOps, secret scan, compileall, Next.js typecheck/build, and diff checks
-  passed, and the three hosted workflows for the verification commit are green.
+- B4.1–B4.20 local synthetic paper broker, recovery, audit, backup, and
+  migration hardening.
+- U5.2–U5.24 local/static read-only operator surfaces.
+- U6.1–U6.4-F CLI/app, Electron shell, signed target artifacts, installer
+  preflight/simulation, embedded-runtime portable installation, rollback, and
+  uninstall-retention evidence tooling.
+- U7-A–U7-O release, evaluation, report, and evidence products.
+- U8-A/U8-B local readiness packs and U8-C permanent paper-only decision.
 
-### Intentional deferrals
+### Intentionally pending
 
-- partial fills and expiry expansion;
-- retention deletion/pruning;
-- distributed broker ownership;
-- externally exposed mutation;
-- live/provider/network execution;
-- U5.5 connected identity, host, ingress, session, authorization, storage,
-  audit, rollback, and secret operations.
-
-### Owner decision required
-
-To move past U5.5 `defined`, choose one concrete combination:
-
-1. always-on runtime for Python + Next.js;
-2. private ingress/access path;
-3. identity/login assertion source;
-4. subject set and portfolio allowlist;
-5. storage root/isolation policy;
-6. session, secret, audit, rollback, and rate-limit policy.
-
-Until those choices are made, connected web and deployment are correctly
-blocked by contract rather than missing implementation.
+- Hosted U6.4-F Windows/Linux evidence and exact runner-image confirmation.
+- Mobile shell work.
+- U5.5 connected promotion and production operations; U8-C keeps this track
+  closed under the current owner decision.
+- Providers, credentials, live execution, external mutation, distributed
+  ownership, partial-fill/expiry expansion, and retention deletion.
 
 ## Exact next gate
 
-U7-O is the current local evidence slice: it catalogs the committed U7-N
-register with U7-J/U7-K/U7-L evidence in one deterministic, fail-closed
-catalog. The slice remains offline and reuses the existing contracts. Keep
-mutation, providers, credentials, and connected access disabled. U5.5
-owner-VM promotion remains a separate gate for a future VM and access path.
+U6.4-F now has an accepted ADR-0055 and a machine-readable evidence schema.
+The implementation is scoped to signed portable tar.gz, per-user/no-elevation
+install, CI-frozen CPython 3.11.x from python.org, preserved mutable state,
+manual rollback, and no native service. Keep the work offline and paper-only;
+the detailed contract is in
+[`U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md`](U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md).
+The local `install:contract:validate` command checks the accepted contract and
+fails closed if any decision reopens or if the paper-only boundary changes.
 
-## Graph-backed contract boundary
+## Verification snapshot
 
-The refreshed knowledge graph places `market_os/cli.py` and `market_os/api.py`
-in the API layer. The CLI imports the API adapter, store, workflow, metrics,
-and U5.5 access configuration; its `build_parser` and `main` functions define
-the command tree and serialize the same bounded inspection envelopes. The
-Next.js `market-api.ts` node is a server-only projection that parses those
-versioned GET responses for pages under `apps/web/next-operator/`. The domain
-graph links these operator surfaces to the orchestration, portfolio, and BTC
-market-data domains while keeping the disconnected static preview separate
-from the deferred private connected runtime.
+The latest documented full suite passed `659 passed, 0 failed, 7 skipped` on
+U8-B commit `db8c8dd`. Later U8-C and U6.4-D/E changes were committed after
+that run; do not report the full-suite result as covering them. U6.4-D/E have
+separate local evidence files under `docs/evidence/`, and CI is configured to
+run the install checks on matching Windows/Linux runners. The current Electron
+suite passed `33 passed, 0 failed`, including the U6.4-F runtime and installer
+tests; the Python full suite was not rerun.
+
+The working-tree Understand Anything graph covers all 610 scanned files: 2,250
+nodes, 4,014 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
+tour.
+Deterministic validation found no structural issues; it reported 125 nodes with
+no incident edges as warnings. The graph and freshness metadata are in
+`.ua/knowledge-graph.json` and `.ua/meta.json`.
+Fingerprint generation succeeded for all 610 files; the multi-document
+Kubernetes YAML manifest used the documented regex fallback after a parser
+warning.
 
 ## Source evidence
 
-- [STRUCTURE.md](../STRUCTURE.md)
-- [STACK-AND-RUNTIME-REVIEW.md](STACK-AND-RUNTIME-REVIEW.md)
-- [NEXT-STACK-AND-DEPLOYMENT-PLAN.md](NEXT-STACK-AND-DEPLOYMENT-PLAN.md)
-- [U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md](U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md)
-- [ADR-0050](decisions/ADR-0050-u5-5-runtime-identity-contract.md)
-- [WORKTREE-BASELINE-MANIFEST.json](WORKTREE-BASELINE-MANIFEST.json)
-- [LOCAL-EXIT-GATE-REPORT.md](LOCAL-EXIT-GATE-REPORT.md)
+- [`PROJECT-CONTEXT.md`](PROJECT-CONTEXT.md)
+- [`STRUCTURE.md`](../STRUCTURE.md)
+- [`ROADMAP.md`](ROADMAP.md)
+- [`PHASES.md`](PHASES.md)
+- [`LOCAL-EXIT-GATE-REPORT.md`](LOCAL-EXIT-GATE-REPORT.md)
+- [`NEXT-WORK-HANDOFF.md`](NEXT-WORK-HANDOFF.md)
+- [`U6.4-D installer preflight`](U6.4-D-INSTALLER-PREFLIGHT.md)
+- [`U6.4-E offline install simulation`](U6.4-E-OFFLINE-INSTALL-SIMULATION.md)
+- [`U8-C permanent paper-only decision`](U8-C-PERMANENT-PAPER-ONLY.md)
+- `.ua/knowledge-graph.json` and `.ua/meta.json`

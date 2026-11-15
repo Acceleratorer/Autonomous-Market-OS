@@ -38,6 +38,11 @@ Autonomous-Market-OS/
 │   ├── synthetic_economic_report.py synthetic ClawWork-shaped cost/income report
 │   ├── tool_registry_report.py  typed CLI registry and sandbox audit
 │   ├── evidence_pack.py        local U7 reviewer evidence pack index
+│   ├── u7_evidence_register.py U7-N fail-closed hosted/local evidence register
+│   ├── u7_evidence_catalog.py  U7-O normalized evidence catalog
+│   ├── u8a_readiness.py        U8-A local live-readiness decision pack
+│   ├── u8b_operations.py       U8-B local operations-readiness pack
+│   ├── u8c_paper_mode.py       U8-C permanent paper-only decision pack
 │   ├── synthetic_server.py    loopback synthetic HTTP server
 │   ├── synthetic_catalog.py   session catalog and comparison
 │   ├── synthetic_replay.py    generic synthetic replay helpers
@@ -69,8 +74,9 @@ Autonomous-Market-OS/
 │   ├── cli/                   CLI application entrypoint
 │   ├── gateway/               local HTTP service entrypoint
 │   └── desktop/electron/      local Electron shell and release evidence tooling
-│                              including U7-M drift audit, U7-N register,
-│                              and U7-O evidence catalog
+│       ├── scripts/           packaging, signing, promotion, rollback,
+│       │                      install preflight/simulation, and U7 reports
+│       └── tests/             Electron shell and release/install regressions
 ├── tests/                     TypeScript static dashboard contract tests
 ├── scripts/                   CI checks and bounded smoke harnesses
 ├── docs/                      roadmap, contracts, ADRs, reports, evidence, operations
@@ -89,6 +95,16 @@ Machine-readable U5.5 planning evidence lives in
 The repository-grounded stack and codebase report lives in
 `docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md`, with machine-readable
 evidence in `docs/evidence/codebase-stack-understanding.json`.
+The full source graph is `.ua/knowledge-graph.json`: 610 scanned files,
+2,250 nodes, 4,014 edges, 8 Vietnamese layers, and 10 tour steps. Check
+`.ua/meta.json` and its fingerprints before relying on graph-backed findings.
+The next-work decisions and continuation checklist are in
+`docs/NEXT-WORK-HANDOFF.md`.
+The U6.4-F accepted contract, ADR, and evidence schema are in
+`docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md`,
+`docs/decisions/ADR-0055-u6-4-f-installer-planning.md`, and
+`docs/evidence/u6-4-f-installation-contract.json`; they authorize only the
+offline per-user portable adapter and embedded CPython scope recorded there.
 
 ## Responsibility map
 
@@ -107,6 +123,8 @@ evidence in `docs/evidence/codebase-stack-understanding.json`.
 | Providers | `adapters/` | Optional external runtimes behind fixture-first typed adapters |
 | Tests | `market_os/tests/`, `tests/` | Python behavior and TypeScript dashboard contract coverage |
 | Operations | `scripts/`, `apps/desktop/electron/scripts/`, `.github/workflows/`, `docs/evidence/` | CI checks, artifact smoke/release reports, U7-M drift auditing, U7-N registration, U7-O cataloging, quality reports, validation and machine-readable evidence |
+| Desktop release/install | `apps/desktop/electron/scripts/` | U6.4-C target-native artifact flow, U6.4-D preflight, U6.4-E simulation, and U6.4-F embedded-runtime portable per-user installation with manual rollback; no native service |
+| Readiness decisions | `market_os/u8a_readiness.py`, `u8b_operations.py`, `u8c_paper_mode.py` | Local fail-closed U8 evidence; U8-C retains the permanent paper-only decision |
 
 Application surfaces are grouped under `apps/web`, `apps/cli`, and
 `apps/gateway`. Their names are the product-facing boundary; `market_os.api`

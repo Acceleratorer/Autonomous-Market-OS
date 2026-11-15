@@ -1,31 +1,92 @@
 {
   "schema": "market-os.codebase-stack-understanding@v1",
-  "date": "2026-11-02",
-  "status": "local-understood-connected-gated",
+  "date": "2026-11-15",
+  "status": "local-understood-paper-only-handoff-ready",
   "scope": {
     "repository": "Autonomous-Market-OS",
     "synthetic": true,
     "paper_only": true,
     "loopback_only": true,
     "connected_runtime_selected": false,
-    "deployment_run": "disconnected_static_preview_verified; private_runtime_not_promoted"
+    "deployment_run": "disconnected_static_preview_verified; private_runtime_not_promoted",
+    "analyzed_files": 610,
+    "file_categories": {
+      "code": 232,
+      "config": 137,
+      "docs": 220,
+      "infra": 11,
+      "data": 0,
+      "script": 5,
+      "markup": 5
+    },
+    "output_language": "vi"
   },
   "authority": {
     "domain_accounting_recovery": "Python market_os",
     "local_gateway": "Python stdlib HTTP",
     "cli": "apps/cli delegates to market_os.cli",
     "next_operator": "server-rendered TypeScript/React/Next.js GET adapter",
-    "static_preview": "apps/web/public disconnected artifact"
+    "static_preview": "apps/web/public disconnected artifact",
+    "desktop": "Electron shell and release/install orchestration; Python remains the domain authority"
   },
   "worktree": {
-    "status_paths": 0,
-    "tracked_modified_paths": 0,
-    "untracked_paths": 0,
+    "status_paths": 29,
+    "tracked_modified_paths": 17,
+    "untracked_paths": 12,
     "product_candidate_paths": 0,
     "preserved_paths": 0,
     "unclassified_paths": 0,
-    "head": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
-    "untracked_classification": [],
+    "head": "5dad8b3a3b85cb4d50aaa9545a19e4b25f5a4b68",
+    "untracked_classification": [
+      {
+        "path": "apps/desktop/electron/scripts/install-portable.cjs",
+        "classification": "U6.4-F portable installer implementation"
+      },
+      {
+        "path": "apps/desktop/electron/scripts/prepare-python-runtime.cjs",
+        "classification": "CPython runtime preparation"
+      },
+      {
+        "path": "apps/desktop/electron/scripts/python-runtime.cjs",
+        "classification": "runtime manifest validator"
+      },
+      {
+        "path": "apps/desktop/electron/scripts/render-installation-evidence.cjs",
+        "classification": "local installation evidence renderer"
+      },
+      {
+        "path": "apps/desktop/electron/scripts/uninstall-portable.cjs",
+        "classification": "portable uninstall implementation"
+      },
+      {
+        "path": "apps/desktop/electron/scripts/validate-installation-contract.cjs",
+        "classification": "accepted contract validator"
+      },
+      {
+        "path": "apps/desktop/electron/tests/install-portable.test.cjs",
+        "classification": "portable lifecycle regression tests"
+      },
+      {
+        "path": "apps/desktop/electron/tests/installation-contract.test.cjs",
+        "classification": "contract regression tests"
+      },
+      {
+        "path": "docs/NEXT-WORK-HANDOFF.md",
+        "classification": "hosted evidence continuation handoff"
+      },
+      {
+        "path": "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
+        "classification": "accepted implementation contract"
+      },
+      {
+        "path": "docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
+        "classification": "accepted decision record"
+      },
+      {
+        "path": "docs/evidence/u6-4-f-installation-contract.json",
+        "classification": "accepted contract evidence schema"
+      }
+    ],
     "archived_paths": 6,
     "archive_path": "D:\\Code\\Github\\HKUDS\\Autonomous-Market-OS-local-scratch-2026-11-02"
   },
@@ -33,67 +94,124 @@
     "implemented": [
       "B4.1-B4.20",
       "U5.2-U5.24",
-      "worktree baseline"
+      "U6.4-A-U6.4-F",
+      "U7-A-U7-O",
+      "U8-A-U8-C"
     ],
     "intentional_deferrals": [
       "partial fills/expiry",
       "retention deletion",
       "distributed ownership",
       "external mutation",
-      "live/provider/network execution"
+      "provider/network execution",
+      "native service registration",
+      "owner-VM promotion",
+      "mobile"
     ],
     "owner_decisions": [
-      "connected runtime",
-      "ingress/access",
-      "identity",
-      "subject-to-portfolio authorization",
-      "storage isolation",
-      "session/audit/rollback/secrets"
+      "U8-C permanent paper-only; connected/live work remains closed without a new explicit owner decision"
     ]
   },
   "verification": {
-    "pytest": "final rerun: 613 passed, 0 failed, 7 skipped",
-    "compileall": "passed",
-    "secret_scan": "passed",
-    "evidence_validation": "63 JSON files validated",
-    "m2_8_evidence_validation": "passed",
-    "mlops_manifest_validation": "passed",
-    "next_typecheck": "passed",
-    "next_build": "passed",
+    "latest_full_suite": "659 passed, 0 failed, 7 skipped on U8-B commit db8c8dd; does not cover later U8-C or U6.4-D/E commits",
+    "application_tests": "Electron suite: 33 passed, 0 failed; U6.4-F contract validator and portable installation evidence fixtures passed. Python full suite was not rerun.",
+    "graph_validation": "passed: 0 structural issues; 125 nodes with no incident edges reported as warnings",
+    "fingerprint_baseline": "generated for all 610 files from the current working-tree scan inventory",
     "git_diff_check": "passed",
-    "graph_validation": "knowledge graph 1,991 nodes/5,025 edges and refreshed domain graph 88 nodes/96 edges; all edge targets resolve",
-    "github_workflows": {
-      "ci": {
-        "run_id": 41345129472,
-        "result": "passed"
-      },
-      "devsecops": {
-        "run_id": 41345129459,
-        "result": "passed"
-      },
-      "security_and_package_checks": {
-        "run_id": 41345129404,
-        "result": "passed"
-      }
-    },
-    "pytest_flake_recovery": "one transient WinError 10053 in full-suite attempt; isolated synthetic-server checks passed 10/10 and subsequent full rerun passed"
+    "evidence_validation": "not run in this refresh",
+    "fingerprint_warning": "Multi-document Kubernetes YAML parsing warned; regex fallback succeeded for all 610 fingerprint entries.",
+    "contract_validator": "passed: accepted U6.4-F contract with 0 open decisions and 9 required evidence items"
   },
   "artifacts": [
     "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
-    "docs/STACK-AND-RUNTIME-REVIEW.md",
-    "docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md",
-    "docs/WORKTREE-BASELINE-MANIFEST.json",
-    "docs/LOCAL-EXIT-GATE-REPORT.md"
+    "docs/NEXT-WORK-HANDOFF.md",
+    "docs/PROJECT-CONTEXT.md",
+    "docs/ROADMAP.md",
+    "docs/PHASES.md",
+    "docs/LOCAL-EXIT-GATE-REPORT.md",
+    "docs/UNDERSTANDING-LOG.md",
+    "docs/GOAL-PROMPT.md",
+    "STRUCTURE.md",
+    ".ua/knowledge-graph.json",
+    ".ua/meta.json",
+    ".ua/fingerprints.json",
+    "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
+    "docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
+    "docs/evidence/u6-4-f-installation-contract.json"
   ],
   "graph": {
-    "knowledge_nodes": 1944,
-    "knowledge_edges": 3438,
+    "knowledge_nodes": 2250,
+    "knowledge_edges": 4014,
+    "file_level_nodes": 621,
+    "analyzed_files": 610,
+    "node_types": {
+      "class": 270,
+      "config": 140,
+      "document": 221,
+      "file": 240,
+      "function": 1359,
+      "pipeline": 4,
+      "resource": 7,
+      "service": 9
+    },
+    "edge_types": {
+      "calls": 210,
+      "configures": 11,
+      "contains": 1642,
+      "depends_on": 38,
+      "deploys": 6,
+      "documents": 306,
+      "exports": 1053,
+      "imports": 422,
+      "related": 90,
+      "serves": 1,
+      "tested_by": 223,
+      "triggers": 11,
+      "validates": 1
+    },
+    "layers_count": 8,
+    "layers": [
+      {
+        "name": "Lõi miền Python",
+        "nodes": 82
+      },
+      {
+        "name": "Các bề mặt ứng dụng",
+        "nodes": 34
+      },
+      {
+        "name": "Ứng dụng desktop và phát hành",
+        "nodes": 20
+      },
+      {
+        "name": "Kiểm thử và xác minh",
+        "nodes": 116
+      },
+      {
+        "name": "Công cụ phát triển",
+        "nodes": 4
+      },
+      {
+        "name": "Hạ tầng và vận hành",
+        "nodes": 42
+      },
+      {
+        "name": "Cấu hình dự án",
+        "nodes": 6
+      },
+      {
+        "name": "Tài liệu và bằng chứng",
+        "nodes": 311
+      }
+    ],
+    "tour_steps": 10,
+    "validated": true,
+    "graph_commit": "5dad8b3a3b85cb4d50aaa9545a19e4b25f5a4b68",
     "domain_nodes": 88,
     "domain_edges": 96,
-    "validated": true,
-    "graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
-    "refresh_note": "Knowledge graph refreshed against the current clean main commit for U7-M planning; the graph contains 1,944 nodes, 3,438 edges, 7 layers, and a 10-step tour."
+    "domain_graph_note": "Separate domain graph remains a 2026-11-02 snapshot; it was not part of this full source-code graph refresh.",
+    "refresh_note": "Working-tree graph snapshot includes the U6.4-F implementation files, later workflow/docs changes, and deterministic structural/import refresh; hosted CI evidence remains the next gate."
   },
-  "next_gate": "U7-O evidence catalog is complete; select another bounded U7 product or keep U5.5 gated on owner VM/access"
+  "next_gate": "Produce matching Windows/Linux CI evidence for embedded CPython provenance, fresh install, upgrade, manual rollback, state preservation, verification failure recovery, and uninstall retention."
 }

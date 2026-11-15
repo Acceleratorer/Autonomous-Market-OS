@@ -88,5 +88,5 @@ both Markdown and JSON drift reports beside the catalog evidence.
 
 ## Deferred boundaries
 
-U5.5 owner-VM promotion, embedded Python/native installer, mobile, credentials,
-provider access, mutation routes, and live execution remain deferred.
+U5.5 owner-VM promotion, mobile, credentials, provider access, mutation routes,
+and live execution remain deferred.

@@ -220,10 +220,9 @@ pnpm run install:preflight -- \
 ```
 
 It verifies the manifest digest, optional Ed25519 signature, target-native
-Electron binary, Python source sidecar, local storage root, slot metadata,
-and the private/read-only/paper-only boundary. The current slice remains a
-preflight only; embedded Python, native installers, service registration, and
-U5.5 owner-VM promotion stay deferred.
+Electron binary, Python sidecar or embedded CPython runtime, local storage root,
+slot metadata, and the private/read-only/paper-only boundary. The preflight
+does not register a service or change release slots.
 
 ## U6.4-E offline install simulation
 
@@ -244,3 +243,74 @@ excluded from the copy and recreated empty. The destination must be new and
 separate from the artifact source. No service, embedded Python runtime,
 release-slot promotion, credentials, providers, mutation routes, or live
 execution are enabled.
+
+## U6.4-F portable per-user installation
+
+U6.4-F accepts a target-native CPython runtime directory with a
+`runtime-manifest.json` produced from the approved python.org 3.11.x archive.
+CI freezes one approved patch per target and compares the downloaded official
+archive to a committed SHA-256 pin: Windows uses CPython 3.11.9's embeddable
+amd64 zip (`009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3`)
+and Linux uses CPython 3.11.14's source tarball
+(`563d2a1b2a5ba5d5409b5ecd05a0e1bf9b028cf3e6a6f0c87a5dc8dc3f2d9182`). The
+offline `duckdb` and `pyarrow` dependencies are installed into the resulting
+target-native runtime before the manifest is written:
+
+```text
+pnpm run runtime:prepare -- \
+  --runtime-root ../../../runtime/linux-x64 \
+  --target linux-x64 \
+  --version 3.11.14 \
+  --source-url https://www.python.org/ftp/python/3.11.14/Python-3.11.14.tgz \
+  --archive ../../../downloads/Python-3.11.14.tgz \
+  --expected-sha256 <published-sha256> \
+  --interpreter bin/python3.11
+```
+
+The command is target-native and must run on the matching Windows or Linux
+runner; it does not make a host Python installation part of the artifact. The
+runtime manifest records the exact CPython patch, source archive URL, archive
+SHA-256, interpreter path, and dependency set.
+The package command copies that runtime into the artifact and records its
+target, exact patch, source archive SHA-256, runtime-manifest SHA-256, dependency
+set, and runtime tree hash. The signed outer manifest binds the runtime
+manifest to the artifact:
+
+```text
+pnpm run package:unsigned -- \
+  --target windows-x64 \
+  --python-runtime ../../../runtime/windows-x64 \
+  --output ../../../output/u6.4-f/windows-x64
+```
+
+The portable installer verifies the signed embedded-runtime artifact, publishes
+through a staging directory and one rename, preserves `python/.market_os` on
+upgrade, and leaves `<destination>.rollback` for manual restore. It defaults to
+the per-user application directory (`%LOCALAPPDATA%/Market OS` on Windows or
+`$XDG_DATA_HOME/market-os` on Linux) and never registers a native service:
+
+```text
+pnpm run install:portable -- \
+  --artifact ../../../output/u6.4-f/windows-x64 \
+  --json ../../../output/u6.4-f/windows-x64/install-result.json \
+  --markdown ../../../output/u6.4-f/windows-x64/install-result.md
+```
+
+The installer CLI requires a verified signature. The runtime manifest must declare the
+`market-os.u6.4-python-runtime@v1` schema, an exact CPython 3.11 patch, a
+`python.org` source URL, SHA-256, a target-native interpreter, and the bundled
+`duckdb` and `pyarrow` dependencies.
+
+Uninstall removes the application tree and moves `python/.market_os` to
+`<destination>.data/python/.market_os`. The retained state is available for a
+later reinstall and remains until the operator removes it explicitly:
+
+```text
+pnpm run uninstall:portable -- \
+  --destination "%LOCALAPPDATA%/Market OS" \
+  --json ../../../output/u6.4-f/uninstall-result.json
+```
+
+`pnpm run install:evidence` exercises fresh install, repair, verification-failure
+recovery and retry, upgrade, manual rollback, uninstall retention, reinstall
+preservation, and the paper-only boundary into one JSON/Markdown evidence pair.

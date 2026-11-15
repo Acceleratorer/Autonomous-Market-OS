@@ -314,7 +314,8 @@ jobs:
             apps/desktop/electron/pnpm-lock.yaml
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          # Host Python only installs build-time dependencies; embedded runtimes below are pinned per target.
+          python-version: "3.11"
           cache: pip
       - name: Install Python sidecar dependencies
         run: python -m pip install --upgrade pip && python -m pip install -e .
@@ -324,17 +325,69 @@ jobs:
       - name: Install Electron shell dependencies
         working-directory: apps/desktop/electron
         run: pnpm install --frozen-lockfile
+      - name: Prepare embedded CPython runtime (Windows)
+        if: matrix.target == 'windows-x64'
+        working-directory: apps/desktop/electron
+        shell: pwsh
+        run: |
+          $runtime = Join-Path $env:RUNNER_TEMP "market-os-python-runtime"
+          $runtimeVersion = "3.11.9"
+          $archiveName = "python-3.11.9-embed-amd64.zip"
+          $sourceUrl = "https://www.python.org/ftp/python/$runtimeVersion/$archiveName"
+          $archive = Join-Path $env:RUNNER_TEMP $archiveName
+          Invoke-WebRequest -Uri $sourceUrl -OutFile $archive
+          $expected = "009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3"
+          if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) { throw "CPython archive was not downloaded: $archive" }
+          $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+          if ([string]::IsNullOrWhiteSpace($actual)) { throw "CPython archive hash was empty: $archive" }
+          $actual = $actual.ToLowerInvariant()
+          if ($actual -ne $expected) { throw "CPython archive SHA-256 mismatch: expected $expected, got $actual" }
+          Remove-Item $runtime -Recurse -Force -ErrorAction SilentlyContinue
+          Expand-Archive -Path $archive -DestinationPath $runtime
+          $sitePackages = Join-Path $runtime "Lib\site-packages"
+          New-Item -ItemType Directory -Force -Path $sitePackages | Out-Null
+          python -m pip install --disable-pip-version-check --target $sitePackages "duckdb>=1.4,<3" "pyarrow>=18,<27"
+          $pth = Join-Path $runtime "python311._pth"
+          $pthLines = Get-Content $pth
+          if ($pthLines -notcontains "Lib/site-packages") { Add-Content -Path $pth -Value "Lib/site-packages" }
+          (Get-Content $pth) -replace '^#import site$', 'import site' | Set-Content $pth
+          pnpm run runtime:prepare -- --runtime-root $runtime --target windows-x64 --version $runtimeVersion --source-url $sourceUrl --archive $archive --expected-sha256 $expected --interpreter python.exe
+      - name: Prepare embedded CPython runtime (Linux)
+        if: matrix.target == 'linux-x64'
+        working-directory: apps/desktop/electron
+        shell: bash
+        run: |
+          set -euo pipefail
+          runtime="$RUNNER_TEMP/market-os-python-runtime"
+          runtime_version="3.11.14"
+          archive_name="Python-3.11.14.tgz"
+          source_url="https://www.python.org/ftp/python/$runtime_version/$archive_name"
+          archive="$RUNNER_TEMP/$archive_name"
+          curl --fail --silent --show-error --location "$source_url" --output "$archive"
+          expected="563d2a1b2a5ba5d5409b5ecd05a0e1bf9b028cf3e6a6f0c87a5dc8dc3f2d9182"
+          actual="$(sha256sum "$archive" | awk '{print $1}')"
+          test "$actual" = "$expected"
+          build_root="$RUNNER_TEMP/Python-$runtime_version"
+          rm -rf "$runtime" "$build_root"
+          mkdir -p "$build_root"
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+          cd "$build_root"
+          ./configure --prefix="$runtime" --with-ensurepip=install
+          make -j"$(nproc)"
+          make install
+          "$runtime/bin/python3.11" -m pip install --disable-pip-version-check "duckdb>=1.4,<3" "pyarrow>=18,<27"
+          pnpm run runtime:prepare -- --runtime-root "$runtime" --target linux-x64 --version "$runtime_version" --source-url "$source_url" --archive "$archive" --expected-sha256 "$expected" --interpreter bin/python3.11
       - name: Download target-native Electron runtime
         working-directory: apps/desktop/electron
         run: pnpm exec install-electron
       - name: Build, sign, smoke, promote, and rollback two target-native artifacts (Windows)
         if: matrix.target == 'windows-x64'
         working-directory: apps/desktop/electron
-        run: pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
+        run: pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4" --python-runtime "${{ runner.temp }}/market-os-python-runtime"
       - name: Build, sign, smoke, promote, and rollback two target-native artifacts (Linux)
         if: matrix.target == 'linux-x64'
         working-directory: apps/desktop/electron
-        run: xvfb-run -a pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4"
+        run: xvfb-run -a pnpm run release:ci -- --target "${{ matrix.target }}" --output "${{ runner.temp }}/market-os-u6-4" --python-runtime "${{ runner.temp }}/market-os-python-runtime"
       - name: Validate U6.4-C evidence bundle
         working-directory: apps/desktop/electron
         run: pnpm run release:validate -- --root "${{ runner.temp }}/market-os-u6-4" --report "${{ runner.temp }}/market-os-u6-4/ci-evidence-validation.json"
@@ -344,6 +397,14 @@ jobs:
       - name: Run U6.4-E offline install simulation
         working-directory: apps/desktop/electron
         run: pnpm run install:simulate -- --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate" --destination "${{ runner.temp }}/market-os-u6-4/installed-candidate" --json "${{ runner.temp }}/market-os-u6-4/install-simulation.json" --markdown "${{ runner.temp }}/market-os-u6-4/install-simulation.md"
+      - name: Render U6.4-F portable installation evidence
+        working-directory: apps/desktop/electron
+        run: >-
+          pnpm run install:evidence --
+          --artifact "${{ runner.temp }}/market-os-u6-4/artifact-candidate"
+          --target "${{ matrix.target }}"
+          --output "${{ runner.temp }}/market-os-u6-4/install-evidence.json"
+          --markdown "${{ runner.temp }}/market-os-u6-4/install-evidence.md"
       - name: Archive target-native artifacts
         working-directory: apps/desktop/electron
         run: |
@@ -368,6 +429,8 @@ jobs:
             ${{ runner.temp }}/market-os-u6-4/install-preflight.md
             ${{ runner.temp }}/market-os-u6-4/install-simulation.json
             ${{ runner.temp }}/market-os-u6-4/install-simulation.md
+            ${{ runner.temp }}/market-os-u6-4/install-evidence.json
+            ${{ runner.temp }}/market-os-u6-4/install-evidence.md
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-known-good.tar.gz
             ${{ runner.temp }}/market-os-u6-4/market-os-${{ matrix.target }}-candidate.tar.gz
             ${{ runner.temp }}/market-os-u6-4/portable-archive-*.json

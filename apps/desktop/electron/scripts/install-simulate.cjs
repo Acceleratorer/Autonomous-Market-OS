@@ -65,12 +65,13 @@ async function sha256File(file) {
   return hash.digest("hex");
 }
 
-async function digestTree(root) {
+async function digestTree(root, { excludeRelative = null } = {}) {
   const entries = [];
   const stack = [path.resolve(root)];
   while (stack.length) {
     const current = stack.pop();
     const relative = relativePosix(root, current);
+    if (excludeRelative && relative === excludeRelative) continue;
     if (relative && isMutableStorage(relative)) continue;
     const stat = await fsp.lstat(current);
     if (stat.isSymbolicLink()) {
