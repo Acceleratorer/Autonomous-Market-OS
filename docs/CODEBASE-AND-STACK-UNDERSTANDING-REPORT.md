@@ -164,13 +164,13 @@ suite passed `34 passed, 0 failed`, including the U6.4-F runtime and installer
 tests; the Python full suite was not rerun. Hosted CI run `43740383177` passed
 15 checks with 0 failures, including both U6.4-F Windows/Linux hardening legs.
 
-The working-tree Understand Anything graph covers all 610 scanned files: 2,250
-nodes, 4,014 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
+The working-tree Understand Anything graph covers all 611 scanned files: 2,251
+nodes, 4,016 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
 tour.
 Deterministic validation found no structural issues; it reported 125 nodes with
 no incident edges as warnings. The graph and freshness metadata are in
 `.ua/knowledge-graph.json` and `.ua/meta.json`.
-Fingerprint generation succeeded for all 610 files; the multi-document
+Fingerprint generation succeeded for all 611 files; the multi-document
 Kubernetes YAML manifest used the documented regex fallback after a parser
 warning.
 

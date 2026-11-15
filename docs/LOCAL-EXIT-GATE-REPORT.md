@@ -81,8 +81,8 @@ run `43740383177`; see
 [`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json)
 for exact runner images and runtime hashes.
 
-The full Understand Anything graph now covers 610 scanned files and has 2,250
-nodes, 4,014 edges, 8 Vietnamese layers, and a 10-step tour. Structural
+The full Understand Anything graph now covers 611 scanned files and has 2,251
+nodes, 4,016 edges, 8 Vietnamese layers, and a 10-step tour. Structural
 validation passed with 125 no-edge node warnings. The graph and metadata live
 under `.ua/`. The Electron suite passed 34 tests, including the U6.4-F
 runtime and portable-install checks; the Python full suite was not rerun.

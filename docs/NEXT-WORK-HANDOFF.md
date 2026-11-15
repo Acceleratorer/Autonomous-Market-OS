@@ -20,7 +20,7 @@ next scoped offline, paper-only slice.
   `--python-runtime`; the U6.4-D preflight and U6.4-E simulation accept and
   validate that runtime. No native service is registered.
 - The full Understand Anything graph has been refreshed against the current
-  610-file worktree: 2,250 nodes and 4,014 edges; exact counts and warnings
+  611-file worktree: 2,251 nodes and 4,016 edges; exact counts and warnings
   are recorded in the current graph evidence.
   Validation found no structural issues and 125 no-edge node warnings. Its
   graph, metadata, and fingerprint baseline are under `.ua/`.

@@ -281,8 +281,8 @@ gates closed. U6.4-F is authorized only for the accepted offline portable
 installer and embedded CPython contract; native service registration,
 connected access, and live execution remain disabled.
 
-The full Understand Anything graph covers all 610 scanned files and contains
-2,250 nodes, 4,014 edges, 8 Vietnamese architecture layers, and a 10-step
+The full Understand Anything graph covers all 611 scanned files and contains
+2,251 nodes, 4,016 edges, 8 Vietnamese architecture layers, and a 10-step
 Vietnamese tour. Deterministic validation found no structural issues and 125
 nodes without incident edges; those remain visible as graph warnings. The graph
 is at `.ua/knowledge-graph.json`, with its analyzed commit, timestamp, and

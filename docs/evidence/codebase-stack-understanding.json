@@ -9,7 +9,7 @@
     "loopback_only": true,
     "connected_runtime_selected": false,
     "deployment_run": "disconnected_static_preview_verified; private_runtime_not_promoted",
-    "analyzed_files": 610,
+    "analyzed_files": 611,
     "file_categories": {
       "code": 232,
       "config": 137,
@@ -36,7 +36,7 @@
     "product_candidate_paths": 0,
     "preserved_paths": 0,
     "unclassified_paths": 0,
-    "head": "5dad8b3a3b85cb4d50aaa9545a19e4b25f5a4b68",
+    "head": "48e5e16b1f209685b031decd511acca4526e6917",
     "untracked_classification": [
       {
         "path": "apps/desktop/electron/scripts/install-portable.cjs",
@@ -114,12 +114,12 @@
   },
   "verification": {
     "latest_full_suite": "659 passed, 0 failed, 7 skipped on U8-B commit db8c8dd; does not cover later U8-C or U6.4-D/E commits",
-    "application_tests": "Electron suite: 33 passed, 0 failed; U6.4-F contract validator and portable installation evidence fixtures passed. Python full suite was not rerun.",
+    "application_tests": "Electron suite: 34 passed, 0 failed; U6.4-F contract validator and portable installation evidence fixtures passed. Hosted CI run 43740383177 passed both Windows/Linux hardening legs. Python full suite was not rerun.",
     "graph_validation": "passed: 0 structural issues; 125 nodes with no incident edges reported as warnings",
-    "fingerprint_baseline": "generated for all 610 files from the current working-tree scan inventory",
+    "fingerprint_baseline": "generated for all 611 files from the current working-tree scan inventory",
     "git_diff_check": "passed",
     "evidence_validation": "not run in this refresh",
-    "fingerprint_warning": "Multi-document Kubernetes YAML parsing warned; regex fallback succeeded for all 610 fingerprint entries.",
+    "fingerprint_warning": "Multi-document Kubernetes YAML parsing warned; regex fallback succeeded for all 611 fingerprint entries.",
     "contract_validator": "passed: accepted U6.4-F contract with 0 open decisions and 9 required evidence items"
   },
   "artifacts": [
@@ -140,10 +140,10 @@
     "docs/evidence/u6-4-f-installation-contract.json"
   ],
   "graph": {
-    "knowledge_nodes": 2250,
-    "knowledge_edges": 4014,
+    "knowledge_nodes": 2251,
+    "knowledge_edges": 4016,
     "file_level_nodes": 621,
-    "analyzed_files": 610,
+    "analyzed_files": 611,
     "node_types": {
       "class": 270,
       "config": 140,
@@ -206,12 +206,12 @@
     ],
     "tour_steps": 10,
     "validated": true,
-    "graph_commit": "5dad8b3a3b85cb4d50aaa9545a19e4b25f5a4b68",
+    "graph_commit": "48e5e16b1f209685b031decd511acca4526e6917",
     "domain_nodes": 88,
     "domain_edges": 96,
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "domain_graph_note": "Separate domain graph remains a 2026-11-02 snapshot; it was not part of this full source-code graph refresh.",
-    "refresh_note": "Working-tree graph snapshot includes the U6.4-F implementation files, later workflow/docs changes, and deterministic structural/import refresh; hosted CI evidence remains the next gate."
+    "refresh_note": "Working-tree graph snapshot includes the U6.4-F implementation files, later workflow/docs changes, and deterministic structural/import refresh; hosted U6.4-F evidence is retained and the gate is closed."
   },
-  "next_gate": "Produce matching Windows/Linux CI evidence for embedded CPython provenance, fresh install, upgrade, manual rollback, state preservation, verification failure recovery, and uninstall retention."
+  "next_gate": "No U6.4-F gate remains open; choose a separately scoped local, offline, synthetic, paper-only slice."
 }

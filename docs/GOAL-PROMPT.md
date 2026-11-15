@@ -29,7 +29,7 @@ live status is authoritative.
   mutable state, manual rollback, and no native service. Read
   `docs/NEXT-WORK-HANDOFF.md` and verify the local slice before extending CI.
 - The full Vietnamese Understand graph is available at `.ua/knowledge-graph.json`:
-  610 scanned files, 2,250 nodes, 4,014 edges, 8 layers, and 10 tour steps.
+  611 scanned files, 2,251 nodes, 4,016 edges, 8 layers, and 10 tour steps.
   Check `.ua/meta.json` and fingerprints against the live source and docs first.
 - U6.4-F is merged under accepted ADR-0055: portable signed install,
   embedded-runtime identity, state preservation, rollback, uninstall retention,

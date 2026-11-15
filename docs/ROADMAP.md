@@ -147,8 +147,8 @@ and hosted-verified on Windows/Linux; the exact evidence is in
 The implementation and verification handoff is in
 [`docs/NEXT-WORK-HANDOFF.md`](NEXT-WORK-HANDOFF.md).
 
-The full Understand Anything graph is refreshed for 610 files (2,250 nodes,
-4,014 edges, 8 Vietnamese layers, and 10 tour steps). Its metadata and
+The full Understand Anything graph is refreshed for 611 files (2,251 nodes,
+4,016 edges, 8 Vietnamese layers, and 10 tour steps). Its metadata and
 fingerprint baseline are in `.ua/`; structural validation passed with 125
 no-edge node warnings recorded for review.
 
