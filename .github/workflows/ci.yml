@@ -336,7 +336,7 @@ jobs:
           $sourceUrl = "https://www.python.org/ftp/python/$runtimeVersion/$archiveName"
           $archive = Join-Path $env:RUNNER_TEMP $archiveName
           Invoke-WebRequest -Uri $sourceUrl -OutFile $archive
-          $expected = "009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3"
+          $expected = "009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3b"
           if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) { throw "CPython archive was not downloaded: $archive" }
           $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
           if ([string]::IsNullOrWhiteSpace($actual)) { throw "CPython archive hash was empty: $archive" }
