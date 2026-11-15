@@ -350,6 +350,7 @@ jobs:
           $pth = Join-Path $runtime "python311._pth"
           $pthLines = Get-Content $pth
           if ($pthLines -notcontains "Lib/site-packages") { Add-Content -Path $pth -Value "Lib/site-packages" }
+          if ($pthLines -notcontains "..") { Add-Content -Path $pth -Value ".." }
           (Get-Content $pth) -replace '^#import site$', 'import site' | Set-Content $pth
           pnpm run runtime:prepare -- --runtime-root $runtime --target windows-x64 --version $runtimeVersion --source-url $sourceUrl --archive $archive --expected-sha256 $expected --interpreter python.exe
       - name: Prepare embedded CPython runtime (Linux)
