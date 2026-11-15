@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-15
 
-**Source checkpoint:** `5dad8b3` (`main`; inspect live `git status` for this documentation refresh)
+**Source checkpoint:** `19367f4` (`main`; U6.4-F hosted evidence is retained in the current documentation refresh)
 
 **Scope:** local deterministic system, synthetic paper portfolio, read-only
 operator surfaces, desktop release/install path, and the permanent paper-only
@@ -55,8 +55,8 @@ U6.4-E remains the source-sidecar installation simulation. U6.4-F now adds the
 accepted portable adapter: signed embedded CPython 3.11.x, per-user staging and
 atomic publish, state preservation, manual rollback, verification-failure
 recovery, and uninstall retention. Native service registration and package
-manager integration remain disabled; hosted Windows/Linux evidence is the next
-gate.
+manager integration remain disabled; hosted Windows/Linux evidence is retained
+and the U6.4-F gate is closed.
 
 ## Responsibility map
 
@@ -128,14 +128,13 @@ work requires a new explicit owner decision and a complete U8 review.
   migration hardening.
 - U5.2–U5.24 local/static read-only operator surfaces.
 - U6.1–U6.4-F CLI/app, Electron shell, signed target artifacts, installer
-  preflight/simulation, embedded-runtime portable installation, rollback, and
-  uninstall-retention evidence tooling.
+  preflight/simulation, embedded-runtime portable installation, rollback,
+  uninstall-retention tooling, and matching hosted Windows/Linux evidence.
 - U7-A–U7-O release, evaluation, report, and evidence products.
 - U8-A/U8-B local readiness packs and U8-C permanent paper-only decision.
 
 ### Intentionally pending
 
-- Hosted U6.4-F Windows/Linux evidence and exact runner-image confirmation.
 - Mobile shell work.
 - U5.5 connected promotion and production operations; U8-C keeps this track
   closed under the current owner decision.
@@ -144,14 +143,15 @@ work requires a new explicit owner decision and a complete U8 review.
 
 ## Exact next gate
 
-U6.4-F now has an accepted ADR-0055 and a machine-readable evidence schema.
-The implementation is scoped to signed portable tar.gz, per-user/no-elevation
-install, CI-frozen CPython 3.11.x from python.org, preserved mutable state,
-manual rollback, and no native service. Keep the work offline and paper-only;
-the detailed contract is in
-[`U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md`](U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md).
-The local `install:contract:validate` command checks the accepted contract and
-fails closed if any decision reopens or if the paper-only boundary changes.
+U6.4-F is closed by hosted CI run `43740383177` on merged commit `19367f4`.
+The target-specific runner images and CPython provenance are recorded in
+[`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json);
+the local contract validator remains the guard against reopened decisions or a
+changed paper-only boundary. No U6.4-F work remains open.
+
+The next work must be a separately scoped local, offline, synthetic,
+paper-only slice. Connected promotion, providers, credentials, mutation, and
+live execution remain closed by U8-C.
 
 ## Verification snapshot
 
@@ -160,16 +160,17 @@ U8-B commit `db8c8dd`. Later U8-C and U6.4-D/E changes were committed after
 that run; do not report the full-suite result as covering them. U6.4-D/E have
 separate local evidence files under `docs/evidence/`, and CI is configured to
 run the install checks on matching Windows/Linux runners. The current Electron
-suite passed `33 passed, 0 failed`, including the U6.4-F runtime and installer
-tests; the Python full suite was not rerun.
+suite passed `34 passed, 0 failed`, including the U6.4-F runtime and installer
+tests; the Python full suite was not rerun. Hosted CI run `43740383177` passed
+15 checks with 0 failures, including both U6.4-F Windows/Linux hardening legs.
 
-The working-tree Understand Anything graph covers all 610 scanned files: 2,250
-nodes, 4,014 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
+The working-tree Understand Anything graph covers all 611 scanned files: 2,251
+nodes, 4,016 edges, 8 Vietnamese architecture layers, and a 10-step Vietnamese
 tour.
 Deterministic validation found no structural issues; it reported 125 nodes with
 no incident edges as warnings. The graph and freshness metadata are in
 `.ua/knowledge-graph.json` and `.ua/meta.json`.
-Fingerprint generation succeeded for all 610 files; the multi-document
+Fingerprint generation succeeded for all 611 files; the multi-document
 Kubernetes YAML manifest used the documented regex fallback after a parser
 warning.
 
@@ -184,4 +185,5 @@ warning.
 - [`U6.4-D installer preflight`](U6.4-D-INSTALLER-PREFLIGHT.md)
 - [`U6.4-E offline install simulation`](U6.4-E-OFFLINE-INSTALL-SIMULATION.md)
 - [`U8-C permanent paper-only decision`](U8-C-PERMANENT-PAPER-ONLY.md)
+- [`U6.4-F hosted installation evidence`](evidence/u6-4-f-hosted-installation.json)
 - `.ua/knowledge-graph.json` and `.ua/meta.json`

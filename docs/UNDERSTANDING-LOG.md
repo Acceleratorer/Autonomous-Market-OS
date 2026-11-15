@@ -1,5 +1,19 @@
 # Understanding log
 
+## 2026-11-16 — U6.4-F hosted installation evidence
+
+- CI run `43740383177` on merged commit `19367f4` passed 15 checks with no
+  failures, including the Windows and Linux U6.4-F hardening legs.
+- Windows used `windows-2025-vs2026` image `20261103.298.1` with CPython 3.11.9;
+  Linux used `ubuntu-26.04` image `20261111.196.1` with CPython 3.11.14.
+- Both targets passed signed package identity, embedded runtime provenance,
+  fresh install, upgrade/state preservation, repair and retry recovery, manual
+  rollback, verification-failure recovery, uninstall retention, and boundary
+  checks.
+- Machine-readable evidence is in
+  `docs/evidence/u6-4-f-hosted-installation.json`. The U6.4-F gate is closed;
+  U8-C still keeps connected and live execution disabled.
+
 ## 2026-11-14 — U6.4-E offline install simulation
 
 - Added `apps/desktop/electron/scripts/install-simulate.cjs` and the

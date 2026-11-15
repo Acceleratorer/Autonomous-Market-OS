@@ -1,8 +1,8 @@
-# Next Work Handoff — U6.4-F hosted evidence
+# Next Work Handoff — post U6.4-F hosted evidence
 
-**Checkpoint:** 2026-11-15, base commit `5dad8b3`
-**Status:** local implementation complete; hosted Windows/Linux evidence is the
-remaining U6.4-F gate.
+**Checkpoint:** 2026-11-16, merged release commit `19367f4`
+**Status:** U6.4-F hosted evidence is complete; the repository is ready for the
+next scoped offline, paper-only slice.
 
 ## Where the project stands
 
@@ -20,7 +20,7 @@ remaining U6.4-F gate.
   `--python-runtime`; the U6.4-D preflight and U6.4-E simulation accept and
   validate that runtime. No native service is registered.
 - The full Understand Anything graph has been refreshed against the current
-  610-file worktree: 2,250 nodes and 4,014 edges; exact counts and warnings
+  611-file worktree: 2,251 nodes and 4,016 edges; exact counts and warnings
   are recorded in the current graph evidence.
   Validation found no structural issues and 125 no-edge node warnings. Its
   graph, metadata, and fingerprint baseline are under `.ua/`.
@@ -36,7 +36,15 @@ remaining U6.4-F gate.
   on any boundary change. Its focused regression tests pass with the Electron
   suite.
 
-## Current gate: U6.4-F hosted evidence
+## Closed gate: U6.4-F hosted evidence
+
+The hosted gate closed in CI run `43740383177` on source commit `19367f4`
+(PR #37). Both target legs passed the signed package, embedded-runtime, fresh
+install, upgrade, rollback, verification-failure recovery, uninstall-retention,
+and boundary checks. The exact runner images, CPython archive hashes, runtime
+manifest hashes, tree hashes, and candidate archive hashes are retained in
+[`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json).
+
 
 The accepted contract is recorded in
 [`U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md`](U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md),
@@ -82,11 +90,11 @@ offline packaging work and does not reopen connected or live execution.
 
 ## Next steps
 
-1. Run the updated U6.4-C/D/E/F matrix on the existing Windows/Linux runners.
-2. Retain `install-evidence.json`/Markdown, runtime manifests, and exact runner
-   image values from each target.
-3. Re-run the local Python suite after hosted evidence is available; do not
-   claim hosted success from this uncommitted worktree.
+1. Keep the hosted evidence summary and CI artifact links as the U6.4-F
+   verification record.
+2. Run the focused local suites whenever the installer or release path changes.
+3. Choose the next scoped local, offline, synthetic, paper-only slice; do not
+   reopen connected or live-readiness work without a new owner decision.
 
 ## Reference artifacts
 

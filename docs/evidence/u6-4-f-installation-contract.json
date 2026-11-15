@@ -79,7 +79,7 @@
     "boundary and provenance recheck",
     "matching Windows/Linux CI evidence"
   ],
-  "next_gate": "Run matching Windows/Linux CI evidence for runtime provenance, fresh install, upgrade, manual rollback, state preservation, verification-failure recovery, and uninstall retention.",
+  "next_gate": "Hosted Windows/Linux evidence is retained in u6-4-f-hosted-installation.json; no U6.4-F gate remains open.",
   "accepted": {
     "package_formats": "portable tar.gz archive for windows-x64 and linux-x64; extracted directory is the install input",
     "install_scope": "per-user application directory",
