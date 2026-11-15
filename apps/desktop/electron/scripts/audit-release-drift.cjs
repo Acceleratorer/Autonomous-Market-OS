@@ -322,7 +322,7 @@ async function auditDrift(options) {
     drift: drifts.sort((left, right) => `${left.code}:${left.path}:${left.target || ""}`.localeCompare(`${right.code}:${right.path}:${right.target || ""}`)),
     drift_count: drifts.length,
     implementation: "So sánh provenance raw-to-derived trong từng target và các invariant dùng chung giữa Windows/Linux.",
-    deferred: ["U5.5 owner-VM promotion", "embedded Python/native installer", "mobile", "credentials/providers", "mutation routes", "live execution"],
+    deferred: ["U5.5 owner-VM promotion", "mobile", "credentials/providers", "mutation routes", "live execution"],
     next_gate: "Selective local U7 evaluation or owner-VM U5.5 evidence when VM/access exists.",
   };
   if (options.markdown) {

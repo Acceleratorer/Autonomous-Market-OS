@@ -5,7 +5,8 @@ const fsp = require("node:fs/promises");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { verifyArtifact, readSlot } = require("../src/release.cjs");
+const { verifyArtifact, readSlot, sha256File } = require("../src/release.cjs");
+const { validateRuntimeManifest } = require("./python-runtime.cjs");
 
 const SCHEMA = "market-os.u6.4-install-preflight@v1";
 const TARGETS = new Set(["windows-x64", "linux-x64"]);
@@ -113,7 +114,7 @@ function renderMarkdown(report) {
     `- Signature: **${report.signature_status}**`,
     `- Preflight fingerprint: \`${report.preflight_fingerprint}\``,
     "",
-    "The preflight validates an unpacked target-native artifact without installing a service, embedding Python, changing release slots, or changing the execution boundary.",
+    "The preflight validates an unpacked target-native artifact without installing a service, changing release slots, or changing the execution boundary.",
     "",
     "## Checks",
     "",
@@ -134,7 +135,7 @@ function renderMarkdown(report) {
     `- native_service: **${report.installation.native_service}**`,
     `- destination: \`${report.installation.destination || "not supplied"}\``,
     "",
-    "Deferred: embedded Python runtime, native service installation, credentials, providers, mutation routes, and live execution.",
+    "Deferred: native service installation, credentials, providers, mutation routes, and live execution.",
     "",
   ].join("\n");
 }
@@ -150,10 +151,35 @@ async function inspectInstallPreflight({ artifactRoot, destination = null, targe
   if (manifest.status !== "unsigned-reproducible") fail("artifact is not marked unsigned-reproducible");
   if (manifest.target !== expectedTarget) fail("artifact target does not match requested target");
   if (expectedHostTarget() !== expectedTarget) fail(`target ${expectedTarget} must match host ${process.platform}/${process.arch}`);
-  if (manifest.sidecar?.type !== "python-source" || manifest.sidecar?.distribution !== "target-native-source" || manifest.sidecar?.root !== "python") {
-    fail("Python sidecar is not a target-native source package under python/");
+  if (manifest.sidecar?.type !== "python-source" || manifest.sidecar?.root !== "python") {
+    fail("Python sidecar is not under python/");
   }
-  if (!/^(python|python3)$/.test(manifest.sidecar?.interpreter || "") || manifest.sidecar?.requires_python !== ">=3.11") {
+  const embeddedPython = manifest.sidecar?.distribution === "target-native-embedded-cpython";
+  if (embeddedPython) {
+    if (!manifest.runtime || manifest.runtime.root !== "python/runtime" || manifest.runtime.manifest !== "python/runtime/runtime-manifest.json") {
+      fail("embedded Python runtime layout is unsafe");
+    }
+    const runtimeManifestPath = path.resolve(root, manifest.runtime.manifest);
+    const runtimeManifest = await readJson(runtimeManifestPath, "embedded Python runtime manifest");
+    const runtime = validateRuntimeManifest(runtimeManifest, { target: expectedTarget });
+    const runtimeManifestSha256 = await sha256File(runtimeManifestPath);
+    if (manifest.runtime.manifest_sha256 !== runtimeManifestSha256) {
+      fail("embedded Python runtime manifest hash does not match artifact manifest");
+    }
+    if (manifest.runtime.version !== runtime.version || manifest.runtime.target !== runtime.target) {
+      fail("embedded Python runtime identity does not match its manifest");
+    }
+    if (manifest.runtime.interpreter !== path.posix.join("runtime", runtime.interpreter.replaceAll("\\", "/"))) {
+      fail("embedded Python interpreter path does not match its manifest");
+    }
+    if (manifest.sidecar.interpreter !== manifest.runtime.interpreter || manifest.sidecar.requires_python !== runtime.version) {
+      fail("Python sidecar does not point at the embedded runtime");
+    }
+    await assertFile(root, manifest.runtime.manifest, "embedded Python runtime manifest");
+    await assertFile(root, path.posix.join(manifest.runtime.root, runtime.interpreter.replaceAll("\\", "/")), "embedded Python interpreter", true);
+  } else if (manifest.sidecar?.distribution !== "target-native-source") {
+    fail("Python sidecar distribution is unsupported");
+  } else if (!/^(python|python3)$/.test(manifest.sidecar?.interpreter || "") || manifest.sidecar?.requires_python !== ">=3.11") {
     fail("Python sidecar interpreter contract is unsafe");
   }
   if (manifest.storage?.root !== "python/.market_os" || manifest.storage?.scope !== "artifact-local" || manifest.storage?.shared_host_root !== false) {
@@ -184,6 +210,7 @@ async function inspectInstallPreflight({ artifactRoot, destination = null, targe
     storage_isolation: true,
     slot_metadata: true,
     runtime_boundary: true,
+    embedded_python: embeddedPython,
     destination_separate: true,
   };
   const boundary = { ...manifest.runtime_boundary };
@@ -195,7 +222,7 @@ async function inspectInstallPreflight({ artifactRoot, destination = null, targe
     signature_status: manifestVerification.signatureStatus,
     checks,
     boundary,
-    installation: { performed: false, embedded_python: false, native_service: false },
+    installation: { performed: false, embedded_python: embeddedPython, native_service: false },
   };
   return {
     schema: SCHEMA,
@@ -208,11 +235,11 @@ async function inspectInstallPreflight({ artifactRoot, destination = null, targe
     boundary,
     installation: {
       performed: false,
-      embedded_python: false,
+      embedded_python: embeddedPython,
       native_service: false,
       destination: resolvedDestination,
     },
-    deferred: ["embedded Python runtime", "native service installation", "credentials", "providers", "mutation routes", "live execution"],
+    deferred: ["native service installation", "credentials", "providers", "mutation routes", "live execution"],
     preflight_fingerprint: stableFingerprint(stable),
   };
 }

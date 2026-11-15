@@ -5,6 +5,8 @@ const fs = require("node:fs");
 const fsp = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
+const { validateRuntimeManifest } = require("./python-runtime.cjs");
+const { digestTree: digestArtifactTree } = require("./install-simulate.cjs");
 
 const ELECTRON_ROOT = path.resolve(__dirname, "..");
 const REPO_ROOT = path.resolve(ELECTRON_ROOT, "../../..");
@@ -20,6 +22,7 @@ function parseArgs(argv) {
     output: null,
     target: process.platform === "win32" ? "windows-x64" : "linux-x64",
     version: null,
+    pythonRuntime: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
@@ -31,8 +34,10 @@ function parseArgs(argv) {
       options.target = argv[++index];
     } else if (value === "--version") {
       options.version = argv[++index];
+    } else if (value === "--python-runtime") {
+      options.pythonRuntime = argv[++index];
     } else if (value === "--help" || value === "-h") {
-      console.log("Usage: node scripts/package.cjs [--output <dir>] [--target windows-x64|linux-x64] [--version <version>]");
+      console.log("Usage: node scripts/package.cjs [--output <dir>] [--target windows-x64|linux-x64] [--version <version>] [--python-runtime <dir>]");
       process.exit(0);
     } else {
       fail(`unknown argument: ${value}`);
@@ -47,7 +52,11 @@ function parseArgs(argv) {
   if (options.version !== null && (!options.version || !/^[A-Za-z0-9][A-Za-z0-9.+_-]{0,63}$/.test(options.version))) {
     fail("version must be a bounded release identifier");
   }
-  return { ...options, output: path.resolve(options.output) };
+  return {
+    ...options,
+    output: path.resolve(options.output),
+    pythonRuntime: options.pythonRuntime ? path.resolve(options.pythonRuntime) : null,
+  };
 }
 
 async function assertPath(candidate, label) {
@@ -88,7 +97,7 @@ function normalizePath(value) {
   return value.split(path.sep).join("/");
 }
 
-async function digestTree(root) {
+async function digestTree(root, { excludeRelative = null } = {}) {
   const entries = [];
   const stack = [root];
   let bytes = 0;
@@ -96,6 +105,7 @@ async function digestTree(root) {
     const current = stack.pop();
     const stat = await fsp.lstat(current);
     const relative = normalizePath(path.relative(root, current));
+    if (excludeRelative && relative === excludeRelative) continue;
     if (stat.isSymbolicLink()) {
       const target = await fsp.readlink(current);
       entries.push(`${relative}\0symlink\0${target}\n`);
@@ -178,6 +188,34 @@ async function main() {
   await copy(path.join(REPO_ROOT, "apps", "gateway"), path.join(pythonRoot, "apps", "gateway"));
   await copy(path.join(REPO_ROOT, "pyproject.toml"), path.join(pythonRoot, "pyproject.toml"));
 
+  let runtime = null;
+  if (options.pythonRuntime) {
+    const runtimeManifestPath = path.join(options.pythonRuntime, "runtime-manifest.json");
+    const runtimeManifest = await readJson(runtimeManifestPath, "embedded Python runtime manifest");
+    const validatedRuntime = validateRuntimeManifest(runtimeManifest, { target: options.target });
+    const runtimeManifestSha256 = await fileHash(runtimeManifestPath);
+    const runtimeInterpreter = path.join(options.pythonRuntime, runtimeManifest.interpreter);
+    await assertPath(runtimeInterpreter, "embedded Python runtime interpreter");
+    const runtimeRoot = path.join(pythonRoot, "runtime");
+    await copy(options.pythonRuntime, runtimeRoot);
+    const runtimeTreeSha256 = await digestArtifactTree(runtimeRoot, { excludeRelative: "runtime-manifest.json" });
+    runtime = {
+      schema: validatedRuntime.schema,
+      distribution: validatedRuntime.distribution,
+      version: validatedRuntime.version,
+      target: validatedRuntime.target,
+      source: validatedRuntime.source,
+      source_url: validatedRuntime.source_url,
+      archive_sha256: validatedRuntime.archive_sha256,
+      manifest_sha256: runtimeManifestSha256,
+      root: "python/runtime",
+      manifest: "python/runtime/runtime-manifest.json",
+      interpreter: `runtime/${normalizePath(runtimeManifest.interpreter)}`,
+      tree_sha256: runtimeTreeSha256,
+      dependencies: validatedRuntime.dependencies,
+    };
+  }
+
   const currentSlot = {
     schema: "market-os.u6.4-slot@v1",
     slot: "unsigned",
@@ -210,6 +248,7 @@ async function main() {
     web: await fileHash(path.join(WEB_ROOT, "pnpm-lock.yaml")),
     electron: await fileHash(path.join(ELECTRON_ROOT, "pnpm-lock.yaml")),
   };
+  const sidecarInterpreter = runtime?.interpreter || nativePython;
   const manifest = {
     schema: "market-os.u6.4-artifact@v1",
     status: "unsigned-reproducible",
@@ -229,14 +268,15 @@ async function main() {
     },
     sidecar: {
       type: "python-source",
-      distribution: "target-native-source",
+      distribution: runtime ? "target-native-embedded-cpython" : "target-native-source",
       root: "python",
-      command: [nativePython, "-m", "apps.gateway"],
-      interpreter: nativePython,
-      requires_python: ">=3.11",
+      command: [sidecarInterpreter, "-m", "apps.gateway"],
+      interpreter: sidecarInterpreter,
+      requires_python: runtime?.version || ">=3.11",
       dependencies: ["duckdb>=1.4,<3", "pyarrow>=18,<27"],
       host: "127.0.0.1",
     },
+    ...(runtime ? { runtime } : {}),
     storage: {
       root: "python/.market_os",
       scope: "artifact-local",

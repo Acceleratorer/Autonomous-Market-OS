@@ -107,7 +107,10 @@ async function waitForHttp(url, { timeoutMs = DEFAULT_READY_TIMEOUT_MS, interval
 }
 
 function defaultSpecs({ repoRoot, pythonRoot, webRoot, apiPort, nextPort, pythonCommand }) {
-  const python = process.env.MARKET_OS_PYTHON || pythonCommand || (process.platform === "win32" ? "python" : "python3");
+  const packagedPython = pythonCommand && (path.isAbsolute(pythonCommand) || pythonCommand.includes("/") || pythonCommand.includes("\\"))
+    ? path.resolve(pythonRoot, pythonCommand)
+    : pythonCommand;
+  const python = process.env.MARKET_OS_PYTHON || packagedPython || (process.platform === "win32" ? "python" : "python3");
   const nextNode = process.env.MARKET_OS_NEXT_NODE || (process.versions.electron ? "node" : process.execPath);
   const nextCommand = process.env.MARKET_OS_NEXT_COMMAND || nextNode;
   const nextCli = path.join(webRoot, "node_modules", "next", "dist", "bin", "next");
@@ -257,6 +260,9 @@ class LocalRuntime {
       MARKET_OS_RELEASE_ROLLBACK: String(releaseState?.rollbackAvailable ?? this.artifactManifest?.release_state?.rollback_available ?? false),
       PYTHONPATH: [this.pythonRoot, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
     };
+    if (this.artifactManifest?.sidecar?.distribution === "target-native-embedded-cpython") {
+      childEnv.PYTHONDONTWRITEBYTECODE = "1";
+    }
     if (storageRoot) childEnv.MARKET_OS_STORE_ROOT = storageRoot;
     try {
       this.children = [this.spawn(this.specs.gateway, childEnv), this.spawn(this.specs.next, childEnv)];

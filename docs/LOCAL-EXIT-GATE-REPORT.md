@@ -44,8 +44,9 @@ pass, but connected runtime and production operations are not verified. Both
 results are gated with paper-only as the default and no execution-boundary
 change. Owner VM/access, Tailscale Serve, production retention/alerting,
 connected promotion/reconciliation, credentials/provider approval, and live
-authorization remain blocked. Embedded Python/native installer, mobile,
-mutation routes, and providers remain deferred.
+authorization remain blocked. Mobile, mutation routes, and providers remain
+deferred; U6.4-F portable installation is implemented locally and awaits hosted
+Windows/Linux evidence.
 
 ## U8-B hosted confirmation (2026-11-14)
 
@@ -61,3 +62,25 @@ This confirms local operational controls only. Owner VM/access, production
 retention and alerting, connected reconciliation, credentials, and live
 authorization remain blocked; the private, synthetic, read-only, paper-only,
 execution-disabled boundary is unchanged.
+
+## Post-U8-B continuation state (updated 2026-11-15)
+
+After the U8-B full-suite/hosted verification, U8-C accepted permanent
+paper-only mode. U6.4-D added signed-artifact preflight and U6.4-E added an
+offline install simulation. Their local evidence is recorded in
+`docs/evidence/u6-4-install-preflight.json` and
+`docs/evidence/u6-4-install-simulation.json`; the workflows are configured to
+run on matching Windows/Linux runners. The U8-B full-suite count above is not a
+verification result for these later commits.
+
+The connected/live track is closed by the U8-C decision. U6.4-F is now an
+accepted local implementation with embedded runtime validation, portable
+install/upgrade/rollback, verification-failure recovery, and uninstall state
+retention. Matching hosted Windows/Linux evidence remains the next gate; see
+`docs/NEXT-WORK-HANDOFF.md` for the continuation checklist.
+
+The full Understand Anything graph now covers 610 scanned files and has 2,250
+nodes, 4,014 edges, 8 Vietnamese layers, and a 10-step tour. Structural
+validation passed with 125 no-edge node warnings. The graph and metadata live
+under `.ua/`. The Electron suite passed 33 tests, including the U6.4-F
+runtime and portable-install checks; the Python full suite was not rerun.

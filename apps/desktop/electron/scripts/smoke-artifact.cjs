@@ -129,15 +129,16 @@ async function main() {
   if (!fs.existsSync(electronBinary)) fail(`Electron binary is missing: ${electronBinary}`);
   const apiPort = await freePort();
   const nextPort = await freePort([apiPort]);
+  const childEnv = {
+    ...process.env,
+    MARKET_OS_ARTIFACT_ROOT: options.artifact,
+    MARKET_OS_API_PORT: String(apiPort),
+    MARKET_OS_NEXT_PORT: String(nextPort),
+  };
+  if (manifest.sidecar?.distribution === "target-native-embedded-cpython") delete childEnv.MARKET_OS_PYTHON;
   const child = spawn(electronBinary, [path.join(options.artifact, "shell"), "--disable-gpu", "--no-sandbox"], {
     cwd: options.artifact,
-    env: {
-      ...process.env,
-      MARKET_OS_ARTIFACT_ROOT: options.artifact,
-      MARKET_OS_API_PORT: String(apiPort),
-      MARKET_OS_NEXT_PORT: String(nextPort),
-      MARKET_OS_PYTHON: process.env.MARKET_OS_PYTHON || (process.platform === "win32" ? "python" : "python3"),
-    },
+    env: childEnv,
     stdio: ["ignore", "pipe", "pipe"],
     windowsHide: true,
   });

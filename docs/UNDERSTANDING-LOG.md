@@ -2052,3 +2052,109 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   f8148b818aa0f2d7768c181bac7344a4597aefcb99eccb85846ea50c76ca2250.
 - Embedded Python, native installer/service registration, owner-VM promotion,
   credentials, providers, mutation routes, and live execution remain deferred.
+
+## 2026-11-14 — U6.4-E and continuation handoff
+
+- U6.4-E adds an offline install simulation for the signed Windows/Linux
+  target-native artifact. It copies through staging and one rename, resets
+  mutable storage, and revalidates the published artifact. It does not bundle
+  Python or register a native service.
+- U8-C records the accepted permanent paper-only decision. Connected and
+  live-readiness work remains closed unless a new explicit owner decision
+  reopens it.
+- Refreshed the project handoff, roadmap, phases, structure, local exit report,
+  codebase/stack report, and next-chat goal prompt. U6.4-F is documented as a
+  planning candidate, not an approved implementation contract.
+- Rebuilt the full codebase graph for the 2026-11-14 source checkpoint in
+  `.ua/knowledge-graph.json`; consult `.ua/meta.json` for the analyzed commit.
+- The latest full-suite evidence remains the U8-B run on `db8c8dd`. Do not
+  attribute it to the later U8-C/U6.4-D/U6.4-E commits.
+
+## 2026-11-15 — Full codebase graph and next-work handoff
+
+- Refreshed the full Understand Anything graph for 599 scanned files. It has
+  2,173 nodes, 3,680 edges, 8 Vietnamese architecture layers, and a 10-step
+  Vietnamese tour. Structural validation found no issues and 125 no-edge
+  node warnings.
+- Corrected 229 graph summaries from Spanish to Vietnamese without changing
+  graph identity or topology. All 408 scanner-resolved imports are present;
+  four Docker relationships were restored to the existing Dockerfile nodes.
+- Fingerprints were generated for all 599 files. The multi-document
+  Kubernetes YAML manifest produced a non-fatal parser warning and used the
+  regex fallback.
+- Updated the codebase report, evidence record, roadmap, phases, project
+  context, local exit report, and next-session handoff. No application tests
+  were run; the latest full-suite result remains the U8-B run on `db8c8dd`.
+- U6.4-F remains a planning candidate, and U8-C keeps connected/live work
+  closed unless a new explicit owner decision reopens it.
+
+## 2026-11-15 — U6.4-F planning contract
+
+- Added the U6.4-F planning draft, proposed ADR-0055, and the machine-readable
+  installation-contract evidence schema.
+- Kept package format, install scope, embedded Python provenance, state paths,
+  lifecycle, upgrade/uninstall, and failure semantics explicitly open until
+  owner approval.
+- No installer, embedded runtime, service registration, or execution-boundary
+  change was implemented.
+
+- Added the three U6.4-F planning artifacts to the graph inventory. The current
+  working-tree graph now covers 602 files, 2,176 nodes, and 3,684 edges; the
+  fingerprint baseline covers all 602 files.
+
+## 2026-11-15 — U6.4-F planning gate validator
+
+- Added `apps/desktop/electron/scripts/validate-installation-contract.cjs` and
+  the `install:contract:validate` package command. It accepts the planning
+  fixture while rejecting implementation authorization with open/proposed
+  decisions or any unsafe runtime boundary.
+- Added focused regression tests for the planning contract and corrected the
+  default evidence path so the command resolves from the Electron package.
+- The Electron suite passed 26/26 tests. The working-tree graph and fingerprint
+  baseline now cover 604 files, 2,183 nodes, and 3,695 edges; structural
+  validation found no issues and retained 125 no-edge warnings.
+
+## 2026-11-15 — U6.4-F accepted portable installation
+
+- Accepted ADR-0055 and the U6.4-F evidence contract: signed portable tar.gz,
+  per-user/no-elevation installation, CI-frozen CPython 3.11.x from python.org,
+  manual launch, no native service, preserved `python/.market_os` state, and a
+  manual `<destination>.rollback` copy for upgrades.
+- Added the shared runtime-manifest validator, optional runtime bundling in
+  `package.cjs`, embedded-runtime preflight checks, and the portable installer
+  with staging, atomic publish, state preservation, and manual rollback.
+- Added focused install fixtures for fresh install, upgrade/state preservation,
+  rollback retention, unsigned rejection, and platform-default destination.
+  The Electron suite now passes 31/31 tests; the contract validator passes with
+  zero open decisions and nine required evidence items.
+
+## 2026-11-15 — U6.4-F portable lifecycle and CI evidence tooling
+
+- Added target-native runtime preparation with Python 3.11.14 version checks,
+  official python.org archive SHA-256 verification, and offline `duckdb`/
+  `pyarrow` import checks before writing `runtime-manifest.json`.
+- Extended the CI release runner to package the embedded runtime, record runner
+  image metadata, and keep U6.4-C signed smoke validation authoritative.
+- Added uninstall retention at `<destination>.data/python/.market_os`,
+  reinstall copy-forward, verification-failure recovery coverage, and the
+  `install:evidence` JSON/Markdown renderer for fresh install, upgrade,
+  rollback, uninstall, and boundary checks.
+- The Electron suite now passes 33/33 tests locally. Hosted Windows/Linux
+  evidence remains unverified until the workflow runs.
+
+- Corrected the hosted runtime preparation so the packaged interpreter comes
+  from the hash-verified python.org archive: Windows expands the official
+  embeddable zip, while Linux builds the official source tarball before adding
+  the offline dependency set.
+
+## 2026-11-15 — U6.4-F graph refresh and documentation reconciliation
+
+- Reconciled the working-tree Understand graph against the 610-file scan, the
+  14 structurally changed Electron files, and the refreshed 422-edge import map.
+- The durable graph now contains 2,250 nodes, 4,014 edges, 8 Vietnamese
+  layers, and a 10-step tour; validation found 0 dangling edges, 0 self-edges,
+  and 125 no-edge node warnings.
+- Added the six new U6.4-F file nodes and refreshed current source line ranges,
+  contains/call/export/test edges, while preserving existing semantic graph data.
+- Updated current graph counts, evidence, roadmap, handoff, and goal snapshots.
+  Historical U6.4-C/D/E evidence remains scoped to the milestones it records.

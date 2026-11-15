@@ -16,19 +16,21 @@ function parseArgs(argv) {
   const options = {
     target: process.platform === "win32" ? "windows-x64" : "linux-x64",
     output: path.resolve(ELECTRON_ROOT, "../../../output/u6.4-ci"),
+    pythonRuntime: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--") continue;
     if (value === "--target") options.target = argv[++index];
     else if (value === "--output") options.output = argv[++index];
+    else if (value === "--python-runtime") options.pythonRuntime = argv[++index];
     else if (value === "--help" || value === "-h") {
-      console.log("Usage: node scripts/ci-release.cjs [--target windows-x64|linux-x64] [--output <dir>]");
+      console.log("Usage: node scripts/ci-release.cjs [--target windows-x64|linux-x64] [--output <dir>] [--python-runtime <dir>]");
       process.exit(0);
     } else fail(`unknown argument: ${value}`);
   }
   if (!["windows-x64", "linux-x64"].includes(options.target)) fail(`unsupported target: ${options.target}`);
-  return { ...options, output: path.resolve(options.output) };
+  return { ...options, output: path.resolve(options.output), pythonRuntime: options.pythonRuntime ? path.resolve(options.pythonRuntime) : null };
 }
 
 function run(script, args) {
@@ -70,7 +72,7 @@ function assertBoundary(manifest) {
   for (const [key, value] of Object.entries(expected)) {
     if (observed[key] !== value) fail(`runtime boundary ${key} is unsafe`);
   }
-  if (manifest.sidecar?.root !== "python" || manifest.sidecar?.distribution !== "target-native-source") {
+  if (manifest.sidecar?.root !== "python" || !["target-native-source", "target-native-embedded-cpython"].includes(manifest.sidecar?.distribution)) {
     fail("Python sidecar is not target-native and isolated under python/");
   }
   if (manifest.storage?.root !== "python/.market_os" || manifest.storage?.scope !== "artifact-local" || manifest.storage?.shared_host_root !== false) {
@@ -97,7 +99,9 @@ async function main() {
 
   try {
     for (const [version, artifact] of [[knownGoodVersion, knownGood], [candidateVersion, candidate]]) {
-      await run("package.cjs", ["--target", options.target, "--version", version, "--output", artifact]);
+      const packageArgs = ["--target", options.target, "--version", version, "--output", artifact];
+      if (options.pythonRuntime) packageArgs.push("--python-runtime", options.pythonRuntime);
+      await run("package.cjs", packageArgs);
       const manifest = await readJson(path.join(artifact, "artifact-manifest.json"));
       if (manifest.version !== version || manifest.target !== options.target || manifest.platform?.os !== options.target.split("-")[0]) {
         fail(`artifact manifest does not match ${options.target}/${version}`);
@@ -120,7 +124,12 @@ async function main() {
       milestone: "U6.4-C",
       status: "passed",
       target: options.target,
-      host: { platform: process.platform, arch: process.arch, node: process.version },
+      host: {
+        platform: process.platform,
+        arch: process.arch,
+        node: process.version,
+        image: process.env.ImageVersion || process.env.ImageOS || null,
+      },
       artifacts: {
         known_good: { version: knownGoodVersion, path: path.relative(process.cwd(), knownGood), manifest: "artifact-manifest.json", signature: "release-signature.json" },
         candidate: { version: candidateVersion, path: path.relative(process.cwd(), candidate), manifest: "artifact-manifest.json", signature: "release-signature.json" },
@@ -152,6 +161,7 @@ async function main() {
         values: candidateManifest.runtime_boundary,
         checks: drill.checks.boundary,
       },
+      runtime: candidateManifest.runtime || null,
     };
     await writeJson(path.join(options.output, "ci-evidence.json"), evidence);
     console.log(JSON.stringify(evidence, null, 2));
