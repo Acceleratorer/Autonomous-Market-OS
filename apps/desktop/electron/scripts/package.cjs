@@ -6,6 +6,7 @@ const fsp = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
 const { validateRuntimeManifest } = require("./python-runtime.cjs");
+const { digestTree: digestArtifactTree } = require("./install-simulate.cjs");
 
 const ELECTRON_ROOT = path.resolve(__dirname, "..");
 const REPO_ROOT = path.resolve(ELECTRON_ROOT, "../../..");
@@ -197,7 +198,7 @@ async function main() {
     await assertPath(runtimeInterpreter, "embedded Python runtime interpreter");
     const runtimeRoot = path.join(pythonRoot, "runtime");
     await copy(options.pythonRuntime, runtimeRoot);
-    const runtimeTree = await digestTree(runtimeRoot, { excludeRelative: "runtime-manifest.json" });
+    const runtimeTreeSha256 = await digestArtifactTree(runtimeRoot, { excludeRelative: "runtime-manifest.json" });
     runtime = {
       schema: validatedRuntime.schema,
       distribution: validatedRuntime.distribution,
@@ -210,7 +211,7 @@ async function main() {
       root: "python/runtime",
       manifest: "python/runtime/runtime-manifest.json",
       interpreter: `runtime/${normalizePath(runtimeManifest.interpreter)}`,
-      tree_sha256: runtimeTree.sha256,
+      tree_sha256: runtimeTreeSha256,
       dependencies: validatedRuntime.dependencies,
     };
   }
