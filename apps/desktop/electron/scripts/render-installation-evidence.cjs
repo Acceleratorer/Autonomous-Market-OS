@@ -122,6 +122,7 @@ async function renderEvidence(options) {
     await fsp.rm(`${destination}.rollback`, { recursive: true, force: true });
     const upgrade = await installPortable({ artifactRoot: upgradeArtifact, destination });
     const uninstall = await uninstallPortable({ destination });
+    await fsp.rm(`${destination}.rollback`, { recursive: true, force: true });
     const reinstall = await installPortable({ artifactRoot: options.artifact, destination });
     const retained = JSON.parse(await fsp.readFile(state, "utf8"));
     const report = {
