@@ -3,9 +3,9 @@
 Continue Autonomous-Market-OS from the live repository state. Read
 `docs/PROJECT-CONTEXT.md`, `docs/NEXT-WORK-HANDOFF.md`, `STRUCTURE.md`,
 `docs/ROADMAP.md`, `docs/PHASES.md`, the relevant U6.4 contracts, and
-`git status` before editing. The checkpoint commit recorded when this handoff
-was written is `5dad8b3`; local documentation and graph refresh artifacts may
-be uncommitted, so the live status is authoritative.
+`git status` before editing. The checkpoint commit recorded by this handoff is merged commit `19367f4`;
+local documentation and graph refresh artifacts may be uncommitted, so the
+live status is authoritative.
 
 ## Current baseline
 
@@ -31,18 +31,19 @@ be uncommitted, so the live status is authoritative.
 - The full Vietnamese Understand graph is available at `.ua/knowledge-graph.json`:
   610 scanned files, 2,250 nodes, 4,014 edges, 8 layers, and 10 tour steps.
   Check `.ua/meta.json` and fingerprints against the live source and docs first.
-- U6.4-F is implemented locally under accepted ADR-0055: portable signed
-  install, embedded-runtime identity, state preservation, rollback, uninstall
-  retention, and evidence rendering. Hosted Windows/Linux evidence is the next
-  gate.
+- U6.4-F is merged under accepted ADR-0055: portable signed install,
+  embedded-runtime identity, state preservation, rollback, uninstall retention,
+  and evidence rendering. Hosted Windows/Linux evidence is complete and
+  retained in `docs/evidence/u6-4-f-hosted-installation.json`.
 
 ## Objective
 
-Close the accepted U6.4-F gate by running the existing Windows/Linux CI matrix
-and retaining matching hosted evidence for runtime provenance, fresh install,
-upgrade, rollback, state preservation, verification-failure recovery, and
-uninstall retention. Keep Python authoritative and Electron as a thin adapter
-over the existing release artifact and validation contracts.
+Continue from merged U6.4-F commit `19367f4`. The hosted Windows/Linux gate is
+closed and its evidence is retained in
+`docs/evidence/u6-4-f-hosted-installation.json`. Choose the next scoped local,
+offline, synthetic, paper-only slice while keeping Python authoritative and
+Electron as a thin adapter over the existing release artifact and validation
+contracts.
 
 ## Execution rules
 

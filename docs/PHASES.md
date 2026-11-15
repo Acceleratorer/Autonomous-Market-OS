@@ -82,6 +82,7 @@ nodes, 4,014 edges, 8 Vietnamese layers, and 10 tour steps. Structural
 validation found no issues and 125 no-edge node warnings; see `.ua/` and the
 codebase understanding report for the current graph snapshot.
 
-U6.4-F is implemented locally within its decision matrix and ADR. Hosted
-Windows/Linux evidence remains the gate; service registration, connected access,
-mutation, and live execution remain out of scope.
+U6.4-F is implemented within its decision matrix and ADR, with matching hosted
+Windows/Linux evidence retained in
+`docs/evidence/u6-4-f-hosted-installation.json`. Service registration, connected
+access, mutation, and live execution remain out of scope.

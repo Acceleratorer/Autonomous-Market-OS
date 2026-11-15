@@ -76,11 +76,26 @@ verification result for these later commits.
 The connected/live track is closed by the U8-C decision. U6.4-F is now an
 accepted local implementation with embedded runtime validation, portable
 install/upgrade/rollback, verification-failure recovery, and uninstall state
-retention. Matching hosted Windows/Linux evidence remains the next gate; see
-`docs/NEXT-WORK-HANDOFF.md` for the continuation checklist.
+retention. Matching hosted Windows/Linux evidence closed the U6.4-F gate in CI
+run `43740383177`; see
+[`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json)
+for exact runner images and runtime hashes.
 
 The full Understand Anything graph now covers 610 scanned files and has 2,250
 nodes, 4,014 edges, 8 Vietnamese layers, and a 10-step tour. Structural
 validation passed with 125 no-edge node warnings. The graph and metadata live
-under `.ua/`. The Electron suite passed 33 tests, including the U6.4-F
+under `.ua/`. The Electron suite passed 34 tests, including the U6.4-F
 runtime and portable-install checks; the Python full suite was not rerun.
+
+## U6.4-F hosted installation confirmation (2026-11-16)
+
+CI run `43740383177` on merged commit `19367f4` passed both the Windows and
+Linux U6.4-F hardening legs. Each target verified signed package identity,
+CPython 3.11 provenance and SHA-256, fresh install, state-preserving upgrade,
+manual rollback, verification-failure recovery, uninstall retention, and the
+unchanged private/synthetic/read-only/paper-only boundary. Exact runner images,
+runtime hashes, and candidate archive hashes are recorded in
+[`u6-4-f-hosted-installation.json`](evidence/u6-4-f-hosted-installation.json).
+
+The U6.4-F gate is closed. The connected/live track remains permanently
+paper-only under U8-C.
