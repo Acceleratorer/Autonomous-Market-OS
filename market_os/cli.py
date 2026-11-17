@@ -416,7 +416,7 @@ def main(argv: list[str] | None = None) -> int:
                 markdown_path=args.markdown,
                 json_path=args.json_path,
             )
-        except (OSError, TypeError, ValueError) as exc:
+        except (KeyError, OSError, TypeError, ValueError) as exc:
             raise SystemExit(f"U7 evidence reproducibility audit failed: {exc}") from exc
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0 if result["status"] == "passed" else 1

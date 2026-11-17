@@ -1,10 +1,21 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 from pathlib import Path
 
+import pytest
+
 from market_os.cli import main as cli_main
-from market_os.u7_evidence_reproducibility import REPRODUCIBILITY_SCHEMA, build_reproducibility_report, main
+import market_os.u7_evidence_reproducibility as reproducibility
+from market_os.u7_evidence_reproducibility import (
+    EvidenceReproducibilityError,
+    REPRODUCIBILITY_SCHEMA,
+    build_reproducibility_report,
+    main,
+    render_reproducibility_report,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,14 +27,14 @@ TOOLS = ROOT / "market_os" / "tests" / "fixtures" / "tools" / "u7_k_cli_anything
 RESEARCH = ROOT / "market_os" / "tests" / "fixtures" / "research" / "u7_l_cited_research.json"
 
 
-def _paths(catalog: Path = CATALOG) -> dict[str, Path]:
+def _paths(catalog: Path = CATALOG, research: Path = RESEARCH, economic: Path = ECONOMIC) -> dict[str, Path]:
     return {
         "catalog": catalog,
         "pack": PACK,
         "drift": DRIFT,
-        "economic": ECONOMIC,
+        "economic": economic,
         "tools": TOOLS,
-        "research": RESEARCH,
+        "research": research,
     }
 
 
@@ -49,6 +60,114 @@ def test_u7_p_reports_catalog_drift_without_writing_sources(tmp_path: Path) -> N
     assert report["status"] == "failed"
     assert report["checks"]["catalog_fingerprint_match"] is False
     assert "catalog_fingerprint" in report["mismatches"]
+
+
+def test_u7_p_rejects_type_changed_catalog_boundary(tmp_path: Path) -> None:
+    mutated = json.loads(CATALOG.read_text(encoding="utf-8"))
+    mutated["boundary"]["paper_only"] = 1
+    body = {key: value for key, value in mutated.items() if key != "catalog_fingerprint"}
+    canonical = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode("utf-8")
+    mutated["catalog_fingerprint"] = hashlib.sha256(canonical).hexdigest()
+    catalog = tmp_path / CATALOG.name
+    catalog.write_text(json.dumps(mutated, indent=2) + "\n", encoding="utf-8")
+
+    report = build_reproducibility_report(**_paths(catalog))
+
+    assert report["status"] == "failed"
+    assert report["checks"]["catalog_body_match"] is False
+    assert report["checks"]["boundaries_consistent"] is False
+    assert "boundary" in report["mismatches"]
+
+
+def test_u7_p_hashes_the_captured_source_bytes(tmp_path: Path, monkeypatch) -> None:
+    economic = tmp_path / ECONOMIC.name
+    original_bytes = ECONOMIC.read_bytes()
+    economic.write_bytes(original_bytes)
+    regenerate = reproducibility._regenerate_catalogs
+
+    def mutate_original_after_capture(pack, drift, economic_snapshot, tools, research):
+        economic.write_bytes(b"changed after audit snapshot")
+        return regenerate(pack, drift, economic_snapshot, tools, research)
+
+    monkeypatch.setattr(reproducibility, "_regenerate_catalogs", mutate_original_after_capture)
+
+    report = build_reproducibility_report(**_paths(economic=economic))
+    economic_hash = next(item["sha256"] for item in report["source_artifacts"] if item["id"] == "economic_fixture")
+    normalized = original_bytes.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+    assert economic_hash == hashlib.sha256(normalized).hexdigest()
+
+
+def test_u7_p_rejects_report_paths_that_collide_with_sources_or_each_other(tmp_path: Path) -> None:
+    original_catalog = CATALOG.read_bytes()
+    same_output = tmp_path / "same-output.txt"
+
+    with pytest.raises(EvidenceReproducibilityError, match="different paths"):
+        render_reproducibility_report(
+            **_paths(), markdown_path=same_output, json_path=same_output
+        )
+    with pytest.raises(EvidenceReproducibilityError, match="overwrite source evidence"):
+        render_reproducibility_report(
+            **_paths(), markdown_path=CATALOG, json_path=tmp_path / "report.json"
+        )
+
+    assert CATALOG.read_bytes() == original_catalog
+
+
+def test_u7_p_failed_publication_restores_both_reports(tmp_path: Path, monkeypatch) -> None:
+    markdown = tmp_path / "report.md"
+    output = tmp_path / "report.json"
+    markdown.write_bytes(b"old markdown")
+    output.write_bytes(b"old json")
+    real_replace = os.replace
+    replace_count = 0
+
+    def fail_second_replace(source, destination):
+        nonlocal replace_count
+        replace_count += 1
+        if replace_count == 2:
+            raise OSError("simulated publish failure")
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(reproducibility.os, "replace", fail_second_replace)
+
+    with pytest.raises(OSError, match="simulated publish failure"):
+        render_reproducibility_report(
+            **_paths(), markdown_path=markdown, json_path=output
+        )
+
+    assert markdown.read_bytes() == b"old markdown"
+    assert output.read_bytes() == b"old json"
+
+
+def test_u7_p_invalid_research_emits_failed_report_through_both_clis(tmp_path: Path, capsys) -> None:
+    invalid = json.loads(RESEARCH.read_text(encoding="utf-8"))
+    invalid.pop("coverage", None)
+    research = tmp_path / "invalid-research.json"
+    research.write_text(json.dumps(invalid), encoding="utf-8")
+
+    for command, prefix in ((main, "module"), (cli_main, "market-os")):
+        markdown = tmp_path / f"{prefix}.md"
+        output = tmp_path / f"{prefix}.json"
+        args = [
+            "--catalog", str(CATALOG),
+            "--pack", str(PACK),
+            "--drift", str(DRIFT),
+            "--economic", str(ECONOMIC),
+            "--tools", str(TOOLS),
+            "--research", str(research),
+            "--markdown", str(markdown),
+            "--json", str(output),
+        ]
+        if command is cli_main:
+            args = ["u7", "evidence-repro"] + args
+
+        assert command(args) == 1
+        result = json.loads(output.read_text(encoding="utf-8"))
+        assert result["status"] == "failed"
+        assert result["mismatches"] == ["catalog_regeneration"]
+        assert result["regeneration_error_type"] == "KeyError"
+        assert markdown.exists()
 
 
 def test_u7_p_cli_writes_json_and_markdown(tmp_path: Path, capsys) -> None:
