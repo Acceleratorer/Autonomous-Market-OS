@@ -281,8 +281,8 @@ gates closed. U6.4-F is authorized only for the accepted offline portable
 installer and embedded CPython contract; native service registration,
 connected access, and live execution remain disabled.
 
-The full Understand Anything graph covers all 611 scanned files and contains
-2,251 nodes, 4,016 edges, 8 Vietnamese architecture layers, and a 10-step
+The full Understand Anything graph covers all 616 scanned files and contains
+2,274 nodes, 4,062 edges, 8 Vietnamese architecture layers, and an 11-step
 Vietnamese tour. Deterministic validation found no structural issues and 125
 nodes without incident edges; those remain visible as graph warnings. The graph
 is at `.ua/knowledge-graph.json`, with its analyzed commit, timestamp, and
@@ -307,3 +307,16 @@ runner-image, runtime, manifest, tree, and archive hashes in
 No U6.4-F gate remains open. Future implementation stays local, offline,
 synthetic, paper-only, and execution-disabled unless a new owner decision
 changes the boundary.
+
+## U7-P evidence reproducibility (2026-11-16)
+
+U7-P adds `market_os.u7_evidence_reproducibility` and the public
+`market-os u7 evidence-repro` command. It regenerates U7-N from the committed
+U7-I/U7-M inputs and U7-J/K/L from synthetic fixtures twice in a temporary
+directory, rebuilds U7-O, and compares both runs with the committed catalog.
+The audit passed with two identical catalog fingerprints, complete source
+hashes, and the private, synthetic, paper-only, read-only, no-network boundary.
+Evidence is in
+[`u7-p-evidence-reproducibility.json`](evidence/u7-p-evidence-reproducibility.json)
+and the contract is in
+[`U7-P-EVIDENCE-REPRODUCIBILITY.md`](U7-P-EVIDENCE-REPRODUCIBILITY.md).

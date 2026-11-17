@@ -2172,3 +2172,14 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   contains/call/export/test edges, while preserving existing semantic graph data.
 - Updated current graph counts, evidence, roadmap, handoff, and goal snapshots.
   Historical U6.4-C/D/E evidence remains scoped to the milestones it records.
+
+## 2026-11-16 — U7-P evidence reproducibility audit
+
+- Added the deep `market_os.u7_evidence_reproducibility` module and public
+  `market-os u7 evidence-repro` command.
+- Regenerated U7-N/J/K/L twice in a temporary directory, rebuilt U7-O, and
+  compared catalog fingerprints, catalog bodies, source hashes, and the shared
+  offline paper-only boundary with the committed evidence.
+- The focused U7 suite passed 13 tests; committed evidence is in
+  `docs/evidence/u7-p-evidence-reproducibility.json` and `.md`.
+- Refreshed the graph to 616 files, 2,274 nodes, 4,062 edges, 8 layers, and an 11-step tour; validation reports 0 issues and 125 pre-existing no-edge warnings. Fingerprints and meta now point to 80460a7.

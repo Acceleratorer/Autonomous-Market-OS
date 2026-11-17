@@ -13,6 +13,8 @@ next scoped offline, paper-only slice.
   directory and publishing with one rename. It verifies the published tree,
   manifest, signature, entrypoints, slot metadata, and fresh mutable storage.
 - U7-A through U7-O evidence products are complete.
+- U7-P now audits deterministic regeneration of the U7-O evidence catalog from
+  the U7-I/U7-M inputs and U7-J/K/L synthetic fixtures.
 - U8-A/U8-B remain gated. U8-C records the permanent paper-only owner
   decision. Connected promotion, production operations, provider access,
   credentials, mutation, and live execution stay disabled.
@@ -20,13 +22,12 @@ next scoped offline, paper-only slice.
   `--python-runtime`; the U6.4-D preflight and U6.4-E simulation accept and
   validate that runtime. No native service is registered.
 - The full Understand Anything graph has been refreshed against the current
-  611-file worktree: 2,251 nodes and 4,016 edges; exact counts and warnings
+  616-file worktree: 2,274 nodes and 4,062 edges across 8 layers and an 11-step tour; exact counts and warnings
   are recorded in the current graph evidence.
   Validation found no structural issues and 125 no-edge node warnings. Its
   graph, metadata, and fingerprint baseline are under `.ua/`.
 - The graph includes the U6.4-F contract, accepted ADR-0055, runtime validator,
-  portable installer, and focused regression tests; metadata marks the
-  snapshot as a working-tree analysis because these changes are uncommitted.
+  portable installer, focused regression tests, and the U7-P reproducibility module, contract, tests, and evidence; `.ua/` remains an ignored generated working artifact.
 - U6.4-F is accepted as signed portable tar.gz for Windows/Linux, per-user
   without elevation, CI-frozen CPython 3.11.x from python.org, manual launch,
   no native service, preserved `python/.market_os` state, and a manual
@@ -93,8 +94,9 @@ offline packaging work and does not reopen connected or live execution.
 1. Keep the hosted evidence summary and CI artifact links as the U6.4-F
    verification record.
 2. Run the focused local suites whenever the installer or release path changes.
-3. Choose the next scoped local, offline, synthetic, paper-only slice; do not
-   reopen connected or live-readiness work without a new owner decision.
+3. Keep U7-P as a local regression gate, then choose the next
+   scoped local, offline, synthetic, paper-only slice; do not reopen connected
+   or live-readiness work without a new owner decision.
 
 ## Reference artifacts
 

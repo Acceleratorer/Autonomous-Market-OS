@@ -1,7 +1,7 @@
 {
   "schema": "market-os.codebase-stack-understanding@v1",
-  "date": "2026-11-15",
-  "status": "local-understood-paper-only-handoff-ready",
+  "date": "2026-11-16",
+  "status": "local-understood-u7-p-reproducibility-complete",
   "scope": {
     "repository": "Autonomous-Market-OS",
     "synthetic": true,
@@ -9,15 +9,15 @@
     "loopback_only": true,
     "connected_runtime_selected": false,
     "deployment_run": "disconnected_static_preview_verified; private_runtime_not_promoted",
-    "analyzed_files": 611,
+    "analyzed_files": 616,
     "file_categories": {
-      "code": 232,
-      "config": 137,
-      "docs": 220,
+      "code": 234,
+      "config": 139,
+      "docs": 222,
       "infra": 11,
-      "data": 0,
       "script": 5,
-      "markup": 5
+      "markup": 5,
+      "data": 0
     },
     "output_language": "vi"
   },
@@ -30,63 +30,14 @@
     "desktop": "Electron shell and release/install orchestration; Python remains the domain authority"
   },
   "worktree": {
-    "status_paths": 29,
-    "tracked_modified_paths": 17,
-    "untracked_paths": 12,
+    "status_paths": 0,
+    "tracked_modified_paths": 0,
+    "untracked_paths": 0,
     "product_candidate_paths": 0,
     "preserved_paths": 0,
     "unclassified_paths": 0,
-    "head": "48e5e16b1f209685b031decd511acca4526e6917",
-    "untracked_classification": [
-      {
-        "path": "apps/desktop/electron/scripts/install-portable.cjs",
-        "classification": "U6.4-F portable installer implementation"
-      },
-      {
-        "path": "apps/desktop/electron/scripts/prepare-python-runtime.cjs",
-        "classification": "CPython runtime preparation"
-      },
-      {
-        "path": "apps/desktop/electron/scripts/python-runtime.cjs",
-        "classification": "runtime manifest validator"
-      },
-      {
-        "path": "apps/desktop/electron/scripts/render-installation-evidence.cjs",
-        "classification": "local installation evidence renderer"
-      },
-      {
-        "path": "apps/desktop/electron/scripts/uninstall-portable.cjs",
-        "classification": "portable uninstall implementation"
-      },
-      {
-        "path": "apps/desktop/electron/scripts/validate-installation-contract.cjs",
-        "classification": "accepted contract validator"
-      },
-      {
-        "path": "apps/desktop/electron/tests/install-portable.test.cjs",
-        "classification": "portable lifecycle regression tests"
-      },
-      {
-        "path": "apps/desktop/electron/tests/installation-contract.test.cjs",
-        "classification": "contract regression tests"
-      },
-      {
-        "path": "docs/NEXT-WORK-HANDOFF.md",
-        "classification": "hosted evidence continuation handoff"
-      },
-      {
-        "path": "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
-        "classification": "accepted implementation contract"
-      },
-      {
-        "path": "docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
-        "classification": "accepted decision record"
-      },
-      {
-        "path": "docs/evidence/u6-4-f-installation-contract.json",
-        "classification": "accepted contract evidence schema"
-      }
-    ],
+    "head": "80460a77fb00018fdf95103f6c809eb497f4a560",
+    "untracked_classification": [],
     "archived_paths": 6,
     "archive_path": "D:\\Code\\Github\\HKUDS\\Autonomous-Market-OS-local-scratch-2026-11-02"
   },
@@ -113,14 +64,14 @@
     ]
   },
   "verification": {
-    "latest_full_suite": "659 passed, 0 failed, 7 skipped on U8-B commit db8c8dd; does not cover later U8-C or U6.4-D/E commits",
-    "application_tests": "Electron suite: 34 passed, 0 failed; U6.4-F contract validator and portable installation evidence fixtures passed. Hosted CI run 43740383177 passed both Windows/Linux hardening legs. Python full suite was not rerun.",
-    "graph_validation": "passed: 0 structural issues; 125 nodes with no incident edges reported as warnings",
-    "fingerprint_baseline": "generated for all 611 files from the current working-tree scan inventory",
+    "latest_full_suite": "669 passed, 0 failed, 7 skipped on U7-P checkpoint 80460a7",
+    "application_tests": "Electron suite: 34 passed, 0 failed; U7-P focused suite: 13 passed, 0 failed; Python full suite: 669 passed, 0 failed, 7 skipped.",
+    "graph_validation": "passed: 0 structural issues; 125 pre-existing nodes with no incident edges remain as warnings",
+    "fingerprint_baseline": "generated for all 616 files from the current working-tree scan inventory",
     "git_diff_check": "passed",
-    "evidence_validation": "not run in this refresh",
-    "fingerprint_warning": "Multi-document Kubernetes YAML parsing warned; regex fallback succeeded for all 611 fingerprint entries.",
-    "contract_validator": "passed: accepted U6.4-F contract with 0 open decisions and 9 required evidence items"
+    "evidence_validation": "U7-P reproducibility evidence passed; catalog and report fingerprints match committed artifacts",
+    "fingerprint_warning": "Multi-document Kubernetes YAML parsing warned; regex fallback succeeded for all 616 fingerprint entries.",
+    "contract_validator": "passed: U7-P regenerated U7-N/J/K/L twice and matched U7-O catalog, source hashes, lineage, and boundary"
   },
   "artifacts": [
     "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
@@ -137,19 +88,22 @@
     ".ua/fingerprints.json",
     "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
     "docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
-    "docs/evidence/u6-4-f-installation-contract.json"
+    "docs/evidence/u6-4-f-installation-contract.json",
+    "docs/U7-P-EVIDENCE-REPRODUCIBILITY.md",
+    "docs/evidence/u7-p-evidence-reproducibility.json",
+    "docs/evidence/u7-p-evidence-reproducibility.md"
   ],
   "graph": {
-    "knowledge_nodes": 2251,
-    "knowledge_edges": 4016,
-    "file_level_nodes": 621,
-    "analyzed_files": 611,
+    "knowledge_nodes": 2274,
+    "knowledge_edges": 4062,
+    "file_level_nodes": 627,
+    "analyzed_files": 616,
     "node_types": {
-      "class": 270,
-      "config": 140,
-      "document": 221,
-      "file": 240,
-      "function": 1359,
+      "class": 271,
+      "config": 142,
+      "document": 223,
+      "file": 242,
+      "function": 1376,
       "pipeline": 4,
       "resource": 7,
       "service": 9
@@ -157,15 +111,15 @@
     "edge_types": {
       "calls": 210,
       "configures": 11,
-      "contains": 1642,
+      "contains": 1660,
       "depends_on": 38,
       "deploys": 6,
-      "documents": 306,
-      "exports": 1053,
-      "imports": 422,
-      "related": 90,
+      "documents": 309,
+      "exports": 1071,
+      "imports": 429,
+      "related": 91,
       "serves": 1,
-      "tested_by": 223,
+      "tested_by": 224,
       "triggers": 11,
       "validates": 1
     },
@@ -173,7 +127,7 @@
     "layers": [
       {
         "name": "Lõi miền Python",
-        "nodes": 82
+        "nodes": 83
       },
       {
         "name": "Các bề mặt ứng dụng",
@@ -185,7 +139,7 @@
       },
       {
         "name": "Kiểm thử và xác minh",
-        "nodes": 116
+        "nodes": 117
       },
       {
         "name": "Công cụ phát triển",
@@ -201,17 +155,18 @@
       },
       {
         "name": "Tài liệu và bằng chứng",
-        "nodes": 311
+        "nodes": 315
       }
     ],
-    "tour_steps": 10,
+    "tour_steps": 11,
     "validated": true,
-    "graph_commit": "48e5e16b1f209685b031decd511acca4526e6917",
+    "graph_commit": "80460a77fb00018fdf95103f6c809eb497f4a560",
     "domain_nodes": 88,
     "domain_edges": 96,
     "domain_graph_commit": "849a4c28fa4acfef17bbfdbc66865300322c4eda",
     "domain_graph_note": "Separate domain graph remains a 2026-11-02 snapshot; it was not part of this full source-code graph refresh.",
-    "refresh_note": "Working-tree graph snapshot includes the U6.4-F implementation files, later workflow/docs changes, and deterministic structural/import refresh; hosted U6.4-F evidence is retained and the gate is closed."
+    "refresh_note": "Working-tree graph includes U6.4-F and U7-P implementation/docs/evidence; five U7-P files used deterministic structural extraction because delegated analyzers were intentionally not used.",
+    "next_gate": "U7-P is complete; choose the next separately scoped local, offline, synthetic, paper-only slice."
   },
-  "next_gate": "No U6.4-F gate remains open; choose a separately scoped local, offline, synthetic, paper-only slice."
+  "next_gate": "U7-P is complete; choose the next separately scoped local, offline, synthetic, paper-only slice."
 }
