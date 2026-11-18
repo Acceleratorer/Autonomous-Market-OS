@@ -88,11 +88,38 @@ import importlib.util
 import io
 import json
 import re
+import socket
 import sys
 import types
 from pathlib import Path
 
 import numpy as np
+
+def _deny_network(*args, **kwargs):
+    del args, kwargs
+    raise RuntimeError("Network access is disabled in this Market OS MiniRAG process")
+
+
+socket.create_connection = _deny_network
+socket.getaddrinfo = _deny_network
+socket.gethostbyname = _deny_network
+socket.gethostbyname_ex = _deny_network
+
+_Socket = socket.socket
+
+class _OfflineSocket(_Socket):
+    def connect(self, *args, **kwargs):
+        return _deny_network(*args, **kwargs)
+
+    def connect_ex(self, *args, **kwargs):
+        return _deny_network(*args, **kwargs)
+
+    def sendto(self, *args, **kwargs):
+        return _deny_network(*args, **kwargs)
+
+
+socket.socket = _OfflineSocket
+
 if importlib.util.find_spec("sentence_transformers") is None:
     sentence_transformers = types.ModuleType("sentence_transformers")
     class _UnusedSentenceTransformer:

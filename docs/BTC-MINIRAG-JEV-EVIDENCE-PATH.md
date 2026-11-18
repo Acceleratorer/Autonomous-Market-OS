@@ -1,9 +1,11 @@
 # BTC MiniRAG and Jev Evidence Path
 
-**Status:** Offline integration slice and bounded local source corpus built.
-Three pinned-runtime MiniRAG retrieval repeats completed; the strict historical
-packet gate blocks Jev assessment work. A synthetic recorded-assessment fixture
-now traverses normalization and alignment, validating that offline seam only.
+**Status:** BTC-only MiniRAG integration slice and bounded local source corpus
+built; local artifact hashes and row counts were rechecked on 2026-11-19.
+Three pinned-runtime MiniRAG retrieval repeats completed before the child
+network guard was added. The strict historical packet gate blocks market-linked
+Jev assessment work. A synthetic recorded-assessment fixture traverses
+normalization and alignment, validating that contract seam only.
 **Scope:** BTCUSDT Spot, five-minute B2 research target, local historical data,
 and paper research only.
 
@@ -19,6 +21,14 @@ and paper research only.
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is
 never substituted for that probability, a return forecast, or an order.
+
+The existing U3/B3 directional `Choice` benchmark is a prior fixture-only
+experiment. Its bullish/bearish labels and E2 market-direction score are not
+the target Jev role for this BTC evidence flow and remain unpromoted. The
+forward BTC contract is B3.1: Jev may assess evidence support,
+agreement/contradiction, and abstention for a validated packet. Those semantic
+labels are not converted into `P(up)` or used as stability, calibration, risk,
+or execution inputs.
 
 ## Implemented seam
 
@@ -102,12 +112,18 @@ repeatability check, not a retrieval-quality benchmark. The six inputs and
 four returned citations are listed by identifier and hash in
 [`btc-minirag-retrieval-2026-11-19.json`](evidence/btc-minirag-retrieval-2026-11-19.json).
 
+Those runs predate the fail-closed socket guard now present in the MiniRAG
+child runner. Their evidence shows that the tokenizer asset was cached, but its
+HTTP request count was not instrumented; those runs therefore do not prove
+zero network egress. The guard has not yet been exercised by a new retrieval.
+
 The packet builder rejected the retrieved passage because its conservative
 local availability / `published_at` projection is after the feature close.
 The original Binance publication time remains unknown. Retrieval is therefore
 retrospective and cannot support a historically eligible Jev assessment. No
-Jev, LLM, embedding, or market-data API was called. The tokenizer asset needed
-by MiniRAG was cached locally; its HTTP request count was not instrumented.
+Jev, LLM, embedding, or market-data API was called by these three retrieval
+runs. The tokenizer asset needed by MiniRAG was cached locally; its HTTP
+request count was not instrumented.
 The exact Python executable hash and package versions are recorded in the
 [runtime package snapshot](evidence/btc-minirag-runtime-freeze-2026-11-19.txt)
 and retrieval evidence.
@@ -144,10 +160,13 @@ Market OS stays paper-only and owns every risk and execution decision.
    strict recorded availability; keep it and obtain source records with
    contemporaneous availability timestamps, or explicitly authorize a
    separate event-time proxy labeled retrospective and not point-in-time valid.
-3. After packet eligibility is resolved, build only recorded B3.1 assessments
+3. Exercise the MiniRAG child socket guard against the already-cached runtime
+   before claiming zero egress. If a required tokenizer or model asset is
+   missing, fail closed and provision it separately outside the evidence run.
+4. After packet eligibility is resolved, build only recorded B3.1 assessments
    for exact packet fingerprints and join them to the same B2 observations as
    the numerical controls.
-4. Freeze an offline matched comparison protocol before reading held-out
+5. Freeze an offline matched comparison protocol before reading held-out
    results. Keep Jev API access, credentials, provider egress, and any future
    shadow or trading path behind separate owner decisions.
 
