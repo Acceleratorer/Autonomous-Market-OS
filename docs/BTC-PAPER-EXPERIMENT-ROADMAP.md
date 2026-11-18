@@ -201,10 +201,12 @@ and one post-guard retrieval from the same exact six-candle B2 input set; all
 returned the same four citations. This is a repeatability check, not retrieval-
 quality evaluation or a zero-egress guarantee. The strict packet-time gate
 rejected the citations because local availability was after the B2 feature
-close. No recorded assessment has been joined and no Jev API was called. The
-B3.1 path keeps evidence support, agreement/contradiction, and abstention as
-semantic results; it computes no market metrics. See the [BTC MiniRAG/Jev
-evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
+close. Those citations cover four of the six B2 input documents in this single
+query; this is not a semantic-quality estimate. No recorded assessment has
+been joined and no Jev API was called. The B3.1 path keeps evidence support,
+agreement/contradiction, and abstention as semantic results; it computes no
+market metrics. See the [BTC MiniRAG/Jev evidence
+path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
 
 The approved B1 archives were received locally on 2026-11-18. Original
 per-candle source publication times were not retained. The local corpus
