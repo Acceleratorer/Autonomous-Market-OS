@@ -1,0 +1,78 @@
+{
+  "schema": "market-os.btc-minirag-post-guard-retrieval-evidence.v1",
+  "status": "retrieval-complete-strict-packet-time-gate-blocked",
+  "recorded_at_utc": "2026-11-18T23:10:15Z",
+  "market_os_commit": "927f6d42a01bda62f1849034a2b9b50f59b72e1e",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market_type": "spot",
+    "interval": "1m",
+    "purpose": "personal-noncommercial-offline-paper-research",
+    "local_only": true,
+    "redistribution": "not-permitted-by-owner-scope",
+    "trading_or_execution": false
+  },
+  "input": {
+    "corpus_fingerprint": "becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa",
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "selected_b2_run_id": "btc-b2-dde76de3b2965ac6f66a",
+    "observation_id": "btc:btc-history-9c58a3ac5cfd05c7398e:1792368360000:c7740002a6cc0b4c",
+    "feature_close_time": "2026-10-19T00:06:00Z",
+    "feature_input_fingerprint": "c7740002a6cc0b4c7a62c8bac8d8a5b469f506065d8fb0540ebf59c47e71deb3",
+    "document_count": 6,
+    "document_ids": [
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368300000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368240000"
+    ]
+  },
+  "runtime": {
+    "python_version": "3.12.0",
+    "python_executable_sha256": "d55736b9f3d6b4ca7985b82db8ce11edfa09994cf93ce31c6b506543b74f32eb",
+    "minirag_source_commit": "e204d239421f45004852953679927fdf6733f236",
+    "adapter_version": "market-os-minirag-mini-mode-v1",
+    "python_hash_seed": 0,
+    "tokenizer_cache_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+    "tokenizer_cache_bytes": 3613922
+  },
+  "retrieval": {
+    "provider_version": "0.0.2+e204d239421f45004852953679927fdf6733f236;market-os-minirag-mini-mode-v1",
+    "query": "Retrieve evidence for the BTCUSDT Spot one-minute candle inputs to this B2 observation; retain cited OHLCV source chunks.",
+    "query_fingerprint": "15b6854f68a16ddd1adc3cf0d37e62af18fb08c13b31e5985278350cfc7443b7",
+    "post_guard_run_count": 1,
+    "passage_count": 4,
+    "citation_refs": [
+      "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+      "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+      "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+      "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4"
+    ],
+    "matches_pre_guard_query_fingerprint": true,
+    "matches_all_three_pre_guard_citations": true,
+    "retrieval_quality_evaluated": false,
+    "market_metrics_computed": false
+  },
+  "packet_time_gate": {
+    "packet_ready": false,
+    "gate": "strict-source-publication-and-recorded-availability",
+    "source_publication_time": "unknown-not-captured",
+    "local_source_available_at": "2026-11-18T04:06:41.552Z",
+    "feature_close_time": "2026-10-19T00:06:00Z",
+    "interpretation": "retrospective retrieval only; source receipt follows the historical feature close"
+  },
+  "network_and_safety": {
+    "jev_api_calls": 0,
+    "llm_provider_calls": 0,
+    "embedding_provider_calls": 0,
+    "market_data_requests": 0,
+    "credentials_used": false,
+    "python_socket_guard_applied": true,
+    "outbound_socket_attempt_counter": "not-instrumented",
+    "os_level_egress_isolation": false,
+    "native_code_can_bypass_python_socket_guard": true,
+    "no_zero_egress_claim": true
+  }
+}
