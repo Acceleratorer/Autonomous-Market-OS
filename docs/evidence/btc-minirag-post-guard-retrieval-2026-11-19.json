@@ -44,6 +44,23 @@
     "query_fingerprint": "15b6854f68a16ddd1adc3cf0d37e62af18fb08c13b31e5985278350cfc7443b7",
     "post_guard_run_count": 1,
     "passage_count": 4,
+    "cited_document_ids": [
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000"
+    ],
+    "b2_input_document_coverage": {
+      "cited": 4,
+      "expected": 6,
+      "fraction": 0.6666667,
+      "unreturned_document_ids": [
+        "btc-btc-history-9c58a3ac5cfd05c7398e-1792368240000",
+        "btc-btc-history-9c58a3ac5cfd05c7398e-1792368300000"
+      ],
+      "cited_documents_outside_input_set": []
+    },
+    "coverage_scope": "single exact query; B2 input-document coverage only, not semantic retrieval quality",
     "citation_refs": [
       "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
       "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",

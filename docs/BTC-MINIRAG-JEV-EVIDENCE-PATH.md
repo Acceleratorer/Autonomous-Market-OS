@@ -117,9 +117,12 @@ Those three runs predate the fail-closed socket guard now present in the
 MiniRAG child runner. A new run after the guard merge used the same six inputs
 and query, returned the same four citations, and had the same query fingerprint.
 This verifies that retrieval still completes with the guard and cached runtime;
-it does not measure retrieval quality. The tokenizer cache was present, but
-socket attempts were not instrumented. The guard limits common Python socket
-APIs to loopback or Unix-domain sockets and blocks forward/reverse DNS lookups.
+it does not measure retrieval quality. Against the six B2 input documents, the
+stored citations cover four; two inputs were not returned. This is a
+single-query coverage diagnostic, not a semantic-quality estimate. The
+tokenizer cache was present, but socket attempts were not instrumented. The
+guard limits common Python socket APIs to loopback or Unix-domain sockets and
+blocks forward/reverse DNS lookups.
 It is not operating-system network isolation and native code can bypass it, so
 the run does not establish a zero-egress guarantee. See
 [`btc-minirag-post-guard-retrieval-2026-11-19.json`](evidence/btc-minirag-post-guard-retrieval-2026-11-19.json).
