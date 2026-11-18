@@ -1038,13 +1038,14 @@ class HistoryStore:
             store_root = os.path.realpath(self.root)
             raw_root = os.path.realpath(self.raw_dir)
             raw_path = os.path.realpath(os.path.join(raw_root, name))
+            raw_root_prefix = os.path.join(raw_root, "")
             if (
                 raw_root == store_root
                 or os.path.commonpath((store_root, raw_root)) != store_root
                 or Path(raw_root) != self.raw_dir
                 or _is_remote_windows_drive(Path(raw_root))
                 or _is_network_mount(Path(raw_root))
-                or os.path.commonpath((raw_root, raw_path)) != raw_root
+                or not raw_path.startswith(raw_root_prefix)
                 or not os.path.isfile(raw_path)
             ):
                 raise HistoryError(code, message)
