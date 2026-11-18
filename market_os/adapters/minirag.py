@@ -117,6 +117,9 @@ class _OfflineSocket(_Socket):
     def sendto(self, *args, **kwargs):
         return _deny_network(*args, **kwargs)
 
+    def sendmsg(self, *args, **kwargs):
+        return _deny_network(*args, **kwargs)
+
 
 socket.socket = _OfflineSocket
 
