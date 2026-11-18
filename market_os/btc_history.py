@@ -155,11 +155,11 @@ def _is_network_mount(root: Path) -> bool:
     return False
 
 
-def _local_storage_root(root: str | Path) -> Path:
+def _local_storage_root(root: Path) -> Path:
     if _is_remote_windows_drive(root):
         raise HistoryError("local_storage_required", "BTC history data must remain on a local volume")
     try:
-        resolved = Path(root).expanduser().resolve()
+        resolved = root.expanduser().resolve()
     except (OSError, RuntimeError) as exc:
         raise HistoryError("local_storage_required", "BTC history storage root cannot be resolved locally") from exc
     if _is_remote_windows_drive(resolved) or _is_network_mount(resolved):
@@ -992,7 +992,8 @@ class IngestResult:
 
 class HistoryStore:
     def __init__(self, root: str | Path, *, read_only: bool = False) -> None:
-        self.root = _local_storage_root(root)
+        self.root = Path(root)
+        self.root = _local_storage_root(self.root)
         self.read_only = read_only
         self.raw_dir = self.root / "raw"
         self.dataset_dir = self.root / "datasets"
