@@ -34,9 +34,10 @@ no market-level Jev comparison has run.
   The acquisition deadline now reaches canonicalization, Parquet writes, and
   DuckDB catalog ingestion, with an expiry check before commit. Regression
   tests cover UNC rejection and archive-ingest expiry; the current suite passes
-  682 tests with 7 skips. PR checks for secrets, 93 JSON evidence files, the
-  web artifact, the MLOps manifest, Python compilation, and whitespace also
-  pass.
+  683 tests with 7 skips. Coverage also rejects fixture-supplied raw-file paths
+  outside their content-addressed storage names. Secret scan, 93-file evidence
+  validation, web artifact, MLOps manifest, Python compilation, and whitespace
+  checks pass.
 - B3.1 normalized 14 recorded synthetic fixture cases (5 usable; 9 rejected,
   unavailable, stale, or abstained). A BTC-only MiniRAG adapter, future-free
   packet builder, alignment-only helper, and a 43,200-document local source

@@ -66,8 +66,9 @@ creation, and DuckDB ingestion. Deadline checks before catalog commit roll back
 the transaction if synchronous ingest work overruns the cap; a blocking local
 operation cannot be preempted, so an overrun may return after 900 seconds but
 cannot register a successful dataset. Regression coverage exercises UNC
-rejection and expiry during archive ingestion. This is a code-path hardening
-result; the historical execution timings above remain unchanged.
+rejection, fixture path traversal, and expiry during archive ingestion. This
+is a code-path hardening result; the historical execution timings above remain
+unchanged.
 
 ## Historical REST-source review (superseded)
 

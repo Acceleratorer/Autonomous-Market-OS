@@ -1093,6 +1093,8 @@ class HistoryStore:
         pages = fixture.get("pages")
         if not isinstance(pages, list) or len(pages) > MAX_PAGES:
             raise HistoryError("page_limit", f"fixture must contain at most {MAX_PAGES} pages")
+        if any(not isinstance(page, list) for page in pages):
+            raise HistoryError("invalid_fixture", "fixture page must be an array of rows")
         if end <= start or start % 60_000 or end % 60_000 or end - start > MAX_CANDLES * 60_000:
             raise HistoryError("invalid_range", "fixture range must be aligned, positive, and within local candle cap")
         _parse_utc(captured_at, "received_at")
@@ -1545,18 +1547,28 @@ class HistoryStore:
                 rows = page["rows"]
                 received_at = page.get("captured_at") or captured_at
                 if page.get("source_path"):
-                    source_path = page["source_path"]
-                    raw_path = (self.root / source_path).resolve()
+                    page_hash = page.get("page_sha256")
+                    if not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None:
+                        raise HistoryError("invalid_page", "raw page digest must be lowercase SHA-256")
+                    source_path = f"raw/{page_hash}.zip"
+                    if page["source_path"] != source_path:
+                        raise HistoryError("invalid_page", "raw archive path does not match its SHA-256 name")
+                    raw_path = self.raw_dir / f"{page_hash}.zip"
                     if not raw_path.is_relative_to(self.raw_dir.resolve()) or not raw_path.is_file():
                         raise HistoryError("archive_invalid", "raw archive path is outside immutable raw storage")
                     raw_bytes = raw_path.read_bytes()
-                    if page.get("page_sha256") != _sha(raw_bytes):
+                    if page_hash != _sha(raw_bytes):
                         raise HistoryError("archive_invalid", "raw archive SHA-256 changed before ingestion")
                     if page.get("source_bytes") is not None and page["source_bytes"] != raw_bytes:
                         raise HistoryError("archive_invalid", "raw archive bytes changed before ingestion")
                 else:
-                    source_path = f"raw/{page['page_sha256']}.json" if "page_sha256" in page else None
-                    raw_bytes = (self.root / source_path).read_bytes() if source_path else _json_bytes(rows)
+                    page_hash = page.get("page_sha256")
+                    if page_hash is not None and (
+                        not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None
+                    ):
+                        raise HistoryError("invalid_page", "raw page digest must be lowercase SHA-256")
+                    source_path = f"raw/{page_hash}.json" if page_hash is not None else None
+                    raw_bytes = (self.raw_dir / f"{page_hash}.json").read_bytes() if page_hash is not None else _json_bytes(rows)
             else:
                 rows = page
                 received_at = captured_at
@@ -1723,7 +1735,16 @@ class HistoryStore:
                     raise HistoryError("dataset_revision_conflict", "existing dataset revision points to different canonical bytes")
                 for page in pages:
                     _check_deadline(deadline)
-                    raw_path = self.root / page.get("path", f"raw/{page['sha256']}.json")
+                    page_hash = page.get("sha256")
+                    if not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None:
+                        raise HistoryError("raw_page_integrity_error", "raw source page digest is invalid")
+                    archive_path = f"raw/{page_hash}.zip"
+                    json_path = f"raw/{page_hash}.json"
+                    recorded_path = page.get("path")
+                    if recorded_path not in (None, archive_path, json_path):
+                        raise HistoryError("raw_page_integrity_error", "raw source path does not match its content address")
+                    raw_name = f"{page_hash}.zip" if recorded_path == archive_path else f"{page_hash}.json"
+                    raw_path = self.raw_dir / raw_name
                     if not raw_path.is_file() or _sha(raw_path.read_bytes()) != page["sha256"]:
                         raise HistoryError("raw_page_integrity_error", "raw source page is missing or has an invalid hash")
                     db.execute("INSERT INTO raw_pages VALUES (?, ?, ?, ?, ?) ON CONFLICT (page_sha256) DO NOTHING", [page["sha256"], str(raw_path), raw_path.stat().st_size, manifest["source_identity"], page["captured_at"]])

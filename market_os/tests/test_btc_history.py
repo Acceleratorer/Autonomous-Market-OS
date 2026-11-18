@@ -261,6 +261,24 @@ def test_history_store_rejects_mapped_remote_drive_before_filesystem_access(tmp_
         HistoryStore(tmp_path)
 
 
+def test_fixture_page_digest_cannot_select_a_file_outside_raw_storage(tmp_path: Path) -> None:
+    fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    outside_file = tmp_path / "escape.json"
+    outside_file.write_text('{"private":"marker"}', encoding="utf-8")
+    fixture["pages"] = [{
+        "rows": fixture["pages"][0],
+        "captured_at": fixture["received_at"],
+        "page_sha256": "../../escape",
+    }]
+    store = HistoryStore(tmp_path / "store")
+
+    with pytest.raises(HistoryError, match="fixture page"):
+        store.ingest_fixture(fixture)
+
+    assert store.inspect_datasets() == []
+    assert list((store.root / "raw").iterdir()) == []
+
+
 def test_archive_ingestion_checks_deadline_before_catalog_commit(tmp_path: Path, monkeypatch) -> None:
     class Clock:
         now = 10.0
