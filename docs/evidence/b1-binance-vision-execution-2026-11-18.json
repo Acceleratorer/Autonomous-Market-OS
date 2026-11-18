@@ -1,0 +1,161 @@
+{
+  "schema": "market-os.btc-research-execution-evidence.v1",
+  "execution_date_utc": "2026-11-18",
+  "scope": {
+    "provider": "Binance Vision",
+    "host": "data.binance.vision",
+    "venue": "BINANCE_SPOT",
+    "symbol": "BTCUSDT",
+    "interval": "1m",
+    "start_date_utc": "2026-10-19",
+    "end_date_exclusive_utc": "2026-11-18",
+    "purpose": "personal non-commercial offline research and paper simulation",
+    "access_region": "Vietnam",
+    "retention": "local-only-until-explicit-deletion",
+    "redistribution": false,
+    "credentials": false,
+    "trading": false
+  },
+  "approved_limits": {
+    "max_https_requests_including_checksums": 60,
+    "max_rows": 43200,
+    "max_zip_bytes_each": 1048576,
+    "max_checksum_bytes_each": 1024,
+    "max_total_download_bytes": 33554432,
+    "max_runtime_seconds": 900,
+    "max_attempts_per_file": 1
+  },
+  "b1_result": {
+    "status": "complete",
+    "archive_requests": 30,
+    "checksum_requests": 30,
+    "network_requests": 60,
+    "additional_recovery_network_requests": 0,
+    "archives": 30,
+    "checksums_verified": 30,
+    "download_bytes": 2093387,
+    "largest_zip_bytes": 72776,
+    "largest_checksum_bytes": 91,
+    "rows_per_archive_min": 1440,
+    "rows_per_archive_max": 1440,
+    "canonical_candle_count": 43200,
+    "outcome_counts": {
+      "accepted": 43200
+    },
+    "gap_count": 0,
+    "first_open_utc": "2026-10-19T00:00:00Z",
+    "last_open_utc": "2026-11-17T23:59:00Z",
+    "store_root": ".market_os/btc-history",
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "manifest_id": "btc-history-manifest-6307b278cdc684f4dc42",
+    "canonical_fingerprint": "9c58a3ac5cfd05c7398e0aa4888e911d88b502b58a5479af671b6e5ad91d7f0d",
+    "parquet_sha256": "6fc6ce8d3925f2360c6630f1b6cad47b89bbf328fc5a5f085c7785bd06909e96"
+  },
+  "ingest_recovery": {
+    "initial_cli_result": "all 60 source objects were fetched and persisted; canonical ingest then rejected the 1440-row daily page against the shared 1000-row guard",
+    "final_recovery": "offline rebuild from the preserved ZIP/checksum files, archive-specific 1440-row allowance, chronological archive order, batched DuckDB provenance writes",
+    "non_cataloged_intermediate_manifest_id": "btc-history-manifest-a63604431cce1e6325e0",
+    "intermediate_manifest_status": "unregistered; produced during a capped local recovery attempt and not used by B2",
+    "receipt_timestamp_semantics": "local raw-artifact modification timestamps; original per-response receive timestamps were not committed by the failed initial ingest",
+    "receipt_timestamp_min_utc": "2026-11-18T04:06:41.552Z",
+    "receipt_timestamp_max_utc": "2026-11-18T04:06:41.662Z",
+    "runtime_evidence": {
+      "approved_cap_seconds": 900,
+      "initial_network_acquisition_cli_elapsed_seconds": 76.7,
+      "initial_network_acquisition_cli_status": "all 60 objects fetched; canonical ingestion failed at shared 1000-row guard",
+      "intermediate_offline_recovery_elapsed_seconds": 938.549,
+      "intermediate_offline_recovery_status": "failed; zero additional network requests; left unregistered provisional manifest",
+      "final_offline_validation_and_rebuild_elapsed_seconds": 8.241,
+      "final_offline_validation_and_rebuild_network_requests": 0,
+      "measured_single_sequence_total_seconds": null,
+      "deadline_scope": "monotonic deadline applied to archive fetch/parse and checked before canonical ingestion",
+      "local_persistence_and_recovery_timing": "offline recoveries are separate commands; the final rebuild completed in 8.241 seconds"
+    },
+    "store_path_enforcement": "executed at local workspace path; CLI accepts a configurable path without remote-location detection"
+  },
+  "b2_result": {
+    "status": "complete-retrospective-chronological-diagnostic",
+    "run_id": "btc-b2-dde76de3b2965ac6f66a",
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "sample_count": 43190,
+    "split_counts": {
+      "train": 25909,
+      "calibration": 8628,
+      "purged": 20,
+      "test": 8633
+    },
+    "split_policy": {
+      "chronological": true,
+      "purge_minutes": 5,
+      "embargo_minutes": 5,
+      "boundaries_frozen_before_model_fit": true
+    },
+    "test_metrics": {
+      "naive_0_5": {
+        "raw": {
+          "accuracy": 0.46507587165527625,
+          "brier": 0.25,
+          "log_loss": 0.6931471805599453,
+          "n": 8633
+        },
+        "calibrated": {
+          "accuracy": 0.5349241283447237,
+          "brier": 0.24966290327104185,
+          "log_loss": 0.6924729636343667,
+          "n": 8633
+        }
+      },
+      "empirical_rate": {
+        "raw": {
+          "accuracy": 0.5349241283447237,
+          "brier": 0.24936100799849353,
+          "log_loss": 0.6918690151019312,
+          "n": 8633
+        },
+        "calibrated": {
+          "accuracy": 0.5349241283447237,
+          "brier": 0.24966290327104185,
+          "log_loss": 0.6924729636343667,
+          "n": 8633
+        }
+      },
+      "conditional_rate": {
+        "raw": {
+          "accuracy": 0.5349241283447237,
+          "brier": 0.2493703314187236,
+          "log_loss": 0.691887636991313,
+          "n": 8633
+        },
+        "calibrated": {
+          "accuracy": 0.5349241283447237,
+          "brier": 0.24966290327104185,
+          "log_loss": 0.6924729636343667,
+          "n": 8633
+        }
+      }
+    },
+    "calibration_rate_up": 0.49478442280945756,
+    "calibration_rows": 8628,
+    "artifact_replay_verified": true,
+    "network_requests": 0,
+    "interpretation": "near-chance baseline diagnostic; no stable predictive edge or profitability established",
+    "availability_limit": "archive capture time is recorded, but contemporaneous per-candle feed availability was not observed; do not treat this as paper execution or point-in-time feed replay"
+  },
+  "b3_1_fixture_result": {
+    "fixture_id": "btc-b31-recorded-synthetic-v1",
+    "schema": "market-os.b3-1.recorded-fixtures@v1",
+    "cases_normalized": 14,
+    "status_counts": {
+      "abstained": 2,
+      "internally_inconsistent": 1,
+      "schema_invalid": 1,
+      "stale": 1,
+      "unavailable": 3,
+      "unsupported": 1,
+      "usable": 5
+    },
+    "network_requests": 0,
+    "market_data_linkage": false,
+    "market_level_jev_comparison": "not_run"
+  }
+}

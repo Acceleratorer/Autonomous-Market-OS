@@ -1,13 +1,33 @@
 # JEV_PROCESSING.md — Jev probabilistic evidence evaluator design
 
-**Status:** B3.1 decision freeze recorded in [ADR-0022](docs/decisions/ADR-0022-b3-1-decision-freeze.md).
-This architecture authorizes no provider request, credential use, data
-acquisition, execution path, B3.1 implementation, or study.
+**Status:** The B3.1 protocol and provider boundary are frozen in
+[ADR-0022](docs/decisions/ADR-0022-b3-1-decision-freeze.md). The fixture-only
+question contract and normalizer in `market_os/btc_question_evaluation.py`
+(with compatibility import `market_os/btc_b31.py`) now have a BTC-specific
+offline seam: a local source corpus, optional MiniRAG adapter, B3.1 packet
+builder, and recorded-assessment alignment helper. The corpus has been built
+and MiniRAG retrieval has completed three repeatability runs. The strict
+historical packet-time gate rejects the retrospective citations, so no matched
+B2/assessment study has run. This work does not authorize a Jev provider
+request, credential use, additional data acquisition, promotion, or execution
+path.
+
+The BTC-specific implementation and retrieval evidence are summarized in the
+[MiniRAG/Jev evidence path](docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md), with its
+run record in
+[`btc-minirag-retrieval-2026-11-19.json`](docs/evidence/btc-minirag-retrieval-2026-11-19.json).
+A separate synthetic fixture validates the normalization/alignment contract
+only; it is not a market sample or Jev result:
+[`btc-b31-synthetic-alignment-2026-11-19.json`](docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json).
 
 **Scope:** BTCUSDT Spot research using B2's existing five-minute log-return
 definition and B1/B2/B3 lineage. B3 remains an offline recorded-response
-benchmark and is not promoted. B3.1 remains fixture-only; its decision freeze
-does not authorize implementation or evaluation.
+benchmark and is not promoted. The BTC packet/alignment seam is offline and
+recorded-response-only; MiniRAG retrieval is repeatable on the selected local
+inputs, but the packet gate blocks those retrospective sources. There is no
+matched B2-to-assessment study or label-backed predictive/calibration result.
+The archive's original source publication times remain unknown, so its local
+availability timestamps cannot establish historical point-in-time evidence.
 
 ## 1. Architectural role
 
@@ -794,8 +814,9 @@ if this role is adopted.
 
 ## 18. Frozen decisions and deferred choices
 
-ADR-0022 freezes the B3.1 decisions below. The freeze does not authorize an
-implementation, provider request, acquisition, or study.
+ADR-0022 freezes the B3.1 study and provider decisions below. The existing
+fixture-only contract/normalization scaffold does not authorize a provider
+request, acquisition, integrated research study, or promotion.
 
 - Jev is an advisory typed evidence evaluator. Initial questions cover evidence
   support, agreement versus contradiction, and abstention. Consistency,
@@ -809,10 +830,13 @@ implementation, provider request, acquisition, or study.
   primary methods. One-bin calibration is a weak baseline. Isotonic is
   unavailable unless a later preregistered sample threshold permits it. Missing
   and abstaining Jev results stay explicit.
-- B3.1 implementation and evaluation are recorded-fixture-only. No new Jev or
-  TypeSafe request, credential, provider adapter activation, or context egress
-  is authorized. Provider budget, version, retention, redaction, and latency
-  require separate approval.
+- B3.1 Jev normalization and evaluation remain recorded-fixture-only. The
+  BTC-specific local corpus, MiniRAG adapter, packet builder, and alignment
+  helper are offline scaffolding. MiniRAG retrieval completed three stable
+  repeats, but strict recorded-availability timing rejects the historical
+  packet; matched market evaluation remains unrun. No Jev or TypeSafe request,
+  credential, provider activation, or context egress is authorized. Provider
+  budget, version, retention, redaction, and latency require separate approval.
 - B3.1 scope is BTCUSDT Spot-only: no short inventory, margin, leverage,
   futures, perpetuals, funding, or x50/x100 assumptions. Derivative work needs
   a new contract, ledger, risk gate, and human decision.
@@ -850,10 +874,15 @@ versions and do not authorize a network request.
 
 ## 20. Future B3.1 study proposal
 
-B3.1 is a frozen offline protocol decision, not an approved implementation,
-dataset acquisition, or active study. A separately approved successor study may
-propose the N0 and J1 arms; C2 and C2-control would additionally require
-separate approval for timestamped context and its egress. Such a study must
+B3.1 remains a frozen offline protocol decision, not an approved integrated
+study or active evaluation. The BTC-specific offline path now includes a local
+corpus, MiniRAG adapter, packet builder, and recorded-assessment alignment
+helper. Retrieval completed three stable repeats, but the strict timestamp
+gate rejects the historical packet and matched evaluation remains unrun. The
+B1 archive was acquired under its own date-bound approval; B3.1 does not grant
+general data acquisition. A separately approved successor study may propose
+the N0 and J1 arms; C2 and C2-control would additionally require separate
+approval for timestamped context and its egress. Such a study must
 preserve B3's purge/embargo and lineage rules and fit calibration and fusion
 only on permitted ranges. It requires a sufficient approved dataset and a
 separately approved plan. A 90-day prospective shadow period is only a future
@@ -882,9 +911,12 @@ inconclusive result remains a valid research outcome.
 
 ## 22. Acceptance criteria for separately approved work
 
-The current B3.1 freeze authorizes no implementation or evaluation. A future
-implementation ticket or successor-study proposal requires separate approval.
-For any offline implementation review, require:
+The current B3.1 freeze does not authorize provider requests, context egress,
+a matched study, or promotion. The offline BTC evidence seam has been
+implemented separately, and MiniRAG retrieval repeatability is documented;
+the strict historical timestamp gate still blocks packets and matched
+evaluation. Any Jev provider request or successor-study proposal requires
+separate approval. For offline implementation review, require:
 
 - packet schema, candidate taxonomy, question versions, and output schema are
   approved by a human owner;

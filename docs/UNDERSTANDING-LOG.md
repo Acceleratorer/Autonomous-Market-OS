@@ -2183,3 +2183,123 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
 - The focused U7 suite passed 13 tests; committed evidence is in
   `docs/evidence/u7-p-evidence-reproducibility.json` and `.md`.
 - Refreshed the graph to 616 files, 2,274 nodes, 4,062 edges, 8 layers, and an 11-step tour; validation reports 0 issues and 125 pre-existing no-edge warnings. Fingerprints and meta now point to 80460a7.
+
+## 2026-11-18 — B1 Binance Vision daily archive adapter
+
+- The owner confirmed Vietnam as the access region and requested Binance or
+  TradingView historical data. Primary-source review selected Binance Vision's
+  daily Spot archives because the Vision Dataset Terms name `data.binance.vision`;
+  REST terms coverage remains unresolved.
+- Added a separate, disabled-by-default archive adapter. It fetches one
+  BTCUSDT/1m ZIP plus its `.CHECKSUM` per UTC day, verifies SHA-256, validates
+  the one-member ZIP and all 12 CSV fields, and normalizes Spot microsecond
+  timestamps for dates from 2025-01-01 onward.
+- Bound the route to 30 completed days, 60 HTTPS requests, one attempt per
+  file, 1 MiB per ZIP, 1 KiB per sidecar, 32 MiB total download, 1 MiB
+  decompressed CSV per day, 900 seconds, and a maximum 24-hour policy expiry.
+  Every transport, including an injected test transport, requires the separate
+  date-bound execution phrase. Raw archive, checksum, and row lineage use the
+  existing B1 HistoryStore.
+- `market_os/tests/test_btc_history.py` passes 36 tests offline, including
+  fixture archive parsing, checksum, policy, lineage, and zero-network
+  readiness coverage. No historical candle or Jev request occurred.
+- Acquisition remains blocked pending owner confirmation of private personal
+  non-commercial research and local-only retention, then a separate exact
+  date-bound execution approval. After acquisition, verify continuity and
+  leakage-safe sample sufficiency before running B2; do not treat B3.1 fixture
+  normalization as a market-level Jev evaluation.
+- Follow-up source review confirmed that the legacy `data-api.binance.vision`
+  ping does not establish archive-host reachability. Binance Public Data
+  maintainer guidance says the Vision terms apply wherever a user lives; the
+  official linked prohibited-country PDF dated 2026-01-05 does not list
+  Vietnam, but its live page may change and the finding is not a Vietnam-specific
+  legal ruling. Recheck before acquisition and stop on any provider refusal.
+- The zero-network readiness snapshot was refreshed at the UTC cutoff
+  `2026-11-18T00:00:00Z`, for `[2026-10-19, 2026-11-18)`, 43,200 maximum rows,
+  and 60 ZIP/checksum requests. No approval policy or market data is present.
+- B2 is runnable against an approved local revision. B3.1 remains a
+  fixture-only normalizer with no integrated B2-to-Jev path, so its current
+  fixture results cannot establish Jev's value on real market samples.
+
+## 2026-11-18 — Approved BTC archive acquisition and offline research
+
+- The owner approved one personal non-commercial, local-only Binance Vision
+  archive run for BTCUSDT Spot 1m, UTC dates 2026-10-19 through 2026-11-17.
+  It fetched 30 ZIPs and 30 checksums (60 requests, 2,093,387 bytes); all
+  checksums passed and the final dataset has 43,200 accepted candles with zero
+  gaps. Revision `btc-history-9c58a3ac5cfd05c7398e`; manifest
+  `btc-history-manifest-6307b278cdc684f4dc42`.
+- The first CLI run persisted all 60 source objects, then failed because the
+  shared page guard capped rows at 1,000 while each archive had 1,440. The
+  ingest guard is now archive-specific and DuckDB provenance commits use Arrow
+  batches. Local recovery made zero additional network requests and processed
+  archives chronologically. The final manifest uses local artifact timestamps
+  because exact HTTP response times were not committed by the failed ingest.
+- B2 run `btc-b2-dde76de3b2965ac6f66a` completed on the local dataset with
+  43,190 samples, 8,633 test rows, chronological splits, and five-minute
+  purge/embargo. Raw empirical and conditional baselines scored 53.49% test
+  accuracy; one-bin calibration did not improve their Brier or log-loss scores.
+  This is a retrospective diagnostic, not a contemporaneous feed replay or
+  paper-execution result.
+- The B3.1 recorded synthetic fixture normalized 14 cases (5 usable); it has
+  no B2 linkage and no market-level Jev result. The next research gate is a
+  time-aligned B2-to-Jev protocol with matched controls and separate provider
+  authorization.
+- Detailed local execution evidence is in
+  `docs/evidence/b1-binance-vision-execution-2026-11-18.json`; the B1 and B2
+  reports, ADR-0016, roadmap, and next-work handoff now record the completed
+  gate and remaining availability limitation.
+
+## 2026-11-19 — BTC MiniRAG local retrieval exercise
+
+- Pinned an isolated local runtime to CPython 3.12.0 and HKUDS/MiniRAG commit
+  `e204d239421f45004852953679927fdf6733f236`. The runtime is outside Market OS
+  base dependencies and the U6.4 embedded CPython 3.11 package. Its exact
+  package snapshot and executable hashes are retained under `docs/evidence/`.
+- Ran MiniRAG `mini` retrieval on exactly the six candle documents referenced
+  by B2 feature `c7740002a6cc0b4c7a62c8bac8d8a5b469f506065d8fb0540ebf59c47e71deb3`.
+  After fixing `PYTHONHASHSEED`, three repeats returned the same four cited
+  documents. Two earlier runs without the fixed seed returned four and three
+  passages. This measures repeatability only; retrieval quality is unevaluated.
+- The strict B3.1 packet builder rejected the retrospective sources because
+  their recorded local availability follows the 2026-10-19 B2 feature close.
+  Original Binance publication time remains unknown. No Jev, LLM, embedding,
+  or market-data API was called, and no recorded market assessment exists.
+- Corrected the packet timestamp mapping to preserve the original B2
+  eligibility clock: a source unavailable by that time is rejected;
+  `packet_available_at_ms` records input availability, while retrieval
+  completion contributes to `packet_ready_at_ms`. The archive remains blocked
+  by its unknown publication time and later local receipt. Python AST parsing
+  and `git diff --check` passed; the project test suite was not run.
+- Tightened recorded-assessment alignment to require the exact B2 feature
+  fingerprint and decision clock from packet lineage. Alignment rows now retain
+  packet readiness, assessment availability, and declared assessment-use time
+  against the B2 decision time, without turning Jev labels into market metrics.
+- Next owner decision: retain strict recorded availability and pause this
+  historical Jev comparison, or explicitly approve a separate retrospective
+  event-time proxy that is not point-in-time valid. See
+  `docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md` and
+  `docs/evidence/btc-minirag-retrieval-2026-11-19.json`.
+
+## 2026-11-19 — Full Understand Anything graph refresh
+
+- Rebuilt the graph from the current working tree at HEAD `3584d3e`. The scan
+  covers 626 non-ignored files across 18 language IDs and 437 resolved import
+  edges. Git ignore kept `.market_os/` local data and `.ua/` generated state
+  out of the source inventory.
+- The graph contains 2,539 nodes, 4,249 edges, 8 Vietnamese architecture
+  layers, and a 10-step Vietnamese tour. It includes the current BTC MiniRAG
+  code, synthetic alignment artifact, evidence-path report, and handoff.
+- Assemble review verified all 437 import-map pairs; deterministic validation
+  found no duplicate IDs, dangling edges, missing file nodes, malformed node
+  fields, or other issues. It reports 351 no-edge warnings, mostly for
+  standalone documents, configuration, and infrastructure nodes.
+- Structural extraction skipped 19 unsupported files across text/config
+  formats; all still have file-level nodes. The multi-document Kubernetes YAML
+  used the documented regex fallback. Fingerprints were generated for all 626
+  scanned files; one YAML multi-document parse warning was recorded.
+- `.ua/meta.json` records the current HEAD plus `analyzedWorkingTree: true`.
+  The prior graph, fingerprint baseline, and metadata were retained in a local
+  `.ua/.trash-*` archive, and `.ua/intermediate/scan-result.json` remains for
+  the next incremental graph update. No Jev or market-data provider request
+  occurred during this graph refresh.

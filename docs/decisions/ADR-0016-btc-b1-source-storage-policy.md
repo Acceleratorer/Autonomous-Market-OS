@@ -1,78 +1,158 @@
 # ADR-0016: B1 historical source, transport gate, and local dataset storage
 
-- **Status:** Proposed; public-data transport disabled pending explicit user approval and unresolved terms/region review
-- **Date:** 2026-10-18
-- **Scope:** B1 BTCUSDT Spot historical one-minute candles; no live streaming
+- **Status:** Accepted for one bounded archive execution on 2026-11-18; future acquisitions require fresh date-bound approval
+- **Date:** 2026-11-18 (source and regional review update)
+- **Scope:** BTCUSDT Spot, closed one-minute history for local quantitative research; no live streaming or trading
 
 ## Decision
 
-Use Binance's documented public Spot REST kline interface as the candidate
-historical source. Use only `GET /api/v3/klines` on the market-data-only host
-`data-api.binance.vision`; do not use authenticated, account, wallet, order, or
-trading APIs. The adapter is deliberately disabled in this B1 implementation:
-the current chat has not supplied the explicit authorization required to fetch
-market candles, and terms/regional eligibility could not be verified from the
-official legal pages, which returned HTTP 202 to the documentation fetch.
+Keep B1 transport disabled by default. A run is enabled only while source
+terms, regional eligibility, retention, and exact owner authorization checks
+pass. Each future range or repeat acquisition requires fresh date-bound
+approval.
 
-The offline implementation will accept source-shaped synthetic fixture pages,
-validate and normalize them through B0's `ClosedCandle`, persist raw pages
-immutably by SHA-256, store canonical closed bars as Parquet, and use DuckDB as
-a local manifest/provenance/outcome catalog and query layer. Dataset revisions
-derive from canonical content, not request page boundaries. DuckDB and PyArrow
-are justified direct dependencies because the requested storage formats are
-not available in the existing runtime or standard library; B0 contracts stay
-stdlib-only.
+Binance's official Spot REST documentation lists `GET /api/v3/klines` on
+`data-api.binance.vision` as keyless public market data. The Binance Vision
+Dataset Terms, however, name `data.binance.vision` and its associated endpoints
+without naming `data-api.binance.vision`. An open question in Binance's public
+data repository received a contributor response advising use of
+`data.binance.vision`; that conflicts with the official Spot API documentation
+and is not an authoritative legal clarification. Therefore the current REST
+host is not cleared by this review.
 
-## Primary-source facts checked 2026-10-18
+If Binance remains the chosen provider, use its historical archive service at
+`data.binance.vision`, which the Vision Dataset Terms name directly. The B1
+archive adapter now uses a separate authorization schema and transport. It
+fetches exactly one daily BTCUSDT/1m ZIP and its `.CHECKSUM` sidecar for each of
+30 completed UTC days, verifies SHA-256, rejects redirects, and preserves the
+raw ZIP, checksum, and source-row lineage. It does not reuse the REST host,
+REST authorization file, or REST execution phrase.
 
-- Binance's official Spot REST docs define `GET /api/v3/klines`, require
-  `symbol` and `interval`, support UTC `startTime`/`endTime`, identify klines by
-  open time, assign request weight 2, and specify default limit 500 / maximum
-  limit 1000. The response has 12 fields; the close timestamp is the interval's
-  inclusive final millisecond. The REST kline schema does not provide a
-  WebSocket-style `is_closed` flag; B1 must enforce its explicit cutoff from
-  the close timestamp.
-- The official market-data-only FAQ lists `https://data-api.binance.vision`
-  and `GET /api/v3/klines`, and says the URL does not require an API key. The
-  API docs classify public market-data endpoints as security type `NONE`.
-- Binance documents dynamic IP-based rate limits: response headers report
-  used weight, HTTP 429 requires backoff, `Retry-After` specifies the wait, and
-  repeated violations may yield HTTP 418 bans. Endpoint weights and global
-  ceilings can change; future transport must honor current server headers and
-  fail closed on 418.
-- The official API documentation repository states that documented endpoints
-  and parameters are supported. This is not a license grant for retaining or
-  redistributing market data. Binance's legal terms pages were inaccessible
-  to this research pass (HTTP 202), and no authoritative regional eligibility,
-  data-retention, or redistribution terms could be established. These remain
-  approval gates, not assumed permissions.
+The Vision Dataset Terms allow only listed non-commercial uses, including
+purely personal non-production algorithmic historical backtesting and
+non-commercial open-source data-science evaluation. They prohibit commercial
+use and certain downstream uses. This project may use such data only for the
+owner's personal, non-production, offline research and paper simulation under
+those restrictions. The terms mention downloading/caching/querying but do not
+set a retention period; indefinite local retention is not certified by this
+review. Do not redistribute datasets or derived feeds.
 
-Sources:
+The owner has identified Vietnam as the access region. The official Binance
+Terms link to a prohibited-country PDF updated 2026-01-05; that published list
+does not name Vietnam. The PDF reserves Binance's ability to designate other
+locations, and the general Terms allow service restrictions. A Binance Public
+Data repository maintainer says the Vision Dataset Terms apply wherever a
+user lives, in a response about Japan; this is useful source guidance, not a
+Vietnam-specific legal ruling. The linked country page is JavaScript-rendered,
+so recheck the current linked list before acquisition. A prior
+`GET /api/v3/ping` returned HTTP 200 from the separate `data-api.binance.vision`
+REST host; it does not establish archive-host reachability. The reviewed
+sources show no identified Vietnam exclusion, but they do not guarantee
+current access to `data.binance.vision`; stop on any regional or policy refusal.
 
-- [Binance Spot REST API — Kline/Candlestick data and limits](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#klinecandlestick-data)
-- [Binance Spot REST API — IP limits and request security](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#ip-limits)
-- [Binance Market Data Only URLs FAQ](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md)
-- [Binance API documentation repository](https://github.com/binance/binance-spot-api-docs)
-- [Binance Terms of Use](https://www.binance.com/en/terms) (HTTP 202; content not verified)
+Vietnam Government Resolution 05/2025/NQ-CP covers the pilot for crypto-asset
+issuance, exchange-market organization, service provision, and state
+management. The cited scope does not specifically address downloading public
+historical candles for private offline research; this is not a legal opinion
+or a certification that any future use is permitted.
 
-## Proposed controls if transport is approved later
+## Source facts checked 2026-11-18
 
-- Allowlist DNS hostname `data-api.binance.vision`, HTTPS port 443, and the
-  exact `GET /api/v3/klines` path only. No redirects to a different host.
-- Send a descriptive `User-Agent` such as
-  `MarketOS-BTC-Paper/0.1 (+https://github.com/Acceleratorer/Autonomous-Market-OS)`.
-- Require explicit UTC, minute-aligned half-open ranges `[start, end)`. Translate
-  the exclusive end to Binance's inclusive `endTime=end_ms-1`.
-- Maximum 1000 candles/page (source limit); proposed local cap 100 pages and
-  100,000 candles per run. These local caps are application safeguards, not
-  Binance quotas.
-- Proposed 10-second per-request timeout and at most three total attempts for
-  network timeouts and 5xx errors. On 429, honor `Retry-After` and stop if it
-  exceeds 60 seconds; never retry 418. A checkpoint permits manual resume.
-- Proposed local-only retention: raw response pages and derived datasets stay
-  in the user-selected local store, are never uploaded or redistributed, and
-  remain until the user deletes them. This retention proposal is not activated
-  for exchange data until legal/region review and explicit approval.
+- Binance Spot REST docs define kline intervals, UTC `startTime`/`endTime`,
+  chronological rows identified by open time, request weight, and a maximum
+  limit of 1,000. The kline REST response has no WebSocket-style
+  `is_closed` flag; B1 must enforce its explicit cutoff.
+- Binance's Market Data Only FAQ lists `data-api.binance.vision` and
+  `GET /api/v3/klines` as public, unauthenticated endpoints.
+- Binance Vision Dataset Terms v1.0 (last updated 2026-08-26) apply to public
+  datasets on `data.binance.vision` and associated endpoints. They govern use
+  of derived data, grant a non-commercial CC BY-NC-SA 4.0 license, restrict
+  permitted purposes, prohibit commercial utilization without a separate
+  written enterprise license, and set no explicit retention duration.
+- A contributor comment in open issue #502 (2026-11-05) says
+  `data-api.binance.vision` is not a live Binance endpoint and recommends the
+  `data.binance.vision` archive service. This statement conflicts with Binance's
+  official Spot API docs; the issue is not treated as legal authority.
+- A maintainer response in open issue #524 (2026-11-05) says Vision datasets
+  are available without an account and the same terms apply wherever a user
+  lives. The response concerns a Japan resident; applying its general wording
+  to Vietnam is an inference, not a Vietnam-specific legal ruling.
+- The official Binance Vietnamese Terms link to a prohibited-country list and
+  say services may be restricted by jurisdiction. The linked list PDF, updated
+  2026-01-05, does not name Vietnam and reserves the right to add locations.
+  The linked page is JavaScript-rendered, so the current list must be rechecked
+  before acquisition. A prior ping to the separate REST host does not prove
+  archive-host access.
+- The official Vietnam Government record for Resolution 05/2025/NQ-CP scopes
+  the pilot around crypto-asset markets and services, not data-only retrieval.
 
-No candle request was made for this decision. The disabled transport seam
-raises a stable `source_not_approved` failure before opening any connection.
+## Sources
+
+- [Binance Vision Dataset Terms](https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md)
+- [Binance public-data repository issue #502](https://github.com/binance/binance-public-data/issues/502)
+- [Binance public-data repository issue #524](https://github.com/binance/binance-public-data/issues/524)
+- [Binance Public Data README](https://github.com/binance/binance-public-data/blob/master/README.md)
+- [Binance Market Data Only URLs](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md)
+- [Binance Spot REST API](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md)
+- [Binance Terms of Use, Vietnamese](https://www.binance.com/vi/terms)
+- [Binance List of Prohibited Countries](https://www.binance.com/en/about-legal/list-of-prohibited-countries) and its [linked PDF](https://bin.bnbstatic.com/static/cms/cg08ou2ak0tn7mcplvfg/file/2dead3dd5d9bccb32694e2f0fe5c7f2c6b583e7a6f851296edef7088340e6df5.pdf) (updated 2026-01-05; PDF title includes `[DRAFT]`)
+- [Vietnam Government registry: Resolution 05/2025/NQ-CP](https://vanban.chinhphu.vn/?classid=0&docid=215249&pageid=27160)
+
+## Existing B1 implementation and proposed controls
+
+The existing offline implementation accepts source-shaped 12-field kline
+fixture pages, validates them through B0 `ClosedCandle`, stores raw pages by
+SHA-256, writes canonical Parquet, and uses DuckDB for manifests, provenance,
+outcomes, and replay. Dataset revisions derive from canonical content rather
+than page boundaries. DuckDB and PyArrow are direct dependencies because the
+requested formats are not available from the standard library.
+
+The opt-in REST adapter remains separate and disabled because its license
+coverage is unresolved. It allowlists only HTTPS `GET /api/v3/klines` on
+`data-api.binance.vision` and requires its own root policy and execution phrase.
+Those REST-specific controls do not authorize archive requests.
+
+## Execution record — 2026-11-18
+
+The owner approved BTCUSDT Spot 1m for UTC dates 2026-10-19 through
+2026-11-17, personal non-commercial offline/paper research, local-only
+retention, and no redistribution, credentials, or trading. The bounded run
+made 60 HTTPS requests (30 ZIPs and 30 checksums), verified all SHA-256
+sidecars, downloaded 2,093,387 bytes, and stored 43,200 canonical candles with
+zero gaps. Dataset revision `btc-history-9c58a3ac5cfd05c7398e` and manifest
+`btc-history-manifest-6307b278cdc684f4dc42` are retained in the local B1
+store. Full evidence is in
+[`../evidence/b1-binance-vision-execution-2026-11-18.json`](../evidence/b1-binance-vision-execution-2026-11-18.json).
+
+The first ingest failed after the downloads because the generic page guard
+allowed only 1,000 rows while each daily archive held 1,440. Recovery used the
+preserved local artifacts, archive-specific row validation, and batched DuckDB
+writes; it made no additional network request. Per-response HTTP receive times
+were not committed by the failed ingest, so the final manifest records local
+artifact modification timestamps. A provisional manifest from an interrupted
+local recovery remains unregistered and was not used by B2.
+
+## Proposed archive controls
+
+The archive proposal is 30 completed UTC days, up to 43,200 rows, 30 ZIPs and
+30 checksum sidecars, 60 HTTPS requests total, one attempt per file, a 1 MiB
+ZIP cap, a 1 KiB checksum cap, 1 MiB uncompressed CSV cap per day, 32 MiB total
+download cap, and a 900-second runtime cap. The parser requires one expected
+CSV member with 12 columns, converts Spot timestamps from microseconds for
+dates on or after 2025-01-01, and leaves B1's continuity/gap classification
+authoritative. The archive transport still requires a repository-root
+`approved-vision-archive-policy.json`, an exact date-bound execution phrase,
+explicit personal non-commercial scope, confirmed local retention, and an
+expiry no more than 24 hours ahead. The execution phrase is required even for
+an injected transport. The approved execution record above closes this gate
+for one range only; the default transport remains disabled.
+
+Any future approved route must keep files local, avoid backups/uploads and
+redistribution, preserve raw-source hashes and lineage, validate closed
+candles and gaps, and stop on provider or integrity ambiguity. Generate a fresh
+UTC cutoff and obtain new date-bound approval before another run.
+
+The approved archive execution made 60 requests to `data.binance.vision`; the
+offline recovery made zero requests. No Jev request, credential use, or trade
+occurred. A prior public ping to the separate REST host was a separate review
+action and did not participate in this acquisition.

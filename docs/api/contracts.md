@@ -138,11 +138,13 @@ policy, runtime flag, and separate execution approval. The CLI surfaces are:
 ```text
 market-os btc-paper ingest --fixture <path> --store-root <path>
 market-os btc-paper historical-readiness --cutoff-ms <UTC-minute-ms>
-market-os btc-paper acquire --start-ms <ms> --end-ms <exclusive-ms> \
-  --page-size 1000 --max-pages 44 --max-requests 44 --max-rows 43200 \
-  --max-runtime-seconds 900 --max-attempts 1 \
-  --allow-historical-ingest --authorization-file <approved-policy.json> \
-  --execution-approval "<exact B1 approval phrase>" \
+market-os btc-paper acquire-archive --start-date <YYYY-MM-DD> \
+  --end-date-exclusive <YYYY-MM-DD> --max-files 30 --max-requests 60 \
+  --max-rows 43200 --max-runtime-seconds 900 --max-attempts 1 \
+  --max-zip-bytes 1048576 --max-checksum-bytes 1024 --max-total-bytes 33554432 \
+  --allow-historical-ingest \
+  --authorization-file <approved-vision-archive-policy.json> \
+  --execution-approval "<exact date-bound archive approval phrase>" \
   --store-root <path>
 market-os btc-paper inspect <dataset-revision> --resource manifest|candles|outcomes|provenance|gaps|replay --store-root <path>
 market-os btc-paper manifests <dataset-revision> --limit <1..100> --after-manifest-id <manifest-id> --store-root <path>
@@ -152,25 +154,26 @@ market-os btc-paper manifest-records <dataset-revision> <manifest-id> outcomes|g
 ```
 
 `historical-readiness` is offline and returns the versioned
-`market-os.btc-history-readiness.v1` proposal. It defaults to a blocked
-30-UTC-day BTCUSDT/1m range ending at the explicit cutoff, with 43,200 rows,
-44 pages/requests, one attempt per page, a 900-second runtime cap, and a
-256 KiB page bound. The candle opening at the cutoff is excluded.
+`market-os.btc-history-vision-readiness.v1` archive proposal. The cutoff must
+be a UTC midnight and the half-open range contains the preceding 30 complete
+UTC days. It allows at most 30 ZIP files, 30 checksum files, 60 HTTPS requests,
+43,200 rows, one attempt per file, 1 MiB per ZIP, 1 KiB per checksum, 32 MiB
+total download, and 900 seconds. The candle opening at the cutoff is excluded.
 
-`acquire` remains refused unless the explicit runtime flag, the exact
-repository-root `approved-policy.json`, and a matching
-`market-os.btc-history-authorization.v1` policy file are supplied. The policy
-must verify source terms, regional eligibility, retention rights, a future
-`expires_at`, and the requested range and caps. The default Binance transport
-remains disabled; the reviewed opt-in path additionally requires a separate
-exact execution approval phrase. The phrase is recorded in
-`docs/U3-B1-HISTORICAL-READINESS-REPORT.md`.
+`acquire-archive` remains refused unless the explicit runtime flag, the exact
+repository-root `approved-vision-archive-policy.json`, and a matching
+`market-os.btc-history-vision-authorization.v1` policy file are supplied. The
+policy must confirm the personal non-commercial purpose, Vietnam region,
+local-only retention, source terms, an `expires_at` no more than 24 hours
+ahead, and the exact date range and caps. The separate exact execution phrase
+binds the approved UTC dates. The old REST `acquire` command and its `approved-policy.json` do not
+authorize this archive route; REST coverage remains unresolved.
 
 The existing HTTP adapter accepts `POST /v1/btc/history/ingest` with a local
 `store_root` and fixture object. Read-only resources are:
 
 ```text
-GET /v1/btc/history/readiness?cutoff-ms=<UTC-minute-ms>
+GET /v1/btc/history/readiness?cutoff-ms=<UTC-midnight-ms>
 GET /v1/btc/history/datasets?limit=<1..100>&after_dataset_revision=<revision>
 GET /v1/btc/history/datasets/<revision>/candles?limit=<1..100>&after_open_time_ms=<UTC-ms>
 GET /v1/btc/history/datasets/<revision>/manifests?limit=<1..100>&after_manifest_id=<manifest-id>

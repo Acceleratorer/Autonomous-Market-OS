@@ -1,10 +1,75 @@
 # B1 BTC Historical Ingestion Report
 
-**Status:** Offline B1 storage/replay implementation complete; public transport
-disabled. No Binance candle request, authenticated request, credential, or live
-market-data connection was made.
+**Status:** One bounded Binance Vision archive run completed locally on
+2026-11-18. The archive transport remains disabled by default and was enabled
+for this run only by the date-bound owner approval. No credentials,
+authenticated requests, Jev calls, or trades were used.
 
-## Source and network decision
+**Historical scope note:** This report documents the earlier REST-source review.
+The current source decision and separately gated archive adapter are documented
+in [U3/B1 historical-data readiness](U3-B1-HISTORICAL-READINESS-REPORT.md).
+That policy uses `data.binance.vision`; the legacy `data-api.binance.vision`
+route described below is not authorized by it.
+
+## Executed bounded Vision archive run
+
+The owner approved BTCUSDT Spot 1m archives for UTC dates 2026-10-19 through
+2026-11-17, personal non-commercial offline/paper research, local-only
+retention, and no redistribution, credentials, or trading. The run was
+approved for 60 HTTPS requests including checksums, 43,200 rows, 1 MiB per
+ZIP, 1 KiB per checksum, 32 MiB total download, 900 seconds, and one attempt
+per file. The adapter applied a monotonic deadline during fetch/parse and
+checked it before canonical ingestion. Exact total wall-clock runtime was not
+saved, and local persistence was not timed against that deadline; do not treat
+this report as a single measurement of the entire recovery sequence. The
+initial network acquisition CLI attempt returned after 76.7 seconds, within
+the cap, after fetching all 60 source objects; it then failed at canonical
+ingestion because of the page-size defect. A separate offline recovery attempt
+ran for 938.5 seconds and failed without additional requests. The final offline
+source validation and rebuild completed in 8.2 seconds with zero additional
+requests.
+
+The final local store is `.market_os/btc-history`. It contains 30 ZIPs and 30
+checksums (2,093,387 bytes total), all checksum-verified, with 1,440 rows per
+day. The registered dataset is `btc-history-9c58a3ac5cfd05c7398e`, with
+manifest `btc-history-manifest-6307b278cdc684f4dc42`: 43,200 canonical rows,
+43,200 accepted outcomes, and zero gaps. The first and last candle opens are
+2026-10-19 00:00 UTC and 2026-11-17 23:59 UTC. Machine-readable execution
+details are in
+[`evidence/b1-binance-vision-execution-2026-11-18.json`](evidence/b1-binance-vision-execution-2026-11-18.json).
+
+The first CLI invocation fetched and persisted all 60 objects, then exposed a
+page-size defect: the shared REST ingest guard rejected a valid 1,440-row daily
+archive. The raw objects were retained. An offline rebuild added an
+archive-specific 1,440-row allowance and batched DuckDB provenance writes; the
+final rebuild processed archives chronologically and made zero additional
+HTTPS requests. One provisional manifest from a capped intermediate rebuild
+remains unregistered in the local `manifests/` directory; the manifest above is
+the cataloged result.
+
+The initial failed ingest did not commit per-response receive times. The final
+manifest therefore uses local raw-artifact file timestamps
+2026-11-18T04:06:41.552Z through 2026-11-18T04:06:41.662Z as receipt-time
+evidence; exact HTTP response timestamps were not retained. Historical candle
+open/close timestamps and row values remain source-verified. B2 is a
+retrospective chronological diagnostic, not a replay of contemporaneous data
+receipt or a paper-execution result.
+
+The 2026-11-18 run used the local workspace path `.market_os/btc-history` on a
+fixed local volume. Follow-up hardening now resolves every `HistoryStore` root
+and rejects UNC paths, mapped Windows remote drives, and recognized Linux
+network mounts before opening or creating store data. The same guard applies
+to read-only corpus loading.
+
+The acquisition deadline is now carried through row classification, Parquet
+creation, and DuckDB ingestion. Deadline checks before catalog commit roll back
+the transaction if synchronous ingest work overruns the cap; a blocking local
+operation cannot be preempted, so an overrun may return after 900 seconds but
+cannot register a successful dataset. Regression coverage exercises UNC
+rejection and expiry during archive ingestion. This is a code-path hardening
+result; the historical execution timings above remain unchanged.
+
+## Historical REST-source review (superseded)
 
 The candidate source is Binance Spot REST `GET /api/v3/klines` on
 `data-api.binance.vision`, the documented market-data-only host. Official docs
@@ -58,8 +123,8 @@ The earlier `7e910cbf...` value is stale evidence from the pre-closure
 canonicalization and is not treated as a current identity. The current
 manifest reports `observed_end_ms_exclusive=1767226320000`, matching the
 exclusive one-minute boundary rather than adding one millisecond.
-No historical data range or live dataset fingerprint was acquired. The stored
-fixture dataset is synthetic and exists only in test temporary directories.
+This fixture remains synthetic and is separate from the approved Vision
+dataset. Its fingerprint is not the real BTCUSDT dataset revision above.
 
 ## Dependencies and limits
 
@@ -70,9 +135,9 @@ MLflow, Kafka, Redis, Ray, Docker, web framework, or model dependency was added.
 
 ## Defect-closure result
 
-- Hard-disabled Binance transport: **intentional boundary**, retained. A
-  separately reviewed enablement boundary is still required; this milestone
-  does not enable or exercise it.
+- Binance transport remains disabled by default. The archive route was enabled
+  only for the single approved, bounded run documented above; any new range or
+  repeat acquisition requires fresh date-bound approval.
 - Fingerprint mismatch: **stale documentation/evidence**, reconciled to the
   current implementation above and in the machine-readable U3/B2/U3/B3
   records.
@@ -83,5 +148,5 @@ MLflow, Kafka, Redis, Ray, Docker, web framework, or model dependency was added.
   decimal lexemes in B1 storage and fingerprints while retaining float64
   analytical columns.
 
-No historical data was acquired. Jev, model calls, backtests, and virtual
-brokerage remain out of B1.
+B1 acquired no Jev assessments, model calls, backtests, or virtual brokerage
+results. The offline B2 diagnostic is documented separately.

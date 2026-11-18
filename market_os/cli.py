@@ -88,6 +88,21 @@ def build_parser() -> argparse.ArgumentParser:
     btc_acquire.add_argument("--execution-approval")
     btc_acquire.add_argument("--no-resume", action="store_true")
     btc_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
+    btc_archive_acquire = btc_commands.add_parser("acquire-archive")
+    btc_archive_acquire.add_argument("--start-date", required=True)
+    btc_archive_acquire.add_argument("--end-date-exclusive", required=True)
+    btc_archive_acquire.add_argument("--max-files", type=int, default=30)
+    btc_archive_acquire.add_argument("--max-requests", type=int, default=60)
+    btc_archive_acquire.add_argument("--max-rows", type=int, default=43_200)
+    btc_archive_acquire.add_argument("--max-runtime-seconds", type=int, default=900)
+    btc_archive_acquire.add_argument("--max-attempts", type=int, default=1)
+    btc_archive_acquire.add_argument("--max-zip-bytes", type=int, default=1024 * 1024)
+    btc_archive_acquire.add_argument("--max-checksum-bytes", type=int, default=1024)
+    btc_archive_acquire.add_argument("--max-total-bytes", type=int, default=32 * 1024 * 1024)
+    btc_archive_acquire.add_argument("--allow-historical-ingest", action="store_true")
+    btc_archive_acquire.add_argument("--authorization-file")
+    btc_archive_acquire.add_argument("--execution-approval")
+    btc_archive_acquire.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_STORE_ROOT", ".market_os/btc-history"))
     btc_readiness = btc_commands.add_parser("historical-readiness")
     btc_readiness.add_argument("--cutoff-ms", type=int, required=True)
     btc_catalog = btc_commands.add_parser("catalog")
@@ -423,7 +438,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "btc-paper":
         from dataclasses import asdict
         from pathlib import Path
-        from .btc_history import HistoryStore, plan_historical_readiness
+        from .btc_history import ARCHIVE_ROWS_PER_DAY, HistoryStore, plan_historical_readiness
         from .btc_paper import replay_fixture
 
         if args.btc_command == "replay":
@@ -470,6 +485,37 @@ def main(argv: list[str] | None = None) -> int:
                 authorization=authorization,
                 execution_approval=args.execution_approval,
                 resume=not args.no_resume,
+            )
+            print(json.dumps(asdict(result), indent=2, sort_keys=True))
+            return 0
+        if args.btc_command == "acquire-archive":
+            if not args.allow_historical_ingest:
+                raise SystemExit("archive acquisition requires --allow-historical-ingest")
+            if not args.authorization_file:
+                raise SystemExit("archive acquisition requires --authorization-file")
+            authorization_path = Path(args.authorization_file).resolve()
+            required_authorization_path = (Path(__file__).resolve().parent.parent / "approved-vision-archive-policy.json").resolve()
+            if authorization_path != required_authorization_path:
+                raise SystemExit("archive acquisition requires the repository approved-vision-archive-policy.json")
+            try:
+                authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise SystemExit(f"cannot read Binance Vision archive authorization: {exc}") from exc
+            store = HistoryStore(args.store_root)
+            result = store.acquire_vision_archive(
+                args.start_date,
+                args.end_date_exclusive,
+                max_files=args.max_files,
+                max_requests=args.max_requests,
+                max_rows=args.max_rows,
+                max_runtime_seconds=args.max_runtime_seconds,
+                max_attempts=args.max_attempts,
+                max_zip_bytes=args.max_zip_bytes,
+                max_checksum_bytes=args.max_checksum_bytes,
+                max_total_bytes=args.max_total_bytes,
+                allow_historical_ingest=True,
+                authorization=authorization,
+                execution_approval=args.execution_approval,
             )
             print(json.dumps(asdict(result), indent=2, sort_keys=True))
             return 0
@@ -562,7 +608,7 @@ def main(argv: list[str] | None = None) -> int:
                             args.manifest_id,
                             limit=args.limit,
                             after_raw_page_sha256=raw_hash,
-                            after_row_index=decimal_cursor(args.after_row_index, "after_row_index", 999, 3),
+                            after_row_index=decimal_cursor(args.after_row_index, "after_row_index", ARCHIVE_ROWS_PER_DAY - 1, len(str(ARCHIVE_ROWS_PER_DAY))),
                         )
                     api_version = "market-os.btc-history-manifest-records@v1"
             except (KeyError, HistoryError, OSError, RuntimeError, TypeError, ValueError) as exc:

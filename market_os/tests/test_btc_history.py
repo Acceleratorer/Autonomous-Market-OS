@@ -1,27 +1,46 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+import hashlib
+import io
 from pathlib import Path
+import zipfile
 
 import pytest
+from market_os import btc_history as btc_history_module
 import threading
 from http.server import ThreadingHTTPServer
 import urllib.request
 import urllib.parse
 
 from market_os.btc_history import (
+    ARCHIVE_AUTHORIZATION_VERSION,
+    ARCHIVE_EXECUTION_PHRASE_PREFIX,
+    ARCHIVE_HOST,
+    ARCHIVE_MAX_CHECKSUM_BYTES,
+    ARCHIVE_MAX_FILES,
+    ARCHIVE_MAX_REQUESTS,
+    ARCHIVE_MAX_ROWS,
+    ARCHIVE_MAX_RUNTIME_SECONDS,
+    ARCHIVE_MAX_TOTAL_BYTES,
+    ARCHIVE_MAX_ZIP_BYTES,
+    ARCHIVE_PATH,
     BinanceHistoricalTransport,
+    BinanceVisionArchiveTransport,
     EXECUTION_APPROVAL_PHRASE,
     HISTORY_MAX_RESPONSE_BYTES,
     HistoryError,
     HistoryStore,
     HttpResponse,
+    archive_execution_approval_phrase,
     classify_http_failure,
     fetch_pages,
     plan_historical_readiness,
+    parse_vision_archive,
     plan_pages,
     parse_kline_row,
+    validate_archive_authorization,
     validate_historical_authorization,
     validate_historical_budget,
 )
@@ -62,6 +81,60 @@ def authorized(**overrides):
     }
     value.update(overrides)
     return value
+
+
+def authorized_archive(**overrides):
+    value = {
+        "schema": ARCHIVE_AUTHORIZATION_VERSION,
+        "explicit_approval": True,
+        "terms_verified": True,
+        "regional_eligibility_verified": True,
+        "personal_noncommercial_scope_confirmed": True,
+        "retention_confirmed": True,
+        "host": ARCHIVE_HOST,
+        "path": ARCHIVE_PATH,
+        "method": "GET",
+        "symbol": "BTCUSDT",
+        "interval": "1m",
+        "access_region": "Vietnam",
+        "authenticated": False,
+        "trading": False,
+        "websocket": False,
+        "account_access": False,
+        "orders": False,
+        "futures": False,
+        "margin": False,
+        "credentials": False,
+        "redistribution": False,
+        "purpose": "personal non-commercial offline BTC historical research and paper-only simulation",
+        "retention": "local-only-until-explicit-deletion",
+        "start_date": "2026-01-02",
+        "end_date_exclusive": "2026-02-01",
+        "max_files": ARCHIVE_MAX_FILES,
+        "max_requests": ARCHIVE_MAX_REQUESTS,
+        "max_rows": ARCHIVE_MAX_ROWS,
+        "max_runtime_seconds": ARCHIVE_MAX_RUNTIME_SECONDS,
+        "max_attempts": 1,
+        "max_zip_bytes": ARCHIVE_MAX_ZIP_BYTES,
+        "max_checksum_bytes": ARCHIVE_MAX_CHECKSUM_BYTES,
+        "max_total_bytes": ARCHIVE_MAX_TOTAL_BYTES,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=12)).isoformat(),
+    }
+    value.update(overrides)
+    return value
+
+
+def vision_zip(day: date) -> bytes:
+    open_ms = int(datetime.combine(day, datetime.min.time(), timezone.utc).timestamp() * 1000)
+    row = [
+        str(open_ms * 1000), "100.00", "101.00", "99.00", "100.50", "2.00",
+        str((open_ms + MINUTE - 1) * 1000 + 999), "200.00", "3", "1.00", "100.00", "0",
+    ]
+    filename = f"BTCUSDT-1m-{day.isoformat()}.csv"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(filename, ",".join(row) + "\n")
+    return buffer.getvalue()
 
 
 def test_kline_parser_normalizes_closed_row_and_preserves_raw_fingerprint() -> None:
@@ -106,14 +179,219 @@ def test_historical_readiness_calculates_conservative_30_day_range_and_caps() ->
     readiness = plan_historical_readiness(cutoff)
 
     assert readiness["ingestion_allowed"] is False
+    assert readiness["network_requests"] == 0
+    assert readiness["schema"] == "market-os.btc-history-vision-readiness.v1"
     assert readiness["requested_end_ms_exclusive"] == cutoff
     assert readiness["excluded_final_candle_open_ms"] == cutoff
-    assert readiness["expected_rows"] == 30 * 24 * 60
-    assert readiness["expected_pages"] == 44
-    assert readiness["max_requests"] == 44
+    assert readiness["proposal"]["expected_rows"] == 30 * 24 * 60
+    assert readiness["proposal"]["expected_days"] == 30
+    assert readiness["max_requests"] == 60
     assert readiness["max_runtime_seconds"] == 900
-    assert readiness["storage"]["raw_page_retention"] == "local-only-until-explicit-deletion"
-    assert readiness["authorization"]["terms_verified"] is False
+    assert readiness["source"]["host"] == "data.binance.vision"
+    assert readiness["limits"]["max_zip_bytes_each"] == 1024 * 1024
+    assert readiness["authorization"]["personal_noncommercial_scope_confirmed"] is False
+    assert readiness["authorization"]["terms_verified"] is True
+
+
+def test_vision_archive_parser_normalizes_spot_microsecond_timestamps() -> None:
+    day = date(2026, 1, 2)
+    rows = parse_vision_archive(day, vision_zip(day))
+    expected_open = int(datetime.combine(day, datetime.min.time(), timezone.utc).timestamp() * 1000)
+    assert len(rows) == 1
+    assert rows[0][0] == expected_open
+    assert rows[0][6] == expected_open + MINUTE - 1
+    assert rows[0][1:6] == ["100.00", "101.00", "99.00", "100.50", "2.00"]
+    assert len(rows[0]) == 12
+    with pytest.raises(HistoryError, match="size"):
+        parse_vision_archive(day, b"x" * (ARCHIVE_MAX_ZIP_BYTES + 1))
+
+
+def test_archive_authorization_and_transport_are_bound_to_approved_dates() -> None:
+    policy = authorized_archive()
+    validate_archive_authorization(policy)
+    phrase = archive_execution_approval_phrase(policy)
+    assert phrase.startswith(ARCHIVE_EXECUTION_PHRASE_PREFIX)
+    assert "2026-01-02 through 2026-01-31" in phrase
+
+    transport = BinanceVisionArchiveTransport(policy, phrase)
+    request, max_bytes, filename = transport.build_request(date(2026, 1, 2), "checksum")
+    assert request.method == "GET"
+    assert request.full_url == (
+        "https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1m/"
+        "BTCUSDT-1m-2026-01-02.zip.CHECKSUM"
+    )
+    assert filename == "BTCUSDT-1m-2026-01-02.zip.CHECKSUM"
+    assert max_bytes == ARCHIVE_MAX_CHECKSUM_BYTES
+    assert transport.request_count == 0
+    with pytest.raises(HistoryError, match="approved UTC range"):
+        transport.build_request(date(2026, 2, 1), "archive")
+    with pytest.raises(HistoryError, match="usage scope"):
+        validate_archive_authorization(authorized_archive(personal_noncommercial_scope_confirmed=False))
+    with pytest.raises(HistoryError, match="within 24 hours"):
+        validate_archive_authorization(authorized_archive(
+            expires_at=(datetime.now(timezone.utc) + timedelta(days=2)).isoformat(),
+        ))
+
+
+def test_history_store_rejects_unc_root_before_filesystem_access(monkeypatch) -> None:
+    def unexpected_mkdir(_self, *_args, **_kwargs):
+        pytest.fail("UNC root reached filesystem creation before local-storage rejection")
+
+    monkeypatch.setattr(Path, "mkdir", unexpected_mkdir)
+    with pytest.raises(HistoryError, match="local volume"):
+        HistoryStore(r"\\server\share\btc-history")
+
+
+def test_mapped_remote_windows_drive_is_classified_as_network_storage() -> None:
+    checked_roots: list[str] = []
+
+    def remote_drive(root: str) -> int:
+        checked_roots.append(root)
+        return 4
+
+    assert btc_history_module._is_remote_windows_drive(r"Z:\btc-history", drive_type=remote_drive)
+    assert checked_roots == ["Z:\\"]
+
+
+def test_history_store_rejects_mapped_remote_drive_before_filesystem_access(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(btc_history_module, "_is_remote_windows_drive", lambda _root: True)
+    monkeypatch.setattr(Path, "mkdir", lambda *_args, **_kwargs: pytest.fail("remote root reached filesystem creation"))
+
+    with pytest.raises(HistoryError, match="local volume"):
+        HistoryStore(tmp_path)
+
+
+def test_archive_ingestion_checks_deadline_before_catalog_commit(tmp_path: Path, monkeypatch) -> None:
+    class Clock:
+        now = 10.0
+
+        def monotonic(self) -> float:
+            return self.now
+
+    clock = Clock()
+    monkeypatch.setattr(btc_history_module.time, "monotonic", clock.monotonic)
+    original_ingest = HistoryStore._ingest_pages
+
+    def expire_during_ingest(self, *args, **kwargs):
+        clock.now = 911.0
+        return original_ingest(self, *args, **kwargs)
+
+    monkeypatch.setattr(HistoryStore, "_ingest_pages", expire_during_ingest)
+
+    class ArchiveSource:
+        approved = True
+
+        def fetch_file(self, day: date, kind: str) -> HttpResponse:
+            archive_bytes = vision_zip(day)
+            filename = f"BTCUSDT-1m-{day.isoformat()}.zip"
+            body = (
+                f"{hashlib.sha256(archive_bytes).hexdigest()}  {filename}\n".encode("ascii")
+                if kind == "checksum"
+                else archive_bytes
+            )
+            return HttpResponse(200, {}, body, "2026-02-01T00:00:02+00:00")
+
+    policy = authorized_archive()
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError, match="runtime cap"):
+        store.acquire_vision_archive(
+            "2026-01-02",
+            "2026-02-01",
+            transport=ArchiveSource(),
+            allow_historical_ingest=True,
+            authorization=policy,
+            execution_approval=archive_execution_approval_phrase(policy),
+        )
+
+    assert store.inspect_datasets() == []
+
+
+def test_archive_acquisition_checks_sidecars_and_persists_source_lineage(tmp_path: Path) -> None:
+    start = date(2026, 1, 2)
+    end = date(2026, 2, 1)
+
+    class ArchiveSource:
+        approved = True
+
+        def __init__(self):
+            self.calls: list[tuple[date, str]] = []
+
+        def fetch_file(self, day: date, kind: str) -> HttpResponse:
+            self.calls.append((day, kind))
+            archive_bytes = vision_zip(day)
+            filename = f"BTCUSDT-1m-{day.isoformat()}.zip"
+            body = (
+                f"{hashlib.sha256(archive_bytes).hexdigest()}  {filename}\n".encode("ascii")
+                if kind == "checksum"
+                else archive_bytes
+            )
+            return HttpResponse(200, {}, body, "2026-02-01T00:00:02+00:00")
+
+    source = ArchiveSource()
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError, match="exact B1 Binance Vision archive execution approval"):
+        store.acquire_vision_archive(
+            start.isoformat(),
+            end.isoformat(),
+            transport=source,
+            allow_historical_ingest=True,
+            authorization=authorized_archive(),
+        )
+    assert source.calls == []
+    result = store.acquire_vision_archive(
+        start.isoformat(),
+        end.isoformat(),
+        transport=source,
+        allow_historical_ingest=True,
+        authorization=authorized_archive(),
+        execution_approval=archive_execution_approval_phrase(authorized_archive()),
+    )
+    manifest = store.inspect_manifest(result.dataset_revision)
+
+    assert result.canonical_count == 30
+    assert source.calls[0] == (start, "checksum")
+    assert len(source.calls) == 60
+    assert manifest["network_requests"] == 60
+    assert manifest["source_identity"] == "binance.spot.daily-archive.klines"
+    assert manifest["endpoint_host"] == "data.binance.vision"
+    assert manifest["raw_record_count"] == 30
+    assert len(manifest["raw_source_artifacts"]) == 30
+    assert len(list((tmp_path / "raw").glob("*.zip"))) == 30
+    assert len(list((tmp_path / "raw").glob("*.CHECKSUM"))) == 30
+    assert store.replay(result.dataset_revision)["network_requests"] == 0
+
+
+def test_archive_checksum_mismatch_stops_before_local_persistence(tmp_path: Path) -> None:
+    day = date(2026, 1, 2)
+
+    class MismatchedArchiveSource:
+        approved = True
+
+        def __init__(self):
+            self.calls = 0
+
+        def fetch_file(self, _day: date, kind: str) -> HttpResponse:
+            self.calls += 1
+            body = (
+                f"{'0' * 64}  BTCUSDT-1m-{day.isoformat()}.zip\n".encode("ascii")
+                if kind == "checksum"
+                else vision_zip(day)
+            )
+            return HttpResponse(200, {}, body, "2026-02-01T00:00:02+00:00")
+
+    source = MismatchedArchiveSource()
+    store = HistoryStore(tmp_path)
+    with pytest.raises(HistoryError, match="checksum mismatch"):
+        store.acquire_vision_archive(
+            "2026-01-02",
+            "2026-02-01",
+            transport=source,
+            allow_historical_ingest=True,
+            authorization=authorized_archive(),
+            execution_approval=archive_execution_approval_phrase(authorized_archive()),
+        )
+    assert source.calls == 2
+    assert list((tmp_path / "raw").iterdir()) == []
 
 
 def test_historical_budget_rejects_unbounded_or_mismatched_caps() -> None:
@@ -744,7 +1022,7 @@ def test_historical_readiness_cli_and_api_are_offline_and_block_ingest(tmp_path:
     cutoff = START + 31 * 24 * 60 * MINUTE
     assert main(["btc-paper", "historical-readiness", "--cutoff-ms", str(cutoff)]) == 0
     readiness = json.loads(capsys.readouterr().out)
-    assert readiness["schema"] == "market-os.btc-history-readiness.v1"
+    assert readiness["schema"] == "market-os.btc-history-vision-readiness.v1"
     assert readiness["ingestion_allowed"] is False
     assert readiness["network_requests"] == 0
 
@@ -758,7 +1036,8 @@ def test_historical_readiness_cli_and_api_are_offline_and_block_ingest(tmp_path:
     try:
         url = f"http://127.0.0.1:{server.server_port}/v1/btc/history/readiness?cutoff-ms={cutoff}"
         response = json.loads(urllib.request.urlopen(url, timeout=2).read())
-        assert response["expected_pages"] == 44
+        assert response["proposal"]["expected_days"] == 30
+        assert response["max_requests"] == 60
         assert response["ingestion_allowed"] is False
     finally:
         server.shutdown()

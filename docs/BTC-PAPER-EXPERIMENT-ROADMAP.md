@@ -5,11 +5,10 @@
 U5; and B6/B7 map to U6. Use `docs/ROADMAP.md`, `docs/PHASES.md`, and
 `docs/decisions/ADR-0017-unified-roadmap.md` for the forward sequence.
 
-**Safety status:** B0 and B1 are complete offline. The U3/B1 readiness gate
-defines a bounded 30-day proposal, but public market-data transport remains
-disabled until source/legal/region/retention review and separate explicit
-approval. This roadmap does not authorize a market-data network connection, a
-Jev request, a model credential, or a real exchange action.
+**Safety status:** B0 is complete offline. One owner-approved B1 Binance Vision
+archive run completed on 2026-11-18 for 30 UTC days and remains local. The
+transport is disabled by default; any repeat or expanded range requires fresh
+date-bound approval. No Jev request, credential, or exchange action occurred.
 ## Product boundary
 
 The experiment studies BTCUSDT Spot with a five-minute horizon using closed
@@ -47,8 +46,9 @@ deferred until its contracts stabilize.
 
 B1 adds fixture-backed `btc-paper ingest` plus read-only manifest, candle,
 outcome, provenance, gap, and stored-replay inspection. The candidate public
-transport is isolated and disabled. `btc-paper historical-readiness` calculates
-the explicit 30-day/44-page proposal; it performs zero network requests.
+transports are isolated and disabled. `btc-paper historical-readiness` now
+calculates the explicit 30-day Binance Vision archive proposal (30 ZIPs, 30
+checksums, at most 60 requests); it performs zero network requests.
 
 ## B0: data contract and replay foundation
 
@@ -136,14 +136,17 @@ calibrated, post-cost positive relative to a matched control, and reproducible.
 See `docs/B0-BTC-PAPER-REPLAY-REPORT.md` and
 `docs/evidence/b0-btc-paper-replay.json` for B0, and
 `docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md`,
-`docs/evidence/b1-btc-historical-ingestion.json`, and ADR-0016 for B1. B1 has
-no network/model/broker code;
-the implementation and tests use only the standard library and existing
-pytest.
+`docs/evidence/b1-btc-historical-ingestion.json`, and ADR-0016 for B1's
+offline storage. A separate, disabled-by-default Binance Vision archive
+adapter now provides the gated acquisition path; it uses the standard library
+and existing DuckDB/PyArrow storage dependencies.
 
-The readiness decision is in `docs/U3-B1-HISTORICAL-READINESS-REPORT.md`,
-ADR-0021, and `docs/evidence/u3-b1-btc-historical-readiness.json`. The exact
-future approval phrase is recorded there; no historical request was made.
+The current archive decision is in
+`docs/U3-B1-HISTORICAL-READINESS-REPORT.md`, ADR-0016, and
+`docs/evidence/u3-b1-btc-historical-readiness.json`. The approved execution
+result is in
+`docs/evidence/b1-binance-vision-execution-2026-11-18.json`: 30 checksum-
+verified archives, 43,200 candles, zero gaps, and 60 HTTPS requests.
 
 ## B2 implementation result
 
@@ -151,14 +154,19 @@ future approval phrase is recorded there; no historical request was made.
 baselines** is implemented offline. The code persists versioned features,
 separate future labels, outcome statuses, chronological splits, purge/embargo
 metadata, baseline predictions, metrics, calibration output, and lineage. The
-shipped B1 fixture has no leakage-safe labeled samples because its eligible
-rows reach the documented gap; its metrics are therefore explicitly
-unavailable. See `docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and
-`docs/evidence/u3-b2-btc-features-baselines.json`.
+shipped synthetic B1 fixture has no leakage-safe labeled samples because its
+eligible rows reach the documented gap; its metrics remain unavailable. A
+separate B2 run on the approved real 30-day archive produced 43,190
+chronological samples, with 8,633 test rows. Baselines were near chance and
+one-bin calibration did not improve the raw statistical baselines. The run is
+retrospective and does not reconstruct contemporaneous feed availability. See
+`docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and
+`docs/evidence/b1-binance-vision-execution-2026-11-18.json`.
 
-LightGBM is deferred: the small offline B2 result does not justify a new model
-dependency. B1 historical transport remains disabled until source/legal/region/
-retention review and explicit bounded-run approval resolve the network gate.
+LightGBM is deferred: the single 30-day window and near-chance baselines do not
+justify a new model dependency. B1 archive transport remains disabled by
+default; future acquisitions require fresh date-bound approval. REST host
+coverage remains unresolved.
 
 ## B3 implementation result
 
@@ -171,13 +179,35 @@ is fit on the calibration range only, and matched deltas use the identical
 held-out test intersection where both arms have usable predictions.
 
 No context `Z`, LightGBM, network, provider SDK, credential, broker, portfolio,
-paper fill, or live path is added. Jev output remains an experimental typed
-assessment and is not a calibrated five-minute return probability or execution
-authority. The shipped B1 fixture has no leakage-safe labels, so B3's
-predictive and calibration metrics are unavailable; the promotion decision is
-**not promoted**. See `docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md`,
-ADR-0019, and `docs/evidence/u3-b3-jev-incremental.json`.
+paper fill, or live path is added to U3/B3. Jev output remains an experimental
+typed assessment and is not a calibrated five-minute return probability or
+execution authority. The earlier B3 result remains **not promoted**. B3.1
+normalized 14 recorded synthetic fixtures. See
+`docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md`, ADR-0019, and
+`docs/evidence/b1-binance-vision-execution-2026-11-18.json`.
 
-The exact next gate is a separate review of the U3/B1 historical authorization
-decision. U4/B4 remains unstarted and must not begin until the data-readiness
-evidence is reviewed; U5/B5 remains unstarted.
+### BTC MiniRAG/Jev evidence slice
+
+The BTC-specific offline slice adds an optional MiniRAG adapter, a packet
+builder, a recorded-assessment alignment helper, and a bounded 43,200-document
+local corpus from the approved B1 candles. MiniRAG is scoped to BTC evidence
+only; the broader LightRAG role is unchanged. The helper joins B3.1 records to
+B2 test rows and reports usable coverage and packet timing, but computes no
+market metrics. An isolated MiniRAG runtime completed three repeated retrievals
+from one exact six-candle B2 input set; all runs returned the same four source
+documents and citations. This is a repeatability check, not retrieval-quality
+evaluation. The strict packet-time gate rejected the citations because local
+availability was after the B2 feature close. No recorded assessment has been
+joined and no Jev API was called. See the [BTC MiniRAG/Jev evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
+
+The approved B1 archives were received locally on 2026-11-18. Original
+per-candle source publication times were not retained. The local corpus
+preserves those timestamps as unknown and keeps B1 receipt time separate, so
+it cannot yet establish evidence availability at each historical B2 decision.
+Resolve that timestamp policy before building usable historical packets or
+making a market-level comparison: retain strict recorded availability, or
+explicitly approve a separate retrospective event-time proxy that is not
+point-in-time valid. Otherwise obtain source records with contemporaneous
+availability timestamps. Keep Jev advisory and paper-only; U4/B4 remains
+unstarted pending stronger, multi-period stability evidence and U5/B5 remains
+unstarted.
