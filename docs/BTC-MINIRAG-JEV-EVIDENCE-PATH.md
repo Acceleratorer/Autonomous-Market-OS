@@ -3,8 +3,9 @@
 **Status:** BTC-only MiniRAG integration slice and bounded local source corpus
 built; local artifact hashes and row counts were rechecked on 2026-11-19.
 Three pinned-runtime MiniRAG retrieval repeats completed before the child
-network guard was added. The strict historical packet gate blocks market-linked
-Jev assessment work. A synthetic recorded-assessment fixture traverses
+network guard was added, followed by one post-guard retrieval with the same
+four citations. The strict historical packet gate blocks market-linked Jev
+assessment work. A synthetic recorded-assessment fixture traverses
 normalization and alignment, validating that contract seam only.
 **Scope:** BTCUSDT Spot, five-minute B2 research target, local historical data,
 and paper research only.
@@ -112,21 +113,24 @@ repeatability check, not a retrieval-quality benchmark. The six inputs and
 four returned citations are listed by identifier and hash in
 [`btc-minirag-retrieval-2026-11-19.json`](evidence/btc-minirag-retrieval-2026-11-19.json).
 
-Those runs predate the fail-closed socket guard now present in the MiniRAG
-child runner. Their evidence shows that the tokenizer asset was cached, but its
-HTTP request count was not instrumented; those runs therefore do not prove
-zero network egress. The guard limits common Python socket APIs to loopback or
-Unix-domain sockets and blocks forward/reverse DNS lookups. It is not
-operating-system network isolation and native code can bypass it. It has not
-yet been exercised by a new retrieval.
+Those three runs predate the fail-closed socket guard now present in the
+MiniRAG child runner. A new run after the guard merge used the same six inputs
+and query, returned the same four citations, and had the same query fingerprint.
+This verifies that retrieval still completes with the guard and cached runtime;
+it does not measure retrieval quality. The tokenizer cache was present, but
+socket attempts were not instrumented. The guard limits common Python socket
+APIs to loopback or Unix-domain sockets and blocks forward/reverse DNS lookups.
+It is not operating-system network isolation and native code can bypass it, so
+the run does not establish a zero-egress guarantee. See
+[`btc-minirag-post-guard-retrieval-2026-11-19.json`](evidence/btc-minirag-post-guard-retrieval-2026-11-19.json).
 
 The packet builder rejected the retrieved passage because its conservative
 local availability / `published_at` projection is after the feature close.
 The original Binance publication time remains unknown. Retrieval is therefore
 retrospective and cannot support a historically eligible Jev assessment. No
-Jev, LLM, embedding, or market-data API was called by these three retrieval
-runs. The tokenizer asset needed by MiniRAG was cached locally; its HTTP
-request count was not instrumented.
+Jev, LLM, embedding, or market-data API was called by the four retrieval runs.
+The post-guard run used the cached tokenizer asset; outbound socket attempts
+were not instrumented.
 The exact Python executable hash and package versions are recorded in the
 [runtime package snapshot](evidence/btc-minirag-runtime-freeze-2026-11-19.txt)
 and retrieval evidence.
@@ -163,13 +167,10 @@ Market OS stays paper-only and owns every risk and execution decision.
    strict recorded availability; keep it and obtain source records with
    contemporaneous availability timestamps, or explicitly authorize a
    separate event-time proxy labeled retrospective and not point-in-time valid.
-3. Exercise the MiniRAG child socket guard against the already-cached runtime
-   before claiming zero egress. If a required tokenizer or model asset is
-   missing, fail closed and provision it separately outside the evidence run.
-4. After packet eligibility is resolved, build only recorded B3.1 assessments
+3. After packet eligibility is resolved, build only recorded B3.1 assessments
    for exact packet fingerprints and join them to the same B2 observations as
    the numerical controls.
-5. Freeze an offline matched comparison protocol before reading held-out
+4. Freeze an offline matched comparison protocol before reading held-out
    results. Keep Jev API access, credentials, provider egress, and any future
    shadow or trading path behind separate owner decisions.
 

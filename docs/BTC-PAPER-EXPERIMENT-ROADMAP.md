@@ -196,14 +196,15 @@ builder, a recorded-assessment alignment helper, and a bounded 43,200-document
 local corpus from the approved B1 candles. MiniRAG is scoped to BTC evidence
 only; the broader LightRAG role is unchanged. The helper joins B3.1 records to
 B2 test rows and reports usable coverage and packet timing, but computes no
-market metrics. An isolated MiniRAG runtime completed three repeated retrievals
-from one exact six-candle B2 input set; all runs returned the same four source
-documents and citations. This is a repeatability check, not retrieval-quality
-evaluation. The strict packet-time gate rejected the citations because local
-availability was after the B2 feature close. No recorded assessment has been
-joined and no Jev API was called. The B3.1 path keeps evidence support,
-agreement/contradiction, and abstention as semantic results; it computes no
-market metrics. See the [BTC MiniRAG/Jev evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
+market metrics. An isolated MiniRAG runtime completed three pre-guard repeats
+and one post-guard retrieval from the same exact six-candle B2 input set; all
+returned the same four citations. This is a repeatability check, not retrieval-
+quality evaluation or a zero-egress guarantee. The strict packet-time gate
+rejected the citations because local availability was after the B2 feature
+close. No recorded assessment has been joined and no Jev API was called. The
+B3.1 path keeps evidence support, agreement/contradiction, and abstention as
+semantic results; it computes no market metrics. See the [BTC MiniRAG/Jev
+evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
 
 The approved B1 archives were received locally on 2026-11-18. Original
 per-candle source publication times were not retained. The local corpus

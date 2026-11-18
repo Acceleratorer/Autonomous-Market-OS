@@ -2280,6 +2280,12 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   event-time proxy that is not point-in-time valid. See
   `docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md` and
   `docs/evidence/btc-minirag-retrieval-2026-11-19.json`.
+- After PR #41 merged, reran MiniRAG on the same six documents with the new
+  Python socket guard. It returned the same four citations and query
+  fingerprint. This confirms the cached local runtime still completes; socket
+  attempts were not instrumented, no OS-level egress isolation was used, and
+  native code can bypass the Python guard. See
+  `docs/evidence/btc-minirag-post-guard-retrieval-2026-11-19.json`.
 
 ## 2026-11-19 — Full Understand Anything graph refresh
 
