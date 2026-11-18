@@ -1,11 +1,11 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-**Checkpoint:** 2026-11-19, implementation branch
-`fix/btc-local-storage-runtime-caps`, based on `main` at `3584d3e`. **Status:**
-U6.4-F/U7-P are closed; B1 and B2 are complete. The optional MiniRAG runtime
-has been exercised locally: three repeats returned the same four of six
-selected candle documents. No real BTC packet has a recorded B3.1 assessment;
-no market-level Jev comparison has run.
+**Checkpoint:** 2026-11-19, follow-up branch
+`fix/btc-minirag-offline-network-guard`, based on `main` at
+`ca2959952fbd2af3be7a3af1a01b8b948773f26a` (PR #40 merged). U6.4-F/U7-P,
+B1, and B2 remain closed. The current work rechecks the local BTC artifacts,
+clarifies the intended B3.1 Jev role, and makes the MiniRAG child fail closed
+on socket network entry points. No post-change retrieval or Jev call has run.
 
 ## Where the project stands
 
@@ -29,6 +29,11 @@ no market-level Jev comparison has run.
   8,633 test rows. Baselines are near chance; this is a retrospective
   chronological diagnostic, not a contemporaneous feed replay or execution
   result.
+- A read-only local recheck matched all 30 checksum files to their 30 ZIPs and
+  the registered manifest, read 43,200 rows from Parquet, and matched both the
+  Parquet and 43,200-document MiniRAG corpus hashes to their manifests. It made
+  zero network requests; details are in
+  [`btc-local-artifact-integrity-2026-11-19.json`](evidence/btc-local-artifact-integrity-2026-11-19.json).
 - B1 follow-up hardening rejects UNC, mapped Windows network-drive, and
   recognized Linux network-mount roots in the shared history-store boundary.
   The acquisition deadline now reaches canonicalization, Parquet writes, and
@@ -66,6 +71,17 @@ no market-level Jev comparison has run.
   decision unchanged. See the
   [retrieval evidence](evidence/btc-minirag-retrieval-2026-11-19.json) and
   [runtime package snapshot](evidence/btc-minirag-runtime-freeze-2026-11-19.txt).
+- The older U3/B3 fixture benchmark uses bullish/bearish/indeterminate
+  `Choice` labels and an E2 market-direction score. It is a historical,
+  unpromoted experiment, not the target Jev contract for the BTC evidence flow.
+  B3.1 is the forward contract: evidence support, agreement/contradiction, and
+  abstention remain semantic outputs and are never converted to B2 market
+  probabilities or risk/execution inputs.
+- The earlier MiniRAG repeats used deterministic local embedding/extraction,
+  but their evidence records that the tokenizer cache HTTP request count was
+  not instrumented. A socket guard has now been added to the child runner;
+  because it has not yet been exercised, the previous repeatability result is
+  not proof of zero network egress.
 - B1 source publication times per candle were not captured. The approved
   archive's local receipt time is 2026-11-18; it does not establish that each
   archived candle was available at its original historical B2 decision.
@@ -151,35 +167,29 @@ offline packaging work and does not reopen connected or live execution.
 
 ## Next steps
 
-1. Treat B1 execution evidence as complete for the approved 2026-10-19 through
-   2026-11-17 range. Do not repeat or extend acquisition without fresh,
-   date-bound approval. Preserve the source receipt-time caveat: the manifest
-   uses local raw-artifact timestamps because exact per-response times were
-   lost before the first ingest failed. Before any later archive run, verify
-   that `--store-root` is genuinely local and include local persistence in the
-   runtime bound; the current adapter accepts an arbitrary path and does not
-   persist a measured full-run duration.
-2. Treat B2's result as a retrospective diagnostic. Its features use only
-   current and prior candles and its splits are chronological with five-minute
-   purge/embargo, but archive receipt timestamps do not reconstruct actual
-   per-candle feed availability. Define that limitation before making any
-   paper-performance or market-predictive claim.
-3. Until the timestamp policy receives an explicit owner decision, apply strict
-   recorded availability: source publication time remains unknown, and the
-   current archive cannot establish point-in-time availability at B2 decision
-   times. Do not substitute candle event time for publication time.
-4. Resolve the BTC archive timestamp gate before creating market-linked
-   assessment packets. Continue with strict availability and obtain sources
-   with contemporaneous timestamps, or explicitly authorize an event-time proxy
-   labeled retrospective and not point-in-time valid.
-5. Only after packet eligibility is resolved, join recorded B3.1 assessments
-   tied to exact packet fingerprints. Freeze a time-aligned matched comparison
-   before reading held-out results; keep calibration on the calibration
-   partition only under ADR-0022. Jev API access needs separate approval. Jev
-   remains advisory; Market OS retains risk and execution authority.
-6. Keep U7-P as a local regression gate and preserve the U6.4-F hosted evidence
-   record. Do not reopen connected or live-readiness work without a new owner
-   decision.
+1. Do not repeat or extend the approved B1 acquisition without fresh,
+   date-bound approval. The local integrity audit is in
+   [`btc-local-artifact-integrity-2026-11-19.json`](evidence/btc-local-artifact-integrity-2026-11-19.json).
+2. Keep B2 classified as a retrospective chronological diagnostic. Its
+   features use current and prior candles with five-minute purge/embargo, but
+   archived receipt times do not reconstruct per-candle live availability.
+3. Keep the strict recorded-availability rule until the pending owner choice
+   is resolved. Original Binance publication time remains unknown; never infer
+   it from candle event time.
+4. If strict timing is kept, only continue with sources that have recorded
+   contemporaneous publication and availability times. If an event-time proxy
+   is authorized, label the result retrospective and prohibit point-in-time,
+   predictive, paper-performance, or trading claims from that proxy.
+5. Exercise the MiniRAG child socket guard against the already-cached runtime
+   before asserting zero egress. No Jev API or other provider call is allowed
+   without separate authorization.
+6. Once packet eligibility and response provenance are established, use B3.1
+   recorded assessments tied to exact packet fingerprints. Freeze the matched
+   comparison before looking at held-out results. Keep Jev's support,
+   contradiction, and abstention labels semantic; Market OS owns all market
+   probability, calibration, stability, risk, and execution decisions.
+7. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
+   direction benchmark unpromoted and retain the project-wide LightRAG choice.
 
 ## Reference artifacts
 

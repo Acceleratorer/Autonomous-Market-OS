@@ -21,11 +21,16 @@ closed market data
   -> validation and replay
   -> deterministic features and labels
   -> naïve/statistical baselines -> optional LightGBM if justified
-  -> optional Jev typed context signal
-  -> calibration and walk-forward evaluation
-  -> deterministic policy
-  -> virtual paper broker, risk gate, audit trail
+  -> optional BTC-only MiniRAG citations -> Jev evidence/contradiction/abstention assessment
+  -> Market OS-owned stability, calibration, deterministic fusion, and policy
+  -> risk-gated paper broker, accounting, and audit trail
 ```
+
+The older U3/B3 fixture benchmark is a historical, unpromoted direction-label
+experiment. The intended Jev role for the BTC MiniRAG slice is B3.1 semantic
+evidence assessment. MiniRAG is scoped to that BTC flow; the project's broader
+LightRAG decision is unchanged. Jev semantic probabilities are never converted
+to `P(up)`, return forecasts, or risk/execution inputs.
 
 ## Delivery order
 
@@ -170,13 +175,11 @@ coverage remains unresolved.
 
 ## B3 implementation result
 
-U3/B3 is implemented as an offline-only controlled benchmark. The recorded
-adapter validates a versioned Jev-shaped `Choice` response and explicitly
-handles valid, unavailable, malformed, late, abstaining, inconsistent, and
-hostile/invalid cases. E1 is the numerical B2 conditional-rate arm; E2 uses
-the same frozen numerical inputs plus the typed recorded assessment. Calibration
-is fit on the calibration range only, and matched deltas use the identical
-held-out test intersection where both arms have usable predictions.
+The existing U3/B3 implementation is an offline-only controlled benchmark.
+Its recorded adapter validates bullish/bearish/indeterminate `Choice` responses
+and E2 combines those direction labels with B2 feature groups. Keep this as a
+historical, unpromoted experiment; it does not define Jev's target role for the
+current BTC evidence flow.
 
 No context `Z`, LightGBM, network, provider SDK, credential, broker, portfolio,
 paper fill, or live path is added to U3/B3. Jev output remains an experimental
@@ -198,7 +201,9 @@ from one exact six-candle B2 input set; all runs returned the same four source
 documents and citations. This is a repeatability check, not retrieval-quality
 evaluation. The strict packet-time gate rejected the citations because local
 availability was after the B2 feature close. No recorded assessment has been
-joined and no Jev API was called. See the [BTC MiniRAG/Jev evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
+joined and no Jev API was called. The B3.1 path keeps evidence support,
+agreement/contradiction, and abstention as semantic results; it computes no
+market metrics. See the [BTC MiniRAG/Jev evidence path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
 
 The approved B1 archives were received locally on 2026-11-18. Original
 per-candle source publication times were not retained. The local corpus

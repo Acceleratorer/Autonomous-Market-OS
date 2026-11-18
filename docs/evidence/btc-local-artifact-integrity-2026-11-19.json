@@ -1,0 +1,50 @@
+{
+  "schema": "market-os.btc-local-artifact-integrity-audit.v1",
+  "verified_at_utc": "2026-11-18T20:34:53Z",
+  "purpose": "Read-only integrity recheck of the approved local B1 dataset and BTC MiniRAG corpus; no acquisition or external requests were made.",
+  "network_requests": 0,
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market_type": "spot",
+    "interval": "1m",
+    "purpose": "personal non-commercial offline and paper research",
+    "local_only": true,
+    "redistribution": false,
+    "trading": false
+  },
+  "b1_dataset": {
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "manifest_id": "btc-history-manifest-6307b278cdc684f4dc42",
+    "approved_date_range_utc": {
+      "start_inclusive": "2026-10-19",
+      "end_inclusive": "2026-11-17"
+    },
+    "archive_count": 30,
+    "checksum_count": 30,
+    "checksum_archives_match": true,
+    "checksum_hashes_match_registered_manifest": true,
+    "raw_archive_and_checksum_bytes": 2093387,
+    "largest_zip_bytes": 72776,
+    "largest_checksum_bytes": 91,
+    "canonical_rows_read_from_parquet": 43200,
+    "first_open_time_ms": 1792368000000,
+    "last_open_time_ms": 1794959940000,
+    "canonical_fingerprint": "9c58a3ac5cfd05c7398e0aa4888e911d88b502b58a5479af671b6e5ad91d7f0d",
+    "parquet_sha256": "6fc6ce8d3925f2360c6630f1b6cad47b89bbf328fc5a5f085c7785bd06909e96",
+    "parquet_sha256_matches_manifest": true
+  },
+  "btc_minirag_corpus": {
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "document_count": 43200,
+    "jsonl_bytes": 74750527,
+    "jsonl_sha256": "bde79f0fbefe994c0a1fc3999f4689ade1e1fa91f53f866cc751c1e6c89068e5",
+    "jsonl_sha256_matches_manifest": true,
+    "source_revision_matches_b1": true,
+    "corpus_fingerprint": "becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa"
+  },
+  "limitations": [
+    "This audit verifies current local artifacts only and does not repeat Binance acquisition.",
+    "The exact original per-response receipt times and per-candle source publication times remain unavailable.",
+    "The audit does not establish historical point-in-time evidence availability, MiniRAG retrieval quality, Jev value, or trading performance."
+  ]
+}
