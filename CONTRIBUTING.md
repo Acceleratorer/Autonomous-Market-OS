@@ -10,7 +10,11 @@ Keep changes aligned with the repository boundary:
 - read-only HTTP/CLI inspection;
 - Python remains authoritative for accounting, risk, persistence, recovery,
   reservations, replay, audit, backup, and portfolio inspection;
-- no Binance, live trading, provider credentials, or public mutation route;
+- no live trading, provider credentials, account/order access, or public
+  mutation route. The owner-requested, disabled-by-default Binance Vision
+  archive path requires confirmed local personal non-commercial offline/paper
+  research, a separate exact policy and execution approval, and must not be
+  used for commercial products or redistribution;
 - no changes to `company-projects/`.
 
 ## Local setup

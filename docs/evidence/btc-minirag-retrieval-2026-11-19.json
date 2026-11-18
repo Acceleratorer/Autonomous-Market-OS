@@ -1,0 +1,277 @@
+{
+  "schema": "market-os.btc-minirag-retrieval-evidence.v1",
+  "status": "retrieval-complete-strict-packet-time-gate-blocked",
+  "recorded_at_utc": "2026-11-18T17:24:43.299728+00:00",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market_type": "spot",
+    "interval": "1m",
+    "purpose": "personal-noncommercial-offline-paper-research",
+    "redistribution": "not-permitted-by-owner-scope"
+  },
+  "input": {
+    "corpus_fingerprint": "becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa",
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "corpus_document_count": 43200,
+    "selected_b2_run_id": "btc-b2-dde76de3b2965ac6f66a",
+    "b2_feature_version": "btc.b2.features.v1",
+    "b2_feature_status": "eligible",
+    "observation_id": "btc:btc-history-9c58a3ac5cfd05c7398e:1792368360000:c7740002a6cc0b4c",
+    "feature_close_time": "2026-10-19T00:06:00.000+00:00",
+    "feature_close_time_ms": 1792368360000,
+    "decision_eligible_at": "2026-11-18T04:06:41.552+00:00",
+    "feature_input_fingerprint": "c7740002a6cc0b4c7a62c8bac8d8a5b469f506065d8fb0540ebf59c47e71deb3",
+    "selected_document_count": 6,
+    "selected_document_ids": [
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368300000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368240000"
+    ],
+    "selected_document_hashes": {
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368300000": "4c2e156329a83763853bc43d6790721b1b46c1b4f3e9a76f30cbd91575938471",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000": "bbb38d51b770b24f8e6bd48e1b4d3b67edb31c57d50d3bb71e615d5f16883b4f",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000": "b3334ed91160b2d192cec701096e5b685b221a7802c4a00c360d18cd3b363ca9",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000": "6ea5dfe13d9c6ebbc01bd9f79e5065b7b07bfe74da4b92bcff161feb0a91389d",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000": "083aef9eee86c056b1c69e0d733a7d282bac470dc591c30a0a947d4d886012a4",
+      "btc-btc-history-9c58a3ac5cfd05c7398e-1792368240000": "41b43daef3e14117b9dbc8d00590172906591e17084cac00ff3a49d585b13c7c"
+    }
+  },
+  "runtime": {
+    "python_version": "3.12.0",
+    "python_executable_relative_path": ".market_os/runtimes/minirag-btc-py312/Scripts/python.exe",
+    "venv_python_sha256": "d55736b9f3d6b4ca7985b82db8ce11edfa09994cf93ce31c6b506543b74f32eb",
+    "base_python_executable": "redacted-local-path",
+    "base_python_sha256": "42ac541168e97dedb9aabd8be335539fc41c682e414b9e8d137b164fb68683b0",
+    "minirag_distribution_version": "0.0.2",
+    "minirag_source_repository": "https://github.com/HKUDS/MiniRAG",
+    "minirag_source_commit": "e204d239421f45004852953679927fdf6733f236",
+    "minirag_source_checkout_clean": true,
+    "adapter_version": "market-os-minirag-mini-mode-v1",
+    "python_hash_seed": 0,
+    "embedding": "deterministic local SHA-256 feature hashing, 64 dimensions",
+    "sentence_transformer_import": "blocked by a fail-closed stub; injected local embedding is used",
+    "package_freeze_path": "docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt",
+    "package_freeze_sha256": "7044cc6f8c65a856509afa7c76101463c2644f35ef1e1a4a41f65e89af46c76c",
+    "package_freeze_lines": 94,
+    "tiktoken_cache": [
+      {
+        "path": ".market_os/minirag-btc-runs/tiktoken-cache/fb374d419588a4632f3f557e76b4b70aebbca790",
+        "sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+        "bytes": 3613922
+      }
+    ]
+  },
+  "retrieval": {
+    "provider": "minirag",
+    "provider_version": "0.0.2+e204d239421f45004852953679927fdf6733f236;market-os-minirag-mini-mode-v1",
+    "query": "Retrieve evidence for the BTCUSDT Spot one-minute candle inputs to this B2 observation; retain cited OHLCV source chunks.",
+    "repeat_runs": [
+      {
+        "run": 1,
+        "retrieved_at": "2026-11-18T17:24:27.708698+00:00",
+        "provider_version": "0.0.2+e204d239421f45004852953679927fdf6733f236;market-os-minirag-mini-mode-v1",
+        "query_fingerprint": "15b6854f68a16ddd1adc3cf0d37e62af18fb08c13b31e5985278350cfc7443b7",
+        "passage_count": 4,
+        "citations": [
+          {
+            "rank": 1,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "ee82e1a0bd8d70223366ec0c46937bd280460193124c6be45cacd4dfee1b26f5",
+            "document_sha256": "b3334ed91160b2d192cec701096e5b685b221a7802c4a00c360d18cd3b363ca9",
+            "event_start_ms": 1792368060000,
+            "event_end_ms": 1792368120000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 2,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "e95f83b02f78be9df6fa8231296fc41d39b4996d3e2f7e6237530ce37f13eb5c",
+            "document_sha256": "bbb38d51b770b24f8e6bd48e1b4d3b67edb31c57d50d3bb71e615d5f16883b4f",
+            "event_start_ms": 1792368000000,
+            "event_end_ms": 1792368060000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 3,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "d03cdb9de2883d1c7efc6db9d001cc52c9d4aefb7d6da45f603695a20e95bb5c",
+            "document_sha256": "083aef9eee86c056b1c69e0d733a7d282bac470dc591c30a0a947d4d886012a4",
+            "event_start_ms": 1792368180000,
+            "event_end_ms": 1792368240000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 4,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "7b1f1f86683977c91bddd9af2b8684eb4ac6fbfeec19b4915bcc2a035bf4c90b",
+            "document_sha256": "6ea5dfe13d9c6ebbc01bd9f79e5065b7b07bfe74da4b92bcff161feb0a91389d",
+            "event_start_ms": 1792368120000,
+            "event_end_ms": 1792368180000,
+            "local_available_at_ms": 1794974801552
+          }
+        ],
+        "error": null
+      },
+      {
+        "run": 2,
+        "retrieved_at": "2026-11-18T17:24:33.863662+00:00",
+        "provider_version": "0.0.2+e204d239421f45004852953679927fdf6733f236;market-os-minirag-mini-mode-v1",
+        "query_fingerprint": "15b6854f68a16ddd1adc3cf0d37e62af18fb08c13b31e5985278350cfc7443b7",
+        "passage_count": 4,
+        "citations": [
+          {
+            "rank": 1,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "ee82e1a0bd8d70223366ec0c46937bd280460193124c6be45cacd4dfee1b26f5",
+            "document_sha256": "b3334ed91160b2d192cec701096e5b685b221a7802c4a00c360d18cd3b363ca9",
+            "event_start_ms": 1792368060000,
+            "event_end_ms": 1792368120000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 2,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "e95f83b02f78be9df6fa8231296fc41d39b4996d3e2f7e6237530ce37f13eb5c",
+            "document_sha256": "bbb38d51b770b24f8e6bd48e1b4d3b67edb31c57d50d3bb71e615d5f16883b4f",
+            "event_start_ms": 1792368000000,
+            "event_end_ms": 1792368060000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 3,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "d03cdb9de2883d1c7efc6db9d001cc52c9d4aefb7d6da45f603695a20e95bb5c",
+            "document_sha256": "083aef9eee86c056b1c69e0d733a7d282bac470dc591c30a0a947d4d886012a4",
+            "event_start_ms": 1792368180000,
+            "event_end_ms": 1792368240000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 4,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "7b1f1f86683977c91bddd9af2b8684eb4ac6fbfeec19b4915bcc2a035bf4c90b",
+            "document_sha256": "6ea5dfe13d9c6ebbc01bd9f79e5065b7b07bfe74da4b92bcff161feb0a91389d",
+            "event_start_ms": 1792368120000,
+            "event_end_ms": 1792368180000,
+            "local_available_at_ms": 1794974801552
+          }
+        ],
+        "error": null
+      },
+      {
+        "run": 3,
+        "retrieved_at": "2026-11-18T17:24:40.773901+00:00",
+        "provider_version": "0.0.2+e204d239421f45004852953679927fdf6733f236;market-os-minirag-mini-mode-v1",
+        "query_fingerprint": "15b6854f68a16ddd1adc3cf0d37e62af18fb08c13b31e5985278350cfc7443b7",
+        "passage_count": 4,
+        "citations": [
+          {
+            "rank": 1,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "ee82e1a0bd8d70223366ec0c46937bd280460193124c6be45cacd4dfee1b26f5",
+            "document_sha256": "b3334ed91160b2d192cec701096e5b685b221a7802c4a00c360d18cd3b363ca9",
+            "event_start_ms": 1792368060000,
+            "event_end_ms": 1792368120000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 2,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368000000:chunk-818e2820491992b37173a1d063a88333",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "e95f83b02f78be9df6fa8231296fc41d39b4996d3e2f7e6237530ce37f13eb5c",
+            "document_sha256": "bbb38d51b770b24f8e6bd48e1b4d3b67edb31c57d50d3bb71e615d5f16883b4f",
+            "event_start_ms": 1792368000000,
+            "event_end_ms": 1792368060000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 3,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368180000:chunk-2bcf56a2192b7ddddf62b5802eeef562",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "d03cdb9de2883d1c7efc6db9d001cc52c9d4aefb7d6da45f603695a20e95bb5c",
+            "document_sha256": "083aef9eee86c056b1c69e0d733a7d282bac470dc591c30a0a947d4d886012a4",
+            "event_start_ms": 1792368180000,
+            "event_end_ms": 1792368240000,
+            "local_available_at_ms": 1794974801552
+          },
+          {
+            "rank": 4,
+            "document_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000",
+            "passage_id": "btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "citation_ref": "minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368120000:chunk-6d5f816722bc5ae9e9b8a1cfce209ea4",
+            "source_ref": "binance-vision:BTCUSDT-1m-2026-10-19.zip#sha256=b2fdee20be764f88cd640d933a492bcdfe833452fff1d6fb87b9ede081e8061b",
+            "passage_sha256": "7b1f1f86683977c91bddd9af2b8684eb4ac6fbfeec19b4915bcc2a035bf4c90b",
+            "document_sha256": "6ea5dfe13d9c6ebbc01bd9f79e5065b7b07bfe74da4b92bcff161feb0a91389d",
+            "event_start_ms": 1792368120000,
+            "event_end_ms": 1792368180000,
+            "local_available_at_ms": 1794974801552
+          }
+        ],
+        "error": null
+      }
+    ],
+    "citation_stability_across_repeats": true,
+    "pre_hash_seed_pilot_passage_counts": [
+      4,
+      3
+    ],
+    "pre_hash_seed_pilot_note": "Two initial runs produced different counts. PYTHONHASHSEED=0 was then set and three repeats were captured above.",
+    "retrieval_quality_evaluated": false
+  },
+  "packet_time_gate": {
+    "packet_ready": false,
+    "packet_fingerprint": null,
+    "gate": "strict-source-publication-and-recorded-availability",
+    "source_publication_time": "unknown-not-captured",
+    "rejection": {
+      "type": "EvidencePacketError",
+      "message": "evidence published after the observation close is prohibited: minirag:btc-btc-history-9c58a3ac5cfd05c7398e-1792368060000:chunk-66d2bdb3f0f630b4b8b213f79c31804e"
+    },
+    "interpretation": "retrospective retrieval only; archive receipt time follows the historical B2 feature close"
+  },
+  "network_and_safety": {
+    "jev_api_calls": 0,
+    "llm_provider_calls": 0,
+    "embedding_provider_calls": 0,
+    "market_data_requests_during_retrieval": 0,
+    "credentials_used": false,
+    "static_tokenizer_asset_cached": true,
+    "tokenizer_asset_http_count": "not-instrumented",
+    "trading_or_execution": false,
+    "raw_market_text_copied_into_evidence": false
+  }
+}

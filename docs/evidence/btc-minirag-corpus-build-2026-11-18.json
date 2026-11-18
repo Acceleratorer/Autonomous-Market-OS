@@ -1,0 +1,68 @@
+{
+  "schema": "market-os.btc-minirag-corpus-build-evidence.v1",
+  "status": "local-corpus-built-source-publication-time-unknown",
+  "built_date": "2026-11-18",
+  "builder": "python -m market_os.btc_source_corpus",
+  "corpus_builder_network_requests": 0,
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market_type": "spot",
+    "interval": "1m",
+    "date_start_utc": "2026-10-19",
+    "date_end_utc_inclusive": "2026-11-17",
+    "max_rows": 43200,
+    "personal_noncommercial_research": true,
+    "local_only": true,
+    "redistribution": "not-permitted-by-owner-scope"
+  },
+  "source": {
+    "dataset_revision": "btc-history-9c58a3ac5cfd05c7398e",
+    "manifest_id": "btc-history-manifest-6307b278cdc684f4dc42",
+    "canonical_fingerprint": "9c58a3ac5cfd05c7398e0aa4888e911d88b502b58a5479af671b6e5ad91d7f0d",
+    "canonical_candle_count": 43200,
+    "source_manifest_fingerprint": "c0a861a05b387db35a50b6fd9f09da01389085e280a355814741ef7ae8a4d9cb",
+    "original_publication_time": "unknown-not-captured",
+    "local_availability_basis": "B1 local raw-artifact receipt timestamps; exact HTTP response times were not retained"
+  },
+  "corpus": {
+    "path": ".market_os/btc-evidence-corpus/btc-history-9c58a3ac5cfd05c7398e",
+    "schema": "market-os.btc-source-corpus.v1",
+    "fingerprint": "becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa",
+    "document_count": 43200,
+    "documents_path": ".market_os/btc-evidence-corpus/btc-history-9c58a3ac5cfd05c7398e/documents.jsonl",
+    "documents_bytes": 74750527,
+    "documents_sha256": "bde79f0fbefe994c0a1fc3999f4689ade1e1fa91f53f866cc751c1e6c89068e5",
+    "dependency_group_id": "binance-vision:BTCUSDT:1m",
+    "hydration": {
+      "status": "verified-local-load",
+      "loader": "market_os.btc_source_corpus.load_btc_source_corpus",
+      "document_records": 43200,
+      "content_hashes": 43200,
+      "source_time_bounds": 43200,
+      "document_record_published_at_projection": "local availability timestamp; conservative, not original source publication"
+    },
+    "same_information_selection": {
+      "helper": "LoadedBTCCorpus.for_b2_feature",
+      "documents_per_b2_feature": 6,
+      "selection_key": "canonical B1 candle fingerprints in B2 input_refs",
+      "status": "verified-local-subset-on-one-eligible-b2-feature",
+      "observed_feature_close_time": "2026-10-19T00:06:00.000+00:00"
+    },
+    "source_published_at": null
+  },
+  "time_alignment": {
+    "historical_point_in_time_eligibility": "not-established",
+    "candle_event_time_is_not_used_as_source_publication_time": true,
+    "next_gate": "resolve whether to use a clearly labeled retrospective event-time proxy; the current local-availability projection remains strict"
+  },
+  "runtime_and_provider": {
+    "minirag_python_module_available": false,
+    "adapter_health": "degraded",
+    "adapter_health_reason": "Python is available, but MiniRAG or NumPy is missing",
+    "minirag_retrieval_run": false,
+    "base_dependency_added": false,
+    "jev_api_calls": 0,
+    "credentials_used": false,
+    "trading_or_execution": false
+  }
+}

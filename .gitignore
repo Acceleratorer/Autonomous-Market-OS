@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .market_os/
+/approved-vision-archive-policy.json
 .venv/
 venv/
 node_modules/

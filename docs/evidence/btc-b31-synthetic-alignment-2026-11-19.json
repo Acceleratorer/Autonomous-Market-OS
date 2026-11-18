@@ -1,0 +1,228 @@
+{
+  "alignment": {
+    "alignment_fingerprint": "72675e25c37c2a00b37d852d71510c9e75031114a3e7f5d999172fc5c56a4479",
+    "assessment_status_counts": {
+      "usable": 1
+    },
+    "b2_feature_fingerprint": "92903a0adecc4f0d625a5aa3b89713710544365a8adf27230320d0bbbc5c49f9",
+    "b2_run_id": "synthetic-b2-b31-alignment-v1",
+    "baseline_name": "empirical_rate",
+    "calibration": {
+      "method": "synthetic-raw-fallback",
+      "n": 0,
+      "probability_falls_back_to_raw_when_unavailable": true,
+      "status": "unavailable"
+    },
+    "candidate_n": 1,
+    "coverage": 1.0,
+    "dataset_revision": "synthetic-btc-b31-alignment-v1",
+    "eligibility": "alignment-only-no-market-metrics",
+    "matched_observation_ids": [
+      "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f"
+    ],
+    "matched_usable_n": 1,
+    "mode": "offline-recorded-only",
+    "recorded_fixture_id": "btc-b31-recorded-synthetic-v1:valid-complete",
+    "rows": [
+      {
+        "assessment_reason": null,
+        "assessment_status": "usable",
+        "b2_control": {
+          "calibration_status": "unavailable",
+          "probability_semantics": "B2 probability of positive five-minute log return",
+          "probability_up_after_calibration_step": 0.51,
+          "raw_probability_up": 0.51
+        },
+        "baseline_name": "empirical_rate",
+        "dataset_revision": "synthetic-btc-b31-alignment-v1",
+        "evidence_timing": {
+          "assessment_available_at_ms": 1800000060000,
+          "assessment_available_by_b2_decision": true,
+          "assessment_use_time_ms": 1800000060000,
+          "b2_decision_eligible_at_ms": 1800000060000,
+          "packet_ready_at_ms": 1800000060000,
+          "packet_ready_by_b2_decision": true
+        },
+        "feature_close_time_ms": 1800000000000,
+        "feature_fingerprint": "1b1c0883dfcab45fd4955e112073aebaec5b7179f20203e8c5f7676b12e5d17e",
+        "jev_semantic_assessment": {
+          "abstention_result": {
+            "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
+            "available_at_ms": 1800000060000,
+            "basis_hypothesis_ids": [],
+            "decision_eligible_at_ms": 1800000060000,
+            "declared_assessment_use_time_ms": 1800000060000,
+            "evidence_refs": [],
+            "expires_at_ms": null,
+            "fresh_until_ms": 1800000120000,
+            "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+            "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+            "packet_ready_at_ms": 1800000060000,
+            "probabilities": {
+              "abstain": 0.2,
+              "answerable": 0.8
+            },
+            "reason": null,
+            "request_started_at_ms": 1800000060000,
+            "response_deadline_at_ms": 1800000060040,
+            "response_fingerprint": null,
+            "response_received_at_ms": 1800000060000,
+            "schema_id": "market-os.b3-1.question.abstention",
+            "selected_label": "answerable",
+            "status": "usable",
+            "version": "v1"
+          },
+          "agreement_results": [
+            {
+              "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
+              "available_at_ms": 1800000060000,
+              "comparison_evidence_group_ids": [],
+              "comparison_hypothesis_ids": [
+                "h2"
+              ],
+              "decision_eligible_at_ms": 1800000060000,
+              "declared_assessment_use_time_ms": 1800000060000,
+              "evidence_refs": [],
+              "expires_at_ms": null,
+              "fresh_until_ms": 1800000120000,
+              "hypothesis_id": "h1",
+              "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+              "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+              "packet_ready_at_ms": 1800000060000,
+              "probabilities": {
+                "agreement": 0.1,
+                "contradiction": 0.1,
+                "mixed": 0.1,
+                "unknown": 0.7
+              },
+              "reason": null,
+              "request_started_at_ms": 1800000060000,
+              "response_deadline_at_ms": 1800000060040,
+              "response_fingerprint": null,
+              "response_received_at_ms": 1800000060000,
+              "schema_id": "market-os.b3-1.question.agreement-contradiction",
+              "selected_label": "unknown",
+              "status": "usable",
+              "version": "v1"
+            },
+            {
+              "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
+              "available_at_ms": 1800000060000,
+              "comparison_evidence_group_ids": [],
+              "comparison_hypothesis_ids": [
+                "h1"
+              ],
+              "decision_eligible_at_ms": 1800000060000,
+              "declared_assessment_use_time_ms": 1800000060000,
+              "evidence_refs": [],
+              "expires_at_ms": null,
+              "fresh_until_ms": 1800000120000,
+              "hypothesis_id": "h2",
+              "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+              "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+              "packet_ready_at_ms": 1800000060000,
+              "probabilities": {
+                "agreement": 0.1,
+                "contradiction": 0.1,
+                "mixed": 0.1,
+                "unknown": 0.7
+              },
+              "reason": null,
+              "request_started_at_ms": 1800000060000,
+              "response_deadline_at_ms": 1800000060040,
+              "response_fingerprint": null,
+              "response_received_at_ms": 1800000060000,
+              "schema_id": "market-os.b3-1.question.agreement-contradiction",
+              "selected_label": "unknown",
+              "status": "usable",
+              "version": "v1"
+            }
+          ],
+          "concentration": {
+            "h1": 0.7,
+            "h2": 0.7
+          },
+          "evidence_disagreement": false,
+          "probability_semantics": "probabilities over question labels; never a BTC return probability",
+          "support_results": [
+            {
+              "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
+              "available_at_ms": 1800000060000,
+              "decision_eligible_at_ms": 1800000060000,
+              "declared_assessment_use_time_ms": 1800000060000,
+              "evidence_refs": [],
+              "expires_at_ms": null,
+              "fresh_until_ms": 1800000120000,
+              "hypothesis_id": "h1",
+              "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+              "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+              "packet_ready_at_ms": 1800000060000,
+              "probabilities": {
+                "mixed": 0.1,
+                "supported": 0.7,
+                "unknown": 0.1,
+                "unsupported": 0.1
+              },
+              "reason": null,
+              "request_started_at_ms": 1800000060000,
+              "response_deadline_at_ms": 1800000060040,
+              "response_fingerprint": null,
+              "response_received_at_ms": 1800000060000,
+              "schema_id": "market-os.b3-1.question.evidence-support",
+              "selected_label": "supported",
+              "status": "usable",
+              "version": "v1"
+            },
+            {
+              "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
+              "available_at_ms": 1800000060000,
+              "decision_eligible_at_ms": 1800000060000,
+              "declared_assessment_use_time_ms": 1800000060000,
+              "evidence_refs": [],
+              "expires_at_ms": null,
+              "fresh_until_ms": 1800000120000,
+              "hypothesis_id": "h2",
+              "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+              "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+              "packet_ready_at_ms": 1800000060000,
+              "probabilities": {
+                "mixed": 0.1,
+                "supported": 0.7,
+                "unknown": 0.1,
+                "unsupported": 0.1
+              },
+              "reason": null,
+              "request_started_at_ms": 1800000060000,
+              "response_deadline_at_ms": 1800000060040,
+              "response_fingerprint": null,
+              "response_received_at_ms": 1800000060000,
+              "schema_id": "market-os.b3-1.question.evidence-support",
+              "selected_label": "supported",
+              "status": "usable",
+              "version": "v1"
+            }
+          ]
+        },
+        "observation_id": "btc:synthetic-btc-b31-alignment-v1:1800000000000:1b1c0883dfcab45f",
+        "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+        "recorded_fixture_id": "btc-b31-recorded-synthetic-v1:valid-complete"
+      }
+    ],
+    "schema": "market-os.btc-b31-b2-alignment.v1"
+  },
+  "normalization_status": "usable",
+  "packet_fingerprint": "0618cf2a329c59dfdc65f9d0748e24d35b4f4ccb133f8c724ea83f6d8c7acf3a",
+  "schema": "market-os.btc-b31-synthetic-alignment-exercise.v1",
+  "scope": {
+    "assessment_case_id": "valid-complete",
+    "dataset_revision": "synthetic-btc-b31-alignment-v1",
+    "external_requests": 0,
+    "market_data_used": false,
+    "market_metrics_computed": false,
+    "real_jev_response_used": false,
+    "source_fixture_id": "btc-b31-recorded-synthetic-v1",
+    "synthetic": true,
+    "trading_or_execution": false
+  },
+  "status": "synthetic-offline-seam-exercised-no-market-claim"
+}

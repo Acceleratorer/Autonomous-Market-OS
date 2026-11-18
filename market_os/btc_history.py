@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+import csv
 from decimal import Decimal, InvalidOperation
 import hashlib
+import http.client
+import io
 import json
 import os
 from pathlib import Path
+from pathlib import PureWindowsPath
 import re
 import tempfile
 import time
@@ -15,6 +19,8 @@ from typing import Any, Callable, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
+import ssl
+import zipfile
 
 import duckdb
 import pyarrow as pa
@@ -39,6 +45,25 @@ EXECUTION_APPROVAL_PHRASE = (
 )
 SOURCE_INTERVAL = "1m"
 SOURCE_REQUEST_WEIGHT = 2
+ARCHIVE_SOURCE_ID = "binance.spot.daily-archive.klines"
+ARCHIVE_HOST = "data.binance.vision"
+ARCHIVE_PATH = "/data/spot/daily/klines"
+ARCHIVE_AUTHORIZATION_VERSION = "market-os.btc-history-vision-authorization.v1"
+ARCHIVE_READINESS_VERSION = "market-os.btc-history-vision-readiness.v1"
+ARCHIVE_EXECUTION_PHRASE_PREFIX = "APPROVE B1 BINANCE VISION ARCHIVE"
+ARCHIVE_AUTHORIZATION_MAX_LIFETIME_SECONDS = 24 * 60 * 60
+ARCHIVE_DAYS = 30
+ARCHIVE_MAX_FILES = 30
+ARCHIVE_MAX_REQUESTS = 60
+ARCHIVE_MAX_ROWS = 43_200
+ARCHIVE_MAX_RUNTIME_SECONDS = 900
+ARCHIVE_MAX_ATTEMPTS = 1
+ARCHIVE_MAX_ZIP_BYTES = 1024 * 1024
+ARCHIVE_MAX_CHECKSUM_BYTES = 1024
+ARCHIVE_MAX_CSV_BYTES = 1024 * 1024
+ARCHIVE_MAX_TOTAL_BYTES = 32 * 1024 * 1024
+ARCHIVE_ROWS_PER_DAY = 24 * 60
+ARCHIVE_MICROSECOND_START = date(2025, 1, 1)
 MAX_PAGE_SIZE = 1000
 DEFAULT_PAGE_SIZE = 1000
 MAX_PAGES = 100
@@ -60,6 +85,11 @@ _REQUESTED_AUTHORIZATION_FIELDS = frozenset({
     "max_pages", "max_requests", "max_rows",
     "max_runtime_seconds", "max_attempts",
 })
+_ARCHIVE_AUTHORIZATION_FIELDS = frozenset({
+    "start_date", "end_date_exclusive", "max_files", "max_requests", "max_rows",
+    "max_runtime_seconds", "max_attempts", "max_zip_bytes", "max_checksum_bytes",
+    "max_total_bytes",
+})
 _DATASET_ID_RE = re.compile(r"^(?:btc-history-[0-9a-f]{20}|btc-history-manifest-[0-9a-f]{20})$")
 _BTC_DATASET_REVISION_RE = re.compile(r"^btc-history-[0-9a-f]{20}$")
 _MANIFEST_ID_RE = re.compile(r"^btc-history-manifest-[0-9a-f]{20}$")
@@ -70,6 +100,71 @@ class HistoryError(ValueError):
         self.code = code
         self.retry_after = retry_after
         super().__init__(message)
+
+
+def _check_deadline(deadline: float | None) -> None:
+    if deadline is not None and time.monotonic() >= deadline:
+        raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
+
+
+def _windows_drive_type(root: str) -> int:
+    import ctypes
+
+    return int(ctypes.windll.kernel32.GetDriveTypeW(root))
+
+
+def _is_remote_windows_drive(
+    root: str | Path,
+    *,
+    drive_type: Callable[[str], int] | None = None,
+) -> bool:
+    windows_root = PureWindowsPath(os.fspath(root))
+    drive = windows_root.drive
+    if drive.startswith("\\\\"):
+        return True
+    if not drive:
+        return False
+    if drive_type is None:
+        if os.name != "nt":
+            return False
+        drive_type = _windows_drive_type
+    return drive_type(f"{drive}\\") == 4  # DRIVE_REMOTE
+
+
+def _is_network_mount(root: Path) -> bool:
+    mountinfo = Path("/proc/self/mountinfo")
+    if os.name != "posix" or not mountinfo.is_file():
+        return False
+    try:
+        lines = mountinfo.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    network_types = ("nfs", "cifs", "smb", "9p", "ceph", "glusterfs", "davfs", "sshfs")
+    for line in lines:
+        before, separator, after = line.partition(" - ")
+        fields = before.split()
+        filesystem = after.split(maxsplit=1)[0] if separator and after else ""
+        if len(fields) < 5 or not filesystem.startswith(network_types):
+            continue
+        mount_text = re.sub(r"\\([0-7]{3})", lambda match: chr(int(match.group(1), 8)), fields[4])
+        try:
+            if root.is_relative_to(Path(mount_text)):
+                return True
+        except (OSError, RuntimeError):
+            continue
+    return False
+
+
+def _local_storage_root(root: Path) -> Path:
+    if _is_remote_windows_drive(root):
+        raise HistoryError("local_storage_required", "BTC history data must remain on a local volume")
+    try:
+        resolved = root.expanduser().resolve()
+    except (OSError, RuntimeError) as exc:
+        raise HistoryError("local_storage_required", "BTC history storage root cannot be resolved locally") from exc
+    if _is_remote_windows_drive(resolved) or _is_network_mount(resolved):
+        raise HistoryError("local_storage_required", "BTC history data must remain on a local volume")
+    return resolved
 
 
 def _require_int(value: Any, field: str) -> int:
@@ -125,67 +220,151 @@ def validate_historical_budget(
 
 
 def plan_historical_readiness(cutoff_ms: int) -> dict[str, Any]:
-    """Return the offline proposal for the first separately approved run.
+    """Return the current B1 proposal (Binance Vision daily archives, offline)."""
+    return plan_archive_readiness(cutoff_ms)
 
-    ``cutoff_ms`` is the explicit UTC minute boundary for the first excluded
-    candle. The half-open range therefore contains exactly the preceding 30
-    days and never treats the current/open candle as finalized data.
-    """
+
+def _archive_date(value: Any, field: str) -> date:
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        raise HistoryError("invalid_range", f"{field} must be an ISO UTC date")
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise HistoryError("invalid_range", f"{field} must be an ISO UTC date") from exc
+    if parsed.isoformat() != value:
+        raise HistoryError("invalid_range", f"{field} must be an ISO UTC date")
+    return parsed
+
+
+def _max_source_page_rows(source_identity: str) -> int:
+    return ARCHIVE_ROWS_PER_DAY if source_identity == ARCHIVE_SOURCE_ID else MAX_PAGE_SIZE
+
+
+def validate_archive_budget(
+    start_date: str,
+    end_date_exclusive: str,
+    *,
+    max_files: int,
+    max_requests: int,
+    max_rows: int,
+    max_runtime_seconds: int,
+    max_attempts: int,
+    max_zip_bytes: int,
+    max_checksum_bytes: int,
+    max_total_bytes: int,
+) -> dict[str, int]:
+    """Validate a fixed 30-day archive request before opening a transport."""
+    start = _archive_date(start_date, "start_date")
+    end = _archive_date(end_date_exclusive, "end_date_exclusive")
+    values = {
+        "max_files": max_files,
+        "max_requests": max_requests,
+        "max_rows": max_rows,
+        "max_runtime_seconds": max_runtime_seconds,
+        "max_attempts": max_attempts,
+        "max_zip_bytes": max_zip_bytes,
+        "max_checksum_bytes": max_checksum_bytes,
+        "max_total_bytes": max_total_bytes,
+    }
+    for name, value in values.items():
+        _require_int(value, name)
+    days = (end - start).days
+    requests = days * 2
+    if days != ARCHIVE_DAYS or end > datetime.now(timezone.utc).date():
+        raise HistoryError("request_budget", "archive range must contain exactly 30 completed UTC days")
+    if (
+        max_files != ARCHIVE_MAX_FILES
+        or max_requests != ARCHIVE_MAX_REQUESTS
+        or max_rows != ARCHIVE_MAX_ROWS
+        or max_runtime_seconds != ARCHIVE_MAX_RUNTIME_SECONDS
+        or max_attempts != ARCHIVE_MAX_ATTEMPTS
+        or max_zip_bytes != ARCHIVE_MAX_ZIP_BYTES
+        or max_checksum_bytes != ARCHIVE_MAX_CHECKSUM_BYTES
+        or max_total_bytes != ARCHIVE_MAX_TOTAL_BYTES
+        or requests > max_requests
+    ):
+        raise HistoryError("request_budget", "archive limits must match the reviewed 30-day policy")
+    return {
+        "expected_days": days,
+        "expected_rows": days * ARCHIVE_ROWS_PER_DAY,
+        "expected_requests": requests,
+        **values,
+    }
+
+
+def plan_archive_readiness(cutoff_ms: int) -> dict[str, Any]:
+    """Return the zero-network plan for the last 30 complete UTC archive days."""
     cutoff_ms = _require_int(cutoff_ms, "cutoff_ms")
-    if cutoff_ms <= 0 or cutoff_ms % 60_000:
-        raise HistoryError("invalid_range", "cutoff_ms must be a positive minute-aligned UTC timestamp")
-    end_ms = cutoff_ms
-    start_ms = end_ms - READINESS_DAYS * 24 * 60 * 60 * 1000
-    budget = validate_historical_budget(
-        start_ms,
-        end_ms,
-        page_size=DEFAULT_PAGE_SIZE,
-        max_pages=READINESS_MAX_PAGES,
-        max_requests=READINESS_MAX_REQUESTS,
-        max_rows=READINESS_MAX_ROWS,
-        max_runtime_seconds=READINESS_MAX_RUNTIME_SECONDS,
-        max_attempts=1,
+    if cutoff_ms <= 0 or cutoff_ms % 86_400_000:
+        raise HistoryError("invalid_range", "cutoff_ms must be a positive UTC-midnight timestamp")
+    end = datetime.fromtimestamp(cutoff_ms / 1000, timezone.utc).date()
+    start = end - timedelta(days=ARCHIVE_DAYS)
+    budget = validate_archive_budget(
+        start.isoformat(), end.isoformat(),
+        max_files=ARCHIVE_MAX_FILES,
+        max_requests=ARCHIVE_MAX_REQUESTS,
+        max_rows=ARCHIVE_MAX_ROWS,
+        max_runtime_seconds=ARCHIVE_MAX_RUNTIME_SECONDS,
+        max_attempts=ARCHIVE_MAX_ATTEMPTS,
+        max_zip_bytes=ARCHIVE_MAX_ZIP_BYTES,
+        max_checksum_bytes=ARCHIVE_MAX_CHECKSUM_BYTES,
+        max_total_bytes=ARCHIVE_MAX_TOTAL_BYTES,
     )
     return {
-        "schema": READINESS_VERSION,
-        "status": "reviewed-opt-in-transport-blocked-pending-authorization",
+        "schema": ARCHIVE_READINESS_VERSION,
+        "status": "offline-archive-plan-pending-personal-scope-and-execution-approval",
         "ingestion_allowed": False,
         "network_requests": 0,
         "provider_requests": 0,
         "credentials_used": False,
         "instrument": {"venue": "BINANCE_SPOT", "symbol": BTC_SYMBOL, "interval": SOURCE_INTERVAL},
-        "source": {"host": SOURCE_HOST, "method": SOURCE_METHOD, "path": SOURCE_PATH, "security": "NONE", "request_weight": SOURCE_REQUEST_WEIGHT},
-        "requested_start_ms": start_ms,
-        "requested_end_ms_exclusive": end_ms,
+        "source": {
+            "host": ARCHIVE_HOST,
+            "method": SOURCE_METHOD,
+            "path": ARCHIVE_PATH,
+            "archive_kind": "daily-spot-kline-zip-and-sha256-sidecar",
+            "security": "NONE",
+        },
+        "requested_start_ms": int(datetime.combine(start, datetime.min.time(), timezone.utc).timestamp() * 1000),
+        "requested_end_ms_exclusive": cutoff_ms,
         "cutoff_ms": cutoff_ms,
         "excluded_final_candle_open_ms": cutoff_ms,
-        "max_response_bytes": HISTORY_MAX_RESPONSE_BYTES,
+        "proposal": {"start_date": start.isoformat(), "end_date_exclusive": end.isoformat(), **budget},
         "authorization": {
+            "schema": ARCHIVE_AUTHORIZATION_VERSION,
+            "ingestion_allowed": False,
             "explicit_runtime_flag": "--allow-historical-ingest",
             "authorization_file_required": True,
-            "authorization_file_path": "approved-policy.json",
-            "authorization_requires_expires_at": True,
+            "authorization_file_path": "approved-vision-archive-policy.json",
             "execution_approval_required": True,
-            "terms_verified": False,
-            "regional_eligibility_verified": False,
-            "retention_rights_verified": False,
-            "refusal_reason": "source terms, regional eligibility, and retention rights are unresolved",
+            "authorization_max_lifetime_seconds": ARCHIVE_AUTHORIZATION_MAX_LIFETIME_SECONDS,
+            "terms_verified": True,
+            "regional_eligibility_verified": True,
+            "personal_noncommercial_scope_confirmed": False,
+            "retention_confirmed": False,
+            "refusal_reason": "owner has not confirmed personal non-commercial use and local retention scope",
         },
-        "purpose": "local BTC quantitative research and paper-only simulation",
+        "purpose": "personal non-commercial offline BTC historical research and paper-only simulation",
         "storage": {
             "root": "user-selected B1 HistoryStore root",
-            "raw_pages": "immutable SHA-256 JSON pages",
-            "raw_page_retention": "local-only-until-explicit-deletion",
+            "raw_archives": "immutable SHA-256 ZIP and CHECKSUM artifacts",
             "canonical": "Parquet snapshot with DuckDB catalog and manifest lineage",
             "retention": "local-only-until-explicit-deletion",
             "backup": "none by default",
             "access": "local operator only; no upload or redistribution",
         },
+        "limits": {
+            "max_zip_bytes_each": ARCHIVE_MAX_ZIP_BYTES,
+            "max_checksum_bytes_each": ARCHIVE_MAX_CHECKSUM_BYTES,
+            "max_uncompressed_csv_bytes_each": ARCHIVE_MAX_CSV_BYTES,
+            "max_total_download_bytes": ARCHIVE_MAX_TOTAL_BYTES,
+            "rows_per_day": ARCHIVE_ROWS_PER_DAY,
+        },
         "retry_policy": {
-            "max_attempts_per_page": 1,
-            "retry_after": "record and stop on 429/418; no automatic retry in initial run",
-            "timeouts": "bounded transport connect/read timeouts",
-            "checkpoint": "persist completed raw pages before each next page; resume requires fresh approval",
+            "max_attempts_per_file": ARCHIVE_MAX_ATTEMPTS,
+            "retry_after": "stop on 429/418; no automatic retry",
+            "redirects": "rejected",
+            "resume": "no automatic resume; a new bounded run requires fresh approval",
         },
         "safety": {
             "websocket": False,
@@ -194,9 +373,92 @@ def plan_historical_readiness(cutoff_ms: int) -> dict[str, Any]:
             "orders": False,
             "account_access": False,
             "trading": False,
+            "futures": False,
+            "margin": False,
+            "redistribution": False,
         },
         **budget,
     }
+
+
+def archive_execution_approval_phrase(authorization: dict[str, Any]) -> str:
+    """Render the exact owner phrase bound to the archive policy's UTC dates."""
+    start = _archive_date(authorization.get("start_date"), "start_date")
+    end = _archive_date(authorization.get("end_date_exclusive"), "end_date_exclusive")
+    last = end - timedelta(days=1)
+    return (
+        f"{ARCHIVE_EXECUTION_PHRASE_PREFIX}: BTCUSDT Spot 1m, UTC dates "
+        f"{start.isoformat()} through {last.isoformat()} (30 daily archives), "
+        "60 maximum HTTPS requests including checksums, 43200 maximum rows, "
+        "1 MiB maximum per ZIP, 1 KiB maximum per checksum, 32 MiB total download cap, "
+        "900-second runtime cap, one attempt per file, local-only until explicit deletion, "
+        "personal non-commercial offline/paper research, no redistribution, no credentials or trading"
+    )
+
+
+def validate_archive_authorization(
+    value: dict[str, Any] | None,
+    *,
+    requested: dict[str, Any] | None = None,
+    now: datetime | None = None,
+) -> None:
+    if not isinstance(value, dict) or value.get("schema") != ARCHIVE_AUTHORIZATION_VERSION:
+        raise HistoryError("source_not_authorized", "a matching Binance Vision archive authorization is required")
+    expected = {
+        "explicit_approval": True,
+        "terms_verified": True,
+        "regional_eligibility_verified": True,
+        "personal_noncommercial_scope_confirmed": True,
+        "retention_confirmed": True,
+        "host": ARCHIVE_HOST,
+        "path": ARCHIVE_PATH,
+        "method": SOURCE_METHOD,
+        "symbol": BTC_SYMBOL,
+        "interval": SOURCE_INTERVAL,
+        "access_region": "Vietnam",
+        "authenticated": False,
+        "trading": False,
+        "websocket": False,
+        "account_access": False,
+        "orders": False,
+        "futures": False,
+        "margin": False,
+        "credentials": False,
+        "redistribution": False,
+        "purpose": "personal non-commercial offline BTC historical research and paper-only simulation",
+        "retention": "local-only-until-explicit-deletion",
+    }
+    allowed = {"schema", "expires_at"} | set(expected) | _ARCHIVE_AUTHORIZATION_FIELDS
+    if set(value) - allowed:
+        raise HistoryError("source_not_authorized", "archive authorization contains unsupported fields")
+    if any(value.get(key) != expected_value for key, expected_value in expected.items()):
+        raise HistoryError("source_not_authorized", "archive authorization does not match the reviewed source and usage scope")
+    missing = _ARCHIVE_AUTHORIZATION_FIELDS - value.keys()
+    if missing:
+        raise HistoryError("source_not_authorized", "archive authorization is missing bounded request values")
+    try:
+        validate_archive_budget(
+            value["start_date"],
+            value["end_date_exclusive"],
+            max_files=value["max_files"],
+            max_requests=value["max_requests"],
+            max_rows=value["max_rows"],
+            max_runtime_seconds=value["max_runtime_seconds"],
+            max_attempts=value["max_attempts"],
+            max_zip_bytes=value["max_zip_bytes"],
+            max_checksum_bytes=value["max_checksum_bytes"],
+            max_total_bytes=value["max_total_bytes"],
+        )
+        expires_at = _parse_utc(value.get("expires_at"), "expires_at")
+    except (HistoryError, ContractError, KeyError, TypeError, ValueError) as exc:
+        raise HistoryError("source_not_authorized", "archive authorization contains invalid bounded values or expiry") from exc
+    current_time = now or datetime.now(timezone.utc)
+    lifetime = (expires_at - current_time).total_seconds()
+    if lifetime <= 0 or lifetime > ARCHIVE_AUTHORIZATION_MAX_LIFETIME_SECONDS:
+        raise HistoryError("source_not_authorized", "archive authorization must expire within 24 hours")
+    for key, expected_value in (requested or {}).items():
+        if value.get(key) != expected_value:
+            raise HistoryError("source_not_authorized", f"archive authorization does not match requested {key}")
 
 
 def validate_historical_authorization(
@@ -401,6 +663,92 @@ class BinanceHistoricalTransport:
             raise
 
 
+class BinanceVisionArchiveTransport:
+    """Sequential, checksum-sidecar-backed transport for daily Spot ZIPs."""
+
+    host = ARCHIVE_HOST
+    method = SOURCE_METHOD
+    approved = False
+
+    def __init__(
+        self,
+        authorization: dict[str, Any],
+        execution_approval: str,
+        *,
+        timeout: float = 10.0,
+        now: datetime | None = None,
+        deadline: float | None = None,
+    ) -> None:
+        validate_archive_authorization(authorization, now=now)
+        if execution_approval != archive_execution_approval_phrase(authorization):
+            raise HistoryError("execution_not_approved", "exact B1 Binance Vision archive execution approval is required")
+        self.authorization = authorization
+        self.approved = True
+        self.timeout = timeout
+        self.request_count = 0
+        self.deadline = deadline if deadline is not None else time.monotonic() + authorization["max_runtime_seconds"]
+        self.start_date = _archive_date(authorization["start_date"], "start_date")
+        self.end_date_exclusive = _archive_date(authorization["end_date_exclusive"], "end_date_exclusive")
+        self.max_requests = authorization["max_requests"]
+
+    def build_request(self, day: date, file_kind: str) -> tuple[Request, int, str]:
+        if not isinstance(day, date) or not self.start_date <= day < self.end_date_exclusive:
+            raise HistoryError("source_not_authorized", "archive date exceeds the approved UTC range")
+        if file_kind not in {"archive", "checksum"}:
+            raise HistoryError("endpoint_not_allowed", "only archive ZIP and checksum files are allowed")
+        filename = f"{BTC_SYMBOL}-1m-{day.isoformat()}.zip"
+        if file_kind == "checksum":
+            filename += ".CHECKSUM"
+            max_bytes = ARCHIVE_MAX_CHECKSUM_BYTES
+        else:
+            max_bytes = ARCHIVE_MAX_ZIP_BYTES
+        path = f"{ARCHIVE_PATH}/BTCUSDT/1m/{filename}"
+        url = f"https://{self.host}{path}"
+        parsed = urlsplit(url)
+        if parsed.scheme != "https" or parsed.netloc != ARCHIVE_HOST or parsed.path != path:
+            raise HistoryError("endpoint_not_allowed", "archive endpoint is outside the approved allowlist")
+        if self.request_count >= self.max_requests:
+            raise HistoryError("request_budget", "archive request count exceeds the approved cap")
+        return Request(url, headers={"User-Agent": SOURCE_USER_AGENT}, method=self.method), max_bytes, filename
+
+    def fetch_file(self, day: date, file_kind: str) -> HttpResponse:
+        outbound, max_bytes, _ = self.build_request(day, file_kind)
+        self.request_count += 1
+        remaining = self.deadline - time.monotonic()
+        if remaining <= 0:
+            raise HistoryError("runtime_cap", "archive acquisition exceeded the runtime cap")
+        connection = http.client.HTTPSConnection(
+            self.host,
+            timeout=min(self.timeout, remaining),
+            context=ssl.create_default_context(),
+        )
+        try:
+            request_path = urlsplit(outbound.full_url).path
+            headers = dict(outbound.header_items())
+            headers["Connection"] = "close"
+            connection.request(outbound.get_method(), request_path, headers=headers)
+            response = connection.getresponse()
+            body = bytearray()
+            while len(body) <= max_bytes:
+                remaining = self.deadline - time.monotonic()
+                if remaining <= 0:
+                    raise HistoryError("runtime_cap", "archive acquisition exceeded the runtime cap")
+                if connection.sock is not None:
+                    connection.sock.settimeout(min(self.timeout, remaining))
+                chunk = response.read1(min(64 * 1024, max_bytes + 1 - len(body)))
+                if not chunk:
+                    break
+                body.extend(chunk)
+            return HttpResponse(
+                int(response.status),
+                dict(response.headers.items()),
+                bytes(body),
+                datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            )
+        finally:
+            connection.close()
+
+
 def plan_pages(
     start_time_ms: int,
     end_time_ms_exclusive: int,
@@ -556,6 +904,84 @@ def _parse_trade_count(value: Any) -> int:
     return value
 
 
+def parse_vision_archive(day: date, raw_zip: bytes) -> list[list[Any]]:
+    """Validate one daily Spot ZIP and normalize its 12 CSV columns to B0 rows."""
+    if not isinstance(day, date) or not isinstance(raw_zip, bytes) or len(raw_zip) > ARCHIVE_MAX_ZIP_BYTES:
+        raise HistoryError("archive_invalid", "archive input exceeds the reviewed ZIP size or date type")
+    zip_name = f"{BTC_SYMBOL}-1m-{day.isoformat()}.zip"
+    csv_name = zip_name[:-4] + ".csv"
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw_zip)) as archive:
+            members = archive.infolist()
+            if len(members) != 1 or members[0].filename != csv_name or members[0].is_dir():
+                raise HistoryError("archive_invalid", "archive must contain only the expected daily CSV")
+            member = members[0]
+            if member.file_size > ARCHIVE_MAX_CSV_BYTES or member.compress_size > ARCHIVE_MAX_ZIP_BYTES:
+                raise HistoryError("archive_invalid", "archive CSV exceeds the reviewed uncompressed size cap")
+            if member.flag_bits & 1 or member.compress_type not in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED}:
+                raise HistoryError("archive_invalid", "archive uses unsupported encryption or compression")
+            with archive.open(member) as stream:
+                csv_bytes = stream.read(ARCHIVE_MAX_CSV_BYTES + 1)
+    except HistoryError:
+        raise
+    except (OSError, RuntimeError, zipfile.BadZipFile, zipfile.LargeZipFile) as exc:
+        raise HistoryError("archive_invalid", "daily ZIP is corrupt or unreadable") from exc
+    if len(csv_bytes) > ARCHIVE_MAX_CSV_BYTES or len(csv_bytes) != member.file_size:
+        raise HistoryError("archive_invalid", "archive CSV exceeds the reviewed uncompressed size cap")
+    try:
+        text = csv_bytes.decode("utf-8-sig", errors="strict")
+        reader = csv.reader(io.StringIO(text, newline=""), strict=True)
+        raw_rows = list(reader)
+    except (UnicodeDecodeError, csv.Error) as exc:
+        raise HistoryError("archive_invalid", "daily CSV is not strict UTF-8 with valid CSV rows") from exc
+    if not 1 <= len(raw_rows) <= ARCHIVE_ROWS_PER_DAY:
+        raise HistoryError("archive_invalid", "daily CSV row count is outside the 1..1440 cap")
+    start_ms = int(datetime.combine(day, datetime.min.time(), timezone.utc).timestamp() * 1000)
+    end_ms = start_ms + 86_400_000
+    rows: list[list[Any]] = []
+    previous_open_ms = None
+    for index, source_row in enumerate(raw_rows):
+        if len(source_row) != 12:
+            raise HistoryError("archive_invalid", f"CSV row {index} must contain exactly 12 columns")
+        if not source_row[0].isascii() or not source_row[0].isdecimal() or not source_row[6].isascii() or not source_row[6].isdecimal():
+            raise HistoryError("archive_invalid", f"CSV row {index} has a non-integer timestamp")
+        if not source_row[8].isascii() or not source_row[8].isdecimal():
+            raise HistoryError("archive_invalid", f"CSV row {index} has a non-integer trade count")
+        open_raw, close_raw = int(source_row[0]), int(source_row[6])
+        if day >= ARCHIVE_MICROSECOND_START:
+            if open_raw % 1000:
+                raise HistoryError("archive_invalid", f"CSV row {index} has a fractional-millisecond open time")
+            open_ms, close_ms = open_raw // 1000, close_raw // 1000
+        else:
+            open_ms, close_ms = open_raw, close_raw
+        if (
+            not start_ms <= open_ms < end_ms
+            or open_ms % 60_000
+            or close_ms != open_ms + 60_000 - 1
+            or (previous_open_ms is not None and open_ms <= previous_open_ms)
+        ):
+            raise HistoryError("archive_invalid", f"CSV row {index} is outside its UTC day, misaligned, or out of order")
+        rows.append([open_ms, *source_row[1:6], close_ms, source_row[7], int(source_row[8]), *source_row[9:]])
+        previous_open_ms = open_ms
+    return rows
+
+
+def _archive_checksum_digest(raw: bytes, filename: str) -> str:
+    if len(raw) > ARCHIVE_MAX_CHECKSUM_BYTES:
+        raise HistoryError("checksum_invalid", "archive checksum exceeds the reviewed byte cap")
+    try:
+        text = raw.decode("ascii", errors="strict").strip()
+    except UnicodeDecodeError as exc:
+        raise HistoryError("checksum_invalid", "archive checksum must be ASCII") from exc
+    parts = text.split()
+    if len(parts) != 2 or not re.fullmatch(r"[0-9a-fA-F]{64}", parts[0]):
+        raise HistoryError("checksum_invalid", "archive checksum must contain one SHA-256 and filename")
+    listed_name = parts[1].removeprefix("*")
+    if listed_name != filename:
+        raise HistoryError("checksum_invalid", "archive checksum names a different ZIP file")
+    return parts[0].lower()
+
+
 @dataclass(frozen=True)
 class IngestResult:
     dataset_revision: str
@@ -567,16 +993,66 @@ class IngestResult:
 class HistoryStore:
     def __init__(self, root: str | Path, *, read_only: bool = False) -> None:
         self.root = Path(root)
+        self.root = _local_storage_root(self.root)
         self.read_only = read_only
         self.raw_dir = self.root / "raw"
         self.dataset_dir = self.root / "datasets"
         self.manifest_dir = self.root / "manifests"
         self.checkpoint_dir = self.root / "checkpoints"
         self.catalog_path = self.root / "catalog.duckdb"
+        self._validate_local_store_layout()
         if not read_only:
             for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir):
                 path.mkdir(parents=True, exist_ok=True)
+            self._validate_local_store_layout()
             self._initialize()
+
+    def _validate_local_store_layout(self) -> None:
+        for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir, self.catalog_path):
+            try:
+                resolved = path.resolve()
+            except (OSError, RuntimeError) as exc:
+                raise HistoryError("local_storage_required", "BTC history storage paths must resolve locally") from exc
+            if (
+                resolved != path
+                or _is_remote_windows_drive(resolved)
+                or _is_network_mount(resolved)
+            ):
+                raise HistoryError("local_storage_required", "BTC history storage paths must remain local")
+
+    def _raw_storage_root(self, code: str, message: str) -> Path:
+        try:
+            raw_root = self.raw_dir.resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError(code, message) from exc
+        if (
+            raw_root != self.raw_dir
+            or _is_remote_windows_drive(raw_root)
+            or _is_network_mount(raw_root)
+        ):
+            raise HistoryError(code, message)
+        return raw_root
+
+    def _read_raw_page_file(self, name: str, code: str, message: str) -> bytes:
+        try:
+            store_root = os.path.realpath(self.root)
+            raw_root = os.path.realpath(self.raw_dir)
+            raw_path = os.path.realpath(os.path.join(raw_root, name))
+            raw_root_prefix = os.path.join(raw_root, "")
+            if (
+                raw_root == store_root
+                or os.path.commonpath((store_root, raw_root)) != store_root
+                or Path(raw_root) != self.raw_dir
+                or _is_remote_windows_drive(Path(raw_root))
+                or _is_network_mount(Path(raw_root))
+                or not raw_path.startswith(raw_root_prefix)
+                or not os.path.isfile(raw_path)
+            ):
+                raise HistoryError(code, message)
+            with open(raw_path, "rb") as handle:
+                return handle.read()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise HistoryError(code, message) from exc
 
     def _connect(self):
         return duckdb.connect(str(self.catalog_path), read_only=self.read_only)
@@ -666,6 +1142,8 @@ class HistoryStore:
         pages = fixture.get("pages")
         if not isinstance(pages, list) or len(pages) > MAX_PAGES:
             raise HistoryError("page_limit", f"fixture must contain at most {MAX_PAGES} pages")
+        if any(not isinstance(page, list) for page in pages):
+            raise HistoryError("invalid_fixture", "fixture page must be an array of rows")
         if end <= start or start % 60_000 or end % 60_000 or end - start > MAX_CANDLES * 60_000:
             raise HistoryError("invalid_range", "fixture range must be aligned, positive, and within local candle cap")
         _parse_utc(captured_at, "received_at")
@@ -745,13 +1223,19 @@ class HistoryStore:
         if checkpoint["status"] == "complete":
             pages = []
             for page in checkpoint["pages"]:
-                raw_rows = json.loads((self.raw_dir / f"{page['sha256']}.json").read_bytes())
+                _check_deadline(deadline)
+                raw_bytes = self._read_raw_page_file(
+                    f"{page['sha256']}.json",
+                    "invalid_checkpoint",
+                    "checkpoint references a missing or unsafe raw page",
+                )
+                raw_rows = json.loads(raw_bytes)
                 pages.append({"rows": raw_rows, "captured_at": page["captured_at"], "page_sha256": page["sha256"]})
             return self._ingest_pages(
                 pages, captured_at=None, as_of_ms=as_of_ms,
                 requested_start_ms=start_time_ms, requested_end_ms=end_time_ms_exclusive,
                 endpoint_class="public-market-data", source_identity=SOURCE_ID,
-                network_requests=0,
+                network_requests=0, deadline=deadline,
             )
         completed = checkpoint["pages"]
         if len(completed) * max_attempts > max_requests:
@@ -759,14 +1243,18 @@ class HistoryStore:
         fetched_rows = 0
         for page in completed:
             try:
-                fetched_rows += len(json.loads((self.raw_dir / f"{page['sha256']}.json").read_bytes()))
+                raw_bytes = self._read_raw_page_file(
+                    f"{page['sha256']}.json",
+                    "invalid_checkpoint",
+                    "checkpoint references a missing or unsafe raw page",
+                )
+                fetched_rows += len(json.loads(raw_bytes))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 raise HistoryError("invalid_checkpoint", "checkpoint raw page is unreadable") from exc
         if fetched_rows > max_rows:
             raise HistoryError("row_budget", "checkpoint exceeds the configured row budget")
         for request in requests[len(completed):]:
-            if time.monotonic() > deadline:
-                raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
+            _check_deadline(deadline)
             response = self._fetch_page(
                 transport,
                 request,
@@ -798,21 +1286,158 @@ class HistoryStore:
             })
             checkpoint["pages"] = completed
             self._write_json_atomic(checkpoint_path, checkpoint)
-        if time.monotonic() > deadline:
-            raise HistoryError("runtime_cap", "historical acquisition exceeded the runtime cap")
+        _check_deadline(deadline)
         page_rows = []
         for item in completed:
-            raw = (self.raw_dir / f"{item['sha256']}.json").read_bytes()
+            raw = self._read_raw_page_file(
+                f"{item['sha256']}.json",
+                "invalid_checkpoint",
+                "checkpoint references a missing or unsafe raw page",
+            )
             page_rows.append({"rows": json.loads(raw), "captured_at": item["captured_at"], "page_sha256": item["sha256"]})
         result = self._ingest_pages(
             page_rows, captured_at=None, as_of_ms=as_of_ms,
             requested_start_ms=start_time_ms, requested_end_ms=end_time_ms_exclusive,
-            endpoint_class="public-market-data", source_identity=SOURCE_ID, network_requests=len(completed),
+            endpoint_class="public-market-data", source_identity=SOURCE_ID,
+            network_requests=len(completed), deadline=deadline,
         )
         checkpoint["status"] = "complete"
         checkpoint["manifest_id"] = result.manifest_id
         self._write_json_atomic(checkpoint_path, checkpoint)
         return result
+
+    def acquire_vision_archive(
+        self,
+        start_date: str,
+        end_date_exclusive: str,
+        *,
+        transport: Any = None,
+        max_files: int = ARCHIVE_MAX_FILES,
+        max_requests: int = ARCHIVE_MAX_REQUESTS,
+        max_rows: int = ARCHIVE_MAX_ROWS,
+        max_runtime_seconds: int = ARCHIVE_MAX_RUNTIME_SECONDS,
+        max_attempts: int = ARCHIVE_MAX_ATTEMPTS,
+        max_zip_bytes: int = ARCHIVE_MAX_ZIP_BYTES,
+        max_checksum_bytes: int = ARCHIVE_MAX_CHECKSUM_BYTES,
+        max_total_bytes: int = ARCHIVE_MAX_TOTAL_BYTES,
+        allow_historical_ingest: bool = False,
+        authorization: dict[str, Any] | None = None,
+        execution_approval: str | None = None,
+    ) -> IngestResult:
+        if not allow_historical_ingest:
+            raise HistoryError("source_not_approved", "archive acquisition requires --allow-historical-ingest")
+        requested = {
+            "start_date": start_date,
+            "end_date_exclusive": end_date_exclusive,
+            "max_files": max_files,
+            "max_requests": max_requests,
+            "max_rows": max_rows,
+            "max_runtime_seconds": max_runtime_seconds,
+            "max_attempts": max_attempts,
+            "max_zip_bytes": max_zip_bytes,
+            "max_checksum_bytes": max_checksum_bytes,
+            "max_total_bytes": max_total_bytes,
+        }
+        validate_archive_authorization(authorization, requested=requested)
+        if execution_approval != archive_execution_approval_phrase(authorization):
+            raise HistoryError("execution_not_approved", "exact B1 Binance Vision archive execution approval is required")
+        deadline = time.monotonic() + max_runtime_seconds
+        if transport is None:
+            transport = BinanceVisionArchiveTransport(authorization, execution_approval, deadline=deadline)
+        if not getattr(transport, "approved", False):
+            raise HistoryError("source_not_approved", "archive transport is disabled pending explicit approval")
+
+        start = _archive_date(start_date, "start_date")
+        end = _archive_date(end_date_exclusive, "end_date_exclusive")
+        request_count = 0
+        total_bytes = 0
+        total_rows = 0
+        downloaded: list[tuple[date, HttpResponse, HttpResponse, str, list[list[Any]]]] = []
+
+        def fetch_file(day: date, kind: str, byte_cap: int) -> HttpResponse:
+            nonlocal request_count, total_bytes
+            _check_deadline(deadline)
+            if request_count >= max_requests:
+                raise HistoryError("request_budget", "archive request count exceeds the approved cap")
+            try:
+                response = transport.fetch_file(day, kind)
+            except (TimeoutError, OSError, URLError) as exc:
+                raise HistoryError("archive_transport_error", "archive request failed; no retry was attempted") from exc
+            _check_deadline(deadline)
+            request_count += 1
+            if len(response.body) > byte_cap:
+                raise HistoryError("response_too_large", f"archive {kind} response exceeds its byte cap")
+            if not 200 <= response.status < 300:
+                raise classify_http_failure(response.status, response.headers)
+            _parse_utc(response.received_at, "received_at")
+            total_bytes += len(response.body)
+            if total_bytes > max_total_bytes:
+                raise HistoryError("request_budget", "archive download exceeds the total byte cap")
+            return response
+
+        for offset in range(max_files):
+            _check_deadline(deadline)
+            day = start + timedelta(days=offset)
+            zip_filename = f"{BTC_SYMBOL}-1m-{day.isoformat()}.zip"
+            checksum_response = fetch_file(day, "checksum", max_checksum_bytes)
+            expected_digest = _archive_checksum_digest(checksum_response.body, zip_filename)
+            archive_response = fetch_file(day, "archive", max_zip_bytes)
+            if _sha(archive_response.body) != expected_digest:
+                raise HistoryError("checksum_mismatch", f"SHA-256 checksum mismatch for {zip_filename}")
+            rows = parse_vision_archive(day, archive_response.body)
+            _check_deadline(deadline)
+            total_rows += len(rows)
+            if total_rows > max_rows:
+                raise HistoryError("row_budget", "archive rows exceed the approved row cap")
+            downloaded.append((day, checksum_response, archive_response, expected_digest, rows))
+
+        if time.monotonic() > deadline:
+            raise HistoryError("runtime_cap", "archive acquisition exceeded the runtime cap")
+        pages: list[dict[str, Any]] = []
+        source_artifacts: list[dict[str, Any]] = []
+        for page_index, (day, checksum_response, archive_response, expected_digest, rows) in enumerate(downloaded):
+            _check_deadline(deadline)
+            zip_filename = f"{BTC_SYMBOL}-1m-{day.isoformat()}.zip"
+            archive_sha256, archive_path = self._write_raw_artifact(archive_response.body, ".zip")
+            checksum_sha256, checksum_path = self._write_raw_artifact(checksum_response.body, ".CHECKSUM")
+            source_artifacts.append({
+                "date": day.isoformat(),
+                "archive_filename": zip_filename,
+                "archive_sha256": archive_sha256,
+                "archive_path": archive_path,
+                "archive_bytes": len(archive_response.body),
+                "checksum_filename": f"{zip_filename}.CHECKSUM",
+                "checksum_sha256": checksum_sha256,
+                "checksum_path": checksum_path,
+                "checksum_expected_archive_sha256": expected_digest,
+                "checksum_bytes": len(checksum_response.body),
+                "row_count": len(rows),
+            })
+            pages.append({
+                "rows": rows,
+                "captured_at": archive_response.received_at,
+                "source_bytes": archive_response.body,
+                "source_extension": ".zip",
+                "source_path": archive_path,
+                "page_sha256": archive_sha256,
+                "page_index": page_index,
+            })
+
+        start_ms = int(datetime.combine(start, datetime.min.time(), timezone.utc).timestamp() * 1000)
+        end_ms = int(datetime.combine(end, datetime.min.time(), timezone.utc).timestamp() * 1000)
+        return self._ingest_pages(
+            pages,
+            captured_at=None,
+            as_of_ms=int(datetime.now(timezone.utc).timestamp() * 1000),
+            requested_start_ms=start_ms,
+            requested_end_ms=end_ms,
+            endpoint_class="public-market-data",
+            source_identity=ARCHIVE_SOURCE_ID,
+            endpoint_host=ARCHIVE_HOST,
+            source_artifacts=source_artifacts,
+            network_requests=request_count,
+            deadline=deadline,
+        )
 
     def _new_checkpoint(
         self,
@@ -899,10 +1524,11 @@ class HistoryStore:
             digest = page.get("sha256")
             if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
                 raise HistoryError("invalid_checkpoint", "checkpoint page hash is invalid")
-            raw_path = self.raw_dir / f"{digest}.json"
-            if not raw_path.is_file():
-                raise HistoryError("invalid_checkpoint", "checkpoint references a missing raw page")
-            raw = raw_path.read_bytes()
+            raw = self._read_raw_page_file(
+                f"{digest}.json",
+                "invalid_checkpoint",
+                "checkpoint references a missing or unsafe raw page",
+            )
             if _sha(raw) != digest:
                 raise HistoryError("invalid_checkpoint", "checkpoint raw page hash mismatch")
             try:
@@ -936,6 +1562,7 @@ class HistoryStore:
                 if attempt + 1 == max_attempts:
                     raise HistoryError("retry_exhausted", "historical page retry limit exhausted") from exc
                 continue
+            _check_deadline(deadline)
             if len(response.body) > max_response_bytes:
                 raise HistoryError("response_too_large", "historical response exceeds the bounded byte limit")
             if 200 <= response.status < 300:
@@ -966,28 +1593,71 @@ class HistoryStore:
         requested_end_ms: int,
         endpoint_class: str,
         source_identity: str,
+        endpoint_host: str | None = None,
+        source_artifacts: list[dict[str, Any]] | None = None,
         network_requests: int = 0,
+        deadline: float | None = None,
     ) -> IngestResult:
+        _check_deadline(deadline)
+        max_page_rows = _max_source_page_rows(source_identity)
         if len(pages) > MAX_PAGES:
             raise HistoryError("page_limit", f"ingestion exceeds {MAX_PAGES} pages")
         page_refs: list[dict[str, Any]] = []
         rows_for_classification: list[dict[str, Any]] = []
         raw_records: list[dict[str, Any]] = []
         for page_index, page in enumerate(pages):
+            _check_deadline(deadline)
             if isinstance(page, dict) and "rows" in page:
                 rows = page["rows"]
                 received_at = page.get("captured_at") or captured_at
-                raw_bytes = (self.raw_dir / f"{page['page_sha256']}.json").read_bytes() if "page_sha256" in page else _json_bytes(rows)
+                if page.get("source_path"):
+                    page_hash = page.get("page_sha256")
+                    if not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None:
+                        raise HistoryError("invalid_page", "raw page digest must be lowercase SHA-256")
+                    source_path = f"raw/{page_hash}.zip"
+                    if page["source_path"] != source_path:
+                        raise HistoryError("invalid_page", "raw archive path does not match its SHA-256 name")
+                    raw_bytes = self._read_raw_page_file(
+                        f"{page_hash}.zip",
+                        "archive_invalid",
+                        "raw archive path is outside immutable raw storage",
+                    )
+                    if page_hash != _sha(raw_bytes):
+                        raise HistoryError("archive_invalid", "raw archive SHA-256 changed before ingestion")
+                    if page.get("source_bytes") is not None and page["source_bytes"] != raw_bytes:
+                        raise HistoryError("archive_invalid", "raw archive bytes changed before ingestion")
+                else:
+                    page_hash = page.get("page_sha256")
+                    if page_hash is not None and (
+                        not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None
+                    ):
+                        raise HistoryError("invalid_page", "raw page digest must be lowercase SHA-256")
+                    source_path = f"raw/{page_hash}.json" if page_hash is not None else None
+                    raw_bytes = (
+                        self._read_raw_page_file(
+                            f"{page_hash}.json",
+                            "archive_invalid",
+                            "raw page path is outside immutable raw storage",
+                        )
+                        if page_hash is not None
+                        else _json_bytes(rows)
+                    )
             else:
                 rows = page
                 received_at = captured_at
                 raw_bytes = _json_bytes(rows)
-            if not isinstance(rows, list) or len(rows) > MAX_PAGE_SIZE:
-                raise HistoryError("invalid_page", f"page {page_index} must be an array of at most {MAX_PAGE_SIZE} rows")
+                source_path = None
+            if not isinstance(rows, list) or len(rows) > max_page_rows:
+                raise HistoryError("invalid_page", f"page {page_index} must be an array of at most {max_page_rows} rows")
             _parse_utc(received_at, "received_at")
-            page_hash = self._write_raw_page(raw_bytes)
-            page_refs.append({"page_index": page_index, "sha256": page_hash, "captured_at": received_at, "row_count": len(rows)})
+            page_hash = page.get("page_sha256") if isinstance(page, dict) and page.get("source_path") else self._write_raw_page(raw_bytes)
+            page_ref = {"page_index": page_index, "sha256": page_hash, "captured_at": received_at, "row_count": len(rows)}
+            if source_path:
+                page_ref["path"] = source_path
+            page_refs.append(page_ref)
             for row_index, row in enumerate(rows):
+                if row_index % 256 == 0:
+                    _check_deadline(deadline)
                 record_fp = _sha(_json_bytes(row))
                 raw_records.append({
                     "page_index": page_index, "row_index": row_index, "page_sha256": page_hash,
@@ -1011,8 +1681,11 @@ class HistoryStore:
                     item.update(status="invalid", reason=str(exc), open_time_ms=_row_open_ms(row))
                 rows_for_classification.append(item)
 
+        _check_deadline(deadline)
         canonical, outcomes = _classify_rows(rows_for_classification)
+        _check_deadline(deadline)
         existing = self._find_superset_dataset(canonical)
+        _check_deadline(deadline)
         if existing is not None:
             canonical_fingerprint = existing["canonical_fingerprint"]
             dataset_revision = existing["dataset_revision"]
@@ -1050,8 +1723,10 @@ class HistoryStore:
         absolute_parquet_path = self.root / parquet_path
         absolute_parquet_path.parent.mkdir(parents=True, exist_ok=True)
         if not absolute_parquet_path.exists():
+            _check_deadline(deadline)
             table = _parquet_table(canonical)
             self._atomic_parquet(absolute_parquet_path, table)
+        _check_deadline(deadline)
         parquet_sha256 = _sha(absolute_parquet_path.read_bytes())
         manifest = {
             "schema": "market-os.btc-history-manifest.v1",
@@ -1065,7 +1740,7 @@ class HistoryStore:
             "interval": "1m",
             "source_identity": source_identity,
             "endpoint_class": endpoint_class,
-            "endpoint_host": SOURCE_HOST if endpoint_class == "public-market-data" else None,
+            "endpoint_host": endpoint_host or (SOURCE_HOST if endpoint_class == "public-market-data" else None),
             "network_requests": network_requests,
             "requested_start_ms": requested_start_ms,
             "requested_end_ms_exclusive": requested_end_ms,
@@ -1079,6 +1754,7 @@ class HistoryStore:
             "canonicalization_timestamp": canonicalized_at,
             "raw_fingerprint": run_raw_fingerprint,
             "raw_page_fingerprints": [item["sha256"] for item in page_refs],
+            "raw_source_artifacts": source_artifacts or [],
             "canonical_fingerprint": canonical_fingerprint,
             "outcome_fingerprint": outcome_fingerprint,
             "canonical_candle_count": len(canonical),
@@ -1091,19 +1767,38 @@ class HistoryStore:
             "package_versions": {"duckdb": duckdb.__version__, "pyarrow": pa.__version__},
             "python_version": f"{os.sys.version_info.major}.{os.sys.version_info.minor}.{os.sys.version_info.micro}",
         }
+        _check_deadline(deadline)
         manifest_raw = _json_bytes(manifest)
         manifest_path = self.manifest_dir / f"{manifest_id}.json"
         self._write_immutable_bytes(manifest_path, manifest_raw)
+        _check_deadline(deadline)
         self._commit_catalog(
             dataset_revision, canonical_fingerprint, parquet_path, parquet_sha256,
             canonical, page_refs, raw_records, outcomes, manifest, _sha(manifest_raw),
+            deadline=deadline,
         )
         return IngestResult(dataset_revision, manifest_id, canonical_fingerprint, len(canonical))
 
-    def _commit_catalog(self, revision: str, canonical_fp: str, parquet_path: str, parquet_sha: str, canonical: list[dict[str, Any]], pages: list[dict[str, Any]], raw_records: list[dict[str, Any]], outcomes: list[dict[str, Any]], manifest: dict[str, Any], manifest_sha: str) -> None:
+    def _commit_catalog(
+        self,
+        revision: str,
+        canonical_fp: str,
+        parquet_path: str,
+        parquet_sha: str,
+        canonical: list[dict[str, Any]],
+        pages: list[dict[str, Any]],
+        raw_records: list[dict[str, Any]],
+        outcomes: list[dict[str, Any]],
+        manifest: dict[str, Any],
+        manifest_sha: str,
+        *,
+        deadline: float | None = None,
+    ) -> None:
+        _check_deadline(deadline)
         with self._connect() as db:
             db.execute("BEGIN TRANSACTION")
             try:
+                _check_deadline(deadline)
                 db.execute("""
                     INSERT INTO datasets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT (dataset_revision) DO NOTHING
@@ -1112,28 +1807,95 @@ class HistoryStore:
                 if catalog != (canonical_fp, parquet_sha):
                     raise HistoryError("dataset_revision_conflict", "existing dataset revision points to different canonical bytes")
                 for page in pages:
-                    db.execute("INSERT INTO raw_pages VALUES (?, ?, ?, ?, ?) ON CONFLICT (page_sha256) DO NOTHING", [page["sha256"], str(self.raw_dir / f"{page['sha256']}.json"), (self.raw_dir / f"{page['sha256']}.json").stat().st_size, manifest["source_identity"], page["captured_at"]])
+                    _check_deadline(deadline)
+                    page_hash = page.get("sha256")
+                    if not isinstance(page_hash, str) or re.fullmatch(r"[0-9a-f]{64}", page_hash) is None:
+                        raise HistoryError("raw_page_integrity_error", "raw source page digest is invalid")
+                    archive_path = f"raw/{page_hash}.zip"
+                    json_path = f"raw/{page_hash}.json"
+                    recorded_path = page.get("path")
+                    if recorded_path not in (None, archive_path, json_path):
+                        raise HistoryError("raw_page_integrity_error", "raw source path does not match its content address")
+                    raw_name = f"{page_hash}.zip" if recorded_path == archive_path else f"{page_hash}.json"
+                    raw_bytes = self._read_raw_page_file(
+                        raw_name,
+                        "raw_page_integrity_error",
+                        "raw source page is missing or has an invalid hash",
+                    )
+                    if _sha(raw_bytes) != page["sha256"]:
+                        raise HistoryError("raw_page_integrity_error", "raw source page is missing or has an invalid hash")
+                    raw_path = self.raw_dir / raw_name
+                    db.execute("INSERT INTO raw_pages VALUES (?, ?, ?, ?, ?) ON CONFLICT (page_sha256) DO NOTHING", [page["sha256"], str(raw_path), len(raw_bytes), manifest["source_identity"], page["captured_at"]])
                 db.execute("""
                     INSERT INTO ingestion_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT (manifest_id) DO NOTHING
                 """, [manifest["manifest_id"], revision, manifest["run_id"], manifest["raw_fingerprint"], str(self.manifest_dir / f"{manifest['manifest_id']}.json"), manifest_sha, manifest["requested_start_ms"], manifest["requested_end_ms_exclusive"], manifest["network_requests"]])
-                for index, record in enumerate(raw_records):
-                    db.execute("""
-                        INSERT INTO run_provenance VALUES (?, ?, ?, ?, ?)
-                        ON CONFLICT (manifest_id, raw_page_sha256, row_index) DO NOTHING
-                    """, [manifest["manifest_id"], record["page_sha256"], record["row_index"], record["record_fingerprint"], record["payload_json"]])
-                    outcome = outcomes[index]
-                    db.execute("""
-                        INSERT INTO run_outcomes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ON CONFLICT (manifest_id, outcome_index) DO NOTHING
-                    """, [manifest["manifest_id"], index, record["page_sha256"], record["row_index"], record["record_fingerprint"], outcome["open_time_ms"], outcome["status"], outcome.get("reason"), outcome["accepted_canonical"]])
-                for item in canonical:
-                    if item["page_sha256"] == "existing":
-                        continue
-                    db.execute("""
-                        INSERT INTO dataset_provenance VALUES (?, ?, ?, ?)
-                        ON CONFLICT DO NOTHING
-                    """, [revision, item["open_time_ms"], item["record_fingerprint"], item["page_sha256"]])
+
+                def insert_batch(name: str, table_name: str, rows: list[dict[str, Any]], schema: pa.Schema, conflict: str) -> None:
+                    if not rows:
+                        return
+                    _check_deadline(deadline)
+                    db.register(name, pa.Table.from_pylist(rows, schema=schema))
+                    try:
+                        db.execute(f"INSERT INTO {table_name} SELECT * FROM {name} {conflict}")
+                    finally:
+                        db.unregister(name)
+                    _check_deadline(deadline)
+
+                manifest_id = manifest["manifest_id"]
+                insert_batch(
+                    "btc_run_provenance_batch", "run_provenance",
+                    [{
+                        "manifest_id": manifest_id,
+                        "raw_page_sha256": record["page_sha256"],
+                        "row_index": record["row_index"],
+                        "source_record_fingerprint": record["record_fingerprint"],
+                        "payload_json": record["payload_json"],
+                    } for record in raw_records],
+                    pa.schema([
+                        ("manifest_id", pa.string()), ("raw_page_sha256", pa.string()),
+                        ("row_index", pa.int64()), ("source_record_fingerprint", pa.string()),
+                        ("payload_json", pa.string()),
+                    ]),
+                    "ON CONFLICT (manifest_id, raw_page_sha256, row_index) DO NOTHING",
+                )
+                insert_batch(
+                    "btc_run_outcomes_batch", "run_outcomes",
+                    [{
+                        "manifest_id": manifest_id,
+                        "outcome_index": index,
+                        "raw_page_sha256": record["page_sha256"],
+                        "row_index": record["row_index"],
+                        "source_record_fingerprint": record["record_fingerprint"],
+                        "open_time_ms": outcomes[index].get("open_time_ms"),
+                        "status": outcomes[index]["status"],
+                        "reason": outcomes[index].get("reason"),
+                        "accepted_canonical": outcomes[index]["accepted_canonical"],
+                    } for index, record in enumerate(raw_records)],
+                    pa.schema([
+                        ("manifest_id", pa.string()), ("outcome_index", pa.int64()),
+                        ("raw_page_sha256", pa.string()), ("row_index", pa.int64()),
+                        ("source_record_fingerprint", pa.string()), ("open_time_ms", pa.int64()),
+                        ("status", pa.string()), ("reason", pa.string()),
+                        ("accepted_canonical", pa.bool_()),
+                    ]),
+                    "ON CONFLICT (manifest_id, outcome_index) DO NOTHING",
+                )
+                insert_batch(
+                    "btc_dataset_provenance_batch", "dataset_provenance",
+                    [{
+                        "dataset_revision": revision,
+                        "open_time_ms": item["open_time_ms"],
+                        "source_record_fingerprint": item["record_fingerprint"],
+                        "raw_page_sha256": item["page_sha256"],
+                    } for item in canonical if item["page_sha256"] != "existing"],
+                    pa.schema([
+                        ("dataset_revision", pa.string()), ("open_time_ms", pa.int64()),
+                        ("source_record_fingerprint", pa.string()), ("raw_page_sha256", pa.string()),
+                    ]),
+                    "ON CONFLICT DO NOTHING",
+                )
+                _check_deadline(deadline)
                 db.execute("COMMIT")
             except Exception:
                 db.execute("ROLLBACK")
@@ -1333,6 +2095,7 @@ class HistoryStore:
             raise HistoryError("invalid_page", "after_outcome_index is outside the supported range")
         detail, manifest = self._load_manifest_record(dataset_revision, manifest_id)
         raw_page_hashes = _manifest_raw_page_hashes(manifest)
+        max_page_rows = _max_source_page_rows(manifest["source_identity"])
         outcome_counts = detail["outcome_counts"]
         if sum(outcome_counts.values()) != detail["raw_record_count"]:
             raise HistoryError("manifest_integrity_error", "manifest outcome counts do not match its raw-record count")
@@ -1392,7 +2155,7 @@ class HistoryStore:
                 or not isinstance(page_sha256, str)
                 or page_sha256 not in raw_page_hashes
                 or type(row_index) is not int
-                or not 0 <= row_index < MAX_PAGE_SIZE
+                or not 0 <= row_index < max_page_rows
                 or not isinstance(record_fingerprint, str)
                 or re.fullmatch(r"[0-9a-f]{64}", record_fingerprint) is None
                 or provenance_fingerprint != record_fingerprint
@@ -1510,10 +2273,13 @@ class HistoryStore:
             not isinstance(after_raw_page_sha256, str)
             or re.fullmatch(r"[0-9a-f]{64}", after_raw_page_sha256) is None
             or type(after_row_index) is not int
-            or not 0 <= after_row_index < MAX_PAGE_SIZE
+            or not 0 <= after_row_index < ARCHIVE_ROWS_PER_DAY
         ):
             raise HistoryError("invalid_page", "provenance cursor is outside the supported range")
         detail, manifest = self._load_manifest_record(dataset_revision, manifest_id)
+        max_page_rows = _max_source_page_rows(manifest["source_identity"])
+        if after_row_index is not None and after_row_index >= max_page_rows:
+            raise HistoryError("invalid_page", "provenance cursor is outside the supported range")
         raw_page_hashes = _manifest_raw_page_hashes(manifest)
         if after_raw_page_sha256 is not None and after_raw_page_sha256 not in raw_page_hashes:
             raise KeyError(after_raw_page_sha256)
@@ -1561,7 +2327,7 @@ class HistoryStore:
                 not isinstance(page_sha256, str)
                 or page_sha256 not in raw_page_hashes
                 or type(row_index) is not int
-                or not 0 <= row_index < MAX_PAGE_SIZE
+                or not 0 <= row_index < max_page_rows
                 or not isinstance(record_fingerprint, str)
                 or re.fullmatch(r"[0-9a-f]{64}", record_fingerprint) is None
                 or payload_sha256 != record_fingerprint
@@ -2047,10 +2813,18 @@ class HistoryStore:
         return None
 
     def _write_raw_page(self, raw: bytes) -> str:
+        return self._write_raw_artifact(raw, ".json")[0]
+
+    def _write_raw_artifact(self, raw: bytes, extension: str) -> tuple[str, str]:
+        if extension not in {".json", ".zip", ".CHECKSUM"}:
+            raise HistoryError("invalid_artifact", "raw artifact extension is not allowlisted")
         digest = _sha(raw)
-        path = self.raw_dir / f"{digest}.json"
+        path = self._raw_storage_root(
+            "local_storage_required",
+            "BTC raw storage must remain inside the local store",
+        ) / f"{digest}{extension}"
         self._write_immutable_bytes(path, raw)
-        return digest
+        return digest, path.relative_to(self.root).as_posix()
 
     @staticmethod
     def _write_immutable_bytes(path: Path, raw: bytes) -> None:

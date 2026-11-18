@@ -2,10 +2,17 @@
 
 Continue Autonomous-Market-OS from the live repository state. Read
 `docs/PROJECT-CONTEXT.md`, `docs/NEXT-WORK-HANDOFF.md`, `STRUCTURE.md`,
-`docs/ROADMAP.md`, `docs/PHASES.md`, the relevant U6.4 contracts, and
-`git status` before editing. The checkpoint commit recorded by this handoff is merged commit `19367f4`;
-local documentation and graph refresh artifacts may be uncommitted, so the
-live status is authoritative.
+`docs/ROADMAP.md`, `docs/PHASES.md`, the B2/B3/B3.1 contracts and evidence,
+and `git status` before editing. Repository history and generated graph data
+may lag the live worktree, so verify their checkpoints before relying on them.
+
+## Product north star
+
+Quantitative math and probability are the core. Market OS owns data quality,
+stability, calibration, deterministic fusion, signal policy, risk, and paper
+execution. Jev adds advisory evidence support, contradiction detection, and
+abstention; Jev assessment probabilities are not BTC-return probabilities and
+never grant execution or risk authority.
 
 ## Current baseline
 
@@ -37,40 +44,44 @@ live status is authoritative.
   retained in `docs/evidence/u6-4-f-hosted-installation.json`.
 - U7-P is complete and remains a local regression gate. It regenerates U7-N/J/K/L
   twice and compares the results with committed U7-O evidence.
+- B2/B3 math-first contracts and the fixture-only B3.1 assessment
+  contract/normalizer already exist. Current B2/B3 evidence has zero
+  leakage-safe labeled samples, so predictive and calibration results are
+  unavailable. Do not claim Jev value or promote it from these fixtures.
 
 ## Objective
 
-Continue from merged U6.4-F commit `19367f4` and checkpoint `80460a7`; the
-U7-P evidence reproducibility audit is complete. The hosted Windows/Linux gate is closed and its evidence
-is retained in `docs/evidence/u6-4-f-hosted-installation.json`. Choose the next
-scoped local, offline, synthetic, paper-only slice while keeping Python
-authoritative and Electron as a thin adapter over the existing release artifact
-and validation contracts.
+Continue from the live `main` state; U6.4-F and U7-P are closed. Prioritize the
+BTC quantitative line: B2 math/probability first, Market OS-owned stability,
+calibration and risk, and Jev as an advisory evidence evaluator. The next
+meaningful evaluation requires leakage-safe labeled market history; until it is
+available, preserve the fixture-only/offline boundary and report metrics as
+unavailable.
 
 ## Execution rules
 
-1. Inspect the live Git state, existing U6.4-C/D/E contracts, Windows/Linux
-   release workflow, installer scripts, evidence schemas, and the updated
-   knowledge graph. Treat old reports as historical when their checkpoint is
-   behind HEAD.
-2. Treat ADR-0055 and the accepted U6.4-F contract as authoritative for
-   package format, install scope, runtime provenance, lifecycle, and rollback.
-3. Preserve the U8-C permanent paper-only decision and the local/offline
-   execution boundary. Do not add provider or credential access, network
-   execution, mutation routes, a public listener, connected hosting, or live
-   trading.
-4. Reuse the existing artifact signature, manifest, preflight, install
-   simulation, storage-isolation, and rollback concepts. Avoid a second domain
-   implementation in TypeScript or Electron.
-5. Retain machine-readable JSON/Markdown CI evidence, rerun focused local
-   checks after hosted evidence arrives, and keep the current docs/graph
-   snapshots synchronized with the live worktree.
-6. Preserve unrelated worktree files. Do not reset, clean, commit, push,
-   deploy, install software on the host, or expose secrets unless separately
-   requested.
+1. Inspect live Git state and the B1/B2/B3/B3.1 modules, contracts, evidence,
+   `JEV_PROCESSING.md`, ADR-0015/0019/0022, and U8-C. Treat graph-backed
+   context as stale if its project-scoped source checkpoint trails HEAD.
+2. Keep B2 numerical forecasts and target definitions authoritative. Keep
+   calibration, fusion, freshness/stability gates, risk, and paper execution
+   inside Market OS. Preserve missing, stale, contradictory, and abstaining Jev
+   outcomes explicitly; never substitute a neutral probability silently.
+3. Preserve U8-C permanent paper-only mode. The owner has requested the bounded
+   Binance Vision B1 archive path; do not execute it until personal
+   non-commercial scope and local retention are confirmed and the exact
+   date-bound execution phrase is approved. Do not call Jev, use credentials,
+   enable connected runtime, add mutation routes, or execute live trades.
+4. Do not fabricate market labels or infer predictive value from synthetic
+   rows. Keep B2/B3 metrics unavailable until the exact leakage-safe sample
+   exists. Follow ADR-0022's frozen target, split, calibration, and fusion rules.
+5. Keep Python as the sole domain/accounting authority; web and Electron remain
+   thin adapters. Preserve unrelated worktree files. Do not reset, clean,
+   commit, push, deploy, install software on the host, or expose secrets unless
+   separately requested.
 
 ## Final report
 
-State the chosen gate, decisions made, files changed, checks and evidence
-actually run, remaining deferrals, and the exact next step. Distinguish local
-verification from hosted CI evidence.
+State the quantitative gate, decisions made, files changed, checks and
+evidence actually run, remaining data/provider boundaries, and the exact next
+step. Distinguish local verification from hosted CI evidence.

@@ -1,155 +1,171 @@
-# U3/B1 BTC historical-data authorization and dataset-readiness report
+# U3/B1 BTC historical-data readiness
 
-**Status:** Reviewed opt-in transport implemented; historical ingestion not
-authorized or executed. **Scope:** Binance BTCUSDT Spot 1-minute closed-candle
-dataset proposal only. Jev, U4/B4, U5/B5, and trading are out of scope.
+**Status:** The readiness gates were closed for one approved run on
+2026-11-18. Binance Vision transport remains disabled by default; the approved
+BTCUSDT/1m archive range was downloaded once, kept local, and indexed for
+offline research.
+
+**Execution result:** UTC dates 2026-10-19 through 2026-11-17 produced 30
+checksum-verified daily archives, 43,200 canonical candles, zero gaps, and 60
+HTTPS requests. Dataset revision:
+`btc-history-9c58a3ac5cfd05c7398e`; manifest:
+`btc-history-manifest-6307b278cdc684f4dc42`. The acquisition evidence and
+recovery/timestamp caveats are in
+[`evidence/b1-binance-vision-execution-2026-11-18.json`](evidence/b1-binance-vision-execution-2026-11-18.json).
 
 ## Decision
 
-**Do not ingest yet.** The B1 transport remains disabled by default. A future
-acquisition requires the exact repository-root policy, the explicit runtime
-flag, and the separate exact execution approval phrase. The readiness contract
-makes the future request range, row/page/request/runtime caps, retention
-metadata, and approval prerequisites inspectable without network access.
-Binance public market-data availability is not treated as permission to retain
-or redistribute data.
+Use Binance Vision's daily Spot archives at `data.binance.vision` for the
+bounded BTCUSDT/1m dataset. The archive host is named directly in the
+[Binance Vision Dataset Terms](https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md).
+The old REST route on `data-api.binance.vision` remains a separate legacy
+adapter and is not authorized by this archive policy.
 
-## Official source re-check
+The terms limit use to listed non-commercial scopes, including purely
+personal, non-production historical backtesting. Commercial utilization
+requires a separate written license. Raw datasets and derivative feeds cannot
+be sold or commercially exploited, and redistributed derivatives must retain
+the stated attribution and license. This project can use these archives only
+for private offline research and paper simulation within those terms. This is
+a source-policy decision, not legal advice.
 
-Official Binance materials rechecked on 2026-10-22:
+The owner confirmed Vietnam as the access region. A Binance Public Data
+repository contributor answered that the Vision Dataset Terms apply wherever
+the user lives, in response to a Japan-specific question; this is repository
+maintainer guidance rather than a Vietnam-specific legal ruling. The official
+Terms link to a prohibited-country PDF updated 2026-01-05; that published list
+does not name Vietnam. The live country page is JavaScript-rendered, so this
+does not prove the list has not changed since that PDF. Recheck the official
+linked list immediately before acquisition. A previous ping to the separate
+REST host does not establish archive-host reachability. Do not probe
+`data.binance.vision` before the usage-scope and exact acquisition gates; make
+the approved, bounded acquisition the first archive-host request and stop on
+any region or policy refusal. [Binance Public Data issue #524](https://github.com/binance/binance-public-data/issues/524)
+records the maintainer's answer; [Binance Terms of Use](https://www.binance.com/en/about-legal/terms)
+remain applicable alongside the [Vision Dataset Terms](https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md).
 
-- [Market Data Only URLs](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md)
-  identifies `https://data-api.binance.vision` and public
-  `GET /api/v3/klines`.
-- [Spot REST API](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md)
-  documents UTC millisecond timestamps, chronological responses, kline open
-  time identity, request weight 2, and the 500 default / 1,000 maximum kline
-  limit.
-- The same REST documentation states that response headers expose
-  `X-MBX-USED-WEIGHT-*`, HTTP 429 requires backoff, `Retry-After` is supplied
-  on 429/418, and continued violations can cause HTTP 418 IP bans. HTTP 403
-  is a WAF/security block; HTTP 5xx has unknown provider-side operation status.
-- [Binance Terms](https://www.binance.com/en/terms) returned HTTP 202 from
-  this environment and was not treated as verified.
+**Source clarification reviewed 2026-11-18 (Asia/Saigon):** Binance Public Data
+issue #502 states that `data-api.binance.vision` is not a live Binance endpoint
+and directs users to `data.binance.vision` for the Datasets. The archive is
+documented as daily/monthly files; the README says daily files appear the next
+day, Spot klines from 2025-01-01 use microsecond timestamps, and every ZIP has
+a `.CHECKSUM` sidecar. The same issue says access/use of Vision Datasets,
+including automated retrieval, is governed by the Vision Dataset Terms and
+Binance Terms of Use. [Issue #502](https://github.com/binance/binance-public-data/issues/502)
+and the [official Public Data README](https://github.com/binance/binance-public-data/blob/master/README.md)
+are the supporting primary sources. The conclusion here is limited to these
+published source statements; it is not legal advice.
 
-The source facts support a bounded public-data design, but terms, regional
-eligibility, retention, and redistribution rights remain unresolved blockers.
+The owner confirmed personal non-commercial offline/paper research and
+local-only retention, then approved the exact date-bound phrase for this run.
+The root policy was valid for less than 24 hours. That approval is exhausted;
+any repeat or expanded date range needs a new policy and separate exact
+approval. The old REST approval phrase does not authorize archive requests.
 
-## Proposed first range and hard caps
+## Current proposal and hard caps
 
-The readiness command accepts an explicit UTC minute-aligned cutoff. It excludes
-the candle opening at `cutoff` and proposes the preceding 30 UTC calendar days
-using a half-open interval:
-
-```text
-[2026-09-19T00:00:00Z, 2026-10-19T00:00:00Z)
-```
+The zero-network readiness command returned the half-open candle range
+`[2026-10-19T00:00:00Z, 2026-11-18T00:00:00Z)`: 30 completed UTC days, up to
+43,200 rows and 60 archive/checksum requests. That exact range was executed
+once under the owner approval above. Recompute the proposal and obtain fresh
+approval before any future acquisition.
 
 | Limit | Value |
 |---|---:|
-| Expected closed candles | 43,200 |
-| Rows per page | 1,000 |
-| Maximum pages | 44 |
-| Maximum HTTP requests | 44 |
-| Attempts per page | 1 |
+| Daily Spot archive files | 30 |
+| Expected maximum closed candles | 43,200 |
+| HTTPS requests, including one checksum per ZIP | 60 |
+| Attempts per file | 1 |
+| Maximum ZIP size | 1 MiB each |
+| Maximum checksum size | 1 KiB each |
+| Maximum total downloaded bytes | 32 MiB |
+| Maximum uncompressed CSV size | 1 MiB per day |
 | Maximum runtime | 900 seconds |
-| Maximum response bytes | 262,144 |
+| Redirects, credentials, accounts, orders, streaming | Disabled |
 
-The existing `plan_pages()` converts each exclusive end to Binance's inclusive
-`endTime` by subtracting one millisecond. No candle opening at the cutoff is
-requested, and no final/open candle is accepted by the existing
-`parse_kline_row()` cutoff validation.
+The official [Binance Public Data README](https://github.com/binance/binance-public-data/blob/master/README.md)
+says Spot klines are distributed as daily or monthly archives, daily data is
+published the next day, each ZIP has a `.CHECKSUM` file, and Spot timestamps
+from 2025-01-01 use microseconds. The adapter therefore requests only the 30
+completed UTC days before the selected cutoff. It converts timestamps to
+milliseconds using integer arithmetic and preserves the ZIP bytes, sidecar,
+hashes, source rows, and row-to-archive lineage.
 
-## Reused implementation and persistence
+## Implementation
 
-No second ingestion framework was created. The reviewed opt-in transport and
-readiness gate extend
-`market_os/btc_history.py` and reuses:
+The archive adapter is isolated in `market_os/btc_history.py` and reuses B0/B1
+candle validation, canonical Parquet, DuckDB manifests, and replay:
 
-- `HistoryStore`, `PageRequest`, `HistoricalTransport`, and the bounded
-  `BinanceHistoricalTransport`;
-- B0 `ClosedCandle` validation and B1 duplicate/conflict/gap/out-of-order
-  classification;
-- immutable raw-page SHA-256 storage;
-- canonical Parquet, DuckDB catalog, manifests, checkpoints, and replay.
+- It allowlists only HTTPS `GET` requests for the exact BTCUSDT/1m daily ZIP
+  and `.CHECKSUM` paths on `data.binance.vision`; redirects are rejected.
+- It validates each sidecar's SHA-256 and exact filename before opening the ZIP.
+- It requires one expected CSV member, caps ZIP and decompressed bytes, checks
+  all 12 Spot kline columns, converts Spot microsecond timestamps exactly, and
+  keeps rows in their UTC date and chronological order.
+- It performs requests sequentially, once per file, without automatic retry or
+  resume. It holds the bounded first run until the integrity checks complete,
+  then persists immutable `.zip` and `.CHECKSUM` artifacts with their hashes.
+- It records archive and checksum hashes, row counts, host, request count, and
+  row provenance in the existing B1 manifest. It does not enable streaming,
+  credentials, account access, trading, or redistribution.
 
-The future store root is selected explicitly by the operator. Raw pages and
-canonical data are local-only until explicit deletion, with no backup, upload,
-or redistribution by default. Read-only inspection cannot trigger provider
-requests.
-
-The future CLI shape is:
+The offline `btc-paper historical-readiness` CLI and
+`GET /v1/btc/history/readiness` endpoint now describe the archive route and
+perform zero network requests. Live acquisition uses a distinct command and
+authorization schema:
 
 ```text
-python -m market_os.cli btc-paper historical-readiness --cutoff-ms <UTC-minute-ms>
-python -m market_os.cli btc-paper acquire \
-  --start-ms <start-ms> --end-ms <exclusive-end-ms> \
-  --page-size 1000 --max-pages 44 --max-requests 44 \
-  --max-rows 43200 --max-runtime-seconds 900 --max-attempts 1 \
-  --allow-historical-ingest --authorization-file <approved-policy.json> \
-  --execution-approval "<exact B1 approval phrase>" \
+python -m market_os.cli btc-paper historical-readiness --cutoff-ms <UTC-midnight-ms>
+python -m market_os.cli btc-paper acquire-archive \
+  --start-date <YYYY-MM-DD> --end-date-exclusive <YYYY-MM-DD> \
+  --allow-historical-ingest \
+  --authorization-file approved-vision-archive-policy.json \
+  --execution-approval "<exact date-bound owner approval phrase>" \
   --store-root <local-b1-root>
 ```
 
-The second command is a future command shape, not an instruction or an
-authorization for this milestone. It fails closed unless the policy is valid,
-unexpired, exactly bounded, and the separate execution phrase matches byte for
-byte. No acquisition was run in this review.
-
-The read-only API inspection surface is:
-
-```text
-GET /v1/btc/history/readiness?cutoff-ms=<UTC-minute-ms>
-```
-
-## Readiness tests
-
-Offline tests cover explicit cutoff/date-range calculation, final-candle
-exclusion, exact page/request/row/runtime budgets, response-size rejection,
-approval-flag and execution-approval refusal before transport, checkpoint/resume behavior, existing
-duplicate/conflict/gap/out-of-order handling, closed-candle validation, and
-zero-network CLI/API readiness inspection. Existing B0/B1 tests remain green;
-the focused readiness/B1 suite is 30 tests after the final transport-boundary
-hardening.
+The authorization file must be at the repository root and is git-ignored. It
+must match the 30-day range, current source, Vietnam region, personal
+non-commercial scope, local retention, an `expires_at` no more than 24 hours
+ahead, and all byte/request/runtime caps. The phrase also binds the exact
+archive dates. REST's `approved-policy.json` and
+execution phrase cannot authorize this route.
 
 ## Verification
 
-Verified locally without provider access:
+- `python -m pytest market_os/tests/test_btc_history.py -q`: **36 passed**.
+- The suite verifies timestamp conversion, checksum matching, path and scope
+  authorization, policy lifetime and exact-phrase gates, raw artifact
+  persistence, manifest lineage, and zero-network readiness using local
+  fixtures and an injected transport.
+- `python -m compileall -q market_os/btc_history.py market_os/cli.py`: passed.
+- No Binance Vision request, historical candle request, Jev request, credential
+  use, or trade occurred while implementing this adapter.
 
-- `python -m pytest market_os/tests/test_btc_history.py -q`: **30 passed**.
-- `python -m pytest market_os/tests/test_btc_paper.py market_os/tests/test_btc_paper_cli.py market_os/tests/test_btc_history.py -q`: **44 passed**.
-- `python -m pytest market_os/tests/test_btc_features.py market_os/tests/test_btc_jev_evaluation.py market_os/tests/test_btc_connectivity.py -q`: **58 passed** with `TYPESAFE_API_KEY` unset.
-- `python -m pytest -q`: **273 passed, 0 failed, 1 skipped** with `TYPESAFE_API_KEY` unset.
-- `python -m compileall -q market_os`: passed.
-- `python scripts/ci_checks.py validate-evidence`: passed for 22 evidence JSON files.
-- `python scripts/ci_checks.py secret-scan`: passed.
-- `python -m pip check`: no broken requirements.
-- `python -m market_os.cli btc-paper historical-readiness --cutoff-ms 1792368000000`: passed with `network_requests=0`.
-- Readiness CLI/API offline smoke, replay/fingerprint checks, and `git diff --check`: passed.
+## Post-execution gates
 
-No historical Binance request, Jev request, credential use, or trade occurred
-during this milestone. The opt-in transport was exercised only through local
-request-construction and policy-validation tests.
+The B2 numerical baseline has run on the local dataset. It is a retrospective
+chronological diagnostic: local archive-artifact timestamps do not reconstruct
+contemporaneous per-candle feed availability, and the 30-day result does not
+establish regime stability or profitability. See
+[`B2-BTC-FEATURES-BASELINES-REPORT.md`](B2-BTC-FEATURES-BASELINES-REPORT.md).
 
-## Unresolved risks
+The BTC evidence seam is now implemented: a local corpus contains 43,200
+documents derived from the approved B1 candles, with a BTC-only optional
+MiniRAG adapter, packet builder, and recorded-assessment alignment helper. See
+[`BTC-MINIRAG-JEV-EVIDENCE-PATH.md`](BTC-MINIRAG-JEV-EVIDENCE-PATH.md). The
+original Binance publication times were not captured. The corpus preserves
+that status as unknown and uses recorded local availability conservatively;
+it therefore cannot establish that these archive documents were available at
+their historical B2 decision times. A pinned local MiniRAG runtime retrieved
+four of six source documents with stable citations across three repeats for
+one B2 feature. The strict B3.1 packet-time gate rejected those retrospective
+documents because their local availability is after the feature close. B3.1
+still only has its 14 synthetic recorded fixture cases and no matched
+market-level Jev comparison. Keep Jev advisory, paper-only, and subordinate to
+deterministic risk controls; obtain separate authorization before any provider
+request. See the [retrieval evidence](evidence/btc-minirag-retrieval-2026-11-19.json).
 
-- Legal terms, regional restrictions/eligibility, retention, and redistribution
-  rights require an operator/legal decision from an authoritative source.
-- Binance request weights, limits, headers, and endpoint behavior can drift;
-  a future run must re-check the official documentation and stop on ambiguity.
-- A 30-day window may still be insufficient for stable leakage-safe B2/B3
-  calibration and test estimates; it is a bounded proposal, not a quality
-  guarantee.
-- Raw-page retention and backup choices affect privacy, storage, and audit
-  obligations.
-- No historical source response, dataset fingerprint, gap profile, or regional
-  availability has been observed in this milestone.
-
-## Exact next approval required
-
-Before any historical request, obtain this separate explicit approval after
-the source/terms/region/retention review is complete:
-
-```text
-APPROVE B1 HISTORICAL INGEST: BTCUSDT Spot 1m, proposed 30 UTC days, 44 pages, 44 maximum HTTP requests, 1000 rows/page, 900-second runtime cap, local-only retention, no retry after failure, no authenticated Binance access
-```
+If the owner intends to use the data in a commercial Market OS product or
+redistribute it, this source is not authorized under the reviewed terms; select
+a separately licensed source first.

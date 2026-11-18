@@ -23,6 +23,35 @@ The current defect-closure regeneration uses B1 dataset revision
 `77e4548a5394b078adee6bf57d9d37df55c72fe09eec388a22ba5a5a1b90bfa6`.
 Earlier `btc-history-49b70e...` evidence is stale and has been superseded.
 
+## Real archive run
+
+On 2026-11-18, B2 ran offline against the approved 30-day Vision dataset
+`btc-history-9c58a3ac5cfd05c7398e` (B1 manifest
+`btc-history-manifest-6307b278cdc684f4dc42`). Run ID:
+`btc-b2-dde76de3b2965ac6f66a`. The run has 43,190 labeled samples split
+chronologically into 25,909 train, 8,628 calibration, 8,633 test, and 20
+purged rows. It uses five-minute purge and embargo rules.
+
+| Baseline | Test accuracy | Raw Brier | Raw log loss | Calibrated Brier | Calibrated log loss |
+|---|---:|---:|---:|---:|---:|
+| `naive_0_5` | 46.51% | 0.250000 | 0.693147 | 0.249663 | 0.692473 |
+| `empirical_rate` | 53.49% | 0.249361 | 0.691869 | 0.249663 | 0.692473 |
+| `conditional_rate` | 53.49% | 0.249370 | 0.691888 | 0.249663 | 0.692473 |
+
+One-bin calibration used 8,628 calibration rows and estimated an up rate of
+49.48%. It made the three test predictions identical and did not improve the
+raw empirical or conditional Brier/log-loss scores. This is a weak baseline
+diagnostic, not evidence of a tradable edge. All eight B2 artifacts replayed
+with matching hashes and the recorded replay fingerprint; B2 made zero network
+requests. The run and artifacts are stored locally under `.market_os/btc-b2`.
+
+The B1 manifest's receipt timestamps are local archive-artifact timestamps
+from 2026-11-18, not original per-response HTTP timestamps. The B2 run is a
+retrospective chronological diagnostic using finalized historical candles; it
+does not reconstruct contemporaneous feed availability, paper fills, or live
+decisions. Its feature references remain limited to the current and previous
+five candles, and the train/calibration/test boundaries are chronological.
+
 ## Formulas and availability
 
 Feature version `btc.b2.features.v1` uses the smallest hand-checkable set:
@@ -71,9 +100,10 @@ Splits are frozen in chronological order. For each boundary, rows with
 the first five minutes after the boundary are embargoed. No random shuffle is
 used. Split assignments and reasons are persisted.
 
-LightGBM was not added. The current B1 fixture is too small and too gappy to
-justify a new dependency or a model comparison; the decision is deferred to a
-later U3/B3 gate with a larger leakage-safe local dataset.
+LightGBM was not added. The synthetic B1 fixture remains too small and gappy,
+and the single 30-day real-data window with near-chance baselines does not
+justify a new model dependency. Reassess only after additional independent
+periods and stability checks.
 
 ## Persistence and inspection
 
@@ -118,10 +148,23 @@ Machine-readable evidence is in
 Excluded from B2: network ingestion, Binance transport enablement, Jev,
 OpenAI, hosted models, credentials, LightGBM, broker/portfolio/execution code,
 and live trading. The unresolved data limitation is the small B1 fixture's
-missing interval and resulting absence of leakage-safe evaluation labels.
+missing interval; the real-data run addresses sample availability but covers
+only one 30-day window and does not establish regime stability or profitability.
 
-B3 is implemented as a separate offline, recorded-response benchmark. Neither
-the B1 gap fixture nor synthetic positive acceptance results establish real
-market predictive value. Any later evaluation or promotion still requires a
-larger source-approved dataset, matched numerical controls, and separate
-uncertainty and prospective evidence.
+The BTC-specific evidence seam is now implemented: the approved B1 data has a
+bounded local document corpus, with a BTC-only optional MiniRAG adapter, a
+B3.1-shaped packet builder, and a recorded-assessment alignment helper. See
+[`BTC-MINIRAG-JEV-EVIDENCE-PATH.md`](BTC-MINIRAG-JEV-EVIDENCE-PATH.md). The
+archive's original publication times were not captured; the loader preserves
+them as unknown and projects recorded local availability conservatively, so
+the corpus cannot establish availability at historical B2 decision times.
+An isolated MiniRAG runtime retrieved four of the six source documents for one
+feature in three repeat runs with the same citations. This is a narrow
+repeatability check, not a retrieval-quality result. The B3.1 packet builder
+rejects these retrospective documents because recorded local availability is
+after the feature close. No recorded assessment or matched market-level Jev
+comparison has run. Such a comparison requires eligible, time-aligned packets,
+matched numerical controls, additional periods, recorded assessments, and
+separate authorization for any Jev provider access. See
+[`BTC-MINIRAG-JEV-EVIDENCE-PATH.md`](BTC-MINIRAG-JEV-EVIDENCE-PATH.md) and its
+linked retrieval evidence.
