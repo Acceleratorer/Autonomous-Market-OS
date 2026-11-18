@@ -97,7 +97,7 @@ import numpy as np
 
 def _deny_network(*args, **kwargs):
     del args, kwargs
-    raise RuntimeError("Network access is disabled in this Market OS MiniRAG process")
+    raise RuntimeError("Network socket access is disabled in this Market OS MiniRAG process")
 
 
 socket.create_connection = _deny_network
@@ -106,8 +106,14 @@ socket.gethostbyname = _deny_network
 socket.gethostbyname_ex = _deny_network
 
 _Socket = socket.socket
+_LOCAL_SOCKET_FAMILY = getattr(socket, "AF_UNIX", None)
 
 class _OfflineSocket(_Socket):
+    def __init__(self, family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0, fileno=None):
+        if family != _LOCAL_SOCKET_FAMILY:
+            _deny_network()
+        super().__init__(family, type, proto, fileno)
+
     def connect(self, *args, **kwargs):
         return _deny_network(*args, **kwargs)
 
