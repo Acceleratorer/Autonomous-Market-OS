@@ -115,10 +115,10 @@ four returned citations are listed by identifier and hash in
 Those runs predate the fail-closed socket guard now present in the MiniRAG
 child runner. Their evidence shows that the tokenizer asset was cached, but its
 HTTP request count was not instrumented; those runs therefore do not prove
-zero network egress. The guard blocks Python network socket creation and common
-socket API entry points, but it is not operating-system network isolation and
-could be bypassed by native code. It has not yet been exercised by a new
-retrieval.
+zero network egress. The guard limits common Python socket APIs to loopback or
+Unix-domain sockets and blocks forward/reverse DNS lookups. It is not
+operating-system network isolation and native code can bypass it. It has not
+yet been exercised by a new retrieval.
 
 The packet builder rejected the retrieved passage because its conservative
 local availability / `published_at` projection is after the feature close.

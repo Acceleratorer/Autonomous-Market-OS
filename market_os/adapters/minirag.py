@@ -85,6 +85,7 @@ import csv
 import hashlib
 import importlib.metadata
 import importlib.util
+import ipaddress
 import io
 import json
 import re
@@ -97,37 +98,99 @@ import numpy as np
 
 def _deny_network(*args, **kwargs):
     del args, kwargs
-    raise RuntimeError("Network socket access is disabled in this Market OS MiniRAG process")
+    raise RuntimeError("Non-local network socket access is disabled in this Market OS MiniRAG process")
+
+
+def _is_loopback_address(address):
+    if not isinstance(address, tuple) or not address:
+        return False
+    try:
+        return ipaddress.ip_address(address[0]).is_loopback
+    except ValueError:
+        return False
+
+
+def _has_local_peer(sock):
+    if sock.family == _LOCAL_SOCKET_FAMILY:
+        return True
+    try:
+        return _is_loopback_address(sock.getpeername())
+    except OSError:
+        return False
 
 
 socket.create_connection = _deny_network
 socket.getaddrinfo = _deny_network
 socket.gethostbyname = _deny_network
 socket.gethostbyname_ex = _deny_network
+socket.gethostbyaddr = _deny_network
+socket.getnameinfo = _deny_network
 
 _Socket = socket.socket
 _LOCAL_SOCKET_FAMILY = getattr(socket, "AF_UNIX", None)
 
 class _OfflineSocket(_Socket):
-    def __init__(self, family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0, fileno=None):
-        if family != _LOCAL_SOCKET_FAMILY:
-            _deny_network()
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
         super().__init__(family, type, proto, fileno)
+        allowed_families = {socket.AF_INET, socket.AF_INET6}
+        if _LOCAL_SOCKET_FAMILY is not None:
+            allowed_families.add(_LOCAL_SOCKET_FAMILY)
+        if self.family not in allowed_families:
+            self.close()
+            _deny_network()
 
     def connect(self, *args, **kwargs):
-        return _deny_network(*args, **kwargs)
+        address = args[0] if args else kwargs.get("address")
+        if self.family != _LOCAL_SOCKET_FAMILY and not _is_loopback_address(address):
+            return _deny_network(*args, **kwargs)
+        return super().connect(*args, **kwargs)
 
     def connect_ex(self, *args, **kwargs):
-        return _deny_network(*args, **kwargs)
+        address = args[0] if args else kwargs.get("address")
+        if self.family != _LOCAL_SOCKET_FAMILY and not _is_loopback_address(address):
+            return _deny_network(*args, **kwargs)
+        return super().connect_ex(*args, **kwargs)
+
+    def send(self, *args, **kwargs):
+        if not _has_local_peer(self):
+            return _deny_network(*args, **kwargs)
+        return super().send(*args, **kwargs)
+
+    def sendall(self, *args, **kwargs):
+        if not _has_local_peer(self):
+            return _deny_network(*args, **kwargs)
+        return super().sendall(*args, **kwargs)
 
     def sendto(self, *args, **kwargs):
-        return _deny_network(*args, **kwargs)
+        address = kwargs.get("address")
+        if address is None and args:
+            address = args[-1]
+        if self.family != _LOCAL_SOCKET_FAMILY and not _is_loopback_address(address):
+            return _deny_network(*args, **kwargs)
+        return super().sendto(*args, **kwargs)
 
     def sendmsg(self, *args, **kwargs):
-        return _deny_network(*args, **kwargs)
+        address = kwargs.get("address")
+        if address is None and len(args) >= 4:
+            address = args[3]
+        if address is None and self.family != _LOCAL_SOCKET_FAMILY:
+            try:
+                address = self.getpeername()
+            except OSError:
+                address = None
+        if self.family != _LOCAL_SOCKET_FAMILY and not _is_loopback_address(address):
+            return _deny_network(*args, **kwargs)
+        return super().sendmsg(*args, **kwargs)
+
+    def bind(self, *args, **kwargs):
+        address = args[0] if args else kwargs.get("address")
+        if self.family != _LOCAL_SOCKET_FAMILY and not _is_loopback_address(address):
+            return _deny_network(*args, **kwargs)
+        return super().bind(*args, **kwargs)
 
 
 socket.socket = _OfflineSocket
+socket.SocketType = _OfflineSocket
 
 if importlib.util.find_spec("sentence_transformers") is None:
     sentence_transformers = types.ModuleType("sentence_transformers")
