@@ -1000,10 +1000,48 @@ class HistoryStore:
         self.manifest_dir = self.root / "manifests"
         self.checkpoint_dir = self.root / "checkpoints"
         self.catalog_path = self.root / "catalog.duckdb"
+        self._validate_local_store_layout()
         if not read_only:
             for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir):
                 path.mkdir(parents=True, exist_ok=True)
+            self._validate_local_store_layout()
             self._initialize()
+
+    def _validate_local_store_layout(self) -> None:
+        for path in (self.raw_dir, self.dataset_dir, self.manifest_dir, self.checkpoint_dir, self.catalog_path):
+            try:
+                resolved = path.resolve()
+            except (OSError, RuntimeError) as exc:
+                raise HistoryError("local_storage_required", "BTC history storage paths must resolve locally") from exc
+            if (
+                resolved != path
+                or _is_remote_windows_drive(resolved)
+                or _is_network_mount(resolved)
+            ):
+                raise HistoryError("local_storage_required", "BTC history storage paths must remain local")
+
+    def _raw_storage_root(self, code: str, message: str) -> Path:
+        try:
+            raw_root = self.raw_dir.resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError(code, message) from exc
+        if (
+            raw_root != self.raw_dir
+            or _is_remote_windows_drive(raw_root)
+            or _is_network_mount(raw_root)
+        ):
+            raise HistoryError(code, message)
+        return raw_root
+
+    def _resolve_raw_page_file(self, name: str, code: str, message: str) -> Path:
+        raw_root = self._raw_storage_root(code, message)
+        try:
+            raw_path = (raw_root / name).resolve()
+        except (OSError, RuntimeError) as exc:
+            raise HistoryError(code, message) from exc
+        if not raw_path.is_relative_to(raw_root) or not raw_path.is_file():
+            raise HistoryError(code, message)
+        return raw_path
 
     def _connect(self):
         return duckdb.connect(str(self.catalog_path), read_only=self.read_only)
@@ -1175,7 +1213,12 @@ class HistoryStore:
             pages = []
             for page in checkpoint["pages"]:
                 _check_deadline(deadline)
-                raw_rows = json.loads((self.raw_dir / f"{page['sha256']}.json").read_bytes())
+                raw_path = self._resolve_raw_page_file(
+                    f"{page['sha256']}.json",
+                    "invalid_checkpoint",
+                    "checkpoint references a missing or unsafe raw page",
+                )
+                raw_rows = json.loads(raw_path.read_bytes())
                 pages.append({"rows": raw_rows, "captured_at": page["captured_at"], "page_sha256": page["sha256"]})
             return self._ingest_pages(
                 pages, captured_at=None, as_of_ms=as_of_ms,
@@ -1189,7 +1232,12 @@ class HistoryStore:
         fetched_rows = 0
         for page in completed:
             try:
-                fetched_rows += len(json.loads((self.raw_dir / f"{page['sha256']}.json").read_bytes()))
+                raw_path = self._resolve_raw_page_file(
+                    f"{page['sha256']}.json",
+                    "invalid_checkpoint",
+                    "checkpoint references a missing or unsafe raw page",
+                )
+                fetched_rows += len(json.loads(raw_path.read_bytes()))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 raise HistoryError("invalid_checkpoint", "checkpoint raw page is unreadable") from exc
         if fetched_rows > max_rows:
@@ -1230,7 +1278,12 @@ class HistoryStore:
         _check_deadline(deadline)
         page_rows = []
         for item in completed:
-            raw = (self.raw_dir / f"{item['sha256']}.json").read_bytes()
+            raw_path = self._resolve_raw_page_file(
+                f"{item['sha256']}.json",
+                "invalid_checkpoint",
+                "checkpoint references a missing or unsafe raw page",
+            )
+            raw = raw_path.read_bytes()
             page_rows.append({"rows": json.loads(raw), "captured_at": item["captured_at"], "page_sha256": item["sha256"]})
         result = self._ingest_pages(
             page_rows, captured_at=None, as_of_ms=as_of_ms,
@@ -1461,9 +1514,11 @@ class HistoryStore:
             digest = page.get("sha256")
             if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
                 raise HistoryError("invalid_checkpoint", "checkpoint page hash is invalid")
-            raw_path = self.raw_dir / f"{digest}.json"
-            if not raw_path.is_file():
-                raise HistoryError("invalid_checkpoint", "checkpoint references a missing raw page")
+            raw_path = self._resolve_raw_page_file(
+                f"{digest}.json",
+                "invalid_checkpoint",
+                "checkpoint references a missing or unsafe raw page",
+            )
             raw = raw_path.read_bytes()
             if _sha(raw) != digest:
                 raise HistoryError("invalid_checkpoint", "checkpoint raw page hash mismatch")
@@ -1553,9 +1608,11 @@ class HistoryStore:
                     source_path = f"raw/{page_hash}.zip"
                     if page["source_path"] != source_path:
                         raise HistoryError("invalid_page", "raw archive path does not match its SHA-256 name")
-                    raw_path = self.raw_dir / f"{page_hash}.zip"
-                    if not raw_path.is_relative_to(self.raw_dir.resolve()) or not raw_path.is_file():
-                        raise HistoryError("archive_invalid", "raw archive path is outside immutable raw storage")
+                    raw_path = self._resolve_raw_page_file(
+                        f"{page_hash}.zip",
+                        "archive_invalid",
+                        "raw archive path is outside immutable raw storage",
+                    )
                     raw_bytes = raw_path.read_bytes()
                     if page_hash != _sha(raw_bytes):
                         raise HistoryError("archive_invalid", "raw archive SHA-256 changed before ingestion")
@@ -1568,7 +1625,15 @@ class HistoryStore:
                     ):
                         raise HistoryError("invalid_page", "raw page digest must be lowercase SHA-256")
                     source_path = f"raw/{page_hash}.json" if page_hash is not None else None
-                    raw_bytes = (self.raw_dir / f"{page_hash}.json").read_bytes() if page_hash is not None else _json_bytes(rows)
+                    raw_bytes = (
+                        self._resolve_raw_page_file(
+                            f"{page_hash}.json",
+                            "archive_invalid",
+                            "raw page path is outside immutable raw storage",
+                        ).read_bytes()
+                        if page_hash is not None
+                        else _json_bytes(rows)
+                    )
             else:
                 rows = page
                 received_at = captured_at
@@ -1744,10 +1809,15 @@ class HistoryStore:
                     if recorded_path not in (None, archive_path, json_path):
                         raise HistoryError("raw_page_integrity_error", "raw source path does not match its content address")
                     raw_name = f"{page_hash}.zip" if recorded_path == archive_path else f"{page_hash}.json"
-                    raw_path = self.raw_dir / raw_name
-                    if not raw_path.is_file() or _sha(raw_path.read_bytes()) != page["sha256"]:
+                    raw_path = self._resolve_raw_page_file(
+                        raw_name,
+                        "raw_page_integrity_error",
+                        "raw source page is missing or has an invalid hash",
+                    )
+                    raw_bytes = raw_path.read_bytes()
+                    if _sha(raw_bytes) != page["sha256"]:
                         raise HistoryError("raw_page_integrity_error", "raw source page is missing or has an invalid hash")
-                    db.execute("INSERT INTO raw_pages VALUES (?, ?, ?, ?, ?) ON CONFLICT (page_sha256) DO NOTHING", [page["sha256"], str(raw_path), raw_path.stat().st_size, manifest["source_identity"], page["captured_at"]])
+                    db.execute("INSERT INTO raw_pages VALUES (?, ?, ?, ?, ?) ON CONFLICT (page_sha256) DO NOTHING", [page["sha256"], str(raw_path), len(raw_bytes), manifest["source_identity"], page["captured_at"]])
                 db.execute("""
                     INSERT INTO ingestion_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT (manifest_id) DO NOTHING
@@ -2741,7 +2811,10 @@ class HistoryStore:
         if extension not in {".json", ".zip", ".CHECKSUM"}:
             raise HistoryError("invalid_artifact", "raw artifact extension is not allowlisted")
         digest = _sha(raw)
-        path = self.raw_dir / f"{digest}{extension}"
+        path = self._raw_storage_root(
+            "local_storage_required",
+            "BTC raw storage must remain inside the local store",
+        ) / f"{digest}{extension}"
         self._write_immutable_bytes(path, raw)
         return digest, path.relative_to(self.root).as_posix()
 
