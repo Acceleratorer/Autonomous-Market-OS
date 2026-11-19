@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import threading
 import time
 from typing import Any
 from unittest import skipUnless
@@ -15,7 +16,7 @@ from unittest.mock import patch
 
 from market_os.btc_evidence_packet import SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
-from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, _WindowsResourceJob, _verify_windows_egress_rules
+from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, LocalLlamaRuntime, _WindowsResourceJob, _verify_windows_egress_rules
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -230,41 +231,91 @@ def test_model_abstention_remains_a_terminal_advisory_result() -> None:
     assert record.assessment["abstention_result"]["reason"] == "model_recommended_abstention"
 
 
-def test_windows_egress_health_requires_exact_active_store_executable_paths() -> None:
+def _windows_powershell_fixture(tmp_path: Path) -> Path:
+    path = tmp_path / "Windows" / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+    path.parent.mkdir(parents=True)
+    path.touch()
+    return path
+
+
+def test_windows_egress_health_requires_exact_active_store_executable_paths(tmp_path: Path) -> None:
     server = Path(sys.executable).parent / "llama-server.exe"
     payload = {
         "schema": "market-os.btc-assessor-firewall.v1",
-        "status": "configured",
+        "status": "enforced",
         "checked_executables": {"python": sys.executable, "llama_server": str(server)},
     }
-    completed = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
-    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
-        "market_os.btc_local_assessor.subprocess.run", return_value=completed
-    ):
+    powershell = _windows_powershell_fixture(tmp_path)
+    calls: list[tuple[list[str], dict[str, Any]]] = []
+
+    def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append((command, kwargs))
+        return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
+
+    with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
+        "market_os.btc_local_assessor.Path.is_file", return_value=True
+    ), patch("market_os.btc_local_assessor.subprocess.run", side_effect=run):
         health = _verify_windows_egress_rules(server)
 
-    assert health["status"] == "configured"
+    assert health["status"] == "enforced"
     assert health["checked_executables"] == ["python", "llama-server"]
+    command, kwargs = calls[0]
+    assert command[command.index("-File") + 1] == str(Path(__file__).parents[1] / "btc_assessor_firewall.ps1")
+    assert command[command.index("-ExecutionPolicy") + 1] == "Bypass"
+    assert "-PythonExecutable" not in command and "-ServerExecutable" not in command
+    assert kwargs["shell"] is False
+    assert kwargs["env"]["MARKET_OS_PYTHON_EXECUTABLE"] == sys.executable
+    assert kwargs["env"]["MARKET_OS_SERVER_EXECUTABLE"] == str(server)
 
 
-def test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy() -> None:
+def test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy(tmp_path: Path) -> None:
     server = Path(sys.executable).parent / "llama-server.exe"
+    powershell = _windows_powershell_fixture(tmp_path)
     payload = {
         "schema": "market-os.btc-assessor-firewall.v1",
-        "status": "configured",
+        "status": "enforced",
         "checked_executables": {"python": sys.executable, "llama_server": str(server.with_name("other.exe"))},
     }
-    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
+    with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
+        "market_os.btc_local_assessor.Path.is_file", return_value=True
+    ), patch(
         "market_os.btc_local_assessor.subprocess.run",
         return_value=subprocess.CompletedProcess([], 0, json.dumps(payload), ""),
     ):
         assert _verify_windows_egress_rules(server)["status"] == "unverified"
 
-    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
+    with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
+        "market_os.btc_local_assessor.Path.is_file", return_value=True
+    ), patch(
         "market_os.btc_local_assessor.subprocess.run",
         return_value=subprocess.CompletedProcess([], 1, "not-json", "firewall unavailable"),
     ):
         assert _verify_windows_egress_rules(server)["status"] == "unverified"
+
+    with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
+        "market_os.btc_local_assessor.Path.is_file", return_value=True
+    ), patch(
+        "market_os.btc_local_assessor.subprocess.run",
+        return_value=subprocess.CompletedProcess([], 2, "\udcff", "\udcff"),
+    ):
+        assert _verify_windows_egress_rules(server)["status"] == "unverified"
+
+
+def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime.server_path = Path(sys.executable)
+
+    with patch("market_os.btc_local_assessor.os.name", "nt"), patch(
+        "market_os.btc_local_assessor._verify_windows_egress_rules",
+        return_value={"status": "unverified", "reason": "synthetic missing policy"},
+    ):
+        try:
+            runtime.start()
+        except LocalAssessorError as exc:
+            assert exc.code == "network_isolation_unverified"
+        else:
+            raise AssertionError("local runtime started without verified network isolation")
 
 
 def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp_path) -> None:

@@ -2,9 +2,7 @@
 param(
     [ValidateSet("Install", "Verify")]
     [string]$Mode = "Verify",
-    [Parameter(Mandatory = $true)]
     [string]$PythonExecutable,
-    [Parameter(Mandatory = $true)]
     [string]$ServerExecutable,
     [string]$ProjectRoot
 )
@@ -32,9 +30,16 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     if ($Rule.Enabled -ne "True" -or $Rule.Direction -ne "Outbound" -or $Rule.Action -ne "Block" -or [string]$Rule.Profile -ne "Any") {
         return $false
     }
+    if ((-not [string]::IsNullOrWhiteSpace([string]$Rule.Owner) -and [string]$Rule.Owner -ne "Any") -or
+        [string]$Rule.LocalOnlyMapping -eq "True" -or [string]$Rule.LooseSourceMapping -eq "True") {
+        return $false
+    }
 
     $applications = @($Rule | Get-NetFirewallApplicationFilter)
     if ($applications.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$applications[0].Program)) {
+        return $false
+    }
+    if ([string]$applications[0].Package -ne "Any") {
         return $false
     }
     if (-not [string]::Equals((Get-FullPath ([string]$applications[0].Program)), (Get-FullPath $Executable), [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -42,7 +47,12 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     }
 
     $addressFilters = @($Rule | Get-NetFirewallAddressFilter)
-    if ($addressFilters.Count -ne 1) {
+    if ($addressFilters.Count -ne 1 -or [string]$addressFilters[0].LocalAddress -ne "Any") {
+        return $false
+    }
+    $localDynamicAddresses = @($addressFilters[0].LocalDynamicKeywordAddresses | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+    $remoteDynamicAddresses = @($addressFilters[0].RemoteDynamicKeywordAddresses | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+    if ($localDynamicAddresses.Count -gt 0 -or $remoteDynamicAddresses.Count -gt 0) {
         return $false
     }
     $actual = @($addressFilters[0].RemoteAddress | ForEach-Object { [string]$_ } | Sort-Object)
@@ -50,6 +60,46 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     if ($actual.Count -ne $expected.Count) {
         return $false
     }
+
+    $portFilters = @($Rule | Get-NetFirewallPortFilter)
+    if ($portFilters.Count -ne 1) {
+        return $false
+    }
+    foreach ($property in @("Protocol", "LocalPort", "RemotePort", "IcmpType", "DynamicTarget")) {
+        $values = @($portFilters[0].$property | ForEach-Object { [string]$_ })
+        if ($values.Count -ne 1 -or $values[0] -ne "Any") {
+            return $false
+        }
+    }
+
+    $serviceFilters = @($Rule | Get-NetFirewallServiceFilter)
+    if ($serviceFilters.Count -ne 1 -or [string]$serviceFilters[0].Service -ne "Any") {
+        return $false
+    }
+
+    $interfaceFilters = @($Rule | Get-NetFirewallInterfaceFilter)
+    if ($interfaceFilters.Count -ne 1 -or [string]$interfaceFilters[0].InterfaceAlias -ne "Any") {
+        return $false
+    }
+    $interfaceTypeFilters = @($Rule | Get-NetFirewallInterfaceTypeFilter)
+    if ($interfaceTypeFilters.Count -ne 1 -or [string]$interfaceTypeFilters[0].InterfaceType -ne "Any") {
+        return $false
+    }
+
+    $securityFilters = @($Rule | Get-NetFirewallSecurityFilter)
+    if ($securityFilters.Count -ne 1) {
+        return $false
+    }
+    $security = $securityFilters[0]
+    if ([string]$security.Authentication -ne "NotRequired" -or
+        [string]$security.Encryption -ne "NotRequired" -or
+        [string]$security.OverrideBlockRules -ne "False" -or
+        [string]$security.LocalUser -ne "Any" -or
+        [string]$security.RemoteUser -ne "Any" -or
+        [string]$security.RemoteMachine -ne "Any") {
+        return $false
+    }
+
     return -not [bool](Compare-Object -ReferenceObject $expected -DifferenceObject $actual -CaseSensitive)
 }
 
@@ -86,6 +136,16 @@ function Remove-CreatedRules {
 }
 
 try {
+    if ([string]::IsNullOrWhiteSpace($PythonExecutable)) {
+        $PythonExecutable = $env:MARKET_OS_PYTHON_EXECUTABLE
+    }
+    if ([string]::IsNullOrWhiteSpace($ServerExecutable)) {
+        $ServerExecutable = $env:MARKET_OS_SERVER_EXECUTABLE
+    }
+    if ([string]::IsNullOrWhiteSpace($PythonExecutable) -or [string]::IsNullOrWhiteSpace($ServerExecutable)) {
+        throw "PythonExecutable and ServerExecutable must be supplied directly or through MARKET_OS_PYTHON_EXECUTABLE and MARKET_OS_SERVER_EXECUTABLE"
+    }
+
     $python = Get-FullPath $PythonExecutable
     $server = Get-FullPath $ServerExecutable
     if (-not (Test-Path -LiteralPath $python -PathType Leaf) -or -not (Test-Path -LiteralPath $server -PathType Leaf)) {
@@ -139,7 +199,25 @@ try {
                 -Direction Outbound `
                 -Action Block `
                 -Program $specification.Executable `
+                -Package Any `
                 -RemoteAddress $blockedRemoteAddresses `
+                -LocalAddress Any `
+                -Protocol Any `
+                -LocalPort Any `
+                -RemotePort Any `
+                -IcmpType Any `
+                -DynamicTarget Any `
+                -Service Any `
+                -InterfaceAlias Any `
+                -InterfaceType Any `
+                -Authentication NotRequired `
+                -Encryption NotRequired `
+                -OverrideBlockRules $false `
+                -LocalUser Any `
+                -RemoteUser Any `
+                -RemoteMachine Any `
+                -LocalOnlyMapping $false `
+                -LooseSourceMapping $false `
                 -Profile Any `
                 -Enabled True | Out-Null
             $createdRuleNames += $specification.Name
@@ -163,7 +241,7 @@ try {
         }
     }
 
-    $result = Get-VerificationResult "configured" ""
+    $result = Get-VerificationResult "enforced" ""
     $result | ConvertTo-Json -Depth 5 -Compress
     exit 0
 }

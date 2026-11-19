@@ -33,13 +33,14 @@ two executable-scoped outbound block rules for non-loopback IPv4/IPv6 traffic;
 the address filters leave `127.0.0.0/8` and `::1` available for the current
 HTTP loopback IPC. Install refuses executable paths outside the project-local
 `.market_os/runtimes` and `.market_os/local-evidence-runtime` directories and
-does not change profile defaults. Health reports `configured` only when the
-exact Python and pinned server paths have matching enabled rules in
-`ActiveStore` and all three firewall profiles are enabled. This is policy
-configuration evidence, not a non-loopback socket-denial probe, so the overall
-assessor health remains `degraded` pending target-host verification. No firewall
-rule was installed during this work. The PowerShell helper is included as
-package data.
+does not change profile defaults. Health reports Windows isolation as
+`enforced` only when the exact Python and pinned server paths have matching
+enabled rules in `ActiveStore`, every associated traffic filter is unrestricted
+except for the intended remote-address ranges, and all three firewall profiles
+are enabled. This is policy evidence, not a non-loopback socket-denial probe, so
+overall assessor health remains `degraded` pending target-host verification. No
+firewall rule was installed during this work. The PowerShell helper is included
+as package data.
 
 The implementation and deployment files are
 [`market_os/btc_local_assessor.py`](../../market_os/btc_local_assessor.py),
@@ -97,12 +98,35 @@ and [Windows Firewall defaults](https://learn.microsoft.com/en-us/windows/securi
    still works. Keep health degraded if systemd or cgroup BPF support is
    missing.
 2. For Windows, use the opt-in firewall installer only after the pinned,
-   project-local CPython 3.11 runtime is installed. An elevated operator must
-   review and run `btc_assessor_firewall.ps1 -Mode Install`, then run health
-   against that same Python and server path. Follow with an actual bounded
-   non-loopback denial probe while confirming loopback IPC; until then, the
-   status remains `degraded`. The installer has not been run and no host policy
-   has been changed here.
+   project-local CPython 3.11 runtime and the locked llama.cpp target are
+   installed. From an elevated PowerShell session at the repository root, set
+   the paths and run the installer with a process-scoped execution-policy
+   override:
+
+   ```powershell
+   $project = (Resolve-Path .).Path
+   $python = Join-Path $project ".market_os\runtimes\btc-assessor-py311\Scripts\python.exe"
+   $installRoot = Join-Path $project ".market_os\local-evidence-runtime\windows-x64-cuda-13.5"
+   $manifest = Get-Content (Join-Path $installRoot "install-manifest.json") -Raw | ConvertFrom-Json
+   $server = Join-Path $installRoot $manifest.runtime.server_relative_path
+   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
+     -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass `
+     -File (Join-Path $project "market_os\btc_assessor_firewall.ps1") `
+     -Mode Install -ProjectRoot $project -PythonExecutable $python -ServerExecutable $server
+   ```
+
+   The Python path must identify the installed, dedicated target interpreter;
+   adjust it if the pinned runtime manifest uses a different directory. The
+   installer is idempotent: if interrupted after creating one rule, rerunning
+   the same `Install` command verifies the existing rule and creates the
+   missing rule. Assessment startup fails closed until both rules verify. If
+   organizational Group Policy blocks script execution, the process-scoped
+   override cannot supersede it and the command reports the policy error.
+   After installation, run health against the same Python and server path, then
+   perform an actual bounded non-loopback denial probe while confirming
+   loopback IPC. Until that target-host verification, overall health remains
+   `degraded`. The installer has not been run and no host policy has been
+   changed here.
 3. Keep the assessor health `degraded` until one of these boundaries is
    installed and its enforcement is observed on the actual launch path.
 
