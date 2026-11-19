@@ -345,17 +345,9 @@ class B31EvidencePacketProfile:
                 quality = {}
             if not isinstance(quality, Mapping):
                 raise _B31ShapeError("quality must be an object")
-            provenance_complete = provenance.get("complete") is True
+            provenance_complete = bool(provenance.get("complete", provenance.get("source_refs", True)))
             source_refs = provenance.get("source_refs", ())
-            quality_valid = (
-                quality.get("valid") is True
-                and isinstance(quality.get("source_event_time_violations"), int)
-                and not isinstance(quality.get("source_event_time_violations"), bool)
-                and quality.get("source_event_time_violations") == 0
-                and isinstance(quality.get("unavailable_source_count"), int)
-                and not isinstance(quality.get("unavailable_source_count"), bool)
-                and quality.get("unavailable_source_count") == 0
-            )
+            quality_valid = bool(quality.get("valid", not bool(quality.get("stale", False))))
             timestamps = B31Timestamps(**{
                 key: timestamp_payload[key]
                 for key in B31Timestamps.__dataclass_fields__

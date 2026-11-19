@@ -1,94 +1,138 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 import hashlib
 import json
 import time
 from typing import Any
 
+from market_os.btc_evidence_packet import SourceTimeBounds, build_b31_evidence_packet
+from market_os.btc_features import B2_FEATURE_VERSION
 from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
+from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
 
 
 def _canonical(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
 
 
+def _iso_ms(value: int) -> str:
+    return datetime.fromtimestamp(value / 1000, timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 def _packet() -> dict[str, Any]:
     now = time.time_ns() // 1_000_000
-    core: dict[str, Any] = {
-        "schema_id": "market-os.b3-1.evidence-packet-profile",
-        "version": "v1",
-        "observation_id": "synthetic-btc-observation-001",
-        "stable_hypothesis_ids": ["h-up", "h-nonpositive"],
-        "timestamps": {
-            "decision_eligible_at_ms": now - 1_000,
-            "packet_available_at_ms": now - 1_000,
-            "packet_ready_at_ms": now - 500,
-            "declared_assessment_use_time_ms": now - 500,
-            "fresh_until_ms": now + 300_000,
-            "expires_at_ms": now + 300_000,
-            "max_response_latency_ms": 0,
-        },
-        "target_definition_id": "btc.b2.close-return-5m",
-        "target_version": "v1",
-        "assessment_configuration_id": "market-os.b3-1.normalized-assessment@v1",
-        "question_ids": [
-            "market-os.b3-1.question.evidence-support@v1",
-            "market-os.b3-1.question.agreement-contradiction@v1",
-            "market-os.b3-1.question.abstention@v1",
-        ],
-        "market": {"venue": "binance", "symbol": "BTCUSDT", "market_type": "spot", "interval": "1m"},
-        "hypotheses": [
-            {
-                "hypothesis_id": "h-up",
-                "claim": "Synthetic fixture hypothesis: supplied evidence is compatible with a positive five-minute BTC return claim.",
-                "target_definition_id": "btc.b2.close-return-5m",
-                "target_version": "v1",
-                "horizon_minutes": 5,
-                "observation_close_time_ms": now - 120_000,
-            },
-            {
-                "hypothesis_id": "h-nonpositive",
-                "claim": "Synthetic fixture hypothesis: supplied evidence is compatible with a non-positive five-minute BTC return claim.",
-                "target_definition_id": "btc.b2.close-return-5m",
-                "target_version": "v1",
-                "horizon_minutes": 5,
-                "observation_close_time_ms": now - 120_000,
-            },
-        ],
-        "numerical_context": {"data_status": "synthetic_fixture", "baseline_score": 0.52},
-        "evidence": [
-            {
-                "citation_ref": "fixture:citation-a",
-                "source_ref": "fixture:source-a",
-                "text": "Synthetic fixture source A describes a positive directional indicator. It is not a real observation.",
-                "published_at": "2026-11-19T00:00:00Z",
-                "available_at_ms": now - 1_000,
-                "event_start_ms": now - 120_000,
-                "event_end_ms": now - 60_000,
-                "dependency_group_id": "group-a",
-            },
-            {
-                "citation_ref": "fixture:citation-b",
-                "source_ref": "fixture:source-b",
-                "text": "Synthetic fixture source B describes a conflicting directional indicator. It is not a real observation.",
-                "published_at": "2026-11-19T00:00:00Z",
-                "available_at_ms": now - 1_000,
-                "event_start_ms": now - 120_000,
-                "event_end_ms": now - 60_000,
-                "dependency_group_id": "group-b",
-            },
-        ],
-        "hypothesis_evidence_groups": {"h-up": ["group-a"], "h-nonpositive": ["group-b"]},
-        "independent_evidence_groups": ["group-a", "group-b"],
-        "provenance": {"complete": True, "source_refs": ["fixture:source-a", "fixture:source-b"]},
-        "quality": {"valid": True},
-        "lineage": {"dataset_revision": "synthetic-only", "feature_fingerprint": "not-a-market-observation"},
+    close_ms = now - 120_000
+    decision_ms = close_ms + 50
+    dataset_revision = "btc-local-assessor-synthetic-v1"
+    input_refs = []
+    for index, open_ms in enumerate([close_ms - 60_000, *range(close_ms - 360_000, close_ms - 60_000, 60_000)]):
+        candle_close_ms = open_ms + 60_000
+        source_ms = candle_close_ms
+        received_ms = candle_close_ms + 50
+        input_refs.append({
+            "role": "current" if index == 0 else "lookback",
+            "open_time_ms": open_ms,
+            "close_time_ms": candle_close_ms,
+            "source_timestamp": _iso_ms(source_ms),
+            "received_at": _iso_ms(received_ms),
+            "availability_timestamp": _iso_ms(received_ms),
+            "canonical_fingerprint": hashlib.sha256(f"candle-{open_ms}".encode()).hexdigest(),
+        })
+    feature: dict[str, Any] = {
+        "feature_version": B2_FEATURE_VERSION,
+        "dataset_revision": dataset_revision,
+        "close_time_ms": close_ms,
+        "close_time": _iso_ms(close_ms),
+        "source_timestamp": _iso_ms(close_ms),
+        "received_at": _iso_ms(decision_ms),
+        "availability_timestamp": _iso_ms(decision_ms),
+        "decision_eligible_at": _iso_ms(decision_ms),
+        "decision_eligible": True,
+        "status": "eligible",
+        "reason": None,
+        "values": {"close": 100_000.0, "log_return_1m": 0.001, "log_return_5m": 0.002, "range_pct": 0.001, "log_volume": 1.0},
+        "input_refs": input_refs,
     }
-    core["packet_fingerprint"] = hashlib.sha256(_canonical(core)).hexdigest()
-    return core
+    feature["input_fingerprint"] = hashlib.sha256(_canonical({"dataset_revision": dataset_revision, "feature": feature})).hexdigest()
+
+    receipt_ms = decision_ms - 25
+    retrieval_ms = decision_ms + 10
+    ready_ms = decision_ms + 20
+    source_texts = (
+        ("doc-a", "fixture:source-a", "fixture:citation-a", "group-a", "Synthetic fixture source A describes a positive directional indicator. It is not a real observation."),
+        ("doc-b", "fixture:source-b", "fixture:citation-b", "group-b", "Synthetic fixture source B describes a conflicting directional indicator. It is not a real observation."),
+    )
+    documents = []
+    passages = []
+    source_times = {}
+    for document_id, source_ref, citation_ref, group, text in source_texts:
+        content_hash = hashlib.sha256(text.encode()).hexdigest()
+        documents.append(DocumentRecord(
+            document_id=document_id,
+            title=f"Synthetic BTC evidence {document_id}",
+            publisher="Market OS test fixture",
+            source_ref=source_ref,
+            published_at=_iso_ms(close_ms - 300_000),
+            retrieved_at=_iso_ms(receipt_ms),
+            symbols=("BTCUSDT",),
+            media_type="text/plain",
+            content_hash=content_hash,
+            license=LicenseMetadata("synthetic_fixture"),
+            provenance=Provenance("fixture", source_ref, _iso_ms(receipt_ms)),
+        ))
+        passages.append(RetrievedPassage(
+            passage_id=f"passage-{document_id}",
+            document_id=document_id,
+            text=text,
+            rank=len(passages) + 1,
+            citation_ref=citation_ref,
+            source_ref=source_ref,
+            content_hash=content_hash,
+        ))
+        source_times[document_id] = SourceTimeBounds(
+            event_start_ms=close_ms - 120_000,
+            event_end_ms=close_ms,
+            dependency_group_id=group,
+            available_at_ms=receipt_ms,
+            publication_time_status="recorded",
+            clock_error_bound_ms=0,
+        )
+    retrieval = RetrievalResult(
+        query="synthetic BTC evidence fixture",
+        document_ids=tuple(document.document_id for document in documents),
+        passages=tuple(passages),
+        citations=tuple(passage.citation_ref for passage in passages),
+        provider="minirag",
+        provider_version="synthetic-fixture-v1",
+        retrieved_at=_iso_ms(retrieval_ms),
+        query_fingerprint=hashlib.sha256(b"synthetic-query").hexdigest(),
+        content_fingerprints=tuple(document.content_hash for document in documents),
+    )
+    packet = build_b31_evidence_packet(
+        feature,
+        retrieval,
+        documents,
+        source_times,
+        hypothesis_claim="Synthetic fixture hypothesis: supplied evidence is compatible with a positive five-minute BTC return claim.",
+        packet_ready_at_ms=ready_ms,
+        independent_evidence_group_ids=("group-a", "group-b"),
+    )
+    first = {**packet["hypotheses"][0], "hypothesis_id": "h-up"}
+    second = {
+        **first,
+        "hypothesis_id": "h-nonpositive",
+        "claim": "Synthetic fixture hypothesis: supplied evidence is compatible with a non-positive five-minute BTC return claim.",
+    }
+    packet["stable_hypothesis_ids"] = ["h-up", "h-nonpositive"]
+    packet["hypotheses"] = [first, second]
+    packet["hypothesis_evidence_groups"] = {"h-up": ["group-a"], "h-nonpositive": ["group-b"]}
+    packet.pop("packet_fingerprint")
+    packet["packet_fingerprint"] = hashlib.sha256(_canonical(packet)).hexdigest()
+    return packet
 
 
 def _usable_response(*, bad_citation: bool = False, self_comparison: bool = False) -> dict[str, Any]:
