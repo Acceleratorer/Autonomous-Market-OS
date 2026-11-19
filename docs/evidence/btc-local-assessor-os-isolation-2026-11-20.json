@@ -1,0 +1,45 @@
+{
+  "schema": "market-os.btc-local-assessor-os-isolation-check.v1",
+  "captured_at_utc": "2026-11-19T21:01:13Z",
+  "target": "windows-x64-cuda-13.5",
+  "runtime": {
+    "provider": "local_qwen_evidence_assessor",
+    "llama_cpp": "b12478",
+    "model_revision": "bc640142c66e1fdd12af0bd68f40445458f3869b:Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "python": "CPython 3.12 project venv with system-site-packages; feasibility harness, not pinned CPython 3.11 release runtime"
+  },
+  "health": {
+    "status": "degraded",
+    "loopback_response_status": 200,
+    "resource_limits": {
+      "status": "enforced",
+      "supervisor": "Windows Job Object",
+      "cpu_hard_cap_percent": 25,
+      "process_commit_limit_bytes": 6442450944,
+      "job_commit_limit_bytes": 6442450944,
+      "working_set_limit_bytes": null,
+      "cuda_fit_free_memory_margin_mib": 2048,
+      "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap"
+    },
+    "network_isolation": {
+      "status": "unverified",
+      "supervisor": "Windows Defender Firewall (ActiveStore)",
+      "reason": "missing_or_mismatched_active_store_rule"
+    }
+  },
+  "verification": {
+    "assessor_tests": "11 passed",
+    "powershell_parser": "valid",
+    "git_diff_check": "passed",
+    "firewall_installer_executed": false,
+    "host_firewall_policy_changed": false,
+    "external_network_requests": 0,
+    "market_data_capture_performed": false
+  },
+  "limitations": [
+    "ActiveStore has no matching enabled outbound firewall rules for the running Python executable and pinned llama-server executable.",
+    "No non-loopback socket-denial probe was performed.",
+    "The current CPython 3.12 venv is a local feasibility harness and is not the pinned, hash-verified CPython 3.11 release runtime."
+  ]
+}

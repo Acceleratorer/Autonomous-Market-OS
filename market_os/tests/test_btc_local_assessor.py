@@ -5,15 +5,17 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import os
+from pathlib import Path
 import subprocess
 import sys
 import time
 from typing import Any
 from unittest import skipUnless
+from unittest.mock import patch
 
 from market_os.btc_evidence_packet import SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
-from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, _WindowsResourceJob
+from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, _WindowsResourceJob, _verify_windows_egress_rules
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -226,6 +228,43 @@ def test_model_abstention_remains_a_terminal_advisory_result() -> None:
     assert record.assessment is not None
     assert record.assessment["abstention_result"]["status"] == B31Status.ABSTAINED.value
     assert record.assessment["abstention_result"]["reason"] == "model_recommended_abstention"
+
+
+def test_windows_egress_health_requires_exact_active_store_executable_paths() -> None:
+    server = Path(sys.executable).parent / "llama-server.exe"
+    payload = {
+        "schema": "market-os.btc-assessor-firewall.v1",
+        "status": "configured",
+        "checked_executables": {"python": sys.executable, "llama_server": str(server)},
+    }
+    completed = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
+    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
+        "market_os.btc_local_assessor.subprocess.run", return_value=completed
+    ):
+        health = _verify_windows_egress_rules(server)
+
+    assert health["status"] == "configured"
+    assert health["checked_executables"] == ["python", "llama-server"]
+
+
+def test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy() -> None:
+    server = Path(sys.executable).parent / "llama-server.exe"
+    payload = {
+        "schema": "market-os.btc-assessor-firewall.v1",
+        "status": "configured",
+        "checked_executables": {"python": sys.executable, "llama_server": str(server.with_name("other.exe"))},
+    }
+    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
+        "market_os.btc_local_assessor.subprocess.run",
+        return_value=subprocess.CompletedProcess([], 0, json.dumps(payload), ""),
+    ):
+        assert _verify_windows_egress_rules(server)["status"] == "unverified"
+
+    with patch("market_os.btc_local_assessor.Path.is_file", return_value=True), patch(
+        "market_os.btc_local_assessor.subprocess.run",
+        return_value=subprocess.CompletedProcess([], 1, "not-json", "firewall unavailable"),
+    ):
+        assert _verify_windows_egress_rules(server)["status"] == "unverified"
 
 
 def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp_path) -> None:
