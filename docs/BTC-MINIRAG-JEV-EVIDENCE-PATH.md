@@ -173,14 +173,19 @@ Market OS stays paper-only and owns every risk and execution decision.
    do not infer publication time from candle event time.
 2. A local inventory on 2026-11-19 found the B1 corpus is the only current BTC
    evidence corpus; five saved general document bundles contained no BTC-tagged
-   records. No local source corpus qualifies for the strict packet gate. Prepare
-   a bounded prospective capture proposal with date range, source class,
-   timestamp fields, request/runtime caps, and retention for separate owner
-   approval; do not make a new data request yet.
-3. After an eligible packet exists, use only recorded B3.1 assessments for its
-   exact fingerprint and join them to the same B2 observations as the numerical
-   controls.
-4. Freeze an offline matched comparison protocol before reading held-out
+   records. No local source corpus qualifies for the strict packet gate. The
+   [prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md) defines a
+   one-day public-stream pilot and is not execution approval. It records the
+   source publication time as unknown and keeps local receipt as a separate
+   availability timestamp.
+3. Resolve the packet-gate prerequisite in the proposal before any new data
+   request. Current packet code rejects unknown publication time even when
+   local receipt is recorded. Preserve strict timing; do not treat source event
+   time or local receipt as publication time.
+4. After an eligible packet exists, use only recorded B3.1 assessments for its
+   exact fingerprint and join them to the same forward observation lineage as
+   the numerical controls. The prospective pilot alone is not a market study.
+5. Freeze an offline matched comparison protocol before reading held-out
    results. Jev API access, credentials, provider egress, and any future shadow
    or trading path still require separate owner decisions.
 
@@ -188,6 +193,7 @@ Market OS stays paper-only and owns every risk and execution decision.
 
 - [ADR-0056: MiniRAG scope for the BTC evidence path](decisions/ADR-0056-minirag-btc-evidence-scope.md)
 - [ADR-0057: Strict recorded availability for BTC evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
+- [BTC prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md)
 - [U3 API connectivity evidence](evidence/u3-api-connectivity.json)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
 - [B3.1 offline evaluation protocol](B3.1-OFFLINE-EVALUATION-PROTOCOL.md)
