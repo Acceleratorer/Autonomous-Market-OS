@@ -2,6 +2,9 @@
 
 **Status:** BTC-only MiniRAG integration slice and bounded local source corpus
 built; local artifact hashes and row counts were rechecked on 2026-11-19.
+The owner selected strict recorded availability for B3.1 evidence under
+[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md); an
+event-time proxy was not selected for the current B1 revision.
 Three pinned-runtime MiniRAG retrieval repeats completed before the child
 network guard was added, followed by one post-guard retrieval with the same
 four citations. The strict historical packet gate blocks market-linked Jev
@@ -144,12 +147,12 @@ The BTC Vision archive is retrospective. Its local receipt timestamps do not
 reconstruct what a live feed exposed at each historical minute. Each packet
 must therefore retain B2 `decision_eligible_at` and source availability
 timestamps. Event time and local availability are separate fields.
-The current policy preserves the unknown original Binance publication time
-and uses only recorded local availability. The corpus therefore cannot
-establish historical point-in-time eligibility at older B2 decision times.
-No source publication time is inferred from candle event time. An explicitly
-optimistic event-time proxy would require a separate owner decision and must
-not be presented as historical source availability.
+The owner selected strict recorded availability in
+[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md). Preserve the
+unknown original Binance publication time and use only captured availability
+metadata. Do not infer publication or availability from candle event time. The
+current B1 corpus therefore cannot establish historical point-in-time evidence
+for older B2 observations, and its citations remain ineligible for B3.1.
 
 The current B2 run and data limitations are recorded in
 [`B2-BTC-FEATURES-BASELINES-REPORT.md`](B2-BTC-FEATURES-BASELINES-REPORT.md).
@@ -166,20 +169,24 @@ Market OS stays paper-only and owns every risk and execution decision.
 
 1. Keep source publication time unknown and preserve B1 local availability;
    do not infer publication time from candle event time.
-2. Resolve packet timing before any Jev assessment. The current default remains
-   strict recorded availability; keep it and obtain source records with
-   contemporaneous availability timestamps, or explicitly authorize a
-   separate event-time proxy labeled retrospective and not point-in-time valid.
-3. After packet eligibility is resolved, build only recorded B3.1 assessments
-   for exact packet fingerprints and join them to the same B2 observations as
-   the numerical controls.
+2. A local inventory on 2026-11-19 found the B1 corpus is the only current BTC
+   evidence corpus; five saved general document bundles contained no BTC-tagged
+   records. No local source corpus qualifies for the strict packet gate. Prepare
+   a bounded prospective capture proposal with date range, source class,
+   timestamp fields, request/runtime caps, and retention for separate owner
+   approval; do not make a new data request yet.
+3. After an eligible packet exists, use only recorded B3.1 assessments for its
+   exact fingerprint and join them to the same B2 observations as the numerical
+   controls.
 4. Freeze an offline matched comparison protocol before reading held-out
-   results. Keep Jev API access, credentials, provider egress, and any future
-   shadow or trading path behind separate owner decisions.
+   results. Jev API access, credentials, provider egress, and any future shadow
+   or trading path still require separate owner decisions.
 
 ## References
 
 - [ADR-0056: MiniRAG scope for the BTC evidence path](decisions/ADR-0056-minirag-btc-evidence-scope.md)
+- [ADR-0057: Strict recorded availability for BTC evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
+- [U3 API connectivity evidence](evidence/u3-api-connectivity.json)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
 - [B3.1 offline evaluation protocol](B3.1-OFFLINE-EVALUATION-PROTOCOL.md)
 - [B2 feature and target implementation](../market_os/btc_features.py)

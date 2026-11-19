@@ -12,6 +12,14 @@ B2/assessment study has run. This work does not authorize a Jev provider
 request, credential use, additional data acquisition, promotion, or execution
 path.
 
+The owner selected strict recorded availability under
+[ADR-0057](docs/decisions/ADR-0057-btc-strict-recorded-availability.md).
+Event-time proxy was not selected for the current B1 revision.
+The earlier U3 TypeSafe/Jev connectivity probe was a single synthetic
+descriptive request that failed response validation; it was not a B3.1 packet
+assessment and was not retried. See
+[`U3-API-CONNECTIVITY-REPORT.md`](docs/U3-API-CONNECTIVITY-REPORT.md).
+
 The BTC-specific implementation and retrieval evidence are summarized in the
 [MiniRAG/Jev evidence path](docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md), with its
 run record in

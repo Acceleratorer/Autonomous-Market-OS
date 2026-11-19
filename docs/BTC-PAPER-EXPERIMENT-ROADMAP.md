@@ -209,13 +209,18 @@ market metrics. See the [BTC MiniRAG/Jev evidence
 path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md).
 
 The approved B1 archives were received locally on 2026-11-18. Original
-per-candle source publication times were not retained. The local corpus
-preserves those timestamps as unknown and keeps B1 receipt time separate, so
-it cannot yet establish evidence availability at each historical B2 decision.
-Resolve that timestamp policy before building usable historical packets or
-making a market-level comparison: retain strict recorded availability, or
-explicitly approve a separate retrospective event-time proxy that is not
-point-in-time valid. Otherwise obtain source records with contemporaneous
-availability timestamps. Keep Jev advisory and paper-only; U4/B4 remains
-unstarted pending stronger, multi-period stability evidence and U5/B5 remains
-unstarted.
+per-candle source publication times were not retained. The owner selected
+strict recorded availability in
+`docs/decisions/ADR-0057-btc-strict-recorded-availability.md`; event-time proxy
+was not selected for this B1 revision. Its local corpus therefore cannot
+establish evidence availability at each historical B2 decision and remains
+ineligible for historical B3.1 packets. The 2026-11-19 local inventory found
+only the B1 BTC evidence corpus; five saved general document bundles had no
+BTC-tagged records.
+Prepare a bounded prospective capture proposal for separate owner approval;
+this decision authorizes no new data request. Jev remains advisory and
+paper-only; Jev API access and provider egress require separate approval. The
+previous U3 Jev connectivity probe was a one-shot synthetic descriptive request
+that failed response validation and was not retried; it is not B3.1 evidence.
+U4/B4 remains unstarted pending stronger, multi-period stability evidence and
+U5/B5 remains unstarted.
