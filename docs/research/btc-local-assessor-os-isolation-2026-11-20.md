@@ -16,16 +16,25 @@ The latest read-only health run is recorded in
 [`btc-local-assessor-os-isolation-2026-11-20.json`](../evidence/btc-local-assessor-os-isolation-2026-11-20.json).
 The repository evidence records the Windows Job Object smoke and its limits in
 [`btc-local-assessor-resource-guard-2026-11-20.json`](../evidence/btc-local-assessor-resource-guard-2026-11-20.json).
-The current CLI originally used the shared CPython 3.12 executable. A project-
-local venv now exists at `.market_os/runtimes/btc-assessor-py312` and resolves
-the project, DuckDB, and PyArrow without downloads. A health run through that
-interpreter started the pinned server and returned HTTP 200; the Windows Job
-Object reported its 6 GiB and 25% CPU limits as enforced, while overall health
-remained degraded because egress isolation is unverified. The venv uses
-`--system-site-packages` and is only a local feasibility harness, not the
-target-native, hash-pinned CPython 3.11 release runtime. A future per-program
-rule must target a dedicated application interpreter so enabling it does not
-block unrelated Python workloads.
+The initial feasibility run used the shared CPython 3.12 executable. Its
+project-local venv remains at `.market_os/runtimes/btc-assessor-py312`; it uses
+`--system-site-packages` and is not the release runtime. A dedicated Windows
+runtime is now installed at `.market_os/runtimes/btc-assessor-py311` using the
+U6.4-approved CPython 3.11.9 embeddable archive from python.org. DuckDB 2.0.0
+and PyArrow 26.0.1 are installed from Windows CPython 3.11 wheels, with their
+wheel hashes recorded. The interpreter successfully imported CPython 3.11.9,
+DuckDB, PyArrow, and `market_os.cli`; this smoke did not start model inference
+and did not prove network isolation. A local assessor health smoke under this
+interpreter started the pinned `llama-server`, received HTTP 200 on loopback,
+and observed the existing 25% CPU and 6 GiB Job Object limits. Overall status
+remained `degraded` because the ActiveStore egress rules are absent. The health
+smoke made no packet assessment and did not change firewall policy. Runtime
+archive, executable, dependency wheels, tree digest, and health result are in
+[`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](../evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
+The runtime was prepared locally; a repeatable cross-platform bootstrap is not
+yet in the repository. The Linux CPython 3.11.14 source-build path remains to
+be prepared and verified. A future Windows per-program rule must target this
+dedicated interpreter so it does not block unrelated Python workloads.
 The Windows firewall helper at
 [`btc_assessor_firewall.ps1`](../../market_os/btc_assessor_firewall.ps1)
 supports read-only `Verify` and explicit elevated `Install` modes. Install adds

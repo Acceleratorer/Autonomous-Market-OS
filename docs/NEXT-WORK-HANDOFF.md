@@ -54,15 +54,32 @@ trace is available. This Windows account is non-admin, and Linux has no
 configured cgroup supervisor. Do not call this zero-egress or production-ready
 until those boundaries are enforced and verified.
 
-**Checkpoint base:** `main` at `e3ee08c` after PR #50 merged. The resource-guard
-implementation and evidence update are in progress; no new market-data capture
-has been run.
+The Windows workstation now has the U6.4-baseline CPython 3.11.9 runtime at
+`.market_os/runtimes/btc-assessor-py311`, with verified DuckDB 2.0.0 and PyArrow
+26.0.1 wheels. Import smoke passed for `market_os.cli`; local health returned
+HTTP 200 and the Job Object enforced 25% CPU and 6 GiB. Health remains degraded
+because egress rules are absent. No model inference or packet assessment ran,
+and no firewall policy changed. Provenance is in
+[`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
+The older CPython 3.12 feasibility venv is left intact. A repeatable setup and
+the Linux CPython 3.11.14 source build remain open.
+
+**Checkpoint base:** `main` at `f316f5f` after PR #52 merged. The Windows
+firewall installer remains opt-in and unrun; the ActiveStore verifier did not
+find installed rules. No new market-data capture has been run.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
 publication time while allowing a contemporaneous local receipt with a
 defensible UTC error bound to establish future availability. The retrospective
 B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
 packets are assessed locally with Qwen. The prospective Binance stream remains
 an unapproved timestamp/provenance pilot; the proposal authorizes no request.
+
+The next engineering slice is to make the CPython 3.11 provisioning repeatable
+for Windows and Linux, then finish Linux OS-level egress and cgroup isolation
+for the standalone assessor path. The owner’s receipt-time decision does not
+approve a new Binance stream: any prospective run still needs current terms and
+regional review, a defensible UTC error bound throughout the run, and separate
+date-bound approval.
 
 ## Where the project stands
 
