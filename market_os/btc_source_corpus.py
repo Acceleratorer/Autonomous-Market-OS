@@ -267,9 +267,10 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
     """Verify and hydrate corpus rows using conservative local availability.
 
     The upstream publication time remains unknown. ``DocumentRecord`` requires
-    ``published_at``, so this projection sets it to the recorded local
-    availability timestamp; the packet builder will consequently reject these
-    retrospective rows for any earlier historical B2 decision.
+    ``published_at``, so its legacy field carries the recorded local
+    availability as a fail-closed eligibility bound, not as source publication
+    time. ``SourceTimeBounds`` preserves the unknown status and the packet
+    builder rejects it under strict recorded availability.
     """
     root = Path(corpus_dir).expanduser().resolve()
     if str(root).startswith("\\\\"):
@@ -323,6 +324,7 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
             or not isinstance(provenance, dict)
             or record.get("market") != {"venue": "binance", "symbol": "BTCUSDT", "market_type": "spot", "interval": "1m"}
             or record.get("source_published_at") is not None
+            or record.get("publication_time_status") != "unknown-not-captured"
             or record.get("dependency_group_id") != DEPENDENCY_GROUP_ID
         ):
             raise SourceCorpusError(f"incomplete corpus document at line {line_number}")
@@ -383,6 +385,7 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
             event_end_ms=event_end_ms,
             dependency_group_id=DEPENDENCY_GROUP_ID,
             available_at_ms=available_at_ms,
+            publication_time_status="unknown-not-captured",
         )
     if len(documents) != MAX_ROWS or len(documents) != manifest.get("document_count"):
         raise SourceCorpusError("BTC source corpus document count is outside the approved bound")

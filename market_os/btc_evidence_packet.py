@@ -39,12 +39,13 @@ class EvidencePacketError(ValueError):
 
 @dataclass(frozen=True)
 class SourceTimeBounds:
-    """Event-time range and correlation group for one source document."""
+    """Event, availability, publication-status, and correlation lineage for one source."""
 
     event_start_ms: int
     event_end_ms: int
     dependency_group_id: str
     available_at_ms: int | None = None
+    publication_time_status: str = "recorded"
 
     def __post_init__(self) -> None:
         for name in ("event_start_ms", "event_end_ms"):
@@ -57,6 +58,8 @@ class SourceTimeBounds:
             isinstance(self.available_at_ms, bool) or not isinstance(self.available_at_ms, int)
         ):
             raise ValueError("available_at_ms must be an integer UTC millisecond timestamp")
+        if self.publication_time_status not in {"recorded", "unknown-not-captured"}:
+            raise ValueError("publication_time_status must be recorded or unknown-not-captured")
         if not self.dependency_group_id.strip():
             raise ValueError("dependency_group_id is required")
 
@@ -198,6 +201,10 @@ def build_b31_evidence_packet(
             raise EvidencePacketError(f"MiniRAG passage source reference disagrees with its document: {passage.citation_ref}")
         if source_time.event_end_ms > close_ms:
             raise EvidencePacketError(f"future event-time evidence is prohibited: {passage.citation_ref}")
+        if source_time.publication_time_status != "recorded":
+            raise EvidencePacketError(
+                f"source publication time is unknown under strict recorded availability: {passage.citation_ref}"
+            )
         published_ms = _timestamp_ms(document.published_at, "document published_at")
         if published_ms > close_ms:
             raise EvidencePacketError(f"evidence published after the observation close is prohibited: {passage.citation_ref}")
