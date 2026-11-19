@@ -179,7 +179,7 @@ Market OS stays paper-only and owns every risk and execution decision.
 
 ## References
 
-- [ADR-0023: MiniRAG scope for the BTC evidence path](decisions/ADR-0023-minirag-btc-evidence-scope.md)
+- [ADR-0056: MiniRAG scope for the BTC evidence path](decisions/ADR-0056-minirag-btc-evidence-scope.md)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
 - [B3.1 offline evaluation protocol](B3.1-OFFLINE-EVALUATION-PROTOCOL.md)
 - [B2 feature and target implementation](../market_os/btc_features.py)
