@@ -823,6 +823,8 @@ The design is grounded in:
   [btc_connectivity.py](market_os/btc_connectivity.py);
 - [TypeSafe/Jev research note](docs/research/typesafe-jev-u3-b3.md), the local
   record of first-party facts used by B3;
+- [TypeSafe Jev local-runtime review](docs/research/typesafe-jev-local-runtime-2026-11-20.md),
+  which records the current public local-deployment and licensing findings;
 - [B1.1 readiness report](docs/U3-B1-HISTORICAL-READINESS-REPORT.md) and
   [B1.1 ADR](docs/decisions/ADR-0021-btc-historical-readiness-gate.md);
 - [U3/API connectivity report](docs/U3-API-CONNECTIVITY-REPORT.md) and
@@ -833,7 +835,12 @@ The TypeSafe claims here are intentionally narrow: the repository records Jev
 as a typed System One model; B3 uses a versioned Choice shape with probabilities
 and confidence; identity, fingerprints, timestamps, failures, abstentions,
 usage, and cost status are recorded; and B3 uses deterministic fixtures only.
-Current provider behavior, pricing, limits, and availability require a fresh
+The public TypeSafe materials checked on 2026-11-20 document Jev through the
+hosted API and do not publish local weights or a self-hosted runtime; the
+enterprise page raises VPC/on-premises deployment but gives no public answer.
+That is a public-documentation finding, not proof that no private offer exists.
+See the local-runtime research note for the source and licensing review.
+Provider behavior, pricing, limits, and availability still require a fresh
 review before any future integration. This design and B3 make no TypeSafe
 request.
 

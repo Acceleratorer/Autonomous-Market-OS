@@ -72,7 +72,14 @@ and [System One API reference](https://docs.typesafe.ai/api/system-one) continue
 to describe Jev through an authenticated hosted endpoint. The public material
 reviewed here does not provide TypeSafe Jev weights or a self-hosted runtime;
 this does not rule out a private option that TypeSafe has not publicly
-documented.
+documented. The current [model reference](https://docs.typesafe.ai/models) says
+the same weights serve every account and describes domain customization through
+request state and questions. The enterprise page lists a VPC/on-premises FAQ
+question but publishes no answer. The dated source, terms, and inference record
+is in [the local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
+TypeSafe also publishes an official [System One adapter](https://github.com/typesafe-ai/system-one-adapter-python)
+for generic LLM APIs; it can preserve the typed client shape with a local
+endpoint, but that endpoint's model remains a substitute, not Jev.
 
 An independent project,
 [`amithgc/local-jev`](https://github.com/amithgc/local-jev/tree/64a0b31ff343dca32142496cf9edca5a0174a18d),
