@@ -1,16 +1,56 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-**Checkpoint base:** `main` at `f03a194` after PR #45 merged; the bounded
-prospective-capture proposal is drafted in PR #46. This work is document-only
-and no new data has been captured.
-U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 now requires strict recorded
-availability for the BTC evidence path. The post-guard MiniRAG retrieval is
-recorded, but there is still no provider Jev assessment or B2-to-assessment
-comparison.
-The proposal keeps the existing strict packet gate and limits the proposed
-Binance stream to timestamp/provenance diagnostics: the feed does not provide
-the publication time required by the current packet contract, so it cannot
-feed a Jev packet. No new market-data request is authorized by the proposal.
+## Current continuation update — 2026-11-19
+
+The current owner decision is recorded in
+[ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md):
+Jev stays at connectivity-only for this BTC work; BTC B3.1 packet content and
+assessment stay local with the separately identified Qwen assessor. The
+reauthorized synthetic U3 probe passed its response contract but assessed no
+BTC packet. Do not send packet text, citations, or assessment context to Jev.
+
+The local Qwen runtime has only been exercised on synthetic packets. Those
+smokes validate local inference and audit plumbing, not BTC prediction,
+calibration, or market fusion. The B2 temporal-dependence audit found that the
+empirical and conditional baselines classified every holdout row as
+non-positive; their accuracy equals the holdout majority rate. This short
+holdout does not establish stable edge or regime coverage. See the updated
+[BTC MiniRAG/Jev path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md) and
+[B2 baseline report](B2-BTC-FEATURES-BASELINES-REPORT.md).
+
+The packet-availability rule is resolved in ADR-0057: a contemporaneous local
+receipt with a defensible UTC error bound establishes availability while source
+publication remains unknown. The packet must compare the conservative receipt
+upper bound with B2 decision eligibility and preserve the unknown publication
+field. The B1 archive remains ineligible because its receipt occurred after the
+historical B2 decisions and it has no defensible clock error bound. Updating
+the code does not authorize the prospective market-data capture; it still
+needs separate date-bound approval.
+
+The implementation now serializes the complete eligible B2 feature row,
+including `status` and `decision_eligible`, and records MiniRAG completion plus
+document receipt separately. A shared pre-inference validator recomputes the
+B2 fingerprint, candle continuity, event-time bound, publication or bounded
+receipt availability, retrieval fingerprints, and source lineage; it rejects
+self-consistent packets that merely assert `provenance.complete` or
+`quality.valid`. `CONTRIBUTING.md` documents the narrow write-once local BTC
+assessment store and replay exception to read-only CLI inspection.
+
+Keep packet assessment local: qualify an eligible packet, assess it with Qwen,
+retain exact packet and B2 observation lineage, and freeze a matched offline
+comparison before inspecting holdout results. No Jev packet egress, provider
+assessment, market fusion, shadow run, or trading path follows from the
+connectivity approval.
+
+**Checkpoint base:** `main` at `c317278` after PR #46 merged. This branch adds
+the local Qwen evidence assessor and clarifies the BTC availability gate; no
+new market-data capture has been run.
+U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
+publication time while allowing a contemporaneous local receipt with a
+defensible UTC error bound to establish future availability. The retrospective
+B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
+packets are assessed locally with Qwen. The prospective Binance stream remains
+an unapproved timestamp/provenance pilot; the proposal authorizes no request.
 
 ## Where the project stands
 
@@ -55,9 +95,11 @@ feed a Jev packet. No new market-data request is authorized by the proposal.
   `becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa` under
   `.market_os/btc-evidence-corpus/`. It preserves original publication time as
   unknown and retains local receipt availability. Its loader verified and
-  hydrated all 43,200 records using local availability only as a fail-closed
-  eligibility bound for the legacy `published_at` field; source publication
-  remains explicitly unknown, and strict packet construction rejects it. The
+  hydrated all 43,200 records using local availability only as a compatibility
+  value for the legacy `published_at` field; source publication remains
+  explicitly unknown. Under the clarified gate, unknown publication requires
+  a contemporaneous receipt and UTC error bound; the B1 archive has no bound
+  and its receipt followed the historical B2 decisions. The
   isolated research runtime uses Python 3.12.0
   and MiniRAG commit `e204d239421f45004852953679927fdf6733f236`; it is outside
   the Market OS base dependencies and U6.4 embedded runtime. Three same-input
@@ -177,14 +219,14 @@ offline packaging work and does not reopen connected or live execution.
 3. Follow the accepted strict recorded-availability rule in
    [ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md).
    Original Binance publication time remains unknown; do not infer it from
-   candle event time or local archive receipt.
+   candle event time or local archive receipt. A separately recorded local
+   receipt with a defensible UTC error bound may establish availability.
 4. Review [the prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
-   Strict recorded availability is selected; the existing packet gate stays
-   unchanged and this stream is diagnostics-only. Before any new market-data
-   request, establish that the configured time source can provide a defensible
-   UTC error bound throughout the run, recheck terms and regional eligibility,
-   and obtain separate date-bound approval. Do not reopen an event-time proxy
-   for B1.
+   This stream remains diagnostics-only and is not authorized. Before any new
+   market-data request, establish that the configured time source can provide
+   a defensible UTC error bound throughout the run, recheck terms and regional
+   eligibility, and obtain separate date-bound approval. Do not reopen an
+   event-time proxy for B1.
 5. Treat the post-guard retrieval as a functional check only. It does not prove
    zero egress. No Jev API or other provider call is allowed without separate
    authorization.

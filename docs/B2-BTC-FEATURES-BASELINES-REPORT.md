@@ -168,3 +168,50 @@ matched numerical controls, additional periods, recorded assessments, and
 separate authorization for any Jev provider access. See
 [`BTC-MINIRAG-JEV-EVIDENCE-PATH.md`](BTC-MINIRAG-JEV-EVIDENCE-PATH.md) and its
 linked retrieval evidence.
+
+## Holdout dependence diagnostic (2026-11-19)
+
+A read-only audit of `btc-b2-dde76de3b2965ac6f66a` found 8,633 unique,
+minute-contiguous test observations from 2026-11-12 00:03 UTC through
+2026-11-17 23:55 UTC. The target labels contain 4,015 positive, 4,614
+negative, and 4 flat outcomes; flat is non-positive under the frozen target.
+All three arms use the same test timestamps.
+
+The reported 53.49% accuracy for the empirical and conditional baselines is
+the test majority-class rate: the empirical probability is 0.48917 on every
+row, and the conditional probabilities range from 0.48602 to 0.49672. Both
+therefore predict non-positive for every row. The 0.5 baseline predicts
+positive for every row and scores 46.51%. These are opposite constant-side
+classifiers, so the accuracy difference does not demonstrate row-level
+discrimination. The empirical raw Brier improvement over 0.5 is 0.000639;
+the one-bin calibrated Brier is worse than the raw empirical score.
+
+The positive-label autocorrelation is 0.5799 at one minute, 0.4001 at two,
+0.2452 at three, 0.1124 at four, and -0.0167 at five minutes. This is
+consistent with adjacent five-minute forward targets sharing most of their
+price path. The positive-label share ranges from 44.44% to 48.75% across the
+six UTC dates, which is descriptive coverage of one short test window, not
+regime stability.
+
+An exploratory paired circular moving-block bootstrap kept the train-fitted
+empirical probability fixed and compared it with the 0.5 baseline. It used
+10,000 resamples per block length, a fixed seed derived from the audit date
+and block length, and block lengths of 5, 10, 30, and 60 minutes. The 95%
+percentile intervals for empirical-minus-0.5 Brier difference remained below
+zero and the accuracy differences remained above zero at all four lengths:
+
+| Block length | Test positive-rate interval | Accuracy difference interval | Brier difference interval |
+|---:|---:|---:|---:|
+| 5 min | 44.82%–48.25% | +3.51 to +10.37 pp | -0.001005 to -0.000263 |
+| 10 min | 44.69%–48.37% | +3.26 to +10.62 pp | -0.001033 to -0.000235 |
+| 30 min | 44.71%–48.30% | +3.39 to +10.58 pp | -0.001028 to -0.000250 |
+| 60 min | 44.69%–48.34% | +3.32 to +10.62 pp | -0.001033 to -0.000243 |
+
+These intervals describe resampling variation within this single six-day
+holdout. They do not establish performance across other periods, regimes, or
+execution costs, and the bootstrap procedure is exploratory rather than a
+preregistered acceptance rule. The B3.1 protocol still needs owner-frozen
+uncertainty and regime rules plus additional approved periods before any
+stability or predictive-edge claim. No new market-data or Jev request was
+made. Machine-readable calculations are in
+[`btc-b2-temporal-dependence-audit-2026-11-19.json`](evidence/btc-b2-temporal-dependence-audit-2026-11-19.json).

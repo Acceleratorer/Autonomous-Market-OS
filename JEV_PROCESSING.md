@@ -5,20 +5,35 @@
 question contract and normalizer in `market_os/btc_question_evaluation.py`
 (with compatibility import `market_os/btc_b31.py`) now have a BTC-specific
 offline seam: a local source corpus, optional MiniRAG adapter, B3.1 packet
-builder, and recorded-assessment alignment helper. The corpus has been built
-and MiniRAG retrieval has completed three repeatability runs. The strict
-historical packet-time gate rejects the retrospective citations, so no matched
-B2/assessment study has run. This work does not authorize a Jev provider
-request, credential use, additional data acquisition, promotion, or execution
-path.
+builder, recorded-assessment alignment helper, and a separate local Qwen
+assessor for offline operation. The local Qwen runtime is not Jev and does not
+emit Jev-calibrated confidence. The corpus has been built and MiniRAG retrieval
+has completed three repeatability runs. The strict historical packet-time
+gate rejects the retrospective citations, so no matched B2/assessment study
+has run. This local work itself authorizes no provider request or credential
+use. Separately, the owner explicitly reauthorized one synthetic TypeSafe/Jev
+connectivity request on 2026-11-19; it passed the U3 response contract but was
+not a BTC B3.1 assessment. No promotion or execution path is authorized.
 
-The owner selected strict recorded availability under
-[ADR-0057](docs/decisions/ADR-0057-btc-strict-recorded-availability.md).
-Event-time proxy was not selected for the current B1 revision.
-The earlier U3 TypeSafe/Jev connectivity probe was a single synthetic
-descriptive request that failed response validation; it was not a B3.1 packet
-assessment and was not retried. See
-[`U3-API-CONNECTIVITY-REPORT.md`](docs/U3-API-CONNECTIVITY-REPORT.md).
+The current BTC operating choice is recorded in
+[ADR-0058](docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md):
+Jev is connectivity-only, and BTC B3.1 packet assessment stays local with
+Qwen. Local Qwen is not Jev and its one-hot output is uncalibrated. The strict
+historical availability gate currently leaves no eligible real BTC packet.
+
+The owner selected strict point-in-time availability under
+[ADR-0057](docs/decisions/ADR-0057-btc-strict-recorded-availability.md): use
+recorded publication time when available, or a contemporaneous local receipt
+plus a defensible UTC error bound when publication remains unknown. This does
+not make local receipt a publication timestamp. The
+retrospective B1 citations remain ineligible because they arrived after the
+B2 decisions and their capture has no defensible clock error bound. Event-time
+proxy was not selected for the current B1 revision.
+The first U3 TypeSafe/Jev connectivity request was synthetic and failed
+response validation. A later, separately approved synthetic U3 request on
+2026-11-19 passed validation; neither request was a B3.1 packet assessment.
+See the [U3 connectivity report](docs/U3-API-CONNECTIVITY-REPORT.md) and the
+[successful probe evidence](docs/evidence/jev-connectivity-reauthorized-2026-11-19.json).
 
 The BTC-specific implementation and retrieval evidence are summarized in the
 [MiniRAG/Jev evidence path](docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md), with its
@@ -43,6 +58,14 @@ Jev is an **evidence evaluator**, not the primary market forecaster. It must
 not be forced to produce ordinary free-form reasoning, replace arithmetic, or
 own a trading decision. It is also not a proof system: a typed answer can be
 well-formed while its claim is wrong, so evaluation must preserve that distinction.
+
+The actual Jev model is currently accessed through TypeSafe's hosted API. The
+repository's one approved U3 request failed response validation and was not
+retried. The new fully local BTC assessor uses pinned Qwen weights and llama.cpp
+to exercise the same B3.1 semantic question contract, but is explicitly a
+separate model. Its hard labels are uncalibrated and ineligible for fusion or
+paper decisions. A local B3.1 contract implementation must never be described
+as Jev or as Jev's calibrated output.
 
 Deterministic technical-analysis, mathematical,
 statistical, numerical-model, and code-validation engines first produce
@@ -842,9 +865,11 @@ request, acquisition, integrated research study, or promotion.
   BTC-specific local corpus, MiniRAG adapter, packet builder, and alignment
   helper are offline scaffolding. MiniRAG retrieval completed three stable
   repeats, but strict recorded-availability timing rejects the historical
-  packet; matched market evaluation remains unrun. No Jev or TypeSafe request,
-  credential, provider activation, or context egress is authorized. Provider
-  budget, version, retention, redaction, and latency require separate approval.
+  packet; matched market evaluation remains unrun. One separately authorized
+  synthetic connectivity request passed on 2026-11-19 and did not assess a BTC
+  packet. Under ADR-0058, Jev stays connectivity-only and packet assessment
+  stays local with Qwen; no packet context is sent to TypeSafe. Further Jev
+  calls and any successor study require separate approval.
 - B3.1 scope is BTCUSDT Spot-only: no short inventory, margin, leverage,
   futures, perpetuals, funding, or x50/x100 assumptions. Derivative work needs
   a new contract, ledger, risk gate, and human decision.
@@ -885,12 +910,14 @@ versions and do not authorize a network request.
 B3.1 remains a frozen offline protocol decision, not an approved integrated
 study or active evaluation. The BTC-specific offline path now includes a local
 corpus, MiniRAG adapter, packet builder, and recorded-assessment alignment
-helper. Retrieval completed three stable repeats, but the strict timestamp
-gate rejects the historical packet and matched evaluation remains unrun. The
-B1 archive was acquired under its own date-bound approval; B3.1 does not grant
-general data acquisition. A separately approved successor study may propose
-the N0 and J1 arms; C2 and C2-control would additionally require separate
-approval for timestamped context and its egress. Such a study must
+helper, and a separate local Qwen assessor. Retrieval completed three stable
+repeats, but the strict timestamp gate rejects the historical packet and
+matched evaluation remains unrun. Jev remains connectivity-only under
+ADR-0058. The B1 archive was acquired under its own date-bound approval; B3.1
+does not grant general data acquisition. Any future hosted Jev packet arm
+would supersede ADR-0058 and require a new owner decision; the current packet
+path uses local Qwen. C2 and C2-control would additionally require separate
+approval for timestamped context and its egress. Any successor study must
 preserve B3's purge/embargo and lineage rules and fit calibration and fusion
 only on permitted ranges. It requires a sufficient approved dataset and a
 separately approved plan. A 90-day prospective shadow period is only a future

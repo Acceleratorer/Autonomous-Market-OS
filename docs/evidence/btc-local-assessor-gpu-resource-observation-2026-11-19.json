@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.btc-local-assessor-gpu-resource-observation.v1",
+  "recorded_at": "2026-11-19T12:50:56.765Z",
+  "scope": "one synthetic B3.1 Qwen inference with Windows GPU memory sampling",
+  "synthetic_only": true,
+  "market_observations": 0,
+  "jev_requests": 0,
+  "market_data_requests": 0,
+  "runtime": {
+    "target": "windows-x64-cuda-13.5",
+    "version": "llama.cpp-b12478",
+    "provider_identity": "local_qwen_evidence_assessor",
+    "model": "Qwen/Qwen3-4B-GGUF",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU"
+  },
+  "assessment": {
+    "run_id": "9bc2bd08d9936705c63082e588896616",
+    "packet_fingerprint": "f3f6106be3d0275a25f88c3eb68b90e688b8ed71158228c0e2f2a4df3c7430ee",
+    "request_fingerprint": "7c0764a9f84aa940a2021e0a68eb63ca0ae5f4691026151bd9cba2532452ba47",
+    "response_fingerprint": "20ebd41ec786b5e5408cf9dd1b9a2e6beb16e8968487f495c4cda60cf2002079",
+    "outcome": "abstained",
+    "latency_ms": 4213,
+    "decision_authority": "advisory_only",
+    "eligible_for_market_fusion": false,
+    "eligible_for_paper_decision": false,
+    "calibration_status": "uncalibrated_hard_labels_one_hot_serialization"
+  },
+  "gpu_memory_observation": {
+    "source": "nvidia-smi aggregate GPU memory.used",
+    "requested_sample_interval_ms": 100,
+    "sample_count": 94,
+    "gpu_total_memory_mib": 8151,
+    "baseline_used_mib": 1300,
+    "maximum_sampled_used_mib": 5033,
+    "maximum_sampled_delta_mib": 3733,
+    "per_process_memory_available": false
+  },
+  "replay": {
+    "status": "verified",
+    "verification": "offline-packet-gates-and-response-normalization",
+    "inference_calls": 0,
+    "network_requests": 0,
+    "bundle_fingerprint": "168233c1a413c70990f5dbe1257c52e734c0ed9fd1bbc00254a49ca14261454c"
+  },
+  "limitations": [
+    "GPU memory is an aggregate system reading and can include unrelated applications; Windows WDDM did not report per-process usage.",
+    "This is one synthetic observation, not a hard GPU memory limit or a benchmark across supported targets.",
+    "The assessor is Qwen, not TypeSafe Jev; labels are uncalibrated and are not BTC return probabilities or trading signals."
+  ],
+  "local_run_record": ".market_os/btc-local-assessments/runs/9bc2bd08d9936705c63082e588896616.json"
+}

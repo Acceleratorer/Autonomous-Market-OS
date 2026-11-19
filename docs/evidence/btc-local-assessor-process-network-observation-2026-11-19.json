@@ -1,0 +1,57 @@
+{
+  "schema": "market-os.btc-local-assessor-process-network-observation.v1",
+  "recorded_at": "2026-11-19T12:44:40.916Z",
+  "scope": "one synthetic B3.1 local inference under unprivileged Windows TCP connection observation",
+  "synthetic_only": true,
+  "market_observations": 0,
+  "jev_requests": 0,
+  "market_data_requests": 0,
+  "runtime": {
+    "target": "windows-x64-cuda-13.5",
+    "version": "llama.cpp-b12478",
+    "provider_identity": "local_qwen_evidence_assessor",
+    "model": "Qwen/Qwen3-4B-GGUF",
+    "local_bind_host": "127.0.0.1"
+  },
+  "assessment": {
+    "run_id": "19fd9a8ddd3edb6b41dfefacfd5d85d5",
+    "packet_fingerprint": "4d89a75188a5c715a2e7478dd042a2eaf3aefdcfb1f0c5a3639891ec34a51752",
+    "request_fingerprint": "1ce620bfd0621d62079d684fb3fa8c5a8e598aafcbff272ea43c1362df8d9468",
+    "response_fingerprint": "32cede1ca82496e0dcbd8feb9cf0175e0940e74485485bbfa7b2697e01f774b1",
+    "outcome": "abstained",
+    "latency_ms": 4149,
+    "decision_authority": "advisory_only",
+    "eligible_for_market_fusion": false,
+    "eligible_for_paper_decision": false,
+    "calibration_status": "uncalibrated_hard_labels_one_hot_serialization"
+  },
+  "process_observation": {
+    "method": "Get-NetTCPConnection sampled by process ID for the CLI process tree",
+    "sample_count": 5,
+    "requested_poll_interval_ms": 100,
+    "external_tcp_endpoint_observed": false,
+    "observed_endpoints": [
+      "0.0.0.0:61680 (Bound; no peer assigned)",
+      "127.0.0.1:61680 -> 127.0.0.1:62521 (Established)",
+      "127.0.0.1:62521 -> 127.0.0.1:61680 (Established)",
+      "127.0.0.1:62521 (Listen)"
+    ],
+    "max_sampled_single_process_working_set_mib": 2867.6,
+    "pktmon_capture": "unavailable: access denied without Administrator privileges"
+  },
+  "replay": {
+    "status": "verified",
+    "verification": "offline-packet-gates-and-response-normalization",
+    "inference_calls": 0,
+    "network_requests": 0,
+    "bundle_fingerprint": "ae053d3f07c8034e3dd015a085816a5f8a59c153557f9b4c1e27fe5bdf201320"
+  },
+  "limitations": [
+    "The observation saw only active TCP connections at sampled instants; it is not a full packet capture or proof that no short-lived or failed connection attempt occurred.",
+    "Only five snapshots were obtained and actual polling cadence was not measured; host process working set does not measure or cap GPU VRAM.",
+    "UDP and other network activity are not covered by this observation.",
+    "No operating-system network isolation or firewall egress block was enabled.",
+    "The assessor is Qwen, not TypeSafe Jev; its labels are uncalibrated and are not BTC return probabilities or trading signals."
+  ],
+  "local_run_record": ".market_os/btc-local-assessments/runs/19fd9a8ddd3edb6b41dfefacfd5d85d5.json"
+}

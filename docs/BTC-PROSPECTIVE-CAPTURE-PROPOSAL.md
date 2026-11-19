@@ -2,8 +2,9 @@
 
 **Status:** Proposal for owner review only. It authorizes no network request,
 data capture, Jev call, credential use, or trading.
-**Packet gate:** The owner selected strict recorded availability on 2026-11-19;
-the current packet contract stays unchanged.
+**Packet gate:** Under the 2026-11-19 clarification to ADR-0057, a
+contemporaneous local receipt with a defensible UTC error bound can establish
+availability while source publication remains unknown.
 **Scope:** BTCUSDT Spot, Binance public market data, BTC-only MiniRAG evidence
 flow.
 **Prepared:** 2026-11-19
@@ -107,21 +108,26 @@ them is not independent corroboration.
 
 The owner selected strict recorded availability under
 [ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md). The current
-BTC packet builder rejects `publication_time_status="unknown-not-captured"`
-even when a separate local availability timestamp exists. Binance's documented
-kline payload does not provide the original publication timestamp. Therefore,
-this stream remains ineligible for a B3.1 packet under the selected rule,
-regardless of whether local receipt preceded a B2 decision. This proposal is
-limited to capture-integrity and timestamp/provenance diagnostics; it cannot
-feed a Jev packet or support a B2-to-Jev comparison.
+owner clarification permits a contemporaneously recorded local receipt time
+with a defensible UTC error bound to establish availability while source
+publication remains unknown. Keep the two fields distinct. For a future packet,
+use the conservative receipt bound (`received_at_utc + clock_error_bound_ms`)
+and require the source event to end by the observation close and that receipt
+bound to be no later than B2 decision eligibility. Binance's documented kline
+payload still does not provide its original publication timestamp.
 
-Any later proposal to admit evidence with unknown publication time requires a
-new owner decision and a contract change across `DocumentRecord`, retrieval
-documents/passages/citations, packet serialization and validation, and their
-tests. Those contracts must preserve publication as unknown separately from
-local availability, keep event time separate, and apply the bounded-clock
-eligibility rule above. No such change or gate relaxation is included or
-authorized here.
+The retrospective B1 archive remains ineligible: its local receipt occurred
+after the historical B2 decisions and no defensible clock error bound was
+captured. This proposal remains an unapproved capture-integrity pilot; it does
+not authorize a new connection, B2 run, packet assessment, provider call, or
+market-performance claim. If a later capture is separately approved, eligible
+packets use local Qwen under ADR-0058; packet content is not sent to hosted Jev.
+
+Any later change that uses event time as publication, omits the receipt-time
+error bound, or admits evidence received after B2 decision eligibility requires
+a new owner decision. The current rule preserves unknown publication,
+contemporaneous local availability, source event time, and the bounded-clock
+eligibility check as separate fields.
 
 ## Use, limits, and later work
 
@@ -148,7 +154,7 @@ authorized here.
 Approval for any later run must identify the exact UTC range and confirm the
 following together:
 
-- the diagnostics-only scope and unchanged strict packet gate;
+- the diagnostics-only scope and strict packet gate clarified by ADR-0057;
 - current source terms and regional eligibility review;
 - the one-stream, one-connection, row, message, byte, storage, and runtime caps;
 - local-only retention and non-commercial paper-research purpose; and

@@ -2275,9 +2275,11 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   fingerprint and decision clock from packet lineage. Alignment rows now retain
   packet readiness, assessment availability, and declared assessment-use time
   against the B2 decision time, without turning Jev labels into market metrics.
-- Next owner decision: retain strict recorded availability and pause this
-  historical Jev comparison, or explicitly approve a separate retrospective
-  event-time proxy that is not point-in-time valid. See
+- Pending at the time of this entry: retain strict recorded availability and
+  pause this historical comparison, or explicitly approve a separate
+  retrospective event-time proxy that is not point-in-time valid. The owner
+  later clarified how contemporaneous receipt establishes availability in the
+  update below; no event-time proxy was approved. See
   `docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md` and
   `docs/evidence/btc-minirag-retrieval-2026-11-19.json`.
 - After PR #41 merged, reran MiniRAG on the same six documents with the new
@@ -2310,3 +2312,54 @@ Inspected the top-level workspace, all 13 child repositories, their READMEs, pac
   `.ua/.trash-*` archive, and `.ua/intermediate/scan-result.json` remains for
   the next incremental graph update. No Jev or market-data provider request
   occurred during this graph refresh.
+
+## 2026-11-19 — Recorded availability owner clarification
+
+The owner clarified that a contemporaneously recorded local receipt with a
+defensible UTC clock error bound establishes source availability while the
+original publication time stays unknown. Preserve the two timestamps
+separately and gate on the conservative receipt upper bound no later than B2
+decision eligibility, with the source event ending by the observation close.
+The historical B1 archive remains ineligible because its receipt followed the
+B2 decisions and no defensible clock error bound was captured. The packet
+builder now carries the publication status, raw receipt, clock bound, and
+conservative availability separately. The prospective capture proposal still
+does not authorize a connection; it requires separate date-bound approval.
+
+## 2026-11-19 — B3.1 local packet eligibility and assessor boundary
+
+- The BTC packet builder now serializes the complete B2 feature row, including
+  eligibility fields, and preserves MiniRAG completion time, document IDs,
+  content fingerprints, and document receipt separately from source
+  publication time.
+- A shared pre-inference validator recomputes packet and B2 fingerprints and
+  checks the six contiguous candle references, timestamp lineage, target and
+  observation identity, MiniRAG retrieval/document lineage, evidence event
+  bounds, and source availability. When publication is unknown, the conservative
+  local receipt (`receipt + non-negative UTC error bound`) must be no later
+  than B2 decision eligibility. Self-asserted `provenance.complete` and
+  `quality.valid` flags do not replace those checks.
+- The local Qwen assessor applies the same gate before prompt construction or
+  inference. Its evidence labels remain uncalibrated advisory output and do not
+  enter market fusion or paper decisions. Jev remains connectivity-only for
+  this BTC slice; no packet egress, new Jev request, or market-data capture was
+  performed.
+- `CONTRIBUTING.md` records the narrow write-once local assessment persistence
+  and replay exception. Retrospective B1 remains ineligible because its local
+  receipt followed the historical B2 decisions and has no defensible clock
+  bound.
+
+## 2026-11-19 — Full Understand Anything graph refresh for B3.1
+
+- Refreshed the graph inventory from the feature working tree: 641 files across
+  18 language IDs and 444 resolved import edges. The candidate contains 2,123
+  nodes, 3,335 edges, eight Vietnamese architecture layers, and a ten-step
+  Vietnamese tour.
+- Every scanned file is represented by a file-level graph node; 642 such nodes
+  are assigned to layers (one Terraform resource node shares a scanned path).
+  Deterministic graph validation found zero issues and 207 no-edge warnings,
+  primarily standalone documents and configuration files. All 444 import-map
+  pairs match the graph.
+- The graph includes the B3.1 eligibility validator, receipt-bound availability
+  contract, local Qwen boundary, and this implementation log. No Jev packet
+  request or market-data request occurred during the refresh.

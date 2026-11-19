@@ -7,7 +7,11 @@ Thanks for helping improve Autonomous-Market-OS.
 Keep changes aligned with the repository boundary:
 
 - synthetic and paper-only by default;
-- read-only HTTP/CLI inspection;
+- read-only HTTP/CLI inspection, with one scoped exception for explicit local
+  BTC B3.1 assessment persistence and replay through
+  `market_os.btc_local_assessor_store`. That write-once JSON store uses a
+  caller-selected local path; it does not add a public mutation route, provider
+  egress, credentials, or trading;
 - Python remains authoritative for accounting, risk, persistence, recovery,
   reservations, replay, audit, backup, and portfolio inspection;
 - no live trading, provider credentials, account/order access, or public

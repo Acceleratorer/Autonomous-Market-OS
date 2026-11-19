@@ -30,7 +30,8 @@ B3.1 packet assessment.
    availability, retrieval, provenance, and observation-lineage checks in the
    packet builder. Prefer already-local source records with contemporaneous
    timestamps; otherwise prepare a prospective capture proposal for separate
-   owner approval.
+   owner approval. Source publication may remain unknown when local availability
+   is independently recorded under the clarification below.
 4. This decision authorizes no additional market-data request, Jev API call,
    credential use, provider egress, promotion, or trading path. Those actions
    require separate explicit approval.
@@ -49,6 +50,23 @@ B3.1 packet assessment.
   only on the same B2 observation ID and feature fingerprint, use recorded
   B3.1 assessments, and preserve the frozen chronological splits.
 
+## Subsequent owner clarification — 2026-11-19
+
+The owner confirms that a contemporaneously recorded local receipt time with a
+defensible, non-negative UTC clock error bound establishes *local availability*
+even while `source_published_at` remains unknown. Keep these timestamps
+separate: do not copy the local receipt into the publication field or infer
+publication from event time. For eligibility, use the conservative latest
+possible receipt (`received_at_utc + clock_error_bound_ms`) and require it to be
+no later than B2 decision eligibility, with the evidence event range ending no
+later than the observation close. Preserve the raw receipt, clock bound, and
+unknown-publication status in packet lineage.
+
+The retrospective B1 archive remains ineligible: its recorded local receipt is
+after the historical B2 decisions and its capture did not retain a defensible
+UTC clock error bound. This clarification does not authorize another market
+data request; a prospective capture still needs separate date-bound approval.
+
 ## References
 
 - [BTC MiniRAG and Jev Evidence Path](../BTC-MINIRAG-JEV-EVIDENCE-PATH.md)
@@ -57,3 +75,4 @@ B3.1 packet assessment.
 - [U3 API connectivity report](../U3-API-CONNECTIVITY-REPORT.md)
 - [U3 API connectivity evidence](../evidence/u3-api-connectivity.json)
 - [ADR-0056: MiniRAG scope for the BTC evidence path](ADR-0056-minirag-btc-evidence-scope.md)
+- [ADR-0058: Jev connectivity-only and local BTC packet assessment](ADR-0058-btc-jev-connectivity-only-local-assessor.md)

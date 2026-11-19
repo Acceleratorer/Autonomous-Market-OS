@@ -25,6 +25,7 @@ from .btc_question_evaluation import (
     B31_VERSION,
     B31EvidencePacketProfile,
     B31NormalizedAssessment,
+    validate_b31_packet_eligibility,
 )
 from .providers import DocumentRecord, RetrievalResult
 
@@ -39,13 +40,19 @@ class EvidencePacketError(ValueError):
 
 @dataclass(frozen=True)
 class SourceTimeBounds:
-    """Event, availability, publication-status, and correlation lineage for one source."""
+    """Event, availability, publication-status, and correlation lineage for one source.
+
+    When publication time is unknown, ``available_at_ms`` is a recorded local
+    receipt and ``clock_error_bound_ms`` is required; packet eligibility uses
+    the conservative receipt upper bound.
+    """
 
     event_start_ms: int
     event_end_ms: int
     dependency_group_id: str
     available_at_ms: int | None = None
     publication_time_status: str = "recorded"
+    clock_error_bound_ms: int | None = None
 
     def __post_init__(self) -> None:
         for name in ("event_start_ms", "event_end_ms"):
@@ -58,6 +65,12 @@ class SourceTimeBounds:
             isinstance(self.available_at_ms, bool) or not isinstance(self.available_at_ms, int)
         ):
             raise ValueError("available_at_ms must be an integer UTC millisecond timestamp")
+        if self.clock_error_bound_ms is not None and (
+            isinstance(self.clock_error_bound_ms, bool)
+            or not isinstance(self.clock_error_bound_ms, int)
+            or self.clock_error_bound_ms < 0
+        ):
+            raise ValueError("clock_error_bound_ms must be a non-negative integer")
         if self.publication_time_status not in {"recorded", "unknown-not-captured"}:
             raise ValueError("publication_time_status must be recorded or unknown-not-captured")
         if not self.dependency_group_id.strip():
@@ -155,10 +168,13 @@ def build_b31_evidence_packet(
 ) -> dict[str, Any]:
     """Create a canonical B3.1 packet for one point-in-time BTC feature row.
 
-    ``source_time_bounds`` supplies each retrieved document's event-time span
-    and correlation group. A source may support a packet only if its event
-    range ends by the B2 observation close and it was available by packet
-    readiness. Independent groups must be named explicitly by the caller.
+    ``source_time_bounds`` supplies each retrieved document's event-time span,
+    availability, and correlation group. A source may support a packet only if
+    its event range ends by the B2 observation close and its conservative
+    availability bound is no later than B2 decision eligibility and MiniRAG
+    retrieval. Unknown publication time requires a contemporaneous receipt
+    and a non-negative UTC error bound. Independent groups must be named
+    explicitly by the caller.
     """
     dataset_revision, close_ms, feature_decision_ms = _validate_feature(feature)
     if not isinstance(hypothesis_claim, str) or not hypothesis_claim.strip():
@@ -201,16 +217,27 @@ def build_b31_evidence_packet(
             raise EvidencePacketError(f"MiniRAG passage source reference disagrees with its document: {passage.citation_ref}")
         if source_time.event_end_ms > close_ms:
             raise EvidencePacketError(f"future event-time evidence is prohibited: {passage.citation_ref}")
-        if source_time.publication_time_status != "recorded":
+        published_ms: int | None = None
+        if source_time.publication_time_status == "recorded":
+            published_ms = _timestamp_ms(document.published_at, "document published_at")
+        elif source_time.available_at_ms is None or source_time.clock_error_bound_ms is None:
             raise EvidencePacketError(
-                f"source publication time is unknown under strict recorded availability: {passage.citation_ref}"
+                f"unknown publication time requires a recorded local receipt and UTC clock error bound: {passage.citation_ref}"
             )
-        published_ms = _timestamp_ms(document.published_at, "document published_at")
-        if published_ms > close_ms:
+        if published_ms is not None and published_ms > close_ms:
             raise EvidencePacketError(f"evidence published after the observation close is prohibited: {passage.citation_ref}")
         document_available_ms = _timestamp_ms(document.retrieved_at, "document retrieved_at")
-        source_available_ms = source_time.available_at_ms if source_time.available_at_ms is not None else 0
-        available_ms = max(published_ms, document_available_ms, source_available_ms)
+        if source_time.publication_time_status == "unknown-not-captured" and document_available_ms != source_time.available_at_ms:
+            raise EvidencePacketError(
+                f"document receipt and source availability timestamps disagree: {passage.citation_ref}"
+            )
+        clock_error_ms = source_time.clock_error_bound_ms or 0
+        source_available_ms = source_time.available_at_ms or 0
+        available_ms = max(
+            published_ms or 0,
+            document_available_ms + clock_error_ms,
+            source_available_ms + clock_error_ms,
+        )
         if available_ms > feature_decision_ms:
             raise EvidencePacketError(
                 f"evidence was unavailable at B2 decision eligibility: {passage.citation_ref}"
@@ -228,7 +255,11 @@ def build_b31_evidence_packet(
             "text": passage.text,
             "content_hash": passage.content_hash,
             "document_content_hash": document.content_hash,
-            "published_at": document.published_at,
+            "published_at": document.published_at if published_ms is not None else None,
+            "publication_time_status": source_time.publication_time_status,
+            "received_at_ms": source_time.available_at_ms,
+            "document_received_at_ms": document_available_ms,
+            "clock_error_bound_ms": source_time.clock_error_bound_ms,
             "available_at_ms": available_ms,
             "event_start_ms": source_time.event_start_ms,
             "event_end_ms": source_time.event_end_ms,
@@ -236,7 +267,9 @@ def build_b31_evidence_packet(
             "retrieval": {
                 "provider": retrieval.provider,
                 "provider_version": retrieval.provider_version,
+                "completed_at_ms": retrieval_ms,
                 "query_fingerprint": retrieval.query_fingerprint,
+                "document_ids": list(retrieval.document_ids),
                 "rank": passage.rank,
                 "content_fingerprints": list(retrieval.content_fingerprints),
             },
@@ -258,16 +291,7 @@ def build_b31_evidence_packet(
         "target_definition_id": target_definition_id,
         "claim": hypothesis_claim,
     })[:24]
-    feature_input = {
-        "feature_version": B2_FEATURE_VERSION,
-        "dataset_revision": dataset_revision,
-        "close_time_ms": close_ms,
-        "close_time": feature["close_time"],
-        "decision_eligible_at": feature["decision_eligible_at"],
-        "input_fingerprint": feature["input_fingerprint"],
-        "values": dict(feature["values"]),
-        "input_refs": [dict(ref) for ref in feature["input_refs"]],
-    }
+    feature_input = dict(feature)
     source_refs.extend(
         f"binance-vision-candle:{ref['canonical_fingerprint']}"
         for ref in feature["input_refs"]
@@ -323,6 +347,7 @@ def build_b31_evidence_packet(
             "retrieval_provider": retrieval.provider,
             "retrieval_provider_version": retrieval.provider_version,
             "retrieval_query_fingerprint": retrieval.query_fingerprint,
+            "retrieval_completed_at_ms": retrieval_ms,
         },
     }
     if packet_ready_at_ms is None:
@@ -340,6 +365,7 @@ def build_b31_evidence_packet(
     core["timestamps"]["declared_assessment_use_time_ms"] = ready_at_ms
     packet = {**core, "packet_fingerprint": _sha(core)}
     try:
+        validate_b31_packet_eligibility(packet)
         B31EvidencePacketProfile.from_dict(packet)
     except (TypeError, ValueError) as exc:
         raise EvidencePacketError(f"generated B3.1 packet failed its contract: {exc}") from exc
@@ -423,7 +449,7 @@ def align_recorded_b31_assessments_to_b2(
         if not isinstance(observation_id, str) or not observation_id.strip():
             raise EvidencePacketError("B3.1 packet is missing observation_id")
         try:
-            packet_fingerprint(packet)
+            validate_b31_packet_eligibility(packet)
         except (TypeError, ValueError) as exc:
             raise EvidencePacketError(f"B3.1 packet fingerprint is invalid: {exc}") from exc
         try:
