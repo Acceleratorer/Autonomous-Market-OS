@@ -27,7 +27,7 @@ TypeSafe's [Master Customer Agreement](https://typesafe.ai/legal/mca) defines th
 
 ## What needs direct confirmation
 
-The [enterprise page](https://typesafe.ai/enterprise) invites discussion of data requirements and lists “Can we run Jev in our own VPC or on-premises?”, but its public page does not provide an answer or deployment details. Ask TypeSafe in writing whether it offers a customer-VPC, on-premises, or air-gapped Jev deployment; what exact Jev version, weights, runtime, and integrity identifiers it supplies; and what the agreement permits for local inference, copying/backups, modification, and redistribution. Confirm that the deployment is the same Jev version and retains its identity, rather than a compatible or Jev-style substitute.
+The [enterprise page](https://typesafe.ai/enterprise) invites discussion of data requirements and lists “Can we run Jev in our own VPC or on-premises?”, but its public page does not provide an answer or deployment details. The official [Help Center](https://help.typesafe.ai/articles/8737694518-who-should-i-reach-out-to-with-support-requests) routes enterprise plans, procurement, and contracts to `sales@typesafe.ai`. No inquiry has been sent. Ask TypeSafe in writing whether it offers a customer-VPC, on-premises, or air-gapped Jev deployment; what exact Jev version, weights, runtime, and integrity identifiers it supplies; and what the agreement permits for local inference, copying/backups, modification, and redistribution. Confirm that the deployment is the same Jev version and retains its identity, rather than a compatible or Jev-style substitute.
 
 ## Project boundary
 
