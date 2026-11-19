@@ -1,13 +1,16 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-**Checkpoint base:** `main` at `f03a194` after PR #45 merged; proposal work is
-document-only and no new data has been captured.
+**Checkpoint base:** `main` at `f03a194` after PR #45 merged; the bounded
+prospective-capture proposal is drafted in PR #46. This work is document-only
+and no new data has been captured.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 now requires strict recorded
 availability for the BTC evidence path. The post-guard MiniRAG retrieval is
 recorded, but there is still no provider Jev assessment or B2-to-assessment
 comparison.
-The current next artifact is a bounded prospective-capture proposal; no new
-market-data request is authorized by it.
+The proposal keeps the existing strict packet gate and limits the proposed
+Binance stream to timestamp/provenance diagnostics: the feed does not provide
+the publication time required by the current packet contract, so it cannot
+feed a Jev packet. No new market-data request is authorized by the proposal.
 
 ## Where the project stands
 
@@ -176,10 +179,12 @@ offline packaging work and does not reopen connected or live execution.
    Original Binance publication time remains unknown; do not infer it from
    candle event time or local archive receipt.
 4. Review [the prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
-   It is a one-day pilot proposal only. Resolve its timestamp-gate prerequisite,
-   recheck terms and regional eligibility, and obtain separate date-bound
-   approval before any new market-data request; do not reopen an event-time
-   proxy for B1.
+   Strict recorded availability is selected; the existing packet gate stays
+   unchanged and this stream is diagnostics-only. Before any new market-data
+   request, establish that the configured time source can provide a defensible
+   UTC error bound throughout the run, recheck terms and regional eligibility,
+   and obtain separate date-bound approval. Do not reopen an event-time proxy
+   for B1.
 5. Treat the post-guard retrieval as a functional check only. It does not prove
    zero egress. No Jev API or other provider call is allowed without separate
    authorization.

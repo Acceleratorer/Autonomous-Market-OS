@@ -2,6 +2,8 @@
 
 **Status:** Proposal for owner review only. It authorizes no network request,
 data capture, Jev call, credential use, or trading.
+**Packet gate:** The owner selected strict recorded availability on 2026-11-19;
+the current packet contract stays unchanged.
 **Scope:** BTCUSDT Spot, Binance public market data, BTC-only MiniRAG evidence
 flow.
 **Prepared:** 2026-11-19
@@ -27,10 +29,11 @@ assessment run. It does not change the project-wide LightRAG decision.
 | Source class | Public market-data WebSocket stream; no API key or account stream |
 | Stream | `btcusdt@kline_1m`, UTC intervals |
 | Endpoint | `wss://data-stream.binance.vision:443/ws/btcusdt@kline_1m`; no host fallback |
-| Proposed UTC range | `[2026-11-23T00:00:00Z, 2026-11-23T23:50:00Z)` |
+| Candle-open range | `[2026-11-23T00:00:00Z, 2026-11-23T23:50:00Z)` (1,430 one-minute bars) |
+| Final-candle receive grace | Through `2026-11-23T23:50:30Z` |
 | Maximum finalized records | 1,430 closed candles |
 | Connection attempts | 1 total; no reconnect or retry |
-| Runtime cap | 85,800 seconds (23 hours 50 minutes) |
+| Runtime cap | 85,830 seconds (23 hours 50 minutes 30 seconds) |
 | Market-data messages | At most 50,000 event messages, 1 KiB each |
 | Aggregate market-data payload | At most 32 MiB received |
 | Local capture artifacts | At most 2 MiB total |
@@ -43,6 +46,11 @@ approval is not in place before the proposed start, replace the date range and
 obtain approval for the new dates before connecting. Stop at the first exceeded
 cap, malformed event, unexpected source behavior, disconnection, or storage
 failure; retain a partial-run manifest and do not reconnect or backfill.
+
+The candle-open range and receive window are distinct. Keep the connection open
+through the 30-second post-close grace so the candle opened at 23:49 UTC can be
+delivered and validated after it closes at 23:50 UTC. Do not accept candles
+opened at or after 23:50 UTC; do not exceed the 1,430-record cap.
 
 The stream is a better fit than replaying another archive because the client
 can record when it actually received each finalized event. Binance documents a
@@ -72,13 +80,22 @@ For every saved event, preserve the original JSON payload and record:
 | `payload_sha256` | Hash of the exact preserved event payload |
 | `source_published_at` | `null`; the feed does not provide a publication timestamp in the documented kline payload |
 | `publication_time_status` | `unknown-not-captured` |
-| `clock_status` | Operating-system clock-sync state sampled at start and stop; do not infer clock accuracy if unavailable |
+| `clock_error_bound_ms` | Quantified upper bound on total UTC timestamp error at this receipt, including time-source and timestamp-sampling uncertainty; `null` if no defensible bound is available |
+| `clock_status` | Time-source identity/state, bound observations, and clock-step or sync-loss events recorded against the monotonic clock throughout capture; start/stop snapshots alone are insufficient |
 
 The locally observed `received_at_utc` is a recorded availability timestamp;
 it must never be copied into `source_published_at`. Binance's `E`, `t`, and
 `T` fields remain source event/candle times. This capture establishes local
-receipt only. Whether a future packet may use a source whose publication time
-is unknown depends on the packet-gate choice below.
+receipt only. Before treating receipt as time evidence, the configured time
+source must expose a quantified UTC-error bound that remains valid throughout
+the capture, with observations tied to the monotonic clock. If that bound is
+missing, stale, exceeded, or interrupted by a clock step or sync loss, mark
+all records in the indeterminate interval's bound unknown and withhold packet
+eligibility. A future availability comparison must use the conservative
+latest possible receipt time (`received_at_utc` plus the applicable error
+bound); it must be no later than B2 decision eligibility. A source that
+cannot establish this bound may produce timestamp diagnostics only. This
+proposal does not authorize a new time-service endpoint or request.
 
 Store only `k.x=true` finalized events. Do not use in-progress candle updates
 for a decision, fill missing minutes, or substitute a historical archive row.
@@ -86,27 +103,25 @@ Mark missing or duplicate candle intervals in the manifest. Treat all Binance
 candles in this capture as one source-dependency group; MiniRAG retrieval of
 them is not independent corroboration.
 
-## Packet-gate prerequisite
+## Selected packet gate
 
-The current BTC packet builder rejects
-`publication_time_status="unknown-not-captured"`, even when a separate local
-availability timestamp exists. Therefore, this capture would **not** make a
-B3.1 packet eligible under the current implementation by itself.
+The owner selected strict recorded availability under
+[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md). The current
+BTC packet builder rejects `publication_time_status="unknown-not-captured"`
+even when a separate local availability timestamp exists. Binance's documented
+kline payload does not provide the original publication timestamp. Therefore,
+this stream remains ineligible for a B3.1 packet under the selected rule,
+regardless of whether local receipt preceded a B2 decision. This proposal is
+limited to capture-integrity and timestamp/provenance diagnostics; it cannot
+feed a Jev packet or support a B2-to-Jev comparison.
 
-Before any capture request, resolve this contract question explicitly:
-
-1. Keep the current packet gate unchanged. In that case, the proposed capture
-   is limited to timestamp/provenance diagnostics and cannot feed a Jev packet;
-   or
-2. Review and approve a packet-contract change that allows a source with
-   unknown publication time only when its separately recorded local
-   availability is no later than the decision eligibility time. The change
-   must preserve publication as unknown, keep event time separate, and add
-   validation/evidence before the capture is run.
-
-Option 2 does not claim or infer the original publication time. No code change
-or gate relaxation is included in this proposal. The owner must choose one
-option before any new data request.
+Any later proposal to admit evidence with unknown publication time requires a
+new owner decision and a contract change across `DocumentRecord`, retrieval
+documents/passages/citations, packet serialization and validation, and their
+tests. Those contracts must preserve publication as unknown separately from
+local availability, keep event time separate, and apply the bounded-clock
+eligibility rule above. No such change or gate relaxation is included or
+authorized here.
 
 ## Use, limits, and later work
 
@@ -133,7 +148,7 @@ option before any new data request.
 Approval for any later run must identify the exact UTC range and confirm the
 following together:
 
-- the timestamp-gate choice above;
+- the diagnostics-only scope and unchanged strict packet gate;
 - current source terms and regional eligibility review;
 - the one-stream, one-connection, row, message, byte, storage, and runtime caps;
 - local-only retention and non-commercial paper-research purpose; and
