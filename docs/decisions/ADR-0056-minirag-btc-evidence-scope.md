@@ -1,4 +1,4 @@
-# ADR-0023: MiniRAG Scope for the BTC Evidence Path
+# ADR-0056: MiniRAG Scope for the BTC Evidence Path
 
 - **Status:** Accepted
 - **Date:** 2026-11-18
