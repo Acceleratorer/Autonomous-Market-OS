@@ -202,8 +202,20 @@ with a 2,048 MiB free-memory margin; this is not a hard VRAM quota. The host
 does not grant the privilege required for a working-set cap. The local smoke
 completed and replayed offline, but health remains `degraded` because OS-level
 egress isolation is still unverified. The Linux runtime has no cgroup
-supervisor and has not been resource-verified. See
-[`btc-local-assessor-resource-guard-2026-11-20.json`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
+supervisor and has not been resource-verified. The U5.5 systemd unit files
+configure loopback-only IP access, but that disabled deployment package has
+not been verified on a target host and the standalone assessor CLI does not
+run inside those units. Its policy therefore does not isolate this launch
+path. See the
+[`OS isolation readiness note`](research/btc-local-assessor-os-isolation-2026-11-20.md)
+and [`resource-guard evidence`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
+Windows now has a read-only ActiveStore verifier and an opt-in, executable-
+scoped firewall installer. Neither has changed host policy; health remains
+degraded until the exact target runtime rules are configured and a bounded
+non-loopback denial probe succeeds while loopback inference still works.
+The latest local health evidence records loopback HTTP 200, Windows Job Object
+resource limits enforced, and egress rules absent in ActiveStore
+([`OS-isolation evidence`](evidence/btc-local-assessor-os-isolation-2026-11-20.json)).
 
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is
@@ -381,6 +393,7 @@ Market OS stays paper-only and owns every risk and execution decision.
 - [ADR-0057: Strict recorded availability for BTC evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
 - [ADR-0058: Jev connectivity-only and local BTC packet assessment](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md)
 - [BTC prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md)
+- [BTC local assessor OS-isolation readiness](research/btc-local-assessor-os-isolation-2026-11-20.md)
 - [U3 API connectivity evidence](evidence/u3-api-connectivity.json)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
 - [B3.1 offline evaluation protocol](B3.1-OFFLINE-EVALUATION-PROTOCOL.md)

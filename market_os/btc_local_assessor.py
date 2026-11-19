@@ -17,6 +17,7 @@ from pathlib import Path
 import secrets
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -275,6 +276,93 @@ def _sha256_file(path: Path) -> str:
         while block := stream.read(1024 * 1024):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _windows_powershell_path() -> Path | None:
+    if os.name != "nt" or not hasattr(ctypes, "WinDLL"):
+        return None
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    get_system_directory = kernel32.GetSystemDirectoryW
+    get_system_directory.argtypes = [ctypes.c_wchar_p, ctypes.c_uint]
+    get_system_directory.restype = ctypes.c_uint
+    buffer = ctypes.create_unicode_buffer(32768)
+    length = get_system_directory(buffer, len(buffer))
+    if not length or length >= len(buffer):
+        return None
+    return Path(buffer.value) / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+
+
+def _verify_windows_egress_rules(server_path: Path) -> dict[str, Any]:
+    """Read the effective firewall policy for this Python and inference image."""
+    powershell = _windows_powershell_path()
+    script = Path(__file__).with_name("btc_assessor_firewall.ps1")
+    unverified = {
+        "status": "unverified",
+        "supervisor": "Windows Defender Firewall (ActiveStore)",
+        "reason": "the effective per-process egress policy could not be verified",
+    }
+    if powershell is None or not powershell.is_file():
+        return {**unverified, "reason": "Windows PowerShell was not found under the Windows system directory"}
+    if not script.is_file():
+        return {**unverified, "reason": "the packaged Windows firewall verifier is missing"}
+    system_root = powershell.parents[3]
+    system_directory = powershell.parents[2]
+    env = {
+        "SystemRoot": str(system_root),
+        "WINDIR": str(system_root),
+        "PATH": str(system_directory),
+        "PSModulePath": str(powershell.parent / "Modules"),
+        "MARKET_OS_PYTHON_EXECUTABLE": sys.executable,
+        "MARKET_OS_SERVER_EXECUTABLE": str(server_path),
+    }
+    for key in ("TEMP", "TMP"):
+        if key in os.environ:
+            env[key] = os.environ[key]
+    try:
+        # The command and flags are fixed, shell parsing is disabled, and path values are passed only as data in this fresh environment.
+        result = subprocess.run(  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit,python.lang.security.audit.dangerous-subprocess-use-tainted-env-args
+            [
+                str(powershell), "-NoLogo", "-NoProfile", "-NonInteractive",
+                "-ExecutionPolicy", "Bypass", "-File", str(script), "-Mode", "Verify",
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=8,
+            check=False,
+            shell=False,
+            env=env,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {**unverified, "reason": f"Windows PowerShell verification failed: {type(exc).__name__}"}
+    try:
+        payload = json.loads(result.stdout)
+    except (UnicodeError, json.JSONDecodeError):
+        detail = result.stderr.strip()[:240]
+        reason = f"Windows PowerShell returned no valid verifier JSON{': ' + detail if detail else ''}"
+        return {**unverified, "reason": reason}
+    if not isinstance(payload, dict):
+        return unverified
+    checked = payload.get("checked_executables")
+    expected = {
+        "python": os.path.normcase(os.path.abspath(sys.executable)),
+        "llama_server": os.path.normcase(os.path.abspath(server_path)),
+    }
+    observed = {
+        key: os.path.normcase(os.path.abspath(value))
+        for key, value in checked.items()
+        if key in expected and isinstance(value, str)
+    } if isinstance(checked, dict) else {}
+    if result.returncode != 0 or payload.get("schema") != "market-os.btc-assessor-firewall.v1" or payload.get("status") != "enforced" or observed != expected:
+        return {**unverified, "reason": str(payload.get("reason") or unverified["reason"])}
+    return {
+        "status": "enforced",
+        "supervisor": "Windows Defender Firewall (ActiveStore)",
+        "checked_executables": ["python", "llama-server"],
+        "verification": "effective_block_rules_and_enabled_profiles",
+    }
 
 
 def _now_ms() -> int:
@@ -573,8 +661,22 @@ class LocalLlamaRuntime:
         finally:
             connection.close()
 
-    def start(self) -> None:
+    def require_network_isolation(self) -> dict[str, Any]:
+        if os.name == "nt":
+            isolation = _verify_windows_egress_rules(self.server_path)
+        else:
+            isolation = {
+                "status": "unverified",
+                "reason": "the Linux CLI is not running inside a verified systemd network and cgroup boundary",
+            }
+        if isolation.get("status") != "enforced":
+            raise LocalAssessorError("network_isolation_unverified", str(isolation.get("reason") or "runtime egress isolation is unverified"))
+        return isolation
+
+    def start(self, *, require_network_isolation: bool = True) -> None:
         with self._lock:
+            if require_network_isolation:
+                self.require_network_isolation()
             if self._process is not None:
                 if self._process.poll() is None:
                     return
@@ -730,11 +832,15 @@ class LocalLlamaRuntime:
                 "supervisor": None,
                 "reason": "Linux cgroup resource limits are not configured by this runtime",
             }
-        network_isolation = {
-            "status": "unverified",
-            "supervisor": None,
-            "reason": "the runtime uses loopback IPC but does not install or verify an operating-system egress block",
-        }
+        network_isolation = (
+            _verify_windows_egress_rules(self.server_path)
+            if os.name == "nt"
+            else {
+                "status": "unverified",
+                "supervisor": None,
+                "reason": "the Linux CLI is not running inside a verified systemd network and cgroup boundary",
+            }
+        )
         if not process_running:
             return {
                 "provider": self.provider,
@@ -1080,7 +1186,7 @@ def local_runtime_health(installation_root: str | Path) -> dict[str, Any]:
     """Start, inspect, and stop the local model runtime without a model call."""
     runtime = LocalLlamaRuntime(installation_root)
     try:
-        runtime.start()
+        runtime.start(require_network_isolation=False)
         return runtime.health()
     finally:
         runtime.stop()
