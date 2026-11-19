@@ -65,6 +65,57 @@ or distributing the assessor. The 2026-11-19 request was isolated synthetic
 connectivity evidence; it assessed no BTC packet and its result was not used as
 local-model training or evaluation data.
 
+### Independent local System One-compatible runtime candidate — 2026-11-20
+
+The official TypeSafe [Quick Start](https://docs.typesafe.ai/introduction/quickstart)
+and [System One API reference](https://docs.typesafe.ai/api/system-one) continue
+to describe Jev through an authenticated hosted endpoint. The public material
+reviewed here does not provide TypeSafe Jev weights or a self-hosted runtime;
+this does not rule out a private option that TypeSafe has not publicly
+documented.
+
+An independent project,
+[`amithgc/local-jev`](https://github.com/amithgc/local-jev/tree/64a0b31ff343dca32142496cf9edca5a0174a18d),
+implements the public System One request/response shape with open models. Its
+README describes it as unaffiliated with TypeSafe and containing no TypeSafe
+code. **It is a compatible implementation, not Jev.** Keep its reported model
+identity and calibration separate from Jev. The reviewed source is pinned to
+[`64a0b31`](https://github.com/amithgc/local-jev/commit/64a0b31ff343dca32142496cf9edca5a0174a18d);
+the code is MIT-licensed and each model has its own license. Upstream calls it
+a research project rather than a finished product and reports its own JevBench
+scores. Those scores are not independently reproduced here and say nothing
+about BTC evidence-assessment quality or calibration.
+
+The source review found these gaps before it could be treated as a production
+runtime:
+
+- `pyproject.toml` uses broad dependency ranges and leaves several dependencies
+  without version pins.
+- Hugging Face `from_pretrained` calls do not require local-only loading, so a
+  model cache miss can attempt a download during model loading. An offline
+  deployment would need separately staged and hash-verified files plus runtime
+  egress denial.
+- The engine has a model-count limit and a memory-budget eviction policy, but
+  permits one model to load even when it exceeds the configured budget. That
+  is not a hard resource cap.
+- The API key is optional. The CLI defaults to loopback, but `/healthz` reports
+  only process/version/default-model state and does not establish loaded-model
+  readiness.
+
+This candidate has not been installed or adopted. The current BTC owner choice
+in [ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md)
+still selects the separately identified local Qwen assessor. The candidate
+review does not change the packet path or authorize Jev, Binance, or model-host
+network requests. The synthetic TypeSafe connectivity response remains
+excluded from model training, tuning, and quality evaluation, consistent with
+[TypeSafe's Master Customer Agreement §2.3](https://typesafe.ai/legal/mca).
+
+Reviewed sources: [`local-jev` README](https://github.com/amithgc/local-jev/blob/64a0b31ff343dca32142496cf9edca5a0174a18d/README.md),
+[`pyproject.toml`](https://github.com/amithgc/local-jev/blob/64a0b31ff343dca32142496cf9edca5a0174a18d/pyproject.toml),
+[`engine.py`](https://github.com/amithgc/local-jev/blob/64a0b31ff343dca32142496cf9edca5a0174a18d/src/local_jev/engine.py),
+[`llm.py`](https://github.com/amithgc/local-jev/blob/64a0b31ff343dca32142496cf9edca5a0174a18d/src/local_jev/backends/llm.py),
+and [`api.py`](https://github.com/amithgc/local-jev/blob/64a0b31ff343dca32142496cf9edca5a0174a18d/src/local_jev/api.py).
+
 The local runtime is separately identified as Qwen, using the pinned
 [Qwen3-4B model](https://huggingface.co/Qwen/Qwen3-4B) under its published
 Apache-2.0 license and llama.cpp under the runtime lock's MIT license. It is
