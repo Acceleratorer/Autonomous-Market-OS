@@ -1,0 +1,95 @@
+{
+  "schema": "market-os.btc-local-assessor-resource-guard-evidence.v1",
+  "recorded_on": "2026-11-20",
+  "scope": "one synthetic B3.1 Qwen inference with Windows process resource limits and offline replay",
+  "synthetic_only": true,
+  "market_observations": 0,
+  "jev_requests": 0,
+  "market_data_requests": 0,
+  "host": {
+    "os": "Windows 11 Home Single Language",
+    "build": "10.0.26200",
+    "python": "3.12.0",
+    "administrator": false,
+    "firewall_profiles": {
+      "Domain": "enabled; outbound action not configured",
+      "Private": "enabled; outbound action not configured",
+      "Public": "enabled; outbound action not configured"
+    }
+  },
+  "runtime": {
+    "provider_identity": "local_qwen_evidence_assessor",
+    "model": "Qwen/Qwen3-4B-GGUF",
+    "model_revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "runtime": "llama.cpp-b12478",
+    "target": "windows-x64-cuda-13.5",
+    "resource_limits": {
+      "supervisor": "Windows Job Object",
+      "assignment": "child created suspended, assigned to job, then resumed",
+      "process_commit_limit_bytes": 6442450944,
+      "job_commit_limit_bytes": 6442450944,
+      "cpu_hard_cap_percent": 25,
+      "kill_on_job_close": true,
+      "working_set_limit": false,
+      "cuda_fit": "enabled",
+      "cuda_fit_free_memory_margin_mib": 2048,
+      "cuda_vram_hard_cap": false
+    },
+    "health": {
+      "llama_server_http_status": 200,
+      "resource_limits": "enforced",
+      "network_isolation": "unverified",
+      "overall_status": "degraded"
+    },
+    "install_repair": {
+      "old_manifest_lock_fingerprint": "96330e67a75dacadc01e0912e305d840fd38ca13f53c67375fc585efd95922ed",
+      "current_lock_fingerprint": "b8bdc9c2812d3403ed05f7fb96f9a5e0ed883771758250bf6d1c3814c4f4ffff",
+      "verified_artifacts": [
+        "pinned model file",
+        "pinned llama.cpp runtime archive",
+        "pinned CUDA runtime archive",
+        "installed llama-server executable"
+      ],
+      "network_downloads": 0
+    }
+  },
+  "assessment": {
+    "run_id": "0d6520c40bd388a5b3eb779b19310d48",
+    "packet_fingerprint": "5cb74eb74ede40e083de432063337e3fe3d0538ed8b3aa9aaee31cb833c4c2ca",
+    "request_fingerprint": "f41262505fab456037998daee6592d17bd13cee235ce72f02ba444fc5fa7f469",
+    "response_fingerprint": "f4a283fe5ac71b3c187e98f7d91fb60e241aed6067c348832826e22c1709ff69",
+    "runtime_manifest_fingerprint": "c13ea0dff9a5fa25b4fa01501a23ab79cda5e59a69f19463bef95b3ea85dc284",
+    "outcome": "abstained",
+    "latency_ms": 4981,
+    "calibration_status": "uncalibrated_hard_labels_one_hot_serialization",
+    "decision_authority": "advisory_only",
+    "eligible_for_market_fusion": false,
+    "eligible_for_paper_decision": false
+  },
+  "replay": {
+    "status": "verified",
+    "verification": "offline-packet-gates-and-response-normalization",
+    "inference_calls": 0,
+    "network_requests": 0,
+    "bundle_fingerprint": "78580b3cf85f1f012eb5fd38a26a511c5348a430f563a6b59f53e66dd8b75719"
+  },
+  "focused_tests": {
+    "command": "py -3.12 -m pytest -q market_os/tests/test_btc_local_assessor.py",
+    "result": "9 passed",
+    "windows_job_test": "A suspended child received a 128 MiB process/job memory limit and failed a 512 MiB allocation before exiting non-zero; the test then verified clean process shutdown."
+  },
+  "repository_tests": {
+    "command": "py -3.12 -m pytest -q",
+    "result": "692 passed, 7 skipped in 123.41s"
+  },
+  "limitations": [
+    "The assessment packet is synthetic and makes no market-level, predictive, Jev, calibration, or trading claim.",
+    "The local assessor is Qwen, not TypeSafe Jev; output remains uncalibrated and barred from fusion and paper decisions.",
+    "Windows Job Objects enforce CPU and committed-memory limits; a working-set cap was not enabled because this unprivileged account lacks the privilege Windows requires for that setting.",
+    "llama.cpp fit-target leaves an adaptive GPU-memory margin; it is not a hard VRAM quota, and WDDM per-process VRAM attribution remains unavailable.",
+    "No OS-level egress block or packet trace was available. Offline environment variables and loopback-only IPC do not prove zero network egress; runtime health correctly remains degraded.",
+    "The Linux runtime target has no cgroup supervisor in this implementation and is not resource-bounded or runtime-verified."
+  ],
+  "local_run_record": ".market_os/btc-local-assessor-verification/runs/runs/0d6520c40bd388a5b3eb779b19310d48.json"
+}

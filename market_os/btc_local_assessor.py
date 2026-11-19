@@ -7,6 +7,7 @@ risk, or execution authority.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import ctypes
 import hashlib
 import http.client
 import json
@@ -47,6 +48,9 @@ MAX_EVIDENCE_CHARACTERS = 18_000
 MAX_RESPONSE_BYTES = 1024 * 1024
 MAX_CONTEXT_TOKENS = 8192
 MAX_OUTPUT_TOKENS = 2048
+MAX_RUNTIME_MEMORY_BYTES = 6 * 1024**3
+MAX_RUNTIME_CPU_PERCENT = 25
+CUDA_FREE_MEMORY_MARGIN_MIB = 2048
 
 
 class LocalAssessorError(RuntimeError):
@@ -66,6 +70,165 @@ class CompletionRuntime(Protocol):
     manifest_fingerprint: str
 
     def complete(self, messages: list[dict[str, str]], schema: dict[str, Any], *, timeout_seconds: float) -> tuple[dict[str, Any], int]: ...
+
+
+class _WindowsResourceJob:
+    """Apply hard per-runtime CPU and memory limits before resuming llama-server."""
+
+    def __init__(
+        self,
+        process: subprocess.Popen[bytes],
+        *,
+        memory_limit_bytes: int = MAX_RUNTIME_MEMORY_BYTES,
+        cpu_rate_percent: int = MAX_RUNTIME_CPU_PERCENT,
+    ) -> None:
+        if os.name != "nt" or ctypes.sizeof(ctypes.c_void_p) != 8:
+            raise OSError("Windows x64 job limits are unavailable")
+        if memory_limit_bytes < 64 * 1024**2 or not 1 <= cpu_rate_percent <= 100:
+            raise ValueError("Windows job resource limits are outside supported bounds")
+        from ctypes import wintypes
+
+        class BasicLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("PerProcessUserTimeLimit", ctypes.c_longlong),
+                ("PerJobUserTimeLimit", ctypes.c_longlong),
+                ("LimitFlags", wintypes.DWORD),
+                ("MinimumWorkingSetSize", ctypes.c_size_t),
+                ("MaximumWorkingSetSize", ctypes.c_size_t),
+                ("ActiveProcessLimit", wintypes.DWORD),
+                ("Affinity", ctypes.c_size_t),
+                ("PriorityClass", wintypes.DWORD),
+                ("SchedulingClass", wintypes.DWORD),
+            ]
+
+        class IoCounters(ctypes.Structure):
+            _fields_ = [
+                ("ReadOperationCount", ctypes.c_ulonglong),
+                ("WriteOperationCount", ctypes.c_ulonglong),
+                ("OtherOperationCount", ctypes.c_ulonglong),
+                ("ReadTransferCount", ctypes.c_ulonglong),
+                ("WriteTransferCount", ctypes.c_ulonglong),
+                ("OtherTransferCount", ctypes.c_ulonglong),
+            ]
+
+        class ExtendedLimitInformation(ctypes.Structure):
+            _fields_ = [
+                ("BasicLimitInformation", BasicLimitInformation),
+                ("IoInfo", IoCounters),
+                ("ProcessMemoryLimit", ctypes.c_size_t),
+                ("JobMemoryLimit", ctypes.c_size_t),
+                ("PeakProcessMemoryUsed", ctypes.c_size_t),
+                ("PeakJobMemoryUsed", ctypes.c_size_t),
+            ]
+
+        class CpuRateControlInformation(ctypes.Structure):
+            _fields_ = [("ControlFlags", wintypes.DWORD), ("CpuRate", wintypes.DWORD)]
+
+        class ThreadEntry32(ctypes.Structure):
+            _fields_ = [
+                ("dwSize", wintypes.DWORD),
+                ("cntUsage", wintypes.DWORD),
+                ("th32ThreadID", wintypes.DWORD),
+                ("th32OwnerProcessID", wintypes.DWORD),
+                ("tpBasePri", wintypes.LONG),
+                ("tpDeltaPri", wintypes.LONG),
+                ("dwFlags", wintypes.DWORD),
+            ]
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.CreateJobObjectW.argtypes = [wintypes.LPVOID, wintypes.LPCWSTR]
+        kernel32.CreateJobObjectW.restype = wintypes.HANDLE
+        kernel32.SetInformationJobObject.argtypes = [wintypes.HANDLE, wintypes.INT, wintypes.LPVOID, wintypes.DWORD]
+        kernel32.SetInformationJobObject.restype = wintypes.BOOL
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
+        kernel32.AssignProcessToJobObject.restype = wintypes.BOOL
+        kernel32.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]
+        kernel32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
+        kernel32.Thread32First.argtypes = [wintypes.HANDLE, ctypes.POINTER(ThreadEntry32)]
+        kernel32.Thread32First.restype = wintypes.BOOL
+        kernel32.Thread32Next.argtypes = [wintypes.HANDLE, ctypes.POINTER(ThreadEntry32)]
+        kernel32.Thread32Next.restype = wintypes.BOOL
+        kernel32.OpenThread.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.OpenThread.restype = wintypes.HANDLE
+        kernel32.ResumeThread.argtypes = [wintypes.HANDLE]
+        kernel32.ResumeThread.restype = wintypes.DWORD
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+
+        self._kernel32 = kernel32
+        self._handle = kernel32.CreateJobObjectW(None, None)
+        if not self._handle:
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            limits = ExtendedLimitInformation()
+            # PROCESS_MEMORY | JOB_MEMORY | KILL_ON_JOB_CLOSE.
+            limits.BasicLimitInformation.LimitFlags = 0x00000100 | 0x00000200 | 0x00002000
+            limits.ProcessMemoryLimit = memory_limit_bytes
+            limits.JobMemoryLimit = memory_limit_bytes
+            # Information class 9 is JobObjectExtendedLimitInformation.
+            if not kernel32.SetInformationJobObject(self._handle, 9, ctypes.byref(limits), ctypes.sizeof(limits)):
+                raise ctypes.WinError(ctypes.get_last_error())
+
+            # ENABLE | HARD_CAP; CpuRate is expressed as percent * 100.
+            cpu = CpuRateControlInformation(ControlFlags=0x1 | 0x4, CpuRate=cpu_rate_percent * 100)
+            # Information class 15 is JobObjectCpuRateControlInformation.
+            if not kernel32.SetInformationJobObject(self._handle, 15, ctypes.byref(cpu), ctypes.sizeof(cpu)):
+                raise ctypes.WinError(ctypes.get_last_error())
+
+            process_handle = kernel32.OpenProcess(0x0100 | 0x0001, False, process.pid)
+            if not process_handle:
+                raise ctypes.WinError(ctypes.get_last_error())
+            try:
+                if not kernel32.AssignProcessToJobObject(self._handle, process_handle):
+                    raise ctypes.WinError(ctypes.get_last_error())
+            finally:
+                kernel32.CloseHandle(process_handle)
+            self._resume_suspended_process(process.pid, ThreadEntry32)
+        except BaseException:
+            self.close()
+            raise
+
+    def _resume_suspended_process(self, process_id: int, thread_entry_type: type[ctypes.Structure]) -> None:
+        from ctypes import wintypes
+
+        invalid_handle = ctypes.c_void_p(-1).value
+        snapshot = self._kernel32.CreateToolhelp32Snapshot(0x00000004, 0)
+        if not snapshot or snapshot == invalid_handle:
+            raise ctypes.WinError(ctypes.get_last_error())
+        try:
+            entry = thread_entry_type()
+            entry.dwSize = ctypes.sizeof(entry)
+            thread_ids: list[int] = []
+            if self._kernel32.Thread32First(snapshot, ctypes.byref(entry)):
+                while True:
+                    if entry.th32OwnerProcessID == process_id:
+                        thread_ids.append(int(entry.th32ThreadID))
+                    entry.dwSize = ctypes.sizeof(entry)
+                    if not self._kernel32.Thread32Next(snapshot, ctypes.byref(entry)):
+                        error = ctypes.get_last_error()
+                        if error not in (0, 18):  # ERROR_NO_MORE_FILES
+                            raise ctypes.WinError(error)
+                        break
+            if len(thread_ids) != 1:
+                raise OSError("suspended inference process did not have exactly one initial thread")
+            thread = self._kernel32.OpenThread(0x0002, False, thread_ids[0])
+            if not thread:
+                raise ctypes.WinError(ctypes.get_last_error())
+            try:
+                previous_suspend_count = self._kernel32.ResumeThread(thread)
+                if previous_suspend_count != 1:
+                    raise ctypes.WinError(ctypes.get_last_error())
+            finally:
+                self._kernel32.CloseHandle(thread)
+        finally:
+            self._kernel32.CloseHandle(snapshot)
+
+    def close(self) -> None:
+        handle, self._handle = self._handle, None
+        if handle:
+            self._kernel32.CloseHandle(handle)
 
 
 @dataclass(frozen=True)
@@ -332,6 +495,7 @@ class LocalLlamaRuntime:
         self.startup_timeout_seconds = startup_timeout_seconds
         self._lock = threading.RLock()
         self._process: subprocess.Popen[bytes] | None = None
+        self._resource_job: _WindowsResourceJob | None = None
         self._api_key: str | None = None
         self._port: int | None = None
         self._key_file: Path | None = None
@@ -411,8 +575,10 @@ class LocalLlamaRuntime:
 
     def start(self) -> None:
         with self._lock:
-            if self._process is not None and self._process.poll() is None:
-                return
+            if self._process is not None:
+                if self._process.poll() is None:
+                    return
+                self.stop()
             if os.name == "nt" and not self.server_path.name.lower().endswith(".exe"):
                 raise LocalAssessorError("unsupported_runtime_target", "Windows requires the pinned Windows llama-server build")
             if os.name != "nt" and not self.server_path.name == "llama-server":
@@ -447,6 +613,8 @@ class LocalLlamaRuntime:
                 "--no-webui",
                 "--metrics",
             ]
+            if "cuda" in self.target:
+                args.extend(("--fit", "on", "--fit-target", str(CUDA_FREE_MEMORY_MARGIN_MIB)))
             system_root = os.environ.get("SystemRoot", r"C:\Windows") if os.name == "nt" else ""
             system_paths = [str(self.server_path.parent)]
             if os.name == "nt":
@@ -475,7 +643,7 @@ class LocalLlamaRuntime:
                 "close_fds": True,
             }
             if os.name == "nt":
-                options["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                options["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(subprocess, "CREATE_SUSPENDED", 0x00000004)
             else:
                 options["start_new_session"] = True
             try:
@@ -483,6 +651,14 @@ class LocalLlamaRuntime:
             except OSError as exc:
                 self._remove_key_file()
                 raise LocalAssessorError("local_runtime_failed", "could not launch the pinned local inference server") from exc
+            if os.name == "nt":
+                try:
+                    self._resource_job = _WindowsResourceJob(self._process)
+                except BaseException as exc:
+                    self.stop()
+                    if isinstance(exc, OSError):
+                        raise LocalAssessorError("resource_limit", "Windows could not enforce CPU and memory limits before inference startup") from exc
+                    raise
 
             deadline = time.monotonic() + self.startup_timeout_seconds
             while time.monotonic() < deadline:
@@ -535,22 +711,61 @@ class LocalLlamaRuntime:
         return parsed, max(0, received - started)
 
     def health(self) -> dict[str, Any]:
+        resource_limits: dict[str, Any]
+        if os.name == "nt":
+            resource_limits = {
+                "status": "enforced" if self._resource_job is not None else "not_running",
+                "supervisor": "Windows Job Object",
+                "cpu_hard_cap_percent": MAX_RUNTIME_CPU_PERCENT,
+                "process_commit_limit_bytes": MAX_RUNTIME_MEMORY_BYTES,
+                "job_commit_limit_bytes": MAX_RUNTIME_MEMORY_BYTES,
+                "working_set_limit_bytes": None,
+                "cuda_fit_free_memory_margin_mib": CUDA_FREE_MEMORY_MARGIN_MIB if "cuda" in self.target else None,
+                "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap" if "cuda" in self.target else "not_applicable",
+            }
+        else:
+            resource_limits = {
+                "status": "unmanaged",
+                "supervisor": None,
+                "reason": "Linux cgroup resource limits are not configured by this runtime",
+            }
+        network_isolation = {
+            "status": "unverified",
+            "supervisor": None,
+            "reason": "the runtime uses loopback IPC but does not install or verify an operating-system egress block",
+        }
         if self._process is None or self._process.poll() is not None:
-            return {"provider": self.provider, "status": "unavailable", "runtime": self.runtime_version, "model_sha256": _sha256_file(self.model_path)}
+            return {
+                "provider": self.provider,
+                "status": "unavailable",
+                "runtime": self.runtime_version,
+                "model_sha256": _sha256_file(self.model_path),
+                "resource_limits": resource_limits,
+                "network_isolation": network_isolation,
+            }
         try:
             status, body = self._request("GET", "/health", timeout_seconds=2.0)
             return {
                 "provider": self.provider,
-                "status": "healthy" if status == 200 else "degraded",
+                "status": "healthy" if status == 200 and resource_limits["status"] == "enforced" and network_isolation["status"] == "enforced" else "degraded",
                 "runtime": self.runtime_version,
                 "model": self.model_version,
                 "model_sha256": _sha256_file(self.model_path),
                 "bind_host": "127.0.0.1",
                 "response_status": status,
                 "response_fingerprint": _sha256(body),
+                "resource_limits": resource_limits,
+                "network_isolation": network_isolation,
             }
         except LocalAssessorError:
-            return {"provider": self.provider, "status": "degraded", "runtime": self.runtime_version, "bind_host": "127.0.0.1"}
+            return {
+                "provider": self.provider,
+                "status": "degraded",
+                "runtime": self.runtime_version,
+                "bind_host": "127.0.0.1",
+                "resource_limits": resource_limits,
+                "network_isolation": network_isolation,
+            }
 
     def _remove_key_file(self) -> None:
         path, self._key_file = self._key_file, None
@@ -570,6 +785,9 @@ class LocalLlamaRuntime:
                 except subprocess.TimeoutExpired:
                     process.kill()
                     process.wait(timeout=5)
+            job, self._resource_job = self._resource_job, None
+            if job is not None:
+                job.close()
             self._remove_key_file()
             self._api_key = None
             self._port = None
