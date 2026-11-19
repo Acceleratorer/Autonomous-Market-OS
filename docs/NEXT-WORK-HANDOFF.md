@@ -1,11 +1,13 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-**Checkpoint:** 2026-11-19, follow-up branch
-`fix/btc-minirag-offline-network-guard`, based on `main` at
-`ca2959952fbd2af3be7a3af1a01b8b948773f26a` (PR #40 merged). U6.4-F/U7-P,
-B1, and B2 remain closed. The current work rechecks the local BTC artifacts,
-clarifies the intended B3.1 Jev role, and makes the MiniRAG child fail closed
-on socket network entry points. No post-change retrieval or Jev call has run.
+**Checkpoint base:** `main` at `f03a194` after PR #45 merged; proposal work is
+document-only and no new data has been captured.
+U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 now requires strict recorded
+availability for the BTC evidence path. The post-guard MiniRAG retrieval is
+recorded, but there is still no provider Jev assessment or B2-to-assessment
+comparison.
+The current next artifact is a bounded prospective-capture proposal; no new
+market-data request is authorized by it.
 
 ## Where the project stands
 
@@ -81,9 +83,10 @@ on socket network entry points. No post-change retrieval or Jev call has run.
   probabilities or risk/execution inputs.
 - The earlier MiniRAG repeats used deterministic local embedding/extraction,
   but their evidence records that the tokenizer cache HTTP request count was
-  not instrumented. A socket guard has now been added to the child runner;
-  because it has not yet been exercised, the previous repeatability result is
-  not proof of zero network egress.
+  not instrumented. A post-guard retrieval completed with the same four
+  citations. The Python socket guard is not operating-system network isolation
+  and outbound socket attempts were not instrumented, so this does not prove
+  zero network egress.
 - B1 source publication times per candle were not captured. The approved
   archive's local receipt time is 2026-11-18; it does not establish that each
   archived candle was available at its original historical B2 decision.
@@ -94,16 +97,9 @@ on socket network entry points. No post-change retrieval or Jev call has run.
 - U6.4-F now packages a target-native embedded CPython runtime when CI passes
   `--python-runtime`; the U6.4-D preflight and U6.4-E simulation accept and
   validate that runtime. No native service is registered.
-- The full Understand Anything graph was refreshed on 2026-11-19 from the
-  current working tree at HEAD `3584d3e`: 626 files, 2,539 nodes, 4,249 edges,
-  8 Vietnamese layers, and a 10-step guided tour. Review covered 626 file
-  paths and all 437 import-map pairs; validation found zero duplicate IDs,
-  dangling edges, missing required node fields, or other issues. It reports
-  351 no-edge warnings. The graph includes the BTC MiniRAG code, evidence, and
-  report changes. Its metadata records `analyzedWorkingTree: true`; `.ua/` is
-  ignored generated state, and the local `.market_os/` data was excluded by
-  Git ignore. `.ua/intermediate/scan-result.json` is preserved for incremental
-  graph updates.
+- The Understand Anything graph is a local generated artifact under ignored
+  `.ua/`; refresh it after substantive source changes. Local `.market_os/` data
+  remains excluded by Git ignore.
 - The graph includes the U6.4-F contract, accepted ADR-0055, runtime validator,
   portable installer, focused regression tests, and the U7-P reproducibility module, contract, tests, and evidence; `.ua/` remains an ignored generated working artifact.
 - U6.4-F is accepted as signed portable tar.gz for Windows/Linux, per-user
@@ -179,13 +175,14 @@ offline packaging work and does not reopen connected or live execution.
    [ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md).
    Original Binance publication time remains unknown; do not infer it from
    candle event time or local archive receipt.
-4. Prepare the bounded prospective-capture proposal described in the BTC
-   evidence-path document, including date range, source class, timestamp
-   fields, request/runtime caps, and retention. Seek separate approval before
-   any new market-data request; do not reopen an event-time proxy for B1.
-5. Exercise the MiniRAG child socket guard against the already-cached runtime
-   before asserting zero egress. No Jev API or other provider call is allowed
-   without separate authorization.
+4. Review [the prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
+   It is a one-day pilot proposal only. Resolve its timestamp-gate prerequisite,
+   recheck terms and regional eligibility, and obtain separate date-bound
+   approval before any new market-data request; do not reopen an event-time
+   proxy for B1.
+5. Treat the post-guard retrieval as a functional check only. It does not prove
+   zero egress. No Jev API or other provider call is allowed without separate
+   authorization.
 6. Once packet eligibility and response provenance are established, use B3.1
    recorded assessments tied to exact packet fingerprints. Freeze the matched
    comparison before looking at held-out results. Keep Jev's support,
@@ -202,4 +199,5 @@ offline packaging work and does not reopen connected or live execution.
 - [U6.4-D installer preflight](U6.4-D-INSTALLER-PREFLIGHT.md)
 - [U6.4-E offline install simulation](U6.4-E-OFFLINE-INSTALL-SIMULATION.md)
 - [U8-C permanent paper-only decision](U8-C-PERMANENT-PAPER-ONLY.md)
+- [BTC prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md)
 - [Goal prompt for the next implementation chat](GOAL-PROMPT.md)
