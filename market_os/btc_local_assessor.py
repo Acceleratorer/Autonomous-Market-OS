@@ -711,10 +711,11 @@ class LocalLlamaRuntime:
         return parsed, max(0, received - started)
 
     def health(self) -> dict[str, Any]:
+        process_running = self._process is not None and self._process.poll() is None
         resource_limits: dict[str, Any]
         if os.name == "nt":
             resource_limits = {
-                "status": "enforced" if self._resource_job is not None else "not_running",
+                "status": "enforced" if process_running and self._resource_job is not None else "not_running",
                 "supervisor": "Windows Job Object",
                 "cpu_hard_cap_percent": MAX_RUNTIME_CPU_PERCENT,
                 "process_commit_limit_bytes": MAX_RUNTIME_MEMORY_BYTES,
@@ -734,7 +735,7 @@ class LocalLlamaRuntime:
             "supervisor": None,
             "reason": "the runtime uses loopback IPC but does not install or verify an operating-system egress block",
         }
-        if self._process is None or self._process.poll() is not None:
+        if not process_running:
             return {
                 "provider": self.provider,
                 "status": "unavailable",
@@ -745,9 +746,12 @@ class LocalLlamaRuntime:
             }
         try:
             status, body = self._request("GET", "/health", timeout_seconds=2.0)
+            process_running = self._process is not None and self._process.poll() is None
+            if os.name == "nt" and not process_running:
+                resource_limits["status"] = "not_running"
             return {
                 "provider": self.provider,
-                "status": "healthy" if status == 200 and resource_limits["status"] == "enforced" and network_isolation["status"] == "enforced" else "degraded",
+                "status": "healthy" if process_running and status == 200 and resource_limits["status"] == "enforced" and network_isolation["status"] == "enforced" else "degraded",
                 "runtime": self.runtime_version,
                 "model": self.model_version,
                 "model_sha256": _sha256_file(self.model_path),

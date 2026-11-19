@@ -292,7 +292,7 @@ def test_local_assessment_store_rejects_modified_run_bundles(tmp_path) -> None:
         raise AssertionError("modified local assessment run was accepted")
 
 
-@skipUnless(os.name == "nt", "Windows Job Objects are available only on Windows")
+@skipUnless(os.name == "nt" and sys.maxsize > 2**32, "Windows Job Objects require 64-bit Windows")
 def test_windows_resource_job_limits_memory_and_resumes_suspended_process() -> None:
     script = "bytearray(512 * 1024 * 1024)"
     process = subprocess.Popen(
