@@ -4,12 +4,16 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
+import subprocess
+import sys
 import time
 from typing import Any
+from unittest import skipUnless
 
 from market_os.btc_evidence_packet import SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
-from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor
+from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, _WindowsResourceJob
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -286,3 +290,28 @@ def test_local_assessment_store_rejects_modified_run_bundles(tmp_path) -> None:
         assert "fingerprint mismatch" in str(exc)
     else:
         raise AssertionError("modified local assessment run was accepted")
+
+
+@skipUnless(os.name == "nt" and sys.maxsize > 2**32, "Windows Job Objects require 64-bit Windows")
+def test_windows_resource_job_limits_memory_and_resumes_suspended_process() -> None:
+    script = "bytearray(512 * 1024 * 1024)"
+    process = subprocess.Popen(
+        [sys.executable, "-c", script],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        close_fds=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(subprocess, "CREATE_SUSPENDED", 0x00000004),
+    )
+    job = None
+    try:
+        job = _WindowsResourceJob(process, memory_limit_bytes=128 * 1024**2)
+        _, stderr = process.communicate(timeout=10)
+        assert process.returncode != 0
+        assert b"MemoryError" in stderr
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+        if job is not None:
+            job.close()

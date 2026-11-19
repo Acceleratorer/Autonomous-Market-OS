@@ -138,10 +138,14 @@ serialized one-hot and explicitly marked uncalibrated. It does not estimate
 `P(return_5m > 0)` and cannot enter fusion or paper decisions. Market OS B2,
 calibration, stability, and risk remain separate owners.
 
-After the one-time runtime bootstrap, local health, assessment, durable storage,
-and replay use only the installed model/runtime plus loopback IPC. Bootstrap
-downloads the pinned artifacts during setup; inference and replay do not call
-TypeSafe, Binance, Hugging Face, an embedding API, or another remote service.
+After the one-time runtime bootstrap, the inference path loads the installed
+model/runtime and uses loopback IPC. No TypeSafe, Binance, Hugging Face, or
+embedding-provider call is part of the assessment or replay code path. This is
+not an operating-system egress guarantee: the runtime does not install or
+verify an egress block, and offline environment variables do not block socket
+traffic. Health reports network isolation as `unverified` and stays degraded
+until a separate OS boundary is established and verified. Bootstrap itself
+downloads the pinned artifacts during setup.
 Before inference, the local assessor recomputes the B2 feature fingerprint and
 decision clock, checks the six candle references, and validates event time,
 publication or bounded-receipt availability, MiniRAG completion, source
@@ -188,6 +192,18 @@ requested 100 ms interval: observed usage rose from 1,300 MiB to a maximum of
 5,033 MiB on an 8,151 MiB device. Windows WDDM did not provide per-process
 memory attribution, and this sample does not enforce a VRAM cap. See the
 [GPU resource observation](evidence/btc-local-assessor-gpu-resource-observation-2026-11-19.json).
+
+On 2026-11-20, the Windows runtime was updated to create `llama-server`
+suspended, assign it to a Windows Job Object, and resume it only after the hard
+25% CPU-rate and 6 GiB process/job committed-memory limits were accepted by
+Windows. The test also exercised a 128 MiB memory limit against a synthetic
+child allocation. The runtime now enables llama.cpp's adaptive `--fit` target
+with a 2,048 MiB free-memory margin; this is not a hard VRAM quota. The host
+does not grant the privilege required for a working-set cap. The local smoke
+completed and replayed offline, but health remains `degraded` because OS-level
+egress isolation is still unverified. The Linux runtime has no cgroup
+supervisor and has not been resource-verified. See
+[`btc-local-assessor-resource-guard-2026-11-20.json`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
 
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is

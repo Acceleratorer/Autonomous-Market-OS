@@ -1,6 +1,6 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-## Current continuation update — 2026-11-19
+## Current continuation update — 2026-11-20
 
 The current owner decision is recorded in
 [ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md):
@@ -42,9 +42,21 @@ comparison before inspecting holdout results. No Jev packet egress, provider
 assessment, market fusion, shadow run, or trading path follows from the
 connectivity approval.
 
-**Checkpoint base:** `main` at `c317278` after PR #46 merged. This branch adds
-the local Qwen evidence assessor and clarifies the BTC availability gate; no
-new market-data capture has been run.
+The Windows local-assessor child now starts suspended and enters a Windows Job
+Object with hard 25% CPU and 6 GiB committed-memory limits before it runs. The
+CUDA build uses llama.cpp's 2,048 MiB adaptive free-memory target; this does
+not hard-cap VRAM. A synthetic inference and offline replay passed, and the
+runtime smoke evidence is in
+[`btc-local-assessor-resource-guard-2026-11-20.json`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
+The full Python suite passed: 692 passed, 7 skipped.
+Health remains degraded because no OS-level egress block or complete packet
+trace is available. This Windows account is non-admin, and Linux has no
+configured cgroup supervisor. Do not call this zero-egress or production-ready
+until those boundaries are enforced and verified.
+
+**Checkpoint base:** `main` at `e3ee08c` after PR #50 merged. The resource-guard
+implementation and evidence update are in progress; no new market-data capture
+has been run.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
 publication time while allowing a contemporaneous local receipt with a
 defensible UTC error bound to establish future availability. The retrospective
