@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.btc-assessor-python-runtime-evidence.v1",
+  "observed_date_local": "2026-11-20",
+  "clock_note": "Host UTC synchronization is unverified; this date is not a UTC availability timestamp.",
+  "runtime_relative_path": ".market_os/runtimes/btc-assessor-py311",
+  "runtime_manifest": {
+    "schema": "market-os.btc-assessor-python-runtime.v1",
+    "target": "windows-x64",
+    "python_version": "3.11.9",
+    "python_distribution": "python.org embeddable amd64",
+    "python_archive": "python-3.11.9-embed-amd64.zip",
+    "python_archive_url": "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip",
+    "python_archive_sha256": "009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3b",
+    "python_executable": "python.exe",
+    "python_executable_sha256": "5f7b89a612c9b8af1d6456cdfcd1dbe5ca630849e79aebced9bee9a6694952ec",
+    "dependencies": [
+      {
+        "name": "duckdb",
+        "version": "2.0.0",
+        "wheel_sha256": "a387d4907b535a4bd82ba8aede6809d0bf023dfbb21362832f3c9848aea7743c"
+      },
+      {
+        "name": "pyarrow",
+        "version": "26.0.1",
+        "wheel_sha256": "5f681458e4fb81aefef50d3a8a432fe92f8480a87693616f9d95e95ceac8844c"
+      }
+    ],
+    "verification": {
+      "result": "passed",
+      "checks": [
+        "CPython 3.11.9",
+        "duckdb import",
+        "pyarrow import",
+        "market_os.cli import"
+      ],
+      "model_inference": "not run",
+      "network_isolation": "not changed or claimed"
+    },
+    "runtime_tree_sha256_excluding_manifest_and_bytecode": "d9948b54f116c65cbb33fccaa582e1cb8d206f62c6346256bbf84cff739526ce"
+  },
+  "local_assessor_health_smoke": {
+    "result": "degraded",
+    "response_status": 200,
+    "runtime": "llama.cpp-b12478",
+    "resource_limits": {
+      "status": "enforced",
+      "supervisor": "Windows Job Object",
+      "cpu_hard_cap_percent": 25,
+      "process_commit_limit_bytes": 6442450944,
+      "job_commit_limit_bytes": 6442450944,
+      "cuda_fit_free_memory_margin_mib": 2048,
+      "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap"
+    },
+    "network_isolation": {
+      "status": "unverified",
+      "supervisor": "Windows Defender Firewall (ActiveStore)",
+      "reason": "missing_or_mismatched_active_store_rule"
+    },
+    "model_inference": "not run",
+    "packet_assessment": "not run",
+    "firewall_policy_changed": false
+  }
+}
