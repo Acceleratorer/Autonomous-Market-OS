@@ -191,6 +191,23 @@ def build_parser() -> argparse.ArgumentParser:
     connectivity_inspect.add_argument("probe_id")
     connectivity_inspect.add_argument("--resource", choices=("manifest", "result", "fingerprints", "replay"), default="manifest")
     connectivity_inspect.add_argument("--store-root", default=os.environ.get("MARKET_OS_BTC_CONNECTIVITY_STORE_ROOT", ".market_os/btc-connectivity"))
+    local_assessor = btc_commands.add_parser("local-assessor")
+    local_assessor_commands = local_assessor.add_subparsers(dest="local_assessor_command", required=True)
+    local_assessor_health = local_assessor_commands.add_parser("health")
+    local_assessor_health.add_argument("--install-root", required=True)
+    local_assessor_run = local_assessor_commands.add_parser("assess")
+    local_assessor_run.add_argument("--packet", required=True)
+    local_assessor_run.add_argument("--install-root", required=True)
+    local_assessor_run.add_argument(
+        "--store-root",
+        default=os.environ.get("MARKET_OS_BTC_LOCAL_ASSESSOR_STORE_ROOT", ".market_os/btc-local-assessments"),
+    )
+    local_assessor_replay = local_assessor_commands.add_parser("replay")
+    local_assessor_replay.add_argument("run_id")
+    local_assessor_replay.add_argument(
+        "--store-root",
+        default=os.environ.get("MARKET_OS_BTC_LOCAL_ASSESSOR_STORE_ROOT", ".market_os/btc-local-assessments"),
+    )
     b4 = commands.add_parser("b4-paper")
     b4_commands = b4.add_subparsers(dest="b4_command", required=True)
     b4_inspect = b4_commands.add_parser("inspect")
@@ -719,6 +736,37 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
             return 0
+        if args.btc_command == "local-assessor":
+            from .btc_local_assessor import (
+                MAX_PACKET_BYTES,
+                LocalAssessorError,
+                LocalB31Assessor,
+                LocalLlamaRuntime,
+                local_runtime_health,
+            )
+            from .btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
+
+            try:
+                if args.local_assessor_command == "health":
+                    result = local_runtime_health(args.install_root)
+                    print(json.dumps(result, indent=2, sort_keys=True))
+                    return 0 if result.get("status") == "healthy" else 2
+                store = LocalAssessmentStore(args.store_root)
+                if args.local_assessor_command == "replay":
+                    print(json.dumps(store.replay(args.run_id), indent=2, sort_keys=True))
+                    return 0
+                packet_path = Path(args.packet)
+                if packet_path.stat().st_size > MAX_PACKET_BYTES:
+                    raise ValueError("assessment packet exceeds the 64 KiB input limit")
+                packet = json.loads(packet_path.read_bytes())
+                runtime = LocalLlamaRuntime(args.install_root)
+                with LocalB31Assessor(runtime) as assessor:
+                    record = assessor.assess(packet)
+                run_path = store.persist(packet, record)
+                print(json.dumps({"record": asdict(record), "stored_at": str(run_path)}, indent=2, sort_keys=True))
+                return 0 if record.outcome in {"usable", "abstained"} else 2
+            except (LocalAssessorError, LocalAssessmentStoreError, OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError) as exc:
+                raise SystemExit(f"BTC local assessor failed: {exc}") from exc
         store = HistoryStore(args.store_root, read_only=True)
         resource = args.resource
         if resource == "manifest":

@@ -1,0 +1,100 @@
+{
+  "schema": "market-os.btc-b2-temporal-dependence-audit@v1",
+  "created_at": "2026-11-19",
+  "status": "exploratory_diagnostic",
+  "scope": {
+    "run_id": "btc-b2-dde76de3b2965ac6f66a",
+    "source_artifact": ".market_os/btc-b2/runs/btc-b2-dde76de3b2965ac6f66a/predictions.json",
+    "test_start_utc": "2026-11-12T00:03:00Z",
+    "test_end_utc": "2026-11-17T23:55:00Z",
+    "sample_count": 8633,
+    "unique_timestamps": 8633,
+    "duplicate_timestamps": 0,
+    "non_minute_steps": 0,
+    "matched_test_timestamps_across_arms": true
+  },
+  "label_counts": {
+    "positive": 4015,
+    "negative": 4614,
+    "flat_non_positive": 4,
+    "non_positive_total": 4618,
+    "positive_rate": 0.46507587165527625
+  },
+  "raw_arm_predictions": {
+    "naive_0_5": {
+      "unique_probabilities": [0.5],
+      "predicted_class_counts": {"positive": 8633}
+    },
+    "empirical_rate": {
+      "unique_probabilities": [0.4891736462233201],
+      "predicted_class_counts": {"non_positive": 8633}
+    },
+    "conditional_rate": {
+      "unique_probabilities": [0.4860211656926236, 0.4919096443447613, 0.4967234600262123],
+      "predicted_class_counts": {"non_positive": 8633}
+    }
+  },
+  "point_metrics": {
+    "empirical_accuracy": 0.5349241283447237,
+    "naive_accuracy": 0.46507587165527625,
+    "empirical_raw_brier": 0.24936100799849353,
+    "naive_raw_brier": 0.25,
+    "empirical_minus_naive_brier": -0.00063899200150647,
+    "one_bin_calibrated_brier": 0.24966290327104185
+  },
+  "positive_label_autocorrelation": {
+    "lag_1": 0.57992,
+    "lag_2": 0.4001,
+    "lag_3": 0.2452,
+    "lag_4": 0.1124,
+    "lag_5": -0.01671
+  },
+  "daily_positive_rates_utc": [
+    {"date": "2026-11-12", "n": 1437, "positive": 658, "rate": 0.457898},
+    {"date": "2026-11-13", "n": 1440, "positive": 670, "rate": 0.465278},
+    {"date": "2026-11-14", "n": 1440, "positive": 640, "rate": 0.444444},
+    {"date": "2026-11-15", "n": 1440, "positive": 702, "rate": 0.4875},
+    {"date": "2026-11-16", "n": 1440, "positive": 650, "rate": 0.451389},
+    {"date": "2026-11-17", "n": 1436, "positive": 695, "rate": 0.483983}
+  ],
+  "bootstrap": {
+    "method": "paired circular moving-block bootstrap of the fixed empirical-rate predictions against the 0.5 baseline",
+    "interval": "95th percentile interval (2.5th and 97.5th percentiles)",
+    "resamples_per_block_length": 10000,
+    "seed_rule": "Python random.Random(20261119 + block_length_minutes)",
+    "block_lengths_minutes": [5, 10, 30, 60],
+    "tail_remainder": "sampled as a shorter circular block to preserve the original sample count",
+    "results": [
+      {
+        "block_length_minutes": 5,
+        "positive_rate_interval": [0.448161, 0.482451],
+        "accuracy_difference_empirical_minus_naive_interval": [0.035098, 0.103678],
+        "brier_difference_empirical_minus_naive_interval": [-0.0010052, -0.0002628]
+      },
+      {
+        "block_length_minutes": 10,
+        "positive_rate_interval": [0.44689, 0.483725],
+        "accuracy_difference_empirical_minus_naive_interval": [0.03255, 0.10622],
+        "brier_difference_empirical_minus_naive_interval": [-0.0010328, -0.0002352]
+      },
+      {
+        "block_length_minutes": 30,
+        "positive_rate_interval": [0.447122, 0.48303],
+        "accuracy_difference_empirical_minus_naive_interval": [0.03394, 0.105757],
+        "brier_difference_empirical_minus_naive_interval": [-0.0010278, -0.0002502]
+      },
+      {
+        "block_length_minutes": 60,
+        "positive_rate_interval": [0.44689, 0.483378],
+        "accuracy_difference_empirical_minus_naive_interval": [0.033245, 0.10622],
+        "brier_difference_empirical_minus_naive_interval": [-0.0010328, -0.0002427]
+      }
+    ]
+  },
+  "interpretation_limits": [
+    "The 53.49% empirical and conditional accuracies are the majority-class rate because both arms predict non-positive for every test row.",
+    "The interval analysis is conditional on one six-day test window and is not a preregistered acceptance rule.",
+    "The results do not establish multi-period or regime stability, profitability, calibration adequacy, or a tradable edge.",
+    "No network request or Jev packet call was made."
+  ]
+}

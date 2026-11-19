@@ -1,14 +1,16 @@
-"""Offline B3.1 question contracts and deterministic normalization.
+"""Offline B3.1 packet/question contracts and deterministic normalization.
 
-This module is deliberately fixture-only.  It contains no provider, network,
-market-data, execution, or model-inference code.
+This module contains no provider, network, execution, or model-inference code.
 """
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field, is_dataclass, replace
+from datetime import datetime, timedelta
 from enum import Enum
+import hashlib
+import json
 import math
-from typing import Any, Mapping
+from typing import Any, Mapping, NoReturn
 
 
 # Symbolic names are intentionally separate from schema IDs and versions.
@@ -1048,6 +1050,293 @@ TimestampContract = B31Timestamps
 def diagnostic_ranking(assessment: B31NormalizedAssessment) -> tuple[str, ...]:
     """Return only the approved display ranking projection."""
     return assessment.ranked_hypothesis_ids if assessment.status == B31Status.USABLE.value else ()
+
+
+def validate_b31_packet_eligibility(packet: Mapping[str, Any]) -> str:
+    """Recompute the BTC packet's point-in-time and lineage gates from its content."""
+    def reject(reason: str) -> NoReturn:
+        raise B31ContractError("internally_inconsistent", reason)
+
+    def integer(value: Any, name: str) -> int:
+        if isinstance(value, bool) or not isinstance(value, int):
+            reject(f"{name} must be an integer")
+        return value
+
+    def digest(value: Any, name: str) -> str:
+        if not isinstance(value, str) or len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+            reject(f"{name} must be a lowercase SHA-256 digest")
+        return value
+
+    def utc_ms(value: Any, name: str) -> int:
+        if not isinstance(value, str):
+            reject(f"{name} must be an ISO-8601 UTC timestamp")
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            reject(f"{name} must be an ISO-8601 UTC timestamp")
+        if parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
+            reject(f"{name} must use UTC")
+        return int(parsed.timestamp() * 1000)
+
+    def sha(value: Any) -> str:
+        encoded = json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    if not isinstance(packet, Mapping):
+        reject("B3.1 packet must be an object")
+    validate_future_free_packet(packet)
+    supplied_fingerprint = digest(packet.get("packet_fingerprint"), "packet_fingerprint")
+    core = {key: value for key, value in packet.items() if key != "packet_fingerprint"}
+    if sha(core) != supplied_fingerprint:
+        reject("packet_fingerprint does not match canonical packet content")
+
+    feature = packet.get("numerical_context")
+    if not isinstance(feature, Mapping):
+        reject("B2 numerical_context must be an object")
+    if (
+        feature.get("feature_version") != "btc.b2.features.v1"
+        or feature.get("status") != "eligible"
+        or feature.get("decision_eligible") is not True
+    ):
+        reject("B2 row must be eligible under the frozen feature contract")
+    dataset_revision = feature.get("dataset_revision")
+    if not isinstance(dataset_revision, str) or not dataset_revision.strip():
+        reject("B2 dataset_revision is required")
+    feature_fingerprint = digest(feature.get("input_fingerprint"), "B2 input_fingerprint")
+    feature_projection = dict(feature)
+    feature_projection.pop("input_fingerprint", None)
+    if sha({"dataset_revision": dataset_revision, "feature": feature_projection}) != feature_fingerprint:
+        reject("B2 input_fingerprint does not match the serialized feature row")
+    close_ms = integer(feature.get("close_time_ms"), "B2 close_time_ms")
+    if utc_ms(feature.get("close_time"), "B2 close_time") != close_ms:
+        reject("B2 close_time and close_time_ms disagree")
+    decision_ms = utc_ms(feature.get("decision_eligible_at"), "B2 decision_eligible_at")
+    if decision_ms < close_ms:
+        reject("B2 decision eligibility precedes the feature close")
+    values = feature.get("values")
+    feature_keys = {"close", "log_return_1m", "log_return_5m", "range_pct", "log_volume"}
+    if not isinstance(values, Mapping) or set(values) != feature_keys:
+        reject("B2 numerical values do not match the frozen feature set")
+    for name, value in values.items():
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            reject(f"B2 feature {name} must be finite")
+    refs = feature.get("input_refs")
+    if not isinstance(refs, list) or len(refs) != 6 or any(not isinstance(ref, Mapping) for ref in refs):
+        reject("B2 packet requires six candle input references")
+    expected_opens = [close_ms - 60_000, *range(close_ms - 360_000, close_ms - 60_000, 60_000)]
+    if [ref.get("open_time_ms") for ref in refs] != expected_opens:
+        reject("B2 candle references are not the current row and five contiguous lookbacks")
+    candle_refs: set[str] = set()
+    for index, ref in enumerate(refs):
+        if ref.get("role") != ("current" if index == 0 else "lookback"):
+            reject("B2 candle reference roles are invalid")
+        open_ms = integer(ref.get("open_time_ms"), "B2 candle open_time_ms")
+        candle_close_ms = integer(ref.get("close_time_ms"), "B2 candle close_time_ms")
+        if candle_close_ms != open_ms + 60_000 or candle_close_ms > close_ms:
+            reject("B2 candle reference close time is inconsistent")
+        candle_refs.add(f"binance-vision-candle:{digest(ref.get('canonical_fingerprint'), 'B2 candle fingerprint')}")
+        source_ms = utc_ms(ref.get("source_timestamp"), "B2 input source time")
+        received_ms = utc_ms(ref.get("received_at"), "B2 input receipt time")
+        availability_ms = utc_ms(ref.get("availability_timestamp"), "B2 input availability")
+        if source_ms < candle_close_ms or received_ms < source_ms or availability_ms < received_ms:
+            reject("B2 candle source, receipt, and availability timestamps are not monotonic")
+        if availability_ms > decision_ms:
+            reject("B2 input candle was unavailable at decision eligibility")
+    expected_observation_id = f"btc:{dataset_revision}:{close_ms}:{feature_fingerprint[:16]}"
+    if packet.get("observation_id") != expected_observation_id:
+        reject("observation_id does not match the B2 feature lineage")
+    for field_name in ("source_timestamp", "received_at", "availability_timestamp"):
+        if feature.get(field_name) != refs[0].get(field_name):
+            reject(f"B2 {field_name} does not match its current candle reference")
+    if (
+        packet.get("target_definition_id") != "btc.b2.close-return-5m"
+        or packet.get("target_version") != "btc.b2.close-return-5m.v1"
+    ):
+        reject("B3.1 packet must preserve the frozen B2 five-minute target")
+
+    provenance = packet.get("provenance")
+    quality = packet.get("quality")
+    lineage = packet.get("lineage")
+    if not isinstance(provenance, Mapping) or provenance.get("complete") is not True:
+        reject("Market OS provenance must be explicitly complete")
+    if not isinstance(quality, Mapping) or quality.get("valid") is not True:
+        reject("Market OS quality must be explicitly valid")
+    if integer(quality.get("source_event_time_violations"), "source_event_time_violations") != 0 or integer(quality.get("unavailable_source_count"), "unavailable_source_count") != 0:
+        reject("Market OS event-time and availability quality counts must be zero")
+    source_refs = provenance.get("source_refs")
+    if not isinstance(source_refs, list) or any(not isinstance(value, str) or not value.strip() for value in source_refs):
+        reject("provenance.source_refs must be a non-empty string array")
+    if len(source_refs) != len(set(source_refs)) or not candle_refs.issubset(source_refs):
+        reject("provenance source references are incomplete or duplicated")
+    if (
+        provenance.get("dataset_revision") != dataset_revision
+        or provenance.get("feature_fingerprint") != feature_fingerprint
+        or not isinstance(lineage, Mapping)
+        or lineage.get("dataset_revision") != dataset_revision
+        or lineage.get("feature_fingerprint") != feature_fingerprint
+        or lineage.get("b2_feature_version") != "btc.b2.features.v1"
+        or lineage.get("b2_target_version") != "btc.b2.close-return-5m.v1"
+    ):
+        reject("B2 provenance and lineage do not match numerical_context")
+
+    timestamps = packet.get("timestamps")
+    if not isinstance(timestamps, Mapping):
+        reject("packet timestamps must be an object")
+    packet_decision_ms = integer(timestamps.get("decision_eligible_at_ms"), "decision_eligible_at_ms")
+    packet_available_ms = integer(timestamps.get("packet_available_at_ms"), "packet_available_at_ms")
+    ready_ms = integer(timestamps.get("packet_ready_at_ms"), "packet_ready_at_ms")
+    if packet_decision_ms != decision_ms or packet_available_ms != decision_ms:
+        reject("packet decision and availability must preserve the original B2 decision clock")
+    if integer(timestamps.get("declared_assessment_use_time_ms"), "declared_assessment_use_time_ms") != ready_ms:
+        reject("declared assessment use time must equal packet readiness")
+
+    evidence = packet.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        reject("B3.1 evidence must contain cited passages")
+    hypotheses = packet.get("hypotheses")
+    hypothesis_ids = packet.get("stable_hypothesis_ids")
+    if not isinstance(hypotheses, list) or not hypotheses or not isinstance(hypothesis_ids, list):
+        reject("B3.1 packet must contain bounded hypotheses")
+    if any(not isinstance(item, Mapping) for item in hypotheses):
+        reject("B3.1 hypothesis records must be objects")
+    if any(not isinstance(item, str) or not item.strip() for item in hypothesis_ids):
+        reject("stable_hypothesis_ids must contain non-empty strings")
+    if [item.get("hypothesis_id") for item in hypotheses] != hypothesis_ids:
+        reject("hypothesis records do not match stable_hypothesis_ids")
+    for hypothesis in hypotheses:
+        if (
+            not isinstance(hypothesis.get("claim"), str)
+            or not hypothesis["claim"].strip()
+            or hypothesis.get("target_definition_id") != packet.get("target_definition_id")
+            or hypothesis.get("target_version") != packet.get("target_version")
+            or hypothesis.get("observation_close_time_ms") != close_ms
+        ):
+            reject("hypothesis identity or observation close does not match the packet")
+
+    citations: set[str] = set()
+    evidence_refs: set[str] = set()
+    dependency_groups: set[str] = set()
+    document_hashes: dict[str, str] = {}
+    retrieval_identity: tuple[Any, ...] | None = None
+    for item in evidence:
+        if not isinstance(item, Mapping):
+            reject("evidence passage must be an object")
+        citation = item.get("citation_ref")
+        source_ref = item.get("source_ref")
+        source_id = item.get("source_id")
+        text_value = item.get("text")
+        group = item.get("dependency_group_id")
+        if any(not isinstance(value, str) or not value.strip() for value in (citation, source_ref, source_id, text_value, group)):
+            reject("evidence passage requires source, citation, text, and dependency lineage")
+        if citation in citations:
+            reject("evidence citation references must be unique")
+        citations.add(citation)
+        evidence_refs.update((citation, source_ref))
+        dependency_groups.add(group)
+        text_fingerprint = hashlib.sha256(text_value.encode("utf-8")).hexdigest()
+        if digest(item.get("content_hash"), "evidence content_hash") != text_fingerprint:
+            reject("evidence passage content_hash does not match its text")
+        document_hash = digest(item.get("document_content_hash"), "document_content_hash")
+        document_hashes[source_id] = document_hash
+        event_start_ms = integer(item.get("event_start_ms"), "evidence event_start_ms")
+        event_end_ms = integer(item.get("event_end_ms"), "evidence event_end_ms")
+        if event_start_ms > event_end_ms or event_end_ms > close_ms:
+            reject("evidence event range extends beyond the B2 observation close")
+        publication_status = item.get("publication_time_status")
+        if publication_status not in {"recorded", "unknown-not-captured"}:
+            reject("evidence publication_time_status is invalid")
+        document_received_ms = integer(item.get("document_received_at_ms"), "document_received_at_ms")
+        received_ms = item.get("received_at_ms")
+        clock_bound = item.get("clock_error_bound_ms")
+        if clock_bound is not None and (isinstance(clock_bound, bool) or not isinstance(clock_bound, int) or clock_bound < 0):
+            reject("clock_error_bound_ms must be a non-negative integer")
+        if publication_status == "unknown-not-captured":
+            if item.get("published_at") is not None or received_ms != document_received_ms or clock_bound is None:
+                reject("unknown publication requires separate null publication, recorded receipt, and UTC error bound")
+            published_ms = 0
+        else:
+            published_ms = utc_ms(item.get("published_at"), "evidence published_at")
+            if published_ms > close_ms:
+                reject("evidence was published after the B2 observation close")
+        if received_ms is not None:
+            received_ms = integer(received_ms, "received_at_ms")
+        bound_ms = clock_bound or 0
+        available_ms = max(
+            published_ms,
+            document_received_ms + bound_ms,
+            (received_ms + bound_ms) if received_ms is not None else 0,
+        )
+        if integer(item.get("available_at_ms"), "evidence available_at_ms") != available_ms:
+            reject("evidence available_at_ms does not match publication and bounded receipt lineage")
+        if available_ms > decision_ms:
+            reject("evidence was unavailable at B2 decision eligibility")
+
+        retrieval = item.get("retrieval")
+        if not isinstance(retrieval, Mapping):
+            reject("evidence retrieval lineage must be an object")
+        retrieved_ms = integer(retrieval.get("completed_at_ms"), "MiniRAG retrieval completion")
+        provider = retrieval.get("provider")
+        provider_version = retrieval.get("provider_version")
+        query_fingerprint = digest(retrieval.get("query_fingerprint"), "retrieval query fingerprint")
+        document_ids = retrieval.get("document_ids")
+        content_fingerprints = retrieval.get("content_fingerprints")
+        if (
+            provider != "minirag"
+            or not isinstance(provider_version, str)
+            or not provider_version.strip()
+            or not isinstance(document_ids, list)
+            or not document_ids
+            or any(not isinstance(value, str) or not value.strip() for value in document_ids)
+            or len(document_ids) != len(set(document_ids))
+            or not isinstance(content_fingerprints, list)
+            or len(content_fingerprints) != len(document_ids)
+        ):
+            reject("MiniRAG retrieval identity and document fingerprints are incomplete")
+        for content_fingerprint in content_fingerprints:
+            digest(content_fingerprint, "retrieved document fingerprint")
+        if source_id not in document_ids or document_hash != content_fingerprints[document_ids.index(source_id)]:
+            reject("retrieved document content fingerprint does not match the cited source")
+        rank = integer(retrieval.get("rank"), "MiniRAG passage rank")
+        if rank < 1 or available_ms > retrieved_ms:
+            reject("MiniRAG retrieval rank or completion time is invalid")
+        identity = (provider, provider_version, retrieved_ms, query_fingerprint, tuple(document_ids), tuple(content_fingerprints))
+        if retrieval_identity is not None and retrieval_identity != identity:
+            reject("evidence passages disagree on MiniRAG retrieval lineage")
+        retrieval_identity = identity
+
+    if not evidence_refs.issubset(source_refs):
+        reject("provenance.source_refs omit cited evidence lineage")
+    if not isinstance(lineage, Mapping) or retrieval_identity is None:
+        reject("MiniRAG retrieval lineage is missing")
+    provider, provider_version, retrieved_ms, query_fingerprint, _, _ = retrieval_identity
+    if (
+        lineage.get("retrieval_provider") != provider
+        or lineage.get("retrieval_provider_version") != provider_version
+        or lineage.get("retrieval_query_fingerprint") != query_fingerprint
+        or provenance.get("retrieval_query_fingerprint") != query_fingerprint
+        or integer(lineage.get("retrieval_completed_at_ms"), "retrieval_completed_at_ms") != retrieved_ms
+    ):
+        reject("packet retrieval lineage disagrees with cited passage metadata")
+    if ready_ms < max(decision_ms, retrieved_ms):
+        reject("packet readiness precedes B2 decision or MiniRAG retrieval completion")
+    if not set(document_hashes).issubset(set(retrieval_identity[4])):
+        reject("cited evidence source is absent from MiniRAG document lineage")
+
+    hypothesis_groups = packet.get("hypothesis_evidence_groups")
+    if not isinstance(hypothesis_groups, Mapping) or set(hypothesis_groups) != set(hypothesis_ids):
+        reject("hypothesis evidence groups must cover every stable hypothesis")
+    for hypothesis_id in hypothesis_ids:
+        groups = hypothesis_groups[hypothesis_id]
+        if not isinstance(groups, list) or not groups or any(
+            not isinstance(group, str) or group not in dependency_groups for group in groups
+        ):
+            reject("hypothesis evidence groups do not match retrieved source lineage")
+    independent_groups = packet.get("independent_evidence_groups")
+    if not isinstance(independent_groups, list) or any(
+        not isinstance(group, str) or group not in dependency_groups for group in independent_groups
+    ):
+        reject("independent evidence groups do not match retrieved source lineage")
+    return supplied_fingerprint
 
 
 def validate_future_free_packet(packet: Mapping[str, Any]) -> None:

@@ -1,0 +1,84 @@
+{
+  "schema": "market-os.jev-connectivity-reauthorization-evidence.v1",
+  "recorded_at": "2026-11-19T12:16:22.599Z",
+  "scope": "one explicitly reauthorized TypeSafe/Jev connectivity probe using synthetic descriptive input",
+  "synthetic_only": true,
+  "market_observations": 0,
+  "provider": "typesafe",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "model": {
+    "requested": "jev-1.14.0",
+    "resolved": "jev-1.14.0"
+  },
+  "question_version": "btc.connectivity.synthetic-descriptive.v1",
+  "probe": {
+    "probe_id": "connectivity-ff090f36f3f734431879",
+    "status": "valid",
+    "request_count": 1,
+    "retry_count": 0,
+    "request_fingerprint": "7bc4b7cc84e948de5f266ff35091f6d4249df087a9b37affaa2d770eaaf11cef",
+    "response_fingerprint": "0ffcd39a6aa5c7a146ca415e50bb20bce1b7ff6a16ce69ad32138dbd3c109d4b",
+    "started_at": "2026-11-19T12:16:20.920Z",
+    "finished_at": "2026-11-19T12:16:22.599Z",
+    "latency_ms": 1679,
+    "replay_status": "verified",
+    "replay_network_requests": 0,
+    "replay_provider_requests": 0,
+    "replay_fingerprint": "d3811c852809ceac65cd17d726f36950ae0fbb0b1e859295c15d356ce43188e3"
+  },
+  "usage": {
+    "input_tokens": 484,
+    "output_tokens": 92
+  },
+  "estimated_cost": {
+    "amount_usd": 0.000008977500000000002,
+    "status": "estimated-from-payload-length-not-provider-billing",
+    "runner_status": "estimated-from-provider-input-tokens-not-billing",
+    "method": "Serialized request bytes divided by four as an approximate input-token count, multiplied by the configured $0.042/Mtok input rate; the provider-reported usage is recorded separately.",
+    "provider_billed_amount_observed": false,
+    "approved_estimate_cap_usd": 0.05
+  },
+  "answers": {
+    "descriptive_regime": {
+      "choice": "positive_momentum",
+      "confidence": 0.92,
+      "probabilities": {
+        "mixed_or_uncertain": 0.05,
+        "negative_momentum": 0.0,
+        "positive_momentum": 0.95
+      }
+    },
+    "context_score": {
+      "score": 0.97,
+      "confidence": 0.66,
+      "probabilities": {
+        "0": 0.13,
+        "1": 0.77,
+        "2": 0.1
+      },
+      "legend": {
+        "0": "Weak observed context",
+        "1": "Mixed observed context",
+        "2": "Strong observed context"
+      }
+    },
+    "evidence_is_limited": {
+      "noul": 0.95
+    }
+  },
+  "boundary": {
+    "abstained": false,
+    "paper_only": true,
+    "action": "none",
+    "b31_packet_assessment": false,
+    "market_probability": false,
+    "trading_signal": false
+  },
+  "limitations": [
+    "This synthetic connectivity question set is not the BTC B3.1 evidence-support/contradiction/abstention contract.",
+    "Semantic probabilities and confidence are not P(BTC return > 0), target calibration, or a trading signal.",
+    "The estimated cost is not an observed provider charge or hard billing cap.",
+    "No raw credential or raw provider response body is stored in this evidence artifact."
+  ],
+  "local_redacted_run": ".market_os/jev-connectivity-live-reauthorized/runs/connectivity-ff090f36f3f734431879/"
+}

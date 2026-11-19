@@ -268,9 +268,10 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
 
     The upstream publication time remains unknown. ``DocumentRecord`` requires
     ``published_at``, so its legacy field carries the recorded local
-    availability as a fail-closed eligibility bound, not as source publication
-    time. ``SourceTimeBounds`` preserves the unknown status and the packet
-    builder rejects it under strict recorded availability.
+    availability as a compatibility value, not as source publication time.
+    ``SourceTimeBounds`` preserves unknown publication, local receipt, and any
+    clock error bound; the packet builder requires a bound for unknown
+    publication and applies it to strict availability checks.
     """
     root = Path(corpus_dir).expanduser().resolve()
     if str(root).startswith("\\\\"):
@@ -344,6 +345,7 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
         event_end_ms = event_time.get("event_end_ms")
         available_at = availability.get("available_at")
         available_at_ms = availability.get("available_at_ms")
+        clock_error_bound_ms = availability.get("clock_error_bound_ms")
         if (
             isinstance(event_start_ms, bool) or not isinstance(event_start_ms, int)
             or isinstance(event_end_ms, bool) or not isinstance(event_end_ms, int)
@@ -351,6 +353,14 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
             or isinstance(available_at_ms, bool) or not isinstance(available_at_ms, int)
             or _timestamp_ms(available_at, "corpus available_at") != available_at_ms
             or available_at_ms < event_end_ms
+            or (
+                clock_error_bound_ms is not None
+                and (
+                    isinstance(clock_error_bound_ms, bool)
+                    or not isinstance(clock_error_bound_ms, int)
+                    or clock_error_bound_ms < 0
+                )
+            )
         ):
             raise SourceCorpusError(f"invalid event or availability timestamps at line {line_number}")
         title = record.get("title")
@@ -386,6 +396,7 @@ def load_btc_source_corpus(corpus_dir: str | Path) -> LoadedBTCCorpus:
             dependency_group_id=DEPENDENCY_GROUP_ID,
             available_at_ms=available_at_ms,
             publication_time_status="unknown-not-captured",
+            clock_error_bound_ms=clock_error_bound_ms,
         )
     if len(documents) != MAX_ROWS or len(documents) != manifest.get("document_count"):
         raise SourceCorpusError("BTC source corpus document count is outside the approved bound")

@@ -1,0 +1,51 @@
+{
+  "schema": "market-os.btc-local-assessor-smoke-evidence.v1",
+  "recorded_at": "2026-11-19T12:07:02.745Z",
+  "scope": "one synthetic B3.1 local-runtime smoke and offline replay",
+  "synthetic_only": true,
+  "market_observations": 0,
+  "jev_requests": 0,
+  "market_data_requests": 0,
+  "model": {
+    "provider_identity": "local_qwen_evidence_assessor",
+    "repository": "Qwen/Qwen3-4B-GGUF",
+    "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "file": "Qwen3-4B-Q4_K_M.gguf",
+    "size_bytes": 2497280256,
+    "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "is_jev": false
+  },
+  "runtime": {
+    "version": "llama.cpp-b12478",
+    "target": "windows-x64-cuda-13.5",
+    "install_manifest_fingerprint": "2e9dd81d70c272a9e6c065f78de0c9999be467395309611c2c5b29938fed77da",
+    "local_bind_host": "127.0.0.1",
+    "external_egress_trace_captured": false
+  },
+  "assessment": {
+    "run_id": "23ef800cf3619c4cfc4000e610baf62c",
+    "packet_fingerprint": "01cf4442c0e26a020574393dde8641b2e31090c179c34d2ad7180c65f10b8ca4",
+    "request_fingerprint": "8126d19c411a6d04a3565bec963b3e8c7073410bcda07302cd2a168cc2a8c269",
+    "response_fingerprint": "e52973cf6bb6eb763aacdfcc28faeaa3ea131d6c0de5136cad340d9f8eb9bc72",
+    "outcome": "abstained",
+    "latency_ms": 4088,
+    "decision_authority": "advisory_only",
+    "eligible_for_market_fusion": false,
+    "eligible_for_paper_decision": false,
+    "calibration_status": "uncalibrated_hard_labels_one_hot_serialization"
+  },
+  "replay": {
+    "status": "verified",
+    "verification": "offline-packet-gates-and-response-normalization",
+    "inference_calls": 0,
+    "network_requests": 0,
+    "bundle_fingerprint": "aec6ffc5bbe0fce068c6842ea40428b5d2abbbc0f6acde36ff7c714ee8da8aec"
+  },
+  "limitations": [
+    "Synthetic packet only; no BTC observation or predictive claim.",
+    "The local assessor is Qwen, not TypeSafe Jev.",
+    "One-hot semantic labels are uncalibrated and barred from Market OS fusion and paper decisions.",
+    "The local process used loopback IPC; operating-system egress telemetry was not captured."
+  ],
+  "local_run_record": ".market_os/btc-local-assessments/runs/23ef800cf3619c4cfc4000e610baf62c.json"
+}

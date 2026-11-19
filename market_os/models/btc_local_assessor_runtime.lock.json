@@ -1,0 +1,64 @@
+{
+  "schema": "market-os.btc-local-assessor-runtime-lock.v1",
+  "model": {
+    "provider_identity": "local_qwen_evidence_assessor",
+    "repository": "Qwen/Qwen3-4B-GGUF",
+    "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "file": "Qwen3-4B-Q4_K_M.gguf",
+    "size_bytes": 2497280256,
+    "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "license": "Apache-2.0",
+    "url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/bc640142c66e1fdd12af0bd68f40445458f3869b/Qwen3-4B-Q4_K_M.gguf?download=true"
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release": "b12478",
+    "source_revision": "ad9d9e8f50e6ff9a6bfbbdd3aef6d74a8428cf4e",
+    "license": "MIT",
+    "attestation": "https://github.com/ggml-org/llama.cpp/attestations/68737129",
+    "targets": {
+      "windows-x64-cuda-13.5": {
+        "archive": "llama-b12478-bin-win-cuda-13.5-x64.zip",
+        "format": "zip",
+        "size_bytes": 202877362,
+        "sha256": "5b07f55c3c33e30f9e1227f14c6cb6863ab14b85bc86126809f5bc8a5ff4e0fb",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/llama-b12478-bin-win-cuda-13.5-x64.zip",
+        "cuda_runtime": {
+          "archive": "cudart-llama-bin-win-cuda-13.5-x64.zip",
+          "format": "zip",
+          "size_bytes": 426314199,
+          "sha256": "c2bf4cc202bfbaaa7a0b75f5082457c3811326947bb216059b72839d844e9cba",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/cudart-llama-bin-win-cuda-13.5-x64.zip"
+        }
+      },
+      "windows-x64-cpu": {
+        "archive": "llama-b12478-bin-win-cpu-x64.zip",
+        "format": "zip",
+        "size_bytes": 25231970,
+        "sha256": "7cbda07b3c723270820274b8d43e2ff48a741af2932cf6fbd992130c2cb12239",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/llama-b12478-bin-win-cpu-x64.zip"
+      },
+      "linux-x64-cuda-13.5": {
+        "archive": "llama-b12478-bin-ubuntu-cuda-13.5-x64.tar.gz",
+        "format": "tar.gz",
+        "size_bytes": 201868913,
+        "sha256": "e1a9c526a41fed38d06ebf4d7be53e0976c9309cfd2fe5e176ddc0daefcf78ca",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/llama-b12478-bin-ubuntu-cuda-13.5-x64.tar.gz",
+        "cuda_runtime": {
+          "archive": "cudart-llama-b12478-bin-ubuntu-cuda-13.5-x64.tar.gz",
+          "format": "tar.gz",
+          "size_bytes": 444078938,
+          "sha256": "4dee93de0c4b93778ac4c25c5b414dab8caed189d8837c299de102646c4bbfc5",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/cudart-llama-b12478-bin-ubuntu-cuda-13.5-x64.tar.gz"
+        }
+      },
+      "linux-x64-cpu": {
+        "archive": "llama-b12478-bin-ubuntu-x64.tar.gz",
+        "format": "tar.gz",
+        "size_bytes": 23500845,
+        "sha256": "03aa84921810c74dd2557221ca5fc8f2d74aa95ce1fca2625772ccc411083ff3",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b12478/llama-b12478-bin-ubuntu-x64.tar.gz"
+      }
+    }
+  }
+}

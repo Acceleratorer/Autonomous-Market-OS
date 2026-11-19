@@ -82,9 +82,19 @@ execution, or trading.
 - Whether derivatives remain permanently excluded or receive a separate future
   contract and simulator.
 
+## Subsequent owner decision
+
+On 2026-11-19, [ADR-0058](ADR-0058-btc-jev-connectivity-only-local-assessor.md)
+recorded one separately approved synthetic Jev connectivity probe. That later
+probe did not assess a BTC packet and does not change this ADR's B3.1
+recorded-fixture-only protocol or authorize packet-content egress. For the
+current BTC work, Jev remains connectivity-only and packet assessment stays
+local with the separately identified Qwen assessor.
+
 ## References
 
 - [Jev processing protocol](../../JEV_PROCESSING.md)
 - [B3 benchmark report](../U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md)
 - [ADR-0015: BTC math-first and Jev boundary](ADR-0015-btc-math-first-jev-experiment.md)
 - [ADR-0019: U3/B3 offline Jev boundary](ADR-0019-u3-b3-jev-experimental-boundary.md)
+- [ADR-0058: Jev connectivity-only and local BTC packet assessment](ADR-0058-btc-jev-connectivity-only-local-assessor.md)

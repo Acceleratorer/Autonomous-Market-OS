@@ -2,7 +2,10 @@
 
 **Status:** Implemented and locally verified offline. **Scope:** public
 Binance BTCUSDT Spot ticker/1m kline connectivity and optional TypeSafe/Jev
-connectivity only. U4/B4 and U5/B5 are not started.
+connectivity only. The current BTC owner decision keeps Jev at connectivity;
+B3.1 packet content stays local with Qwen under
+[ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md).
+U4/B4 and U5/B5 are not started.
 
 ## Implemented boundary
 
@@ -34,12 +37,13 @@ failure. It will not switch hosts or bypass regional restrictions. Jev live
 probes require `TYPESAFE_API_KEY`, make at most one request, use zero retries,
 and reserve a durable one-shot marker before transport.
 
-The published TypeSafe price is `$0.042/Mtok` input and output is documented as
-free. Local payload length is only a rough preflight estimate; it is not a
-guaranteed token count or hard provider billing cap. The preflight therefore
-fails closed when the configured estimate exceeds `$0.05`, reports live cost as
-`estimated-from-provider-input-tokens-not-billing`, and does not claim that the
-provider cannot charge more than the estimate.
+The configured TypeSafe input rate is `$0.042/Mtok`; output is documented as
+free. The request preflight estimates input tokens as serialized payload bytes
+divided by four, then applies that rate. This is only a rough reservation
+estimate, not provider-reported token usage or a hard billing cap. It fails
+closed when the configured estimate exceeds `$0.05`. Live records label this
+`estimated-from-provider-input-tokens-not-billing`; the label describes the
+rate basis, while the amount itself comes from the payload-length proxy.
 
 Offline Jev latency, usage, and cost remain unknown rather than zero. Before
 the approved run, `TYPESAFE_API_KEY` was absent from the active process and was
@@ -177,7 +181,35 @@ python -m market_os.cli btc-paper connectivity jev --allow-live-probe --model-ve
   request/response fingerprints, timestamps, latency, provider usage when
   returned, estimate-only cost status, validation, abstention, and `action: none`.
 
-The Jev command requires the key in the local environment only. The approved
-request used a present/non-placeholder User-scope key without printing its
-value. The request is consumed; the durable reservation prevents repetition
-without new approval. No Binance request has been approved or attempted.
+The above describes the 2026-10-19 snapshot. The owner later approved a fresh,
+single synthetic Jev connectivity request on 2026-11-19. That one-shot request
+is documented separately below. Binance Vision archive acquisition was also
+approved under its separate B1 scope; this report's prepared ticker command
+was not run again.
+
+## Subsequent owner-approved Jev connectivity request — 2026-11-19
+
+After the original reservation was consumed, the owner explicitly reauthorized
+one synthetic Jev request and configured `TYPESAFE_API_KEY` in the process
+environment. Its value was checked only for presence and was never printed or
+persisted. The existing bounded CLI was used with `jev-1.14.0`, one request,
+zero retries, paper-only mode, and the approved `$0.05` payload-estimate cap.
+
+Observed result:
+
+- Status: valid; requested and resolved model: `jev-1.14.0`.
+- Request count: `1`; retry count: `0`; latency: `1,679 ms`.
+- Provider usage: `484` input tokens and `92` output tokens.
+- Local preflight cost estimate: `$0.0000089775`, using the serialized payload
+  length divided by four as an approximate input-token count. The separately
+  reported `484` input tokens were not used to calculate this amount. It is not
+  an observed provider charge or a hard billing ceiling.
+- Probe replay verified the saved manifest with `0` network requests and `0`
+  provider requests.
+- Question contract: `btc.connectivity.synthetic-descriptive.v1`. The result
+  is not a B3.1 evidence assessment, a BTC return probability, or a trading
+  signal. No trade or exchange action occurred.
+
+Fingerprints, normalized synthetic answers, and explicit limits are recorded
+in [`jev-connectivity-reauthorized-2026-11-19.json`](evidence/jev-connectivity-reauthorized-2026-11-19.json).
+The raw key and raw provider response body are not included.

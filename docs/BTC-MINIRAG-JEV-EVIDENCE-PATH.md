@@ -2,14 +2,20 @@
 
 **Status:** BTC-only MiniRAG integration slice and bounded local source corpus
 built; local artifact hashes and row counts were rechecked on 2026-11-19.
-The owner selected strict recorded availability for B3.1 evidence under
-[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md); an
-event-time proxy was not selected for the current B1 revision.
+The owner selected strict point-in-time availability under
+[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md): when source
+publication is unknown, a contemporaneous local receipt plus a defensible,
+non-negative UTC error bound can establish availability. An event-time proxy
+was not selected for the current B1 revision, whose receipt followed the B2
+decisions and has no defensible clock bound.
 Three pinned-runtime MiniRAG retrieval repeats completed before the child
 network guard was added, followed by one post-guard retrieval with the same
 four citations. The strict historical packet gate blocks market-linked Jev
 assessment work. A synthetic recorded-assessment fixture traverses
 normalization and alignment, validating that contract seam only.
+The current owner choice is Jev connectivity-only; BTC B3.1 packet assessment
+stays in the local Qwen path under
+[ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md).
 **Scope:** BTCUSDT Spot, five-minute B2 research target, local historical data,
 and paper research only.
 
@@ -19,8 +25,111 @@ and paper research only.
 |---|---|---|
 | B1/B2 | Market OS | Canonical candles, point-in-time features, numerical baselines, labels, calibration, chronological splits, and matched controls. |
 | MiniRAG | Local retrieval adapter | Retrieve cited context from BTC-tagged source documents and return source lineage. It does not calculate market probabilities. |
-| Jev | Optional typed assessor | Classify evidence support, contradiction, and answerability for a packet. Its label probabilities remain semantic. |
+| Jev | Hosted connectivity probe only | No BTC packet assessment or packet-content egress in the current owner-approved path. |
+| Local Qwen | Local evidence assessor | Assess eligible BTC evidence packets under the B3.1-shaped contract. It is not Jev; its current one-hot outputs are uncalibrated and are not market probabilities. |
 | Market OS | Decision and risk owner | Validate timestamps, provenance, calibration, stability, fusion, risk, paper decisions, persistence, and execution gates. |
+
+## Jev and the fully local runtime
+
+The real Jev is TypeSafe's hosted System One model. Its published interface is
+an authenticated request to `https://api.typesafe.ai/v1/systemone`; current
+public materials do not publish local Jev weights or a local runtime. The first U3
+connectivity request failed local response validation; a later, separately
+approved synthetic connectivity request passed. Neither request assessed a
+BTC B3.1 packet. See the [U3 connectivity report](U3-API-CONNECTIVITY-REPORT.md)
+and [successful probe evidence](evidence/jev-connectivity-reauthorized-2026-11-19.json).
+Under ADR-0058, Jev remains at connectivity for this BTC work. Packet text,
+citations, and assessments stay local; local Qwen is the selected packet path.
+The synthetic probe did not assess a packet. Future Jev connectivity calls
+still require separate explicit approval.
+
+### Jev local-feasibility and use-boundary review — 2026-11-19
+
+TypeSafe's current [Quick Start](https://docs.typesafe.ai/introduction/quickstart)
+and [System One API reference](https://docs.typesafe.ai/api/system-one) document
+Jev through its authenticated hosted API. The public material reviewed here
+does not provide Jev weights or a self-hosted runtime. This is a finding about
+the public release path, not proof that TypeSafe has no private deployment
+option; a private option would need confirmation from TypeSafe.
+
+The public
+[Master Customer Agreement, section 2.3(b)](https://typesafe.ai/legal/mca)
+restricts using TypeSafe Services or their output to train an imitator or
+develop a similar or competing product, and section 2.3(c) restricts reverse
+engineering. That contract language is broader than whether this research is
+commercial. This note is not a legal interpretation; it does not establish
+that the local assessor is contractually cleared. Keep future local-assessor
+design, tests, and tuning independent of TypeSafe Services and their outputs,
+and resolve any contractual question with TypeSafe or counsel before expanding
+or distributing the assessor. The 2026-11-19 request was isolated synthetic
+connectivity evidence; it assessed no BTC packet and its result was not used as
+local-model training or evaluation data.
+
+The local runtime is separately identified as Qwen, using the pinned
+[Qwen3-4B model](https://huggingface.co/Qwen/Qwen3-4B) under its published
+Apache-2.0 license and llama.cpp under the runtime lock's MIT license. It is
+not Jev or a Jev weight port. The local prompt and schema implement Market OS's
+BTC B3.1 contract; they do not emulate TypeSafe's model or expose its
+`/v1/systemone` API. The Jev API result is not used by that inference path.
+
+The optional local runtime in `market_os/btc_local_assessor.py` uses the pinned
+Qwen3-4B GGUF model and llama.cpp. It is a separate local evidence assessor,
+not Jev or a Jev model port. It implements the B3.1 support,
+agreement/contradiction, and abstention contract; current output labels are
+serialized one-hot and explicitly marked uncalibrated. It does not estimate
+`P(return_5m > 0)` and cannot enter fusion or paper decisions. Market OS B2,
+calibration, stability, and risk remain separate owners.
+
+After the one-time runtime bootstrap, local health, assessment, durable storage,
+and replay use only the installed model/runtime plus loopback IPC. Bootstrap
+downloads the pinned artifacts during setup; inference and replay do not call
+TypeSafe, Binance, Hugging Face, an embedding API, or another remote service.
+Before inference, the local assessor recomputes the B2 feature fingerprint and
+decision clock, checks the six candle references, and validates event time,
+publication or bounded-receipt availability, MiniRAG completion, source
+fingerprints, and citation lineage from the packet itself. It does not treat
+the packet's `provenance.complete` or `quality.valid` booleans as proof.
+
+Assessment runs are stored as write-once JSON bundles through the application
+interface, containing the bounded packet, structured local response,
+normalized assessment, identities, and fingerprints. `replay` reruns packet
+gates and response normalization from that saved bundle; it does not call the
+model again. SHA-256 fingerprints detect accidental or unsophisticated
+modification, but are not signatures or proof of who created a run.
+
+From the repository root on the currently installed Windows CUDA target:
+
+```powershell
+py -3.12 scripts/bootstrap_btc_local_assessor.py --target windows-x64-cuda-13.5
+py -3.12 -m market_os.cli btc-paper local-assessor health --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
+py -3.12 -m market_os.cli btc-paper local-assessor assess --packet <eligible-b31-packet.json> --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
+py -3.12 -m market_os.cli btc-paper local-assessor replay <run-id>
+```
+
+The real historical Binance packet still fails the point-in-time availability
+gate because its local receipt was after the B2 decisions and the archive has
+no defensible UTC clock error bound. Unknown publication time remains unknown;
+it does not by itself block a future prospectively received record when
+availability is captured with the required clock bound. A successful local
+runtime smoke on a clearly synthetic packet proves the inference and audit
+plumbing only; it is not a market observation, Jev result, calibration result,
+or predictive claim. The smoke metadata is recorded in
+[`btc-local-assessor-smoke-2026-11-19.json`](evidence/btc-local-assessor-smoke-2026-11-19.json);
+the detailed packet and raw local response remain in the ignored `.market_os`
+run store. Windows and Linux runtime archives are separately pinned; only the
+Windows CUDA target is currently installed and exercised. No OS-level egress
+trace was captured during the original smoke run. A later unprivileged
+process-level TCP sample around one fresh synthetic inference observed a
+loopback listener and loopback client/server connections; the largest sampled
+host working set was about 2.8 GiB. Windows denied PktMon access without
+Administrator privileges, so the sample does not prove zero egress or cover
+UDP and short-lived attempts. It also does not measure GPU memory. See the
+[process observation evidence](evidence/btc-local-assessor-process-network-observation-2026-11-19.json).
+A separate Windows CUDA inference sampled aggregate GPU memory 94 times at a
+requested 100 ms interval: observed usage rose from 1,300 MiB to a maximum of
+5,033 MiB on an 8,151 MiB device. Windows WDDM did not provide per-process
+memory attribution, and this sample does not enforce a VRAM cap. See the
+[GPU resource observation](evidence/btc-local-assessor-gpu-resource-observation-2026-11-19.json).
 
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is
@@ -28,11 +137,11 @@ never substituted for that probability, a return forecast, or an order.
 
 The existing U3/B3 directional `Choice` benchmark is a prior fixture-only
 experiment. Its bullish/bearish labels and E2 market-direction score are not
-the target Jev role for this BTC evidence flow and remain unpromoted. The
-forward BTC contract is B3.1: Jev may assess evidence support,
-agreement/contradiction, and abstention for a validated packet. Those semantic
+the target evidence-assessment role for this BTC flow and remain unpromoted.
+The forward BTC contract is B3.1: a local evidence assessor may assess support,
+agreement/contradiction, and abstention for an eligible packet. These semantic
 labels are not converted into `P(up)` or used as stability, calibration, risk,
-or execution inputs.
+or execution inputs. The current implementation uses local Qwen, not Jev.
 
 ## Implemented seam
 
@@ -62,10 +171,12 @@ or execution inputs.
 - `load_btc_source_corpus` verifies both artifact hashes and hydrates the
   existing `DocumentRecord` seam. Since that contract requires `published_at`,
   the loader places conservative local availability in that legacy field only
-  as a fail-closed eligibility bound; `SourceTimeBounds` separately preserves
-  `publication_time_status="unknown-not-captured"`. The packet builder rejects
-  evidence with unknown publication time under strict recorded availability,
-  including for observations after local archive receipt.
+  as a compatibility field; `SourceTimeBounds` separately preserves
+  `publication_time_status="unknown-not-captured"`, local receipt, and its
+  optional clock error bound. Under ADR-0057, unknown publication requires a
+  contemporaneous local receipt plus a defensible UTC error bound; eligibility
+  uses the conservative receipt upper bound. The historical B1 records have no
+  such bound and arrived after the B2 decisions, so they remain rejected.
 - Its recorded-assessment alignment helper matches normalized B3.1 results to
   B2 test predictions by observation, exact feature lineage, decision clock,
   and packet fingerprint. It reports usable coverage only, preserves the B2
@@ -131,11 +242,11 @@ It is not operating-system network isolation and native code can bypass it, so
 the run does not establish a zero-egress guarantee. See
 [`btc-minirag-post-guard-retrieval-2026-11-19.json`](evidence/btc-minirag-post-guard-retrieval-2026-11-19.json).
 
-The packet builder rejects the retrieved passage because its original Binance
-publication time is unknown under the strict recorded-availability rule. The
-local availability value used to satisfy the legacy `DocumentRecord` field is
-not emitted or treated as source publication time. Retrieval is retrospective
-and cannot support a historically eligible Jev assessment. No
+The packet builder rejects the retrieved passage because its archive receipt
+was after the historical B2 decision and the capture did not retain a clock
+error bound. Its local availability is not emitted or treated as source
+publication time. Retrieval is retrospective and cannot support a
+historically eligible Qwen assessment. No
 Jev, LLM, embedding, or market-data API was called by the four retrieval runs.
 The post-guard run used the cached tokenizer asset; outbound socket attempts
 were not instrumented.
@@ -178,21 +289,23 @@ Market OS stays paper-only and owns every risk and execution decision.
    one-day public-stream pilot and is not execution approval. It records the
    source publication time as unknown and keeps local receipt as a separate
    availability timestamp.
-3. Resolve the packet-gate prerequisite in the proposal before any new data
-   request. Current packet code rejects unknown publication time even when
-   local receipt is recorded. Preserve strict timing; do not treat source event
-   time or local receipt as publication time.
-4. After an eligible packet exists, use only recorded B3.1 assessments for its
-   exact fingerprint and join them to the same forward observation lineage as
-   the numerical controls. The prospective pilot alone is not a market study.
+3. Follow the ADR-0057 clarification: a future record with unknown source
+   publication time needs a contemporaneous local receipt and defensible UTC
+   error bound; use receipt plus bound for availability. This does not turn
+   local receipt into publication time. The capture proposal is not approval;
+   obtain separate date-bound approval before any new data request.
+4. After an eligible packet exists, assess it locally with Qwen and persist the
+   B3.1-shaped response against its exact fingerprint and forward observation
+   lineage. The prospective pilot alone is not a market study.
 5. Freeze an offline matched comparison protocol before reading held-out
-   results. Jev API access, credentials, provider egress, and any future shadow
-   or trading path still require separate owner decisions.
+   results. Jev remains connectivity-only; packet assessment egress, any future
+   shadow, and any trading path require a new owner decision.
 
 ## References
 
 - [ADR-0056: MiniRAG scope for the BTC evidence path](decisions/ADR-0056-minirag-btc-evidence-scope.md)
 - [ADR-0057: Strict recorded availability for BTC evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
+- [ADR-0058: Jev connectivity-only and local BTC packet assessment](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md)
 - [BTC prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md)
 - [U3 API connectivity evidence](evidence/u3-api-connectivity.json)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
