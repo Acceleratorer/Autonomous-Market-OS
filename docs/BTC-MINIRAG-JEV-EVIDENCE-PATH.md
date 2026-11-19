@@ -61,10 +61,11 @@ or execution inputs.
   prevents wider-lookback or future-candle additions.
 - `load_btc_source_corpus` verifies both artifact hashes and hydrates the
   existing `DocumentRecord` seam. Since that contract requires `published_at`,
-  the loader projects the conservative local availability time into that field;
-  it does not infer an upstream publication time. This prevents the packet
-  builder from treating these later-received archives as available at older
-  candle closes.
+  the loader places conservative local availability in that legacy field only
+  as a fail-closed eligibility bound; `SourceTimeBounds` separately preserves
+  `publication_time_status="unknown-not-captured"`. The packet builder rejects
+  evidence with unknown publication time under strict recorded availability,
+  including for observations after local archive receipt.
 - Its recorded-assessment alignment helper matches normalized B3.1 results to
   B2 test predictions by observation, exact feature lineage, decision clock,
   and packet fingerprint. It reports usable coverage only, preserves the B2
@@ -130,10 +131,11 @@ It is not operating-system network isolation and native code can bypass it, so
 the run does not establish a zero-egress guarantee. See
 [`btc-minirag-post-guard-retrieval-2026-11-19.json`](evidence/btc-minirag-post-guard-retrieval-2026-11-19.json).
 
-The packet builder rejected the retrieved passage because its conservative
-local availability / `published_at` projection is after the feature close.
-The original Binance publication time remains unknown. Retrieval is therefore
-retrospective and cannot support a historically eligible Jev assessment. No
+The packet builder rejects the retrieved passage because its original Binance
+publication time is unknown under the strict recorded-availability rule. The
+local availability value used to satisfy the legacy `DocumentRecord` field is
+not emitted or treated as source publication time. Retrieval is retrospective
+and cannot support a historically eligible Jev assessment. No
 Jev, LLM, embedding, or market-data API was called by the four retrieval runs.
 The post-guard run used the cached tokenizer asset; outbound socket attempts
 were not instrumented.

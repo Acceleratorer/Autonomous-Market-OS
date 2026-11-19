@@ -50,8 +50,10 @@ on socket network entry points. No post-change retrieval or Jev call has run.
   `becdc7b7801e8a3d145f43637043a80ed6fb1053ba281ad0f36f7635ef4e2caa` under
   `.market_os/btc-evidence-corpus/`. It preserves original publication time as
   unknown and retains local receipt availability. Its loader verified and
-  hydrated all 43,200 records using local availability as a conservative
-  `published_at` projection. The isolated research runtime uses Python 3.12.0
+  hydrated all 43,200 records using local availability only as a fail-closed
+  eligibility bound for the legacy `published_at` field; source publication
+  remains explicitly unknown, and strict packet construction rejects it. The
+  isolated research runtime uses Python 3.12.0
   and MiniRAG commit `e204d239421f45004852953679927fdf6733f236`; it is outside
   the Market OS base dependencies and U6.4 embedded runtime. Three same-input
   retrieval repeats returned the same four of six candle documents after
@@ -173,13 +175,14 @@ offline packaging work and does not reopen connected or live execution.
 2. Keep B2 classified as a retrospective chronological diagnostic. Its
    features use current and prior candles with five-minute purge/embargo, but
    archived receipt times do not reconstruct per-candle live availability.
-3. Keep the strict recorded-availability rule until the pending owner choice
-   is resolved. Original Binance publication time remains unknown; never infer
-   it from candle event time.
-4. If strict timing is kept, only continue with sources that have recorded
-   contemporaneous publication and availability times. If an event-time proxy
-   is authorized, label the result retrospective and prohibit point-in-time,
-   predictive, paper-performance, or trading claims from that proxy.
+3. Follow the accepted strict recorded-availability rule in
+   [ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md).
+   Original Binance publication time remains unknown; do not infer it from
+   candle event time or local archive receipt.
+4. Prepare the bounded prospective-capture proposal described in the BTC
+   evidence-path document, including date range, source class, timestamp
+   fields, request/runtime caps, and retention. Seek separate approval before
+   any new market-data request; do not reopen an event-time proxy for B1.
 5. Exercise the MiniRAG child socket guard against the already-cached runtime
    before asserting zero egress. No Jev API or other provider call is allowed
    without separate authorization.
