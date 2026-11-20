@@ -14,10 +14,11 @@ a different local directory.
 
 ## Decision
 
-1. Store the project import entry in each runtime path file as a relative path
-   computed from the final runtime location. The Windows `python311._pth` entry
-   is relative to the runtime root; Linux `market-os-source.pth` is relative to
-   the final `site-packages` directory.
+1. Store import entries as relative paths computed from the final runtime
+   location. On Windows, select the active `_pth` file beside `python311.dll`
+   when present; compute both the project and `site-packages` entries relative
+   to that file's directory. Otherwise use the executable-level `_pth` file.
+   Linux `market-os-source.pth` is relative to final `site-packages`.
 2. Package the verified runtime beside its CI evidence: ZIP for Windows x64
    and tar.gz for Linux x64. Preserve Linux file modes and internal symlinks;
    reject symlinks in the Windows bundle and Linux links that escape the tree.

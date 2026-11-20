@@ -168,6 +168,23 @@ def _relative_import_entry(base: Path, target: Path) -> str:
     return os.path.relpath(target, base).replace("\\", "/")
 
 
+def _windows_runtime_pth_path(runtime_root: Path) -> Path:
+    dll_candidates = (
+        runtime_root / "python311.dll",
+        runtime_root / "DLLs" / "python311.dll",
+        *runtime_root.rglob("python311.dll"),
+    )
+    dll = next((path for path in dll_candidates if path.is_file()), None)
+    if dll is None:
+        raise ValueError("Windows Python runtime is missing python311.dll")
+    shared_library_pth = dll.with_name("python311._pth")
+    executable_pth = runtime_root / "python._pth"
+    pth_path = shared_library_pth if shared_library_pth.is_file() else executable_pth
+    if not pth_path.is_file():
+        raise ValueError("Windows Python runtime is missing its python311._pth path file")
+    return pth_path
+
+
 def _package_runtime(runtime_root: Path, target: str, output: Path) -> dict[str, Any]:
     runtime_root = runtime_root.resolve()
     output = output.resolve()
@@ -243,7 +260,7 @@ def _verify_runtime(runtime_root: Path, project_root: Path, spec: dict[str, Any]
     if not interpreter.is_relative_to(runtime_root.resolve()) or not interpreter.is_file():
         raise AssessorPythonRuntimeError("pinned BTC assessor Python interpreter is missing or escapes its runtime")
     result = _run(
-        [str(interpreter), "-B", "-c", "import json,pathlib,sys,duckdb,pyarrow; p=pathlib.Path(sys.executable).with_name('python311._pth'); print(json.dumps({'sys_path':sys.path,'python311_pth':p.read_text(),'executable':sys.executable}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
         cwd=project_root,
         env={**_pip_environment(), "PYTHONPATH": ""},
         timeout=30,
@@ -287,11 +304,14 @@ def _install_windows(project_root: Path, work_root: Path, staging_root: Path, sp
         cwd=project_root,
         env=_pip_environment(),
     )
-    pth_path = staging_root / "python311._pth"
+    pth_path = _windows_runtime_pth_path(staging_root)
     lines = pth_path.read_text(encoding="utf-8").splitlines()
     lines = ["import site" if line.strip() == "#import site" else line for line in lines]
-    project_entry = _relative_import_entry(project_root / RUNTIME_RELATIVE_PATH, project_root)
-    for entry in ("Lib/site-packages", project_entry):
+    final_runtime_root = project_root / RUNTIME_RELATIVE_PATH
+    final_pth_directory = final_runtime_root / pth_path.parent.relative_to(staging_root)
+    project_entry = _relative_import_entry(final_pth_directory, project_root)
+    site_packages_entry = _relative_import_entry(final_pth_directory, final_runtime_root / "Lib" / "site-packages")
+    for entry in (site_packages_entry, project_entry):
         if entry not in lines:
             lines.append(entry)
     if "import site" not in lines:

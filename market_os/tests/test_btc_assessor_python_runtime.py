@@ -14,6 +14,7 @@ from market_os.btc_assessor_python_runtime import (
     _relative_import_entry,
     _safe_member,
     _tree_sha256,
+    _windows_runtime_pth_path,
     runtime_ci_evidence,
 )
 
@@ -104,6 +105,29 @@ def test_runtime_import_entries_resolve_from_the_final_bundle_location(tmp_path:
     assert not Path(linux_entry).is_absolute()
     assert (runtime / windows_entry).resolve() == project.resolve()
     assert (linux_site_packages / linux_entry).resolve() == project.resolve()
+
+
+def test_windows_runtime_uses_the_shared_library_path_file_when_dll_is_nested(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    staging = tmp_path / "staging"
+    dll_directory = staging / "DLLs"
+    dll_directory.mkdir(parents=True)
+    (dll_directory / "python311.dll").write_bytes(b"runtime dll")
+    shared_library_pth = dll_directory / "python311._pth"
+    shared_library_pth.write_text("relative path file", encoding="ascii")
+    (staging / "python311._pth").write_text("executable path file", encoding="ascii")
+
+    pth_path = _windows_runtime_pth_path(staging)
+    final_runtime = project / ".market_os" / "runtimes" / "btc-assessor-py311"
+    final_pth_directory = final_runtime / "DLLs"
+    project_entry = _relative_import_entry(final_pth_directory, project)
+    site_packages = final_runtime / "Lib" / "site-packages"
+    site_packages_entry = _relative_import_entry(final_pth_directory, site_packages)
+
+    assert pth_path == shared_library_pth
+    assert not Path(project_entry).is_absolute()
+    assert (final_pth_directory / project_entry).resolve() == project.resolve()
+    assert (final_pth_directory / site_packages_entry).resolve() == site_packages.resolve()
 
 
 def test_target_runtime_bundles_preserve_tree_paths_and_linux_modes(tmp_path: Path) -> None:
