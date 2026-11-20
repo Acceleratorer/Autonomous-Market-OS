@@ -14,7 +14,9 @@ from typing import Any
 from unittest import skipUnless
 from unittest.mock import patch
 
-from market_os.btc_evidence_packet import SourceTimeBounds, build_b31_evidence_packet
+import pytest
+
+from market_os.btc_evidence_packet import EvidencePacketError, SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
 from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, LocalLlamaRuntime, _WindowsResourceJob, _verify_windows_egress_rules
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
@@ -30,7 +32,12 @@ def _iso_ms(value: int) -> str:
     return datetime.fromtimestamp(value / 1000, timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-def _packet() -> dict[str, Any]:
+def _packet(
+    *,
+    publication_time_status: str = "recorded",
+    receipt_offset_ms: int = -25,
+    clock_error_bound_ms: int | None = 0,
+) -> dict[str, Any]:
     now = time.time_ns() // 1_000_000
     close_ms = now - 120_000
     decision_ms = close_ms + 50
@@ -66,7 +73,7 @@ def _packet() -> dict[str, Any]:
     }
     feature["input_fingerprint"] = hashlib.sha256(_canonical({"dataset_revision": dataset_revision, "feature": feature})).hexdigest()
 
-    receipt_ms = decision_ms - 25
+    receipt_ms = decision_ms + receipt_offset_ms
     retrieval_ms = decision_ms + 10
     ready_ms = decision_ms + 20
     source_texts = (
@@ -83,7 +90,7 @@ def _packet() -> dict[str, Any]:
             title=f"Synthetic BTC evidence {document_id}",
             publisher="Market OS test fixture",
             source_ref=source_ref,
-            published_at=_iso_ms(close_ms - 300_000),
+            published_at=_iso_ms(close_ms - 300_000 if publication_time_status == "recorded" else receipt_ms),
             retrieved_at=_iso_ms(receipt_ms),
             symbols=("BTCUSDT",),
             media_type="text/plain",
@@ -105,8 +112,8 @@ def _packet() -> dict[str, Any]:
             event_end_ms=close_ms,
             dependency_group_id=group,
             available_at_ms=receipt_ms,
-            publication_time_status="recorded",
-            clock_error_bound_ms=0,
+            publication_time_status=publication_time_status,
+            clock_error_bound_ms=clock_error_bound_ms,
         )
     retrieval = RetrievalResult(
         query="synthetic BTC evidence fixture",
@@ -140,6 +147,36 @@ def _packet() -> dict[str, Any]:
     packet.pop("packet_fingerprint")
     packet["packet_fingerprint"] = hashlib.sha256(_canonical(packet)).hexdigest()
     return packet
+
+
+def test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication() -> None:
+    packet = _packet(
+        publication_time_status="unknown-not-captured",
+        clock_error_bound_ms=20,
+    )
+
+    evidence = packet["evidence"][0]
+    assert evidence["published_at"] is None
+    assert evidence["publication_time_status"] == "unknown-not-captured"
+    assert evidence["available_at_ms"] == evidence["received_at_ms"] + 20
+    assert evidence["available_at_ms"] == packet["timestamps"]["decision_eligible_at_ms"] - 5
+
+
+def test_b31_packet_rejects_receipt_bound_after_decision_eligibility() -> None:
+    with pytest.raises(EvidencePacketError, match="unavailable at B2 decision eligibility"):
+        _packet(
+            publication_time_status="unknown-not-captured",
+            receipt_offset_ms=-5,
+            clock_error_bound_ms=10,
+        )
+
+
+def test_b31_packet_rejects_unknown_publication_without_utc_error_bound() -> None:
+    with pytest.raises(EvidencePacketError, match="requires a recorded local receipt and UTC clock error bound"):
+        _packet(
+            publication_time_status="unknown-not-captured",
+            clock_error_bound_ms=None,
+        )
 
 
 def _usable_response(*, bad_citation: bool = False, self_comparison: bool = False) -> dict[str, Any]:
