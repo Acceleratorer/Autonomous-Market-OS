@@ -1,5 +1,24 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Owner goal: verify authentic local Jev — 2026-11-20
+
+The owner now wants the BTC evidence flow to run locally and use authentic Jev
+if TypeSafe provides a lawful, technically supported local runtime. Market OS
+continues to own market math, probability, calibration, stability, risk, and
+paper decisions.
+
+The current primary-source review found Jev documented as a hosted API and no
+public Jev weights or local serving package. TypeSafe's enterprise page asks
+whether Jev can run in a customer VPC or on-premises but does not answer. This
+does not rule out a private offer. See the
+[Jev local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
+
+Until TypeSafe provides written local-deployment terms and an identifiable
+Jev runtime artifact, do not claim the local Qwen assessor is Jev, do not use
+hosted Jev outputs to train an imitator, and do not send BTC packets to hosted
+Jev. The existing ADR-0058 boundary remains in force while authentic local Jev
+is unverified. No Jev API call or vendor inquiry was made for this review.
+
 ## Current continuation update — 2026-11-20
 
 The current owner decision is recorded in
