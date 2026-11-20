@@ -7,10 +7,14 @@ if TypeSafe provides a lawful, technically supported local runtime. Market OS
 continues to own market math, probability, calibration, stability, risk, and
 paper decisions.
 
-The current primary-source review found Jev documented as a hosted API and no
-public Jev weights or local serving package. TypeSafe's enterprise page asks
-whether Jev can run in a customer VPC or on-premises but does not answer. This
-does not rule out a private offer. See the
+The official [Enterprise FAQ](https://typesafe.ai/enterprise) now says Jev is
+currently available only through its hosted API. Cloudflare, Vercel, Netlify,
+and OpenRouter expose managed hosted routes; the public TypeSafe registries
+reviewed expose no verifiable Jev weights or offline runtime. A separate
+deployment may still exist privately. TypeSafe Sales was emailed on 2026-11-20
+with a follow-up about written local-use terms and artifact identity; both
+messages are sent and no reply has arrived. The complete source, contract, and
+mailbox record is in the
 [Jev local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
 
 Until TypeSafe provides written local-deployment terms and an identifiable

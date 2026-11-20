@@ -68,15 +68,19 @@ local-model training or evaluation data.
 ### Independent local System One-compatible runtime candidate — 2026-11-20
 
 The official TypeSafe [Quick Start](https://docs.typesafe.ai/introduction/quickstart)
-and [System One API reference](https://docs.typesafe.ai/api/system-one) continue
-to describe Jev through an authenticated hosted endpoint. The public material
-reviewed here does not provide TypeSafe Jev weights or a self-hosted runtime;
-this does not rule out a private option that TypeSafe has not publicly
-documented. The current [model reference](https://docs.typesafe.ai/models) says
-the same weights serve every account and describes domain customization through
-request state and questions. The enterprise page lists a VPC/on-premises FAQ
-question but publishes no answer. The dated source, terms, and inference record
-is in [the local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
+and [System One API reference](https://docs.typesafe.ai/api/system-one) describe
+Jev through an authenticated hosted endpoint. The [Enterprise FAQ](https://typesafe.ai/enterprise)
+now answers that Jev is currently available only through the hosted API. Public
+Cloudflare, Vercel, Netlify, and OpenRouter routes are hosted gateways; the
+public TypeSafe registries reviewed expose no verifiable Jev weights or local
+runtime. TypeSafe Sales was asked whether a separately licensed or private
+deployment exists and for a runtime manifest and written local-use terms; no
+reply has arrived as of this check. This does not rule out a private option.
+The dated source, terms, and inquiry record is in
+[the local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
+The current [model reference](https://docs.typesafe.ai/models) says the same
+weights serve every account and describes domain customization through request
+state and questions.
 TypeSafe also publishes an official [System One adapter](https://github.com/typesafe-ai/system-one-adapter-python)
 for generic LLM APIs; it can preserve the typed client shape with a local
 endpoint, but that endpoint's model remains a substitute, not Jev.
