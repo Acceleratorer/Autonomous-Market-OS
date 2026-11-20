@@ -294,8 +294,10 @@ jobs:
         include:
           - target: windows-x64
             runner: windows-latest
+            runtime_bundle: btc-assessor-python-runtime-windows-x64.zip
           - target: linux-x64
             runner: ubuntu-latest
+            runtime_bundle: btc-assessor-python-runtime-linux-x64.tar.gz
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -383,14 +385,17 @@ jobs:
         run: >-
           python -m market_os.btc_assessor_python_runtime
           --target "${{ matrix.target }}"
+          --bundle-output "${{ runner.temp }}/${{ matrix.runtime_bundle }}"
           --evidence-output "${{ runner.temp }}/btc-assessor-python-runtime-${{ matrix.target }}.json"
       - name: Upload BTC assessor CPython runtime evidence
         uses: actions/upload-artifact@v7
         with:
           name: market-os-btc-assessor-runtime-${{ matrix.target }}
-          path: ${{ runner.temp }}/btc-assessor-python-runtime-${{ matrix.target }}.json
+          path: |
+            ${{ runner.temp }}/btc-assessor-python-runtime-${{ matrix.target }}.json
+            ${{ runner.temp }}/${{ matrix.runtime_bundle }}
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 7
       - name: Download target-native Electron runtime
         working-directory: apps/desktop/electron
         run: pnpm exec install-electron
