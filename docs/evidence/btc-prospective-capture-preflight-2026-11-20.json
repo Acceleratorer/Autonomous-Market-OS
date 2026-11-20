@@ -1,8 +1,9 @@
 {
   "schema": "market-os.btc-prospective-capture-preflight.v1",
-  "started_at_utc": "2026-11-20T00:36:08.6891663Z",
-  "completed_at_utc": "2026-11-20T00:43:51Z",
+  "host_clock_started_at": "2026-11-20T00:36:08.6891663Z",
+  "host_clock_completed_at": "2026-11-20T00:43:51Z",
   "scope": "read-only readiness check for the unapproved BTCUSDT prospective capture proposal",
+  "host_clock_qualification": "The Z-suffixed wall-clock values are unverified because Windows Time was not running; they do not establish UTC accuracy, an error bound, or packet availability.",
   "clock": {
     "platform": "windows",
     "provider": "Windows Time service (W32Time)",
@@ -10,7 +11,7 @@
       "w32tm /query /status",
       "w32tm /query /configuration"
     ],
-    "service_configuration_checked_at_utc": "2026-11-20T00:43:51Z",
+    "service_configuration_checked_at_host_clock": "2026-11-20T00:43:51Z",
     "service_state": "not_started",
     "service_start_mode": "manual",
     "configured_sync_mode": "NTP",

@@ -79,7 +79,9 @@ which uses official CPython 3.11.18 source on both targets. The Windows source
 build and Linux build remain unverified locally; this workstation lacks the
 Visual Studio C++ build tools and a WSL distribution. The pinned builds passed
 in CI, but the Windows workstation still needs its own CPython 3.11.18 runtime
-before the updated assessor can start.
+before the updated assessor can start. A read-only `--verify-only` check on
+2026-11-20 confirmed the existing 3.11.9 runtime is rejected by the new lock;
+it made no network request or model call.
 
 **Checkpoint base:** `main` at `8132c57` after PR #54 merged. The Windows
 firewall installer remains opt-in and unrun; the ActiveStore verifier did not
