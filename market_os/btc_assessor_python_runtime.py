@@ -259,12 +259,18 @@ def _verify_runtime(runtime_root: Path, project_root: Path, spec: dict[str, Any]
     interpreter = (runtime_root / spec["interpreter"]).resolve()
     if not interpreter.is_relative_to(runtime_root.resolve()) or not interpreter.is_file():
         raise AssessorPythonRuntimeError("pinned BTC assessor Python interpreter is missing or escapes its runtime")
-    result = _run(
-        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
-        cwd=project_root,
-        env={**_pip_environment(), "PYTHONPATH": ""},
-        timeout=30,
-    )
+    try:
+        result = _run(
+            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+            cwd=project_root,
+            env={**_pip_environment(), "PYTHONPATH": ""},
+            timeout=30,
+        )
+    except AssessorPythonRuntimeError as exc:
+        if target == "windows-x64":
+            pth_path = _windows_runtime_pth_path(runtime_root)
+            raise AssessorPythonRuntimeError(f"{exc}; active Windows path file {pth_path}: {pth_path.read_text(encoding='utf-8')!r}") from exc
+        raise
     observed = json.loads(result.stdout.strip())
     if observed.get("version") != spec["version"]:
         raise AssessorPythonRuntimeError(f"pinned Python interpreter reported {observed.get('version')}, expected {spec['version']}")
