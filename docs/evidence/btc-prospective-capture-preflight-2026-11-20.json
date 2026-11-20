@@ -1,0 +1,42 @@
+{
+  "schema": "market-os.btc-prospective-capture-preflight.v1",
+  "host_clock_started_at": "2026-11-20T00:36:08.6891663Z",
+  "host_clock_completed_at": "2026-11-20T00:43:51Z",
+  "scope": "read-only readiness check for the unapproved BTCUSDT prospective capture proposal",
+  "host_clock_qualification": "The Z-suffixed wall-clock values are unverified because Windows Time was not running; they do not establish UTC accuracy, an error bound, or packet availability.",
+  "clock": {
+    "platform": "windows",
+    "provider": "Windows Time service (W32Time)",
+    "queries": [
+      "w32tm /query /status",
+      "w32tm /query /configuration"
+    ],
+    "service_configuration_checked_at_host_clock": "2026-11-20T00:43:51Z",
+    "service_state": "not_started",
+    "service_start_mode": "manual",
+    "configured_sync_mode": "NTP",
+    "ntp_peer_configured": true,
+    "observed_error_code": "0x80070426",
+    "utc_error_bound_ms": null,
+    "packet_availability_status": "not_established"
+  },
+  "market_data": {
+    "source": "Binance Spot public market data",
+    "endpoint": "wss://data-stream.binance.vision:443/ws/btcusdt@kline_1m",
+    "technical_endpoint_confirmed_from_official_docs": true,
+    "terms_and_regional_eligibility": "unresolved",
+    "capture_attempted": false,
+    "market_data_requests": 0
+  },
+  "jev": {
+    "api_request_attempted": false,
+    "btc_packet_egress_authorized": false
+  },
+  "result": "proposal remains diagnostics-only until a qualified UTC error bound is established; no Binance capture or Jev request was made",
+  "references": [
+    "https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md",
+    "https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md",
+    "https://www.binance.com/en/terms",
+    "https://www.binance.com/en/legal/list-of-prohibited-countries"
+  ]
+}

@@ -8,6 +8,11 @@ availability while source publication remains unknown.
 **Scope:** BTCUSDT Spot, Binance public market data, BTC-only MiniRAG evidence
 flow.
 **Prepared:** 2026-11-19
+**Preflight (2026-11-20):** The current Windows workspace host's Windows Time
+service was not started, so no defensible UTC error bound was available. This
+keeps the proposal diagnostics-only until a qualified time source and
+continuous bound monitoring are available. See the
+[clock and source preflight](evidence/btc-prospective-capture-preflight-2026-11-20.json).
 
 ## Purpose
 
@@ -98,6 +103,14 @@ bound); it must be no later than B2 decision eligibility. A source that
 cannot establish this bound may produce timestamp diagnostics only. This
 proposal does not authorize a new time-service endpoint or request.
 
+The 2026-11-20 read-only host preflight found that `w32tm /query /status` and
+`w32tm /query /configuration` both reported the Windows Time service was not
+started (`0x80070426`). The service is configured for NTP with a peer present,
+but no sync status or UTC error bound was available. Do not start it or treat
+its wall clock as packet-eligible without the owner's approval and continuous
+bound observations. A capture made in this state may retain diagnostics, but
+its receipt timestamps cannot establish packet availability.
+
 Store only `k.x=true` finalized events. Do not use in-progress candle updates
 for a decision, fill missing minutes, or substitute a historical archive row.
 Mark missing or duplicate candle intervals in the manifest. Treat all Binance
@@ -107,9 +120,9 @@ them is not independent corroboration.
 ## Selected packet gate
 
 The owner selected strict recorded availability under
-[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md). The current
-owner clarification permits a contemporaneously recorded local receipt time
-with a defensible UTC error bound to establish availability while source
+[ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md) and
+reaffirmed on 2026-11-20 that a contemporaneously recorded local receipt time
+with a defensible UTC error bound qualifies as availability while source
 publication remains unknown. Keep the two fields distinct. For a future packet,
 use the conservative receipt bound (`received_at_utc + clock_error_bound_ms`)
 and require the source event to end by the observation close and that receipt
@@ -148,6 +161,12 @@ eligibility check as separate fields.
   market-data endpoint; it does not settle the terms, retention rights, or
   regional-use questions already marked as blockers in
   [ADR-0021](decisions/ADR-0021-btc-historical-readiness-gate.md).
+- The 2026-11-20 source-document check reconfirmed that Binance documents the
+  market-data-only WebSocket endpoint without API-key authentication. The
+  current Terms of Use says service availability can vary by jurisdiction; the
+  reviewed public material did not settle public-stream retention rights or
+  Vietnam-specific eligibility. Keep both questions unresolved until the
+  actual terms applicable to this endpoint and region are confirmed.
 
 ## Approval checklist
 
@@ -168,6 +187,8 @@ this prospective connection.
 
 - [Binance Spot WebSocket Streams](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md) — kline fields, update cadence, connection lifetime, and WebSocket limits.
 - [Binance market-data-only endpoints](https://github.com/binance/binance-spot-api-docs/blob/master/faqs/market_data_only.md) — public WebSocket market-data endpoint and no API-key requirement.
+- [Binance Terms of Use](https://www.binance.com/en/terms) and [prohibited-countries page](https://www.binance.com/en/legal/list-of-prohibited-countries) — service availability may be jurisdiction-specific; this review did not resolve public market-data retention or Vietnam eligibility.
+- [2026-11-20 clock and source preflight](evidence/btc-prospective-capture-preflight-2026-11-20.json)
 - [ADR-0057: Strict Recorded Availability for BTC Evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
 - [ADR-0021: BTC historical-data authorization and readiness gate](decisions/ADR-0021-btc-historical-readiness-gate.md)
 - [BTC MiniRAG and Jev Evidence Path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md)
