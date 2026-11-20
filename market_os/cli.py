@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import sys
 
 from .api import serve
 from .metrics import MetricsRegistry
@@ -270,7 +271,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    args = build_parser().parse_args(arguments)
+    if (
+        args.command == "btc-paper"
+        and args.btc_command == "local-assessor"
+        and args.local_assessor_command in {"health", "assess"}
+    ):
+        from .btc_assessor_linux_isolation import run_assessor_in_isolation
+
+        isolated_exit = run_assessor_in_isolation(arguments)
+        if isolated_exit is not None:
+            return isolated_exit
     if args.command == "serve":
         workflow = MarketWorkflow(RunStore(args.store_root))
         serve(

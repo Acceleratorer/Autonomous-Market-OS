@@ -36,6 +36,7 @@ from .btc_question_evaluation import (
     normalize_b31_assessment,
     validate_b31_packet_eligibility,
 )
+from .btc_assessor_python_runtime import AssessorPythonRuntimeError, RUNTIME_RELATIVE_PATH, bootstrap_runtime
 
 
 LOCAL_PROVIDER = "local_qwen_evidence_assessor"
@@ -365,6 +366,28 @@ def _verify_windows_egress_rules(server_path: Path) -> dict[str, Any]:
     }
 
 
+def _verify_pinned_python_runtime(expected: Any) -> None:
+    target = "windows-x64" if os.name == "nt" else "linux-x64"
+    if not isinstance(expected, Mapping) or expected.get("target") != target:
+        raise LocalAssessorError("runtime_integrity_failed", "install manifest is missing the pinned target Python runtime")
+    relative = Path(str(expected.get("runtime_root_relative_path", "")))
+    if relative.is_absolute() or ".." in relative.parts or relative.as_posix() != RUNTIME_RELATIVE_PATH.as_posix():
+        raise LocalAssessorError("runtime_integrity_failed", "install manifest has an unsafe Python runtime path")
+    try:
+        project_root = Path(__file__).resolve().parents[1]
+        verified = bootstrap_runtime(project_root, target, verify_only=True)
+    except (AssessorPythonRuntimeError, OSError, ValueError, KeyError, IndexError) as exc:
+        raise LocalAssessorError("runtime_integrity_failed", "pinned CPython runtime failed its local verification") from exc
+    manifest = verified["manifest"]
+    if (
+        expected.get("version") != manifest.get("python_version")
+        or expected.get("manifest_sha256") != verified.get("manifest_sha256")
+        or expected.get("runtime_tree_sha256") != manifest.get("runtime_tree_sha256_excluding_manifest_and_bytecode")
+        or Path(sys.executable).resolve() != Path(verified["interpreter"]).resolve()
+    ):
+        raise LocalAssessorError("runtime_integrity_failed", "assessor must run under the exact pinned target CPython runtime")
+
+
 def _now_ms() -> int:
     return time.time_ns() // 1_000_000
 
@@ -605,6 +628,7 @@ class LocalLlamaRuntime:
         target_spec = lock.get("runtime", {}).get("targets", {}).get(target)
         if not isinstance(target_spec, Mapping):
             raise LocalAssessorError("runtime_integrity_failed", "install target is not present in the runtime lock")
+        _verify_pinned_python_runtime(manifest.get("python_runtime"))
         if (manifest.get("model") or {}).get("sha256") != lock["model"]["sha256"]:
             raise LocalAssessorError("runtime_integrity_failed", "installed model identity does not match the runtime lock")
         runtime = manifest.get("runtime") or {}
@@ -665,17 +689,17 @@ class LocalLlamaRuntime:
         if os.name == "nt":
             isolation = _verify_windows_egress_rules(self.server_path)
         else:
-            isolation = {
-                "status": "unverified",
-                "reason": "the Linux CLI is not running inside a verified systemd network and cgroup boundary",
-            }
+            from .btc_assessor_linux_isolation import verify_linux_isolation
+
+            result = verify_linux_isolation()
+            isolation = result["network_isolation"]
         if isolation.get("status") != "enforced":
             raise LocalAssessorError("network_isolation_unverified", str(isolation.get("reason") or "runtime egress isolation is unverified"))
         return isolation
 
     def start(self, *, require_network_isolation: bool = True) -> None:
         with self._lock:
-            if require_network_isolation:
+            if require_network_isolation or os.name != "nt":
                 self.require_network_isolation()
             if self._process is not None:
                 if self._process.poll() is None:
@@ -761,6 +785,13 @@ class LocalLlamaRuntime:
                     if isinstance(exc, OSError):
                         raise LocalAssessorError("resource_limit", "Windows could not enforce CPU and memory limits before inference startup") from exc
                     raise
+            else:
+                from .btc_assessor_linux_isolation import verify_linux_isolation
+
+                isolation = verify_linux_isolation(self._process.pid)
+                if isolation.get("status") != "enforced":
+                    self.stop()
+                    raise LocalAssessorError("network_isolation_unverified", str(isolation.get("reason") or "Linux runtime isolation is unverified"))
 
             deadline = time.monotonic() + self.startup_timeout_seconds
             while time.monotonic() < deadline:
@@ -827,20 +858,18 @@ class LocalLlamaRuntime:
                 "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap" if "cuda" in self.target else "not_applicable",
             }
         else:
-            resource_limits = {
-                "status": "unmanaged",
-                "supervisor": None,
-                "reason": "Linux cgroup resource limits are not configured by this runtime",
-            }
-        network_isolation = (
-            _verify_windows_egress_rules(self.server_path)
-            if os.name == "nt"
-            else {
-                "status": "unverified",
-                "supervisor": None,
-                "reason": "the Linux CLI is not running inside a verified systemd network and cgroup boundary",
-            }
-        )
+            if process_running:
+                from .btc_assessor_linux_isolation import verify_linux_isolation
+
+                isolation = verify_linux_isolation(self._process.pid if self._process is not None else None)
+                resource_limits = isolation["resource_limits"]
+                network_isolation = isolation["network_isolation"]
+            else:
+                reason = "the Linux assessor is not running inside a verified systemd scope and network namespace"
+                resource_limits = {"status": "not_running", "supervisor": "systemd user scope / cgroup v2", "reason": reason}
+                network_isolation = {"status": "unverified", "supervisor": "unshare user and network namespaces", "reason": reason}
+        if os.name == "nt":
+            network_isolation = _verify_windows_egress_rules(self.server_path)
         if not process_running:
             return {
                 "provider": self.provider,
@@ -1186,7 +1215,7 @@ def local_runtime_health(installation_root: str | Path) -> dict[str, Any]:
     """Start, inspect, and stop the local model runtime without a model call."""
     runtime = LocalLlamaRuntime(installation_root)
     try:
-        runtime.start(require_network_isolation=False)
+        runtime.start(require_network_isolation=os.name != "nt")
         return runtime.health()
     finally:
         runtime.stop()

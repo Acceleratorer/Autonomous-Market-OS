@@ -1,7 +1,7 @@
 # BTC Local Assessor OS Isolation Readiness
 
 **Checked:** 2026-11-20
-**Status:** Research note; no host firewall or service policy was changed.
+**Status:** Linux rootless boundary is implemented and unit-checked; no Linux target-host verification or host policy change has occurred.
 **Scope:** OS-enforced egress and resource limits for the local Qwen assessor.
 
 ## Current result
@@ -9,7 +9,7 @@
 | Launch path | Resource boundary | Network boundary | Readiness |
 |---|---|---|---|
 | Windows `btc-paper local-assessor` CLI | The pinned `llama-server` child is assigned to a Windows Job Object before it is resumed. The current limits are a 6 GiB process/job commit cap and 25% CPU hard cap. CUDA fit is adaptive, not a VRAM quota. | ActiveStore has no enabled outbound block rule matching the Python executable, the pinned `llama-server.exe`, or `Any`; all profiles default to outbound `Allow`. A read-only ActiveStore verifier and opt-in per-program installer now exist, but the installer has not been run. | Health remains `degraded`; zero egress is unproved. |
-| Linux `btc-paper local-assessor` CLI | The runtime starts `llama-server` with `Popen`; Linux health reports resource limits as `unmanaged`. | Loopback bind and offline environment variables do not block other sockets. Health reports egress isolation as `unverified`. | Not resource-bounded or network-isolated by this runtime. |
+| Linux `btc-paper local-assessor health/assess` CLI | The CLI re-executes in a transient `systemd --user` scope with `CPUQuota=25%`, `MemoryMax=6 GiB`, and `TasksMax=128`. It verifies the active cgroup-v2 files for both Python and `llama-server`. | `unshare --user --map-root-user --net` creates a separate network namespace. A small stdlib wrapper raises only `lo`; verification requires a distinct namespace inode, exactly the loopback interface, loopback-only IPv4/IPv6 routes, and matching Python/server cgroup and namespace membership. | Code and mocked boundary tests exist. No Linux host or live scope was available here, so deployment remains unverified and fails closed until target-host health passes. |
 | U5.5 system services | `market-os-python.service` and `market-os-next.service` have no explicit CPU or memory quota. | Both unit files configure `IPAddressDeny=any` with loopback allows. The package is disabled and the policy has not been verified on a target host. | Even when installed and supported, the policy covers those service processes, not a separate shell-launched CLI. |
 
 The latest read-only health run is recorded in
@@ -18,23 +18,50 @@ The repository evidence records the Windows Job Object smoke and its limits in
 [`btc-local-assessor-resource-guard-2026-11-20.json`](../evidence/btc-local-assessor-resource-guard-2026-11-20.json).
 The initial feasibility run used the shared CPython 3.12 executable. Its
 project-local venv remains at `.market_os/runtimes/btc-assessor-py312`; it uses
-`--system-site-packages` and is not the release runtime. A dedicated Windows
-runtime is now installed at `.market_os/runtimes/btc-assessor-py311` using the
-U6.4-approved CPython 3.11.9 embeddable archive from python.org. DuckDB 2.0.0
-and PyArrow 26.0.1 are installed from Windows CPython 3.11 wheels, with their
-wheel hashes recorded. The interpreter successfully imported CPython 3.11.9,
-DuckDB, PyArrow, and `market_os.cli`; this smoke did not start model inference
-and did not prove network isolation. A local assessor health smoke under this
-interpreter started the pinned `llama-server`, received HTTP 200 on loopback,
+`--system-site-packages` and is not the release runtime. A Windows CPython 3.11.9
+embeddable runtime was installed under `.market_os/runtimes/btc-assessor-py311`
+for the prior U6.4 baseline. DuckDB 2.0.0 and PyArrow 26.0.1 were installed
+from Windows CPython 3.11 wheels, with their wheel hashes recorded. That
+interpreter imported CPython, DuckDB, PyArrow, and `market_os.cli`; a local
+health smoke started the pinned `llama-server`, received HTTP 200 on loopback,
 and observed the existing 25% CPU and 6 GiB Job Object limits. Overall status
-remained `degraded` because the ActiveStore egress rules are absent. The health
-smoke made no packet assessment and did not change firewall policy. Runtime
-archive, executable, dependency wheels, tree digest, and health result are in
+remained `degraded` because the ActiveStore egress rules are absent. No model
+inference, packet assessment, or firewall policy change occurred. Historical
+provenance is in
 [`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](../evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
-The runtime was prepared locally; a repeatable cross-platform bootstrap is not
-yet in the repository. The Linux CPython 3.11.14 source-build path remains to
-be prepared and verified. A future Windows per-program rule must target this
-dedicated interpreter so it does not block unrelated Python workloads.
+
+Python.org's latest 3.11 security patch is 3.11.18 and is source-only; the
+updated BTC-specific runtime lock now builds this source on both Windows and
+Linux. Windows uses the official `PCbuild` plus `PC/layout` embeddable-layout
+flow; Linux uses the source `configure`/`make` flow. The U6.4/Electron runtime
+baseline remains unchanged. The existing workstation 3.11.9 tree does not
+match the new BTC runtime lock and has not been replaced: Visual Studio C++
+build tools are absent locally. The source-build paths require CI verification,
+and each target job now uploads a runtime evidence JSON with the exact runner
+image, archive SHA-256, runtime-manifest/tree hashes, and dependency wheels.
+The Linux path still requires live supported-host isolation and GPU
+verification. A future Windows per-program firewall rule must target the new
+dedicated interpreter so it does not block unrelated Python workloads. See
+the [Python 3.11.18 release](https://www.python.org/downloads/release/python-31118/),
+CPython's [Windows build instructions](https://github.com/python/cpython/blob/v3.11.18/PCbuild/readme.txt),
+and the [3.11.18 embed layout options](https://github.com/python/cpython/blob/v3.11.18/PC/layout/support/options.py).
+The Linux assessment path now uses a transient user scope plus a user/network
+namespace. The scope is synchronous and applies only to one `health` or
+`assess` invocation; replay remains local file inspection. It fails closed if
+`systemd-run`, delegated cgroup-v2 CPU/memory/pids controls, rootless user
+namespaces, loopback setup, or any membership check is unavailable. In
+particular, the Windows workstation has no WSL distribution, so no live Linux
+run, actual `llama-server` loopback check, GPU device-access check, or target
+cgroup observation has been recorded. The scope does not rely on
+`IPAddressDeny`: systemd documents that IP address filtering is available only
+for system services, while a user scope can still carry resource controls.
+The network namespace provides separate IPv4/IPv6 stacks and routing tables.
+See [`systemd-run --scope`](https://freedesktop.org/software/systemd/man/latest/systemd-run.html),
+[`systemd.resource-control`](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control),
+and [`unshare(1)`](https://www.man7.org/linux/man-pages/man1/unshare.1.html).
+The implementation and focused test evidence are in
+[`btc-assessor-runtime-isolation-implementation-2026-11-20.json`](../evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json).
+
 The Windows firewall helper at
 [`btc_assessor_firewall.ps1`](../../market_os/btc_assessor_firewall.ps1)
 supports read-only `Verify` and explicit elevated `Install` modes. Install adds
@@ -74,14 +101,19 @@ collected during this local probe.
 ## Platform findings
 
 Linux systemd `IPAddressDeny=` and `IPAddressAllow=` filter IPv4/IPv6 ingress
-and egress for sockets created by processes in a unit. The systemd guidance
-states these controls are available for **system services**, not per-user
-services, and may have no effect when the kernel or container lacks cgroup BPF
-support. `CPUQuota=` is a hard ceiling expressed relative to one CPU, while
-`MemoryMax=` controls the unit's cgroup memory limit. Therefore, a user scope
-or a static unit-file review alone cannot prove runtime isolation; the actual
-assessor must run inside a supported system service and its effective cgroup
-controls must be checked. See the [systemd resource-control documentation](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html).
+and egress for sockets created by processes in a unit, but systemd documents
+these controls for **system services**, not per-user services. The standalone
+CLI therefore uses a separate user/network namespace instead of claiming that
+a per-user `IPAddressDeny` rule works. systemd `CPUQuota=`, `MemoryMax=`, and
+`TasksMax=` map to cgroup controller limits; runtime health reads the actual
+v2 `cpu.max`, `memory.max`, and `pids.max` files for the transient scope.
+`unshare --user --map-root-user --net` gives the process a separate network
+stack and routing tables and grants namespace-local capabilities to configure
+loopback without host elevation. These configured limits are not deployment
+evidence until a supported Linux host confirms them at runtime. See the
+[systemd resource-control documentation](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html),
+[`systemd-run`](https://freedesktop.org/software/systemd/man/latest/systemd-run.html),
+and [`unshare(1)`](https://www.man7.org/linux/man-pages/man1/unshare.1.html).
 
 Windows Job Objects support CPU-rate and committed-memory limits for assigned
 processes, matching the current runtime's resource controls. They do not
@@ -98,14 +130,16 @@ explicit treatment. See Microsoft's [Job Objects](https://learn.microsoft.com/en
 [loopback guidance](https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/troubleshooting-uwp-firewall),
 and [Windows Firewall defaults](https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall).
 
-## Next implementation gate
+## Next verification gate
 
-1. For Linux, place the assessor execution path inside a **system** service with
-   loopback-only `IPAddress*` policy and explicit cgroup CPU/memory/process
-   limits. Verify the active unit properties and effective cgroup files on the
-   target host, and confirm a non-loopback probe is denied while loopback IPC
-   still works. Keep health degraded if systemd or cgroup BPF support is
-   missing.
+1. On a supported Linux x64 host, install the pinned Linux runtime and run
+   `btc-paper local-assessor health` plus a synthetic-only assessment. Confirm
+   the emitted health shows the requested cgroup-v2 limits, Python and server
+   share the scope and network namespace, loopback IPC succeeds, and no
+   non-loopback interface or route exists. Also confirm the target user's GPU
+   device permissions still allow the pinned CUDA runtime; otherwise use the
+   locked CPU build or keep Linux health degraded. Do not call a mocked test or
+   CI source build live target-host isolation evidence.
 2. For Windows, use the opt-in firewall installer only after the pinned,
    project-local CPython 3.11 runtime and the locked llama.cpp target are
    installed. From an elevated PowerShell session at the repository root, set

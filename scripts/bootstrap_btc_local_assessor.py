@@ -17,7 +17,6 @@ from typing import Any, BinaryIO
 from urllib.request import Request, urlopen
 import zipfile
 
-
 MAX_MODEL_BYTES = 3_000_000_000
 MAX_RUNTIME_ARCHIVE_BYTES = 1_000_000_000
 CHUNK_BYTES = 1024 * 1024
@@ -140,11 +139,19 @@ def main() -> int:
     args = parser.parse_args()
 
     root = _repo_root()
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    from market_os.btc_assessor_python_runtime import RUNTIME_RELATIVE_PATH, bootstrap_runtime
+
     lock_path = root / "market_os" / "models" / "btc_local_assessor_runtime.lock.json"
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
     if lock.get("schema") != "market-os.btc-local-assessor-runtime-lock.v1":
         raise ValueError("unsupported local-assessor runtime lock schema")
     target_spec = lock["runtime"]["targets"][args.target]
+    python_target = "windows-x64" if os.name == "nt" else "linux-x64"
+    if (args.target.startswith("windows-") != (os.name == "nt")):
+        raise ValueError("local assessor target must match the host operating system")
+    python_runtime = bootstrap_runtime(root, python_target)
     install_root = root / ".market_os" / "local-evidence-runtime" / args.target
     download_root = install_root / "downloads"
     engine_root = install_root / "engine"
@@ -183,6 +190,13 @@ def main() -> int:
             "server_sha256": _sha256_file(matches[0]),
             "archive_sha256": target_spec["sha256"],
             "cuda_runtime_sha256": cuda_spec["sha256"] if cuda_spec else None,
+        },
+        "python_runtime": {
+            "target": python_target,
+            "version": python_runtime["manifest"]["python_version"],
+            "runtime_root_relative_path": RUNTIME_RELATIVE_PATH.as_posix(),
+            "manifest_sha256": python_runtime["manifest_sha256"],
+            "runtime_tree_sha256": python_runtime["manifest"]["runtime_tree_sha256_excluding_manifest_and_bytecode"],
         },
     }
     manifest_path = install_root / "install-manifest.json"
