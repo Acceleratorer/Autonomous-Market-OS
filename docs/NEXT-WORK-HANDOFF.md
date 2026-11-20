@@ -89,9 +89,22 @@ lacks the Visual Studio C++ build tools and a WSL distribution. The pinned
 3.11.18 builds passed in CI, and the Windows 3.11.18 bundle is now installed
 and verified locally as recorded above.
 
-**Checkpoint base:** `main` at `8132c57` after PR #54 merged. The Windows
-firewall installer remains opt-in and unrun; the ActiveStore verifier did not
-find installed rules. No new market-data capture has been run.
+**Checkpoint base:** `main` at `75a3bbf` after PR #58 merged. PR #57 records
+the verified Windows CPython 3.11.18 runtime health; PR #58 adds regression
+coverage for unknown publication time with bounded local receipt. Both PRs
+were merged under `Acceleratorer`, and both branches were deleted. The local
+assessor module passed 17 tests; PR #58 CI finished with 15 passed, 0 failed,
+and 3 skipped checks.
+
+The incremental Understand graph is current at `75a3bbf`: 656 files analyzed,
+20 symbols in `test_btc_local_assessor.py`, and no unresolved symbols. Two
+candidate call edges to provider classes absent from the graph were dropped by
+the merge validator.
+
+The Windows firewall installer remains opt-in and unrun; ActiveStore has no
+matching executable rules. No new market-data capture or B3.1 packet
+assessment has run; Jev remains at the existing synthetic U3 connectivity
+scope.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
 publication time while allowing a contemporaneous local receipt with a
 defensible UTC error bound to establish future availability. The retrospective
@@ -99,16 +112,16 @@ B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
 packets are assessed locally with Qwen. The prospective Binance stream remains
 an unapproved timestamp/provenance pilot; the proposal authorizes no request.
 
-The CPython 3.11.18 Windows/Linux source builds passed in CI run 44644535859;
-PR #54 is merged and its branch is deleted. Next, install the pinned runtime
-on a supported Windows target when the required C++ build tools are available,
-then verify its local health and firewall boundary with the owner's approval.
-On Linux, run `health` and one synthetic-only assessment on a supported x64
-host and preserve actual cgroup, namespace, loopback, and GPU-access evidence.
-The owner’s receipt-time decision resolves the B3.1 eligibility rule but does
-not approve a new Binance stream: any prospective run still needs current
-terms and regional review, a defensible UTC error bound throughout the run,
-and separate date-bound approval.
+Next, if the owner approves the two executable-scoped Windows firewall rules,
+run the installer elevated, verify ActiveStore, then perform the bounded
+non-loopback denial probe and confirm loopback health before one synthetic-only
+Qwen assessment. The current PowerShell session is not elevated. On Linux,
+verify `health`, cgroup limits, namespace, loopback, and GPU access on a
+supported x64 host; this workstation has neither WSL nor Docker. The
+receipt-time decision resolves B3.1 eligibility but does not approve a Binance
+stream: any prospective run still needs current terms and regional review, a
+defensible UTC error bound throughout the run, and separate date-bound
+approval. Keep Jev connectivity-only and BTC packets local to Qwen.
 
 ## Where the project stands
 
