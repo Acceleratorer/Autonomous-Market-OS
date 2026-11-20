@@ -215,12 +215,12 @@ def _install_windows(project_root: Path, work_root: Path, staging_root: Path, sp
         raise ValueError("official CPython source archive is missing PCbuild/build.bat")
     _run([str(build_script), "-e", "-p", "x64"], cwd=source_root, timeout=1800)
     build_python = source_root / "PCbuild" / "amd64" / "python.exe"
-    layout_script = source_root / "PC" / "layout"
-    if not build_python.is_file() or not layout_script.is_file():
+    layout_package = source_root / "PC" / "layout"
+    if not build_python.is_file() or not (layout_package / "__main__.py").is_file():
         raise ValueError("CPython Windows source build is missing its interpreter or layout tool")
     embedded_archive = work_root / "python-embed.zip"
     _run(
-        [str(build_python), str(layout_script), "--zip", str(embedded_archive), "--preset-embed"],
+        [str(build_python), str(layout_package), "--zip", str(embedded_archive), "--preset-embed"],
         cwd=source_root,
         timeout=300,
     )
