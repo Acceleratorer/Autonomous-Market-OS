@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tarfile
 import tempfile
+import zipfile
 
 from market_os.btc_assessor_python_runtime import (
     LOCK_PATH,
     AssessorPythonRuntimeError,
     _dependency_records,
+    _package_runtime,
+    _relative_import_entry,
     _safe_member,
     _tree_sha256,
+    _write_project_import_pth,
+    _windows_runtime_pth_path,
     runtime_ci_evidence,
 )
 
@@ -47,6 +53,7 @@ def test_ci_runtime_evidence_binds_runner_image_and_runtime_hashes() -> None:
         verified,
         image_os="windows-2025",
         image_version="20261103.298.1",
+        bundle={"archive": "runtime.zip", "format": "zip", "bytes": 10, "sha256": "e" * 64},
     )
 
     assert evidence["schema"] == "market-os.btc-assessor-python-runtime-ci-evidence.v1"
@@ -57,6 +64,7 @@ def test_ci_runtime_evidence_binds_runner_image_and_runtime_hashes() -> None:
     assert evidence["runtime"]["archive_sha256"] == "b" * 64
     assert evidence["runtime"]["manifest_sha256"] == "a" * 64
     assert evidence["runtime"]["tree_sha256"] == "c" * 64
+    assert evidence["runtime"]["bundle"]["sha256"] == "e" * 64
     try:
         runtime_ci_evidence("windows-x64", verified, image_os="windows-2025", image_version="")
     except AssessorPythonRuntimeError:
@@ -85,6 +93,84 @@ def test_runtime_tree_digest_ignores_bytecode_and_its_manifest(tmp_path: Path) -
     (runtime / "Lib" / "__pycache__" / "module.cpython-311.pyc").write_bytes(b"next cache")
 
     assert _tree_sha256(runtime) == before
+
+
+def test_runtime_import_entries_resolve_from_the_final_bundle_location(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    runtime = project / ".market_os" / "runtimes" / "btc-assessor-py311"
+    windows_site_packages = runtime / "Lib" / "site-packages"
+    windows_entry = _relative_import_entry(windows_site_packages, project)
+    linux_site_packages = runtime / "lib" / "python3.11" / "site-packages"
+    linux_entry = _relative_import_entry(linux_site_packages, project)
+
+    assert not Path(windows_entry).is_absolute()
+    assert not Path(linux_entry).is_absolute()
+    assert (windows_site_packages / windows_entry).resolve() == project.resolve()
+    assert (linux_site_packages / linux_entry).resolve() == project.resolve()
+
+
+def test_project_import_path_is_written_relative_to_final_site_packages(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    site_packages = tmp_path / "staging" / "Lib" / "site-packages"
+    final_site_packages = project / ".market_os" / "runtimes" / "btc-assessor-py311" / "Lib" / "site-packages"
+    site_packages.mkdir(parents=True)
+
+    _write_project_import_pth(site_packages, final_site_packages, project)
+
+    entry = (site_packages / "market-os-source.pth").read_text(encoding="utf-8").strip()
+    assert not Path(entry).is_absolute()
+    assert (final_site_packages / entry).resolve() == project.resolve()
+
+
+def test_windows_runtime_uses_the_shared_library_path_file_when_dll_is_nested(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    staging = tmp_path / "staging"
+    dll_directory = staging / "DLLs"
+    dll_directory.mkdir(parents=True)
+    (dll_directory / "python311.dll").write_bytes(b"runtime dll")
+    shared_library_pth = dll_directory / "python311._pth"
+    shared_library_pth.write_text("relative path file", encoding="ascii")
+    (staging / "python311._pth").write_text("executable path file", encoding="ascii")
+
+    pth_path = _windows_runtime_pth_path(staging)
+    final_runtime = project / ".market_os" / "runtimes" / "btc-assessor-py311"
+    final_pth_directory = final_runtime / "DLLs"
+    project_entry = _relative_import_entry(final_pth_directory, project)
+    site_packages = final_runtime / "Lib" / "site-packages"
+    site_packages_entry = _relative_import_entry(final_pth_directory, site_packages)
+
+    assert pth_path == shared_library_pth
+    assert not Path(project_entry).is_absolute()
+    assert (final_pth_directory / project_entry).resolve() == project.resolve()
+    assert (final_pth_directory / site_packages_entry).resolve() == site_packages.resolve()
+
+
+def test_target_runtime_bundles_preserve_tree_paths_and_linux_modes(tmp_path: Path) -> None:
+    runtime = tmp_path / "runtime"
+    interpreter = runtime / "bin" / "python3.11"
+    interpreter.parent.mkdir(parents=True)
+    interpreter.write_bytes(b"pinned interpreter")
+    interpreter.chmod(0o755)
+    (runtime / "python-runtime-manifest.json").write_text("{}", encoding="utf-8")
+
+    windows_bundle = tmp_path / "windows.zip"
+    windows_record = _package_runtime(runtime, "windows-x64", windows_bundle)
+    with zipfile.ZipFile(windows_bundle) as package:
+        assert "bin/python3.11" in package.namelist()
+    assert windows_record["sha256"]
+    assert windows_record["format"] == "zip"
+
+    linux_bundle = tmp_path / "linux.tar.gz"
+    linux_record = _package_runtime(runtime, "linux-x64", linux_bundle)
+    with tarfile.open(linux_bundle, "r:gz") as package:
+        member = package.getmember("bin/python3.11")
+        assert member.isfile()
+        source_mode = interpreter.stat().st_mode & 0o777
+        assert member.mode == source_mode
+        if source_mode & 0o111:
+            assert member.mode & 0o111
+    assert linux_record["sha256"]
+    assert linux_record["format"] == "tar.gz"
 
 
 def test_pip_report_requires_wheel_sha256() -> None:

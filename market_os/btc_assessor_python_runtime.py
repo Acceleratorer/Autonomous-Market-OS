@@ -164,6 +164,76 @@ def _project_dependencies(project_root: Path) -> list[str]:
     return dependencies
 
 
+def _relative_import_entry(base: Path, target: Path) -> str:
+    return os.path.relpath(target, base).replace("\\", "/")
+
+
+def _write_project_import_pth(site_packages: Path, final_site_packages: Path, project_root: Path) -> None:
+    project_entry = _relative_import_entry(final_site_packages, project_root)
+    (site_packages / "market-os-source.pth").write_text(project_entry + "\n", encoding="utf-8")
+
+
+def _windows_runtime_pth_path(runtime_root: Path) -> Path:
+    dll_candidates = (
+        runtime_root / "python311.dll",
+        runtime_root / "DLLs" / "python311.dll",
+        *runtime_root.rglob("python311.dll"),
+    )
+    dll = next((path for path in dll_candidates if path.is_file()), None)
+    if dll is None:
+        raise ValueError("Windows Python runtime is missing python311.dll")
+    shared_library_pth = dll.with_name("python311._pth")
+    executable_pth = runtime_root / "python._pth"
+    pth_path = shared_library_pth if shared_library_pth.is_file() else executable_pth
+    if not pth_path.is_file():
+        raise ValueError("Windows Python runtime is missing its python311._pth path file")
+    return pth_path
+
+
+def _package_runtime(runtime_root: Path, target: str, output: Path) -> dict[str, Any]:
+    runtime_root = runtime_root.resolve()
+    output = output.resolve()
+    if target not in {"windows-x64", "linux-x64"}:
+        raise ValueError(f"unsupported BTC assessor runtime target: {target}")
+    if output.is_relative_to(runtime_root):
+        raise ValueError("runtime bundle output must be outside the runtime tree")
+    suffix = ".zip" if target == "windows-x64" else ".tar.gz"
+    if not output.name.lower().endswith(suffix):
+        raise ValueError(f"{target} runtime bundle must use the {suffix} format")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    paths = sorted(runtime_root.rglob("*"), key=lambda path: path.relative_to(runtime_root).as_posix())
+    try:
+        if target == "windows-x64":
+            with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as package:
+                for path in paths:
+                    if path.is_symlink():
+                        raise ValueError(f"Windows runtime bundle cannot contain symlinks: {path}")
+                    relative = path.relative_to(runtime_root).as_posix()
+                    if path.is_dir():
+                        package.writestr(relative + "/", "")
+                    elif path.is_file():
+                        package.write(path, relative)
+                    else:
+                        raise ValueError(f"runtime contains an unsupported file type: {path}")
+        else:
+            with tarfile.open(output, "w:gz") as package:
+                for path in paths:
+                    if path.is_symlink() and not path.resolve().is_relative_to(runtime_root):
+                        raise ValueError(f"Linux runtime symlink escapes its tree: {path}")
+                    if not (path.is_dir() or path.is_file() or path.is_symlink()):
+                        raise ValueError(f"runtime contains an unsupported file type: {path}")
+                    package.add(path, arcname=path.relative_to(runtime_root).as_posix(), recursive=False)
+    except BaseException:
+        output.unlink(missing_ok=True)
+        raise
+    return {
+        "archive": output.name,
+        "format": "zip" if target == "windows-x64" else "tar.gz",
+        "bytes": output.stat().st_size,
+        "sha256": _sha256_file(output),
+    }
+
+
 def _dependency_records(report_path: Path) -> list[dict[str, str]]:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     records = []
@@ -195,7 +265,7 @@ def _verify_runtime(runtime_root: Path, project_root: Path, spec: dict[str, Any]
     if not interpreter.is_relative_to(runtime_root.resolve()) or not interpreter.is_file():
         raise AssessorPythonRuntimeError("pinned BTC assessor Python interpreter is missing or escapes its runtime")
     result = _run(
-        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow,market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
         cwd=project_root,
         env={**_pip_environment(), "PYTHONPATH": ""},
         timeout=30,
@@ -239,15 +309,18 @@ def _install_windows(project_root: Path, work_root: Path, staging_root: Path, sp
         cwd=project_root,
         env=_pip_environment(),
     )
-    pth_path = staging_root / "python311._pth"
+    pth_path = _windows_runtime_pth_path(staging_root)
     lines = pth_path.read_text(encoding="utf-8").splitlines()
     lines = ["import site" if line.strip() == "#import site" else line for line in lines]
-    for entry in ("Lib/site-packages", str(project_root)):
-        if entry not in lines:
-            lines.append(entry)
+    final_runtime_root = project_root / RUNTIME_RELATIVE_PATH
+    final_pth_directory = final_runtime_root / pth_path.parent.relative_to(staging_root)
+    site_packages_entry = _relative_import_entry(final_pth_directory, final_runtime_root / "Lib" / "site-packages")
+    if site_packages_entry not in lines:
+        lines.append(site_packages_entry)
     if "import site" not in lines:
         lines.append("import site")
     pth_path.write_text("\n".join(dict.fromkeys(lines)) + "\n", encoding="ascii")
+    _write_project_import_pth(site_packages, final_runtime_root / "Lib" / "site-packages", project_root)
     return staging_root / spec["interpreter"], report_path
 
 
@@ -284,7 +357,8 @@ def _install_linux(project_root: Path, work_root: Path, staging_root: Path, spec
         env=_pip_environment(),
         timeout=600,
     )
-    (site_packages / "market-os-source.pth").write_text(str(project_root) + "\n", encoding="utf-8")
+    final_site_packages = project_root / RUNTIME_RELATIVE_PATH / site_packages.relative_to(staging_root)
+    _write_project_import_pth(site_packages, final_site_packages, project_root)
     return interpreter, report_path
 
 
@@ -314,7 +388,7 @@ def bootstrap_runtime(project_root: str | Path, target: str, *, verify_only: boo
             else _install_linux(root, work_root, staging_root, spec)
         )
         smoke = _run(
-            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow,market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
             cwd=root,
             env=_pip_environment(),
             timeout=30,
@@ -351,10 +425,23 @@ def runtime_ci_evidence(
     *,
     image_os: str,
     image_version: str,
+    bundle: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if not image_os or not image_version:
         raise AssessorPythonRuntimeError("CI runtime evidence requires the exact hosted runner image identity")
     manifest = verified["manifest"]
+    runtime = {
+        "version": manifest["python_version"],
+        "distribution": manifest["python_distribution"],
+        "archive": manifest["python_archive"],
+        "archive_sha256": manifest["python_archive_sha256"],
+        "manifest_sha256": verified["manifest_sha256"],
+        "tree_sha256": manifest["runtime_tree_sha256_excluding_manifest_and_bytecode"],
+        "dependencies": manifest["dependencies"],
+        "verification": manifest["verification"],
+    }
+    if bundle is not None:
+        runtime["bundle"] = bundle
     return {
         "schema": "market-os.btc-assessor-python-runtime-ci-evidence.v1",
         "target": target,
@@ -364,16 +451,7 @@ def runtime_ci_evidence(
             "platform": sys.platform,
             "architecture": platform.machine(),
         },
-        "runtime": {
-            "version": manifest["python_version"],
-            "distribution": manifest["python_distribution"],
-            "archive": manifest["python_archive"],
-            "archive_sha256": manifest["python_archive_sha256"],
-            "manifest_sha256": verified["manifest_sha256"],
-            "tree_sha256": manifest["runtime_tree_sha256_excluding_manifest_and_bytecode"],
-            "dependencies": manifest["dependencies"],
-            "verification": manifest["verification"],
-        },
+        "runtime": runtime,
     }
 
 
@@ -384,19 +462,24 @@ def main() -> int:
     parser.add_argument("--target", required=True, choices=("windows-x64", "linux-x64"))
     parser.add_argument("--verify-only", action="store_true", help="verify an installed runtime without downloading or building")
     parser.add_argument("--evidence-output", type=Path, help="write CI evidence with the hosted runner image and runtime hashes")
+    parser.add_argument("--bundle-output", type=Path, help="package the verified runtime as a target-native archive")
     args = parser.parse_args()
     result = bootstrap_runtime(Path(__file__).resolve().parents[1], args.target, verify_only=args.verify_only)
+    bundle = _package_runtime(result["runtime_root"], args.target, args.bundle_output) if args.bundle_output else None
     if args.evidence_output:
         evidence = runtime_ci_evidence(
             args.target,
             result,
             image_os=os.environ.get("ImageOS", ""),
             image_version=os.environ.get("ImageVersion", ""),
+            bundle=bundle,
         )
         args.evidence_output.parent.mkdir(parents=True, exist_ok=True)
         args.evidence_output.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"verified BTC assessor Python runtime: {result['interpreter']}")
     print(f"runtime manifest SHA-256: {result['manifest_sha256']}")
+    if bundle:
+        print(f"runtime bundle SHA-256: {bundle['sha256']}")
     return 0
 
 
