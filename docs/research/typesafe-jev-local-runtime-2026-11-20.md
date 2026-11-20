@@ -5,7 +5,7 @@
 
 ## Conclusion
 
-No publicly documented and licensed path was found to run TypeSafe's actual Jev model locally or offline while retaining Jev identity. Public materials document Jev as a hosted API: the [model reference](https://docs.typesafe.ai/models) lists versioned Jev IDs and says all use `POST /v1/systemone`; the [API reference](https://docs.typesafe.ai/api/system-one) specifies `https://api.typesafe.ai` and a bearer API key, and the [quick start](https://docs.typesafe.ai/introduction/quickstart) directs users to obtain a key from TypeSafe. The model page says the same weights serve every account and describes domain customization through request state and question instructions/criteria.
+No publicly documented and licensed path was found to run TypeSafe's actual Jev model locally or offline while retaining Jev identity. Rechecking the current public catalog on 2026-11-20, it lists `jev-1.14.0` and `jev-1.13.0` and says both use `POST /v1/systemone`; Jev 1.14 is identified as the newest release. The [API reference](https://docs.typesafe.ai/api/system-one) specifies `https://api.typesafe.ai` and required bearer authentication, and the [quick start](https://docs.typesafe.ai/introduction/quickstart) directs users to obtain an API key from TypeSafe. The model page says the same weights serve every account and describes domain customization through request state and question instructions/criteria.
 
 **Inference:** The public offering is technically hosted-only: I found no TypeSafe Jev weights, binary, container, offline-serving instructions, or local deployment entitlement in the public materials reviewed. The official [GitHub organization](https://github.com/typesafe-ai) lists SDKs, examples, an adapter, and a vLLM fork, but no Jev checkpoint or serving package. This absence does not establish that TypeSafe has no private offer. An SDK or compatible HTTP endpoint running locally would not, by itself, prove that the inference model is TypeSafe's Jev.
 
@@ -24,6 +24,8 @@ and is not changed by this finding.
 ## Contract and legal boundary
 
 TypeSafe's [Master Customer Agreement](https://typesafe.ai/legal/mca) defines the product Services as its **TypeSafe-hosted** console and API. Its license grants access to and use of those Services and permission to integrate the API into customer applications; it does not expressly grant rights to obtain, run, or redistribute Jev weights. The agreement also prohibits making the Services available as a standalone service, model distillation or training an imitator from Services/output, reverse engineering or deriving service source/underlying data, and creating derivative works; it reserves TypeSafe's rights in its technology. **Inference:** The public agreement is not a local-model license. Any private deployment, weight access, or redistribution would need explicit written terms from TypeSafe; this note is not a legal determination about a separate agreement.
+
+**Project constraint:** Do not use hosted Jev responses as labels for distilling or training a local Jev imitator under the public agreement. A local assessor must be developed and evaluated independently unless TypeSafe provides separate written permission covering that use.
 
 ## What needs direct confirmation
 
