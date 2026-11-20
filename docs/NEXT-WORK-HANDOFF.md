@@ -18,6 +18,17 @@ holdout does not establish stable edge or regime coverage. See the updated
 [BTC MiniRAG/Jev path](BTC-MINIRAG-JEV-EVIDENCE-PATH.md) and
 [B2 baseline report](B2-BTC-FEATURES-BASELINES-REPORT.md).
 
+The workstation now has the BTC-locked CPython 3.11.18 runtime at
+`.market_os/runtimes/btc-assessor-py311`; `--verify-only` passed. The existing
+Qwen/llama.cpp artifacts were SHA-256 verified and the bootstrap regenerated
+their local install manifest without downloading artifacts. Health returned
+HTTP 200 with the Windows Job Object limits enforced, but remains `degraded`
+because the Python and llama-server outbound-block rules are absent from
+ActiveStore. No model inference or packet assessment ran. Evidence is in
+[`btc-assessor-cpython-3.11.18-local-health-2026-11-20.json`](evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json).
+The firewall installer is prepared but has not been run; it requires an
+elevated session and owner approval before changing Windows Firewall policy.
+
 The packet-availability rule is resolved in ADR-0057: a contemporaneous local
 receipt with a defensible UTC error bound establishes availability while source
 publication remains unknown. The packet must compare the conservative receipt
@@ -66,22 +77,17 @@ runtime evidence artifacts. This proves source-build and packaging steps on
 the hosted runners; it does not prove Linux isolation or GPU access on a
 supported target host.
 
-The Windows workstation now has the U6.4-baseline CPython 3.11.9 runtime at
-`.market_os/runtimes/btc-assessor-py311`, with verified DuckDB 2.0.0 and PyArrow
-26.0.1 wheels. Import smoke passed for `market_os.cli`; local health returned
-HTTP 200 and the Job Object enforced 25% CPU and 6 GiB. Health remains degraded
-because egress rules are absent. No model inference or packet assessment ran,
-and no firewall policy changed. Provenance is in
+The Windows workstation previously used the U6.4-baseline CPython 3.11.9
+runtime, with verified DuckDB 2.0.0 and PyArrow 26.0.1 wheels. Its historical
+provenance is in
 [`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
-The older CPython 3.12 feasibility venv is left intact. That 3.11.9 runtime is
-historical U6.4 baseline evidence and no longer matches the updated BTC lock,
-which uses official CPython 3.11.18 source on both targets. The Windows source
-build and Linux build remain unverified locally; this workstation lacks the
-Visual Studio C++ build tools and a WSL distribution. The pinned builds passed
-in CI, but the Windows workstation still needs its own CPython 3.11.18 runtime
-before the updated assessor can start. A read-only `--verify-only` check on
-2026-11-20 confirmed the existing 3.11.9 runtime is rejected by the new lock;
-it made no network request or model call.
+The older CPython 3.12 feasibility venv remains intact. The 3.11.9 tree is
+preserved at `.market_os/runtimes/btc-assessor-py311-3.11.9`; it is historical
+U6.4 baseline evidence and does not match the updated BTC lock. The Windows
+source build and Linux build remain unverified locally because this workstation
+lacks the Visual Studio C++ build tools and a WSL distribution. The pinned
+3.11.18 builds passed in CI, and the Windows 3.11.18 bundle is now installed
+and verified locally as recorded above.
 
 **Checkpoint base:** `main` at `8132c57` after PR #54 merged. The Windows
 firewall installer remains opt-in and unrun; the ActiveStore verifier did not
@@ -287,10 +293,13 @@ offline packaging work and does not reopen connected or live execution.
    comparison before looking at held-out results. Keep Jev's support,
    contradiction, and abstention labels semantic; Market OS owns all market
    probability, calibration, stability, risk, and execution decisions.
-7. Verify the pinned Windows and Linux CPython bootstrap in CI. Then run Linux
-   `btc-paper local-assessor health` and one synthetic-only assessment on a
-   supported Linux x64 host; preserve the actual scope, cgroup, namespace, and
-   GPU-access evidence. Until then Linux health remains unverified.
+7. Windows CPython 3.11.18 and the assessor install manifest now verify
+   locally. Health returns 200 with resource limits enforced but remains
+   degraded until the owner approves installing the two executable-scoped
+   outbound-block rules and ActiveStore verification succeeds. Then run the
+   bounded denial and loopback probes before one synthetic-only assessment.
+   Linux still needs a supported x64 host to verify the live scope, cgroup,
+   namespace, loopback, and GPU access.
 8. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
    direction benchmark unpromoted and retain the project-wide LightRAG choice.
 
