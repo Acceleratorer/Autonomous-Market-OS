@@ -14,11 +14,11 @@ a different local directory.
 
 ## Decision
 
-1. Store import entries as relative paths computed from the final runtime
-   location. On Windows, select the active `_pth` file beside `python311.dll`
-   when present; compute both the project and `site-packages` entries relative
-   to that file's directory. Otherwise use the executable-level `_pth` file.
-   Linux `market-os-source.pth` is relative to final `site-packages`.
+1. Keep the Windows `_pth` file focused on the runtime and `site-packages`,
+   selecting the active file beside `python311.dll` when present and otherwise
+   using the executable-level file. Store the project import as
+   `market-os-source.pth` in `site-packages`, with an entry relative to its
+   final location. Linux uses the same `site-packages` import path.
 2. Package the verified runtime beside its CI evidence: ZIP for Windows x64
    and tar.gz for Linux x64. Preserve Linux file modes and internal symlinks;
    reject symlinks in the Windows bundle and Linux links that escape the tree.
@@ -31,6 +31,8 @@ a different local directory.
 
 ## Consequences
 
+- Both runtimes use the same relative source import through `site-packages`, so
+  the Windows `_pth` file stays limited to the embedded runtime layout.
 - The two target runtimes can be transferred from CI into the local project
   without rebuilding CPython or retaining the original checkout path.
 - The target artifact digest and the inner runtime archive digest are distinct;

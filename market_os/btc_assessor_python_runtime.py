@@ -168,6 +168,11 @@ def _relative_import_entry(base: Path, target: Path) -> str:
     return os.path.relpath(target, base).replace("\\", "/")
 
 
+def _write_project_import_pth(site_packages: Path, final_site_packages: Path, project_root: Path) -> None:
+    project_entry = _relative_import_entry(final_site_packages, project_root)
+    (site_packages / "market-os-source.pth").write_text(project_entry + "\n", encoding="utf-8")
+
+
 def _windows_runtime_pth_path(runtime_root: Path) -> Path:
     dll_candidates = (
         runtime_root / "python311.dll",
@@ -259,18 +264,12 @@ def _verify_runtime(runtime_root: Path, project_root: Path, spec: dict[str, Any]
     interpreter = (runtime_root / spec["interpreter"]).resolve()
     if not interpreter.is_relative_to(runtime_root.resolve()) or not interpreter.is_file():
         raise AssessorPythonRuntimeError("pinned BTC assessor Python interpreter is missing or escapes its runtime")
-    try:
-        result = _run(
-            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
-            cwd=project_root,
-            env={**_pip_environment(), "PYTHONPATH": ""},
-            timeout=30,
-        )
-    except AssessorPythonRuntimeError as exc:
-        if target == "windows-x64":
-            pth_path = _windows_runtime_pth_path(runtime_root)
-            raise AssessorPythonRuntimeError(f"{exc}; active Windows path file {pth_path}: {pth_path.read_text(encoding='utf-8')!r}") from exc
-        raise
+    result = _run(
+        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+        cwd=project_root,
+        env={**_pip_environment(), "PYTHONPATH": ""},
+        timeout=30,
+    )
     observed = json.loads(result.stdout.strip())
     if observed.get("version") != spec["version"]:
         raise AssessorPythonRuntimeError(f"pinned Python interpreter reported {observed.get('version')}, expected {spec['version']}")
@@ -315,14 +314,13 @@ def _install_windows(project_root: Path, work_root: Path, staging_root: Path, sp
     lines = ["import site" if line.strip() == "#import site" else line for line in lines]
     final_runtime_root = project_root / RUNTIME_RELATIVE_PATH
     final_pth_directory = final_runtime_root / pth_path.parent.relative_to(staging_root)
-    project_entry = _relative_import_entry(final_pth_directory, project_root)
     site_packages_entry = _relative_import_entry(final_pth_directory, final_runtime_root / "Lib" / "site-packages")
-    for entry in (site_packages_entry, project_entry):
-        if entry not in lines:
-            lines.append(entry)
+    if site_packages_entry not in lines:
+        lines.append(site_packages_entry)
     if "import site" not in lines:
         lines.append("import site")
     pth_path.write_text("\n".join(dict.fromkeys(lines)) + "\n", encoding="ascii")
+    _write_project_import_pth(site_packages, final_runtime_root / "Lib" / "site-packages", project_root)
     return staging_root / spec["interpreter"], report_path
 
 
@@ -360,8 +358,7 @@ def _install_linux(project_root: Path, work_root: Path, staging_root: Path, spec
         timeout=600,
     )
     final_site_packages = project_root / RUNTIME_RELATIVE_PATH / site_packages.relative_to(staging_root)
-    project_entry = _relative_import_entry(final_site_packages, project_root)
-    (site_packages / "market-os-source.pth").write_text(project_entry + "\n", encoding="utf-8")
+    _write_project_import_pth(site_packages, final_site_packages, project_root)
     return interpreter, report_path
 
 
