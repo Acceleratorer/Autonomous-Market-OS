@@ -43,6 +43,12 @@ A read-only check of this Windows workstation found only the `TYPESAFE_API_KEY` 
 
 No TypeSafe API request was made for this follow-up. The 2026-11-20 inquiry remains unanswered. The existing 2026-11-19 synthetic hosted connectivity probe remains the only recorded live Jev request in this project; it established hosted connectivity only, not local availability or BTC-packet assessment. The current state is therefore: **authentic local Jev remains unverified and was not found on this workstation; only hosted access is evidenced.**
 
+### Repository integration boundary
+
+The current B3.1 local path in [`btc_local_assessor.py`](../../market_os/btc_local_assessor.py) consumes an OpenAI-style chat-completion runtime and reports the pinned `local_qwen_evidence_assessor` / Qwen identity. Its semantic labels are serialized as one-hot distributions and explicitly marked uncalibrated. The separate [`btc_connectivity.py`](../../market_os/btc_connectivity.py) TypeSafe adapter posts to the hosted System One endpoint; the checked request builder emits only the fixed synthetic connectivity request, not a BTC evidence packet. [`btc_local_assessor_store.py`](../../market_os/btc_local_assessor_store.py) accepts only the Qwen provider/model identity and rejects a Jev identity.
+
+Therefore, a loopback server that accepts the System One wire format, or changing the local model label, would not make this path authentic Jev. A future authentic local integration needs a distinct typed `state`/`questions` runtime seam, verified TypeSafe model identity and artifact provenance, and a deterministic mapping into B3.1 while preserving Jev's semantic probabilities separately from Market OS return probabilities. No such runtime or attestation is currently available in the project.
+
 ## Project boundary
 
 [ADR-0058](../decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md) keeps BTC packet content, citations, and assessment context local and prohibits sending them to hosted Jev. It also requires separate explicit approval for future Jev connectivity calls. This research does not change that boundary or authorize packet egress.
