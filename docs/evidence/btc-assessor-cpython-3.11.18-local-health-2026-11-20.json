@@ -1,0 +1,65 @@
+{
+  "schema": "market-os.btc-assessor-cpython-local-health.v1",
+  "observed_date_local": "2026-11-20",
+  "clock": {
+    "timezone": "Asia/Saigon",
+    "utc_error_bound_ms": null,
+    "note": "The host clock was not qualified as a UTC source for market-data availability."
+  },
+  "host": {
+    "platform": "Windows x64",
+    "firewall_policy_changed": false
+  },
+  "python_runtime": {
+    "target": "windows-x64",
+    "version": "3.11.18",
+    "runtime_root_relative_path": ".market_os/runtimes/btc-assessor-py311",
+    "runtime_manifest_sha256": "a262fee5fbabf35bc54251f55ba555748b5a159d783e2d5f4d4271b5d584417d",
+    "runtime_tree_sha256": "fc5755bea6b82f36f0ee2bce2090b26d418a91de31c6e909024762d67cecbad1",
+    "verify_only": "passed"
+  },
+  "assessor_install": {
+    "target": "windows-x64-cuda-13.5",
+    "install_manifest_sha256": "dd57e0525964089f3c78760d47a209d018d50cffbaef9a15c47ec692fbfd2319",
+    "server_sha256": "4c872fce2e47539d58ea0e324f60eb96cfba818c683a55c1afe1a0f55bdb7fa1",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "python_version_recorded_in_install_manifest": "3.11.18"
+  },
+  "bootstrap": {
+    "command": "scripts/bootstrap_btc_local_assessor.py --target windows-x64-cuda-13.5",
+    "result": "passed",
+    "existing_model_and_runtime_archives_preverified": true,
+    "new_artifact_downloads": 0,
+    "network_trace_captured": false
+  },
+  "health": {
+    "command": "market_os.cli btc-paper local-assessor health",
+    "overall_status": "degraded",
+    "response_status": 200,
+    "bind_host": "127.0.0.1",
+    "runtime": "llama.cpp-b12478",
+    "provider_identity": "local_qwen_evidence_assessor",
+    "model_version": "bc640142c66e1fdd12af0bd68f40445458f3869b:Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "resource_limits": {
+      "status": "enforced",
+      "supervisor": "Windows Job Object",
+      "cpu_hard_cap_percent": 25,
+      "job_commit_limit_bytes": 6442450944,
+      "cuda_fit_free_memory_margin_mib": 2048,
+      "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap"
+    },
+    "network_isolation": {
+      "status": "unverified",
+      "supervisor": "Windows Defender Firewall (ActiveStore)",
+      "reason": "missing_or_mismatched_active_store_rule"
+    }
+  },
+  "not_run": [
+    "model inference",
+    "BTC packet assessment",
+    "firewall rule installation",
+    "Binance market-data request",
+    "Jev API request"
+  ]
+}

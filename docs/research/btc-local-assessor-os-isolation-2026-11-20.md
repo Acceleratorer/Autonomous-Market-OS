@@ -16,6 +16,14 @@ The latest read-only health run is recorded in
 [`btc-local-assessor-os-isolation-2026-11-20.json`](../evidence/btc-local-assessor-os-isolation-2026-11-20.json).
 The repository evidence records the Windows Job Object smoke and its limits in
 [`btc-local-assessor-resource-guard-2026-11-20.json`](../evidence/btc-local-assessor-resource-guard-2026-11-20.json).
+On 2026-11-20, CPython 3.11.18 was installed at the locked runtime path and
+passed `--verify-only`. The assessor install manifest was regenerated from
+already-present, hash-verified model and llama.cpp archives; no artifact was
+downloaded. Health then returned HTTP 200 under the 25% CPU and 6 GiB Job
+Object limits, but remained `degraded` because matching executable-scoped
+ActiveStore firewall rules are absent. No model inference or packet assessment
+ran. See
+[`btc-assessor-cpython-3.11.18-local-health-2026-11-20.json`](../evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json).
 The initial feasibility run used the shared CPython 3.12 executable. Its
 project-local venv remains at `.market_os/runtimes/btc-assessor-py312`; it uses
 `--system-site-packages` and is not the release runtime. A Windows CPython 3.11.9
@@ -31,13 +39,13 @@ provenance is in
 [`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](../evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
 
 Python.org's latest 3.11 security patch is 3.11.18 and is source-only; the
-updated BTC-specific runtime lock now builds this source on both Windows and
-Linux. Windows uses the official `PCbuild` plus `PC/layout` embeddable-layout
-flow; Linux uses the source `configure`/`make` flow. The U6.4/Electron runtime
-baseline remains unchanged. The existing workstation 3.11.9 tree does not
-match the new BTC runtime lock and has not been replaced: Visual Studio C++
-build tools are absent locally. Both target-native CPython 3.11.18 builds
-passed in [GitHub Actions CI run 44644535859](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/44644535859),
+updated BTC-specific runtime lock builds this source on both Windows and Linux.
+Windows uses the official `PCbuild` plus `PC/layout` embeddable-layout flow;
+Linux uses the source `configure`/`make` flow. The U6.4/Electron runtime
+baseline remains unchanged. The old workstation 3.11.9 tree is preserved as
+historical evidence; Visual Studio C++ build tools are absent locally, so the
+Windows source build itself remains unverified on this host. Both target-native
+CPython 3.11.18 builds passed in [GitHub Actions CI run 44644535859](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/44644535859),
 triggered by PR #54. The Windows and Linux jobs uploaded runtime evidence
 artifacts with exact runner image, archive SHA-256, runtime-manifest/tree
 hashes, and dependency wheels. The CI build does not verify the Linux
@@ -151,7 +159,7 @@ and [Windows Firewall defaults](https://learn.microsoft.com/en-us/windows/securi
 
    ```powershell
    $project = (Resolve-Path .).Path
-   $python = Join-Path $project ".market_os\runtimes\btc-assessor-py311\Scripts\python.exe"
+   $python = Join-Path $project ".market_os\runtimes\btc-assessor-py311\python.exe"
    $installRoot = Join-Path $project ".market_os\local-evidence-runtime\windows-x64-cuda-13.5"
    $manifest = Get-Content (Join-Path $installRoot "install-manifest.json") -Raw | ConvertFrom-Json
    $server = Join-Path $installRoot $manifest.runtime.server_relative_path

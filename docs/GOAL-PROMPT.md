@@ -35,9 +35,9 @@ never grant execution or risk authority.
   per-user/no-elevation installation, CI-frozen CPython 3.11.x, preserved
   mutable state, manual rollback, and no native service. Read
   `docs/NEXT-WORK-HANDOFF.md` and verify the local slice before extending CI.
-- The full Vietnamese Understand graph is available at `.ua/knowledge-graph.json`:
-  616 scanned files, 2,274 nodes, 4,062 edges, 8 layers, and 11 tour steps.
-  Check `.ua/meta.json` and fingerprints against the live source and docs first.
+- The Vietnamese Understand graph is an ignored local artifact at
+  `.ua/knowledge-graph.json`. Check its commit and project-scoped freshness
+  before using it; refresh after source or documentation changes.
 - U6.4-F is merged under accepted ADR-0055: portable signed install,
   embedded-runtime identity, state preservation, rollback, uninstall retention,
   and evidence rendering. Hosted Windows/Linux evidence is complete and
@@ -48,6 +48,21 @@ never grant execution or risk authority.
   contract/normalizer already exist. Current B2/B3 evidence has zero
   leakage-safe labeled samples, so predictive and calibration results are
   unavailable. Do not claim Jev value or promote it from these fixtures.
+- The approved B1 Binance Vision archive is complete and stored locally: 30
+  daily archives, 43,200 canonical candles, 60 HTTPS requests, and no gaps.
+  Do not extend acquisition without new date-bound approval. Its retrospective
+  receipt still cannot qualify evidence for the earlier B2 decisions.
+- Jev is hosted-only in the public TypeSafe release; no official local Jev
+  weights or runtime were found. ADR-0058 keeps BTC packet content local with
+  separately identified Qwen. The current public Master Customer Agreement
+  raises a restriction on developing similar products using TypeSafe Services
+  or outputs; check any account-specific agreement or obtain written clearance
+  before expanding the local assessor. Do not use Jev outputs to train, tune,
+  or evaluate it.
+- The Windows CPython 3.11.18 runtime is installed and verified locally. The
+  assessor health returned HTTP 200 with resource limits enforced but remains
+  degraded because executable-scoped firewall rules are not installed. Linux
+  target-host isolation remains unverified.
 
 ## Objective
 
@@ -67,11 +82,12 @@ unavailable.
    calibration, fusion, freshness/stability gates, risk, and paper execution
    inside Market OS. Preserve missing, stale, contradictory, and abstaining Jev
    outcomes explicitly; never substitute a neutral probability silently.
-3. Preserve U8-C permanent paper-only mode. The owner has requested the bounded
-   Binance Vision B1 archive path; do not execute it until personal
-   non-commercial scope and local retention are confirmed and the exact
-   date-bound execution phrase is approved. Do not call Jev, use credentials,
-   enable connected runtime, add mutation routes, or execute live trades.
+3. Preserve U8-C permanent paper-only mode. B1 is complete under its
+   date-bound approval; do not repeat or extend it without new approval. The
+   prospective Binance stream remains unapproved and requires a qualified
+   continuous UTC error bound, a current source/region review, and separate
+   date-bound approval. Jev stays at connectivity-only; no packet egress,
+   credentials, connected runtime, mutation routes, or live trades.
 4. Do not fabricate market labels or infer predictive value from synthetic
    rows. Keep B2/B3 metrics unavailable until the exact leakage-safe sample
    exists. Follow ADR-0022's frozen target, split, calibration, and fusion rules.
