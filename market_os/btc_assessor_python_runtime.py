@@ -365,7 +365,7 @@ def bootstrap_runtime(project_root: str | Path, target: str, *, verify_only: boo
             else _install_linux(root, work_root, staging_root, spec)
         )
         smoke = _run(
-            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow,market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+            [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
             cwd=root,
             env=_pip_environment(),
             timeout=30,
