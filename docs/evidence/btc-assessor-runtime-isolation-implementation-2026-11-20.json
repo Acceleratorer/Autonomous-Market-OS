@@ -1,0 +1,63 @@
+{
+  "schema": "market-os.btc-assessor-runtime-isolation-implementation.v1",
+  "observed_date_local": "2026-11-20",
+  "host": {
+    "platform": "Windows x64",
+    "linux_host_available": false,
+    "wsl_distribution_available": false
+  },
+  "tracked_runtime_lock": {
+    "version": "3.11.18",
+    "distribution": "python.org source archive",
+    "archive": "Python-3.11.18.tgz",
+    "archive_sha256": "5f62711b12470fd435f83f1451c1b1ef4a179aebc715c716874b0967567d814e",
+    "targets": ["windows-x64", "linux-x64"],
+    "ci_evidence_artifact": "market-os-btc-assessor-runtime-<target>",
+    "target_build_verification": "pending CI"
+  },
+  "python_runtime": {
+    "target": "windows-x64",
+    "version": "3.11.9",
+    "runtime_root_relative_path": ".market_os/runtimes/btc-assessor-py311",
+    "runtime_manifest_sha256": "53049c5473b594f6f1b2932fd3240830f05d291d58027971c9c5b5773dcc24cd",
+    "runtime_tree_sha256": "12e9face3d876fedabf71f4e6bccfa3240c4ecf8fa8c22b290c970e3d285a8c8",
+    "verify_only": "passed before 3.11.18 source lock update",
+    "current_btc_lock_compatible": false
+  },
+  "assessor_bootstrap": {
+    "target": "windows-x64-cuda-13.5",
+    "result": "passed before 3.11.18 source lock update",
+    "install_manifest_sha256": "88bee325eb48de456a072173edf0f71cd6873c76a6feabb1139cd635538a95b1",
+    "local_model_and_runtime_artifacts_hash_verified": true,
+    "new_artifact_downloads": 0,
+    "model_inference": "not run",
+    "packet_assessment": "not run"
+  },
+  "linux_isolation": {
+    "implementation": "rootless systemd user scope with cgroup v2 limits plus unshare user/network namespaces",
+    "configured_limits": {
+      "cpu_quota_percent_of_one_cpu": 25,
+      "memory_max_bytes": 6442450944,
+      "tasks_max": 128
+    },
+    "verification": "mocked unit tests passed; no Linux target-host execution",
+    "target_health": "unverified",
+    "host_policy_changed": false
+  },
+  "focused_tests": {
+    "command": "python -m pytest -q market_os/tests/test_btc_assessor_python_runtime.py market_os/tests/test_btc_assessor_linux_isolation.py market_os/tests/test_btc_local_assessor.py",
+    "result": "23 passed"
+  },
+  "full_python_suite": {
+    "command": "python -m pytest -q",
+    "result": "706 passed, 0 failed, 7 skipped",
+    "note": "A previous full run hit a transient WinError 10053 in the unrelated synthetic-catalog loopback test; the later full rerun passed."
+  },
+  "network_activity": {
+    "binance_market_data_requests": 0,
+    "jev_requests": 0,
+    "python_org_archive_structure_probe_requests": 1,
+    "python_org_archive_probe_sha256_checked": false,
+    "windows_firewall_rules_added": false
+  }
+}

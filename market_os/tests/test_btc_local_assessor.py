@@ -318,6 +318,64 @@ def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() 
             raise AssertionError("local runtime started without verified network isolation")
 
 
+def test_linux_runtime_cannot_bypass_unverified_isolation_for_health() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime.server_path = Path("llama-server")
+    with patch("market_os.btc_local_assessor.os.name", "posix"), patch(
+        "market_os.btc_assessor_linux_isolation.verify_linux_isolation",
+        return_value={"status": "unverified", "network_isolation": {"status": "unverified", "reason": "missing scope"}},
+    ):
+        try:
+            runtime.start(require_network_isolation=False)
+        except LocalAssessorError as exc:
+            assert exc.code == "network_isolation_unverified"
+        else:
+            raise AssertionError("Linux runtime bypassed network isolation during health startup")
+
+
+def test_local_runtime_rejects_a_different_python_executable_before_loading_model(tmp_path: Path) -> None:
+    lock_path = Path(__file__).resolve().parents[1] / "models" / "btc_local_assessor_runtime.lock.json"
+    lock_bytes = lock_path.read_bytes()
+    target = "windows-x64-cuda-13.5" if os.name == "nt" else "linux-x64-cpu"
+    python_target = "windows-x64" if os.name == "nt" else "linux-x64"
+    python_lock = json.loads((lock_path.parent / "btc_assessor_python_runtime.lock.json").read_text(encoding="utf-8"))
+    python_manifest = {
+        "python_version": python_lock["targets"][python_target]["version"],
+        "runtime_tree_sha256_excluding_manifest_and_bytecode": "b" * 64,
+    }
+    (tmp_path / "install-manifest.json").write_text(
+        json.dumps({
+            "schema": "market-os.btc-local-assessor-install.v1",
+            "lock_sha256": hashlib.sha256(lock_bytes).hexdigest(),
+            "target": target,
+            "python_runtime": {
+                "target": python_target,
+                "version": python_manifest["python_version"],
+                "runtime_root_relative_path": ".market_os/runtimes/btc-assessor-py311",
+                "manifest_sha256": "a" * 64,
+                "runtime_tree_sha256": python_manifest["runtime_tree_sha256_excluding_manifest_and_bytecode"],
+            },
+        }),
+        encoding="utf-8",
+    )
+    verified = {
+        "manifest": python_manifest,
+        "manifest_sha256": "a" * 64,
+        "interpreter": tmp_path / "different-python.exe",
+    }
+
+    with patch("market_os.btc_local_assessor.bootstrap_runtime", return_value=verified) as verify_runtime:
+        try:
+            LocalLlamaRuntime(tmp_path)
+        except LocalAssessorError as exc:
+            assert exc.code == "runtime_integrity_failed"
+            assert "exact pinned target CPython runtime" in str(exc)
+        else:
+            raise AssertionError("local assessor accepted an installation launched by a different Python executable")
+    verify_runtime.assert_called_once_with(Path(__file__).resolve().parents[2], python_target, verify_only=True)
+
+
 def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp_path) -> None:
     packet = _packet()
     record = LocalB31Assessor(FakeRuntime(_usable_response())).assess(packet)

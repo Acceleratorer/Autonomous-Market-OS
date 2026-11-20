@@ -141,11 +141,14 @@ calibration, stability, and risk remain separate owners.
 After the one-time runtime bootstrap, the inference path loads the installed
 model/runtime and uses loopback IPC. No TypeSafe, Binance, Hugging Face, or
 embedding-provider call is part of the assessment or replay code path. This is
-not an operating-system egress guarantee: the runtime does not install or
-verify an egress block, and offline environment variables do not block socket
-traffic. Health reports network isolation as `unverified` and stays degraded
-until a separate OS boundary is established and verified. Bootstrap itself
-downloads the pinned artifacts during setup.
+an operating-system egress boundary only when its platform checks pass. Linux
+`health` and `assess` run in a rootless systemd user scope and a loopback-only
+network namespace; the runtime checks effective cgroup-v2 limits and namespace
+membership. Missing user namespaces or cgroup controls fail closed. Linux has
+not yet been exercised on a target host. Windows health remains degraded until
+the opt-in executable-scoped firewall rules are installed and verified.
+Bootstrap may download the pinned artifacts during setup; assessment and replay
+use local files only.
 Before inference, the local assessor recomputes the B2 feature fingerprint and
 decision clock, checks the six candle references, and validates event time,
 publication or bounded-receipt availability, MiniRAG completion, source
@@ -159,14 +162,35 @@ gates and response normalization from that saved bundle; it does not call the
 model again. SHA-256 fingerprints detect accidental or unsophisticated
 modification, but are not signatures or proof of who created a run.
 
-From the repository root on the currently installed Windows CUDA target:
+Prepare the target from an existing host Python, then launch the local assessor
+with the pinned CPython 3.11 runtime. From the repository root on Windows:
 
 ```powershell
 py -3.12 scripts/bootstrap_btc_local_assessor.py --target windows-x64-cuda-13.5
-py -3.12 -m market_os.cli btc-paper local-assessor health --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
-py -3.12 -m market_os.cli btc-paper local-assessor assess --packet <eligible-b31-packet.json> --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
-py -3.12 -m market_os.cli btc-paper local-assessor replay <run-id>
+\.market_os\runtimes\btc-assessor-py311\python.exe -m market_os.cli btc-paper local-assessor health --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
+\.market_os\runtimes\btc-assessor-py311\python.exe -m market_os.cli btc-paper local-assessor assess --packet <eligible-b31-packet.json> --install-root .market_os/local-evidence-runtime/windows-x64-cuda-13.5
+\.market_os\runtimes\btc-assessor-py311\python.exe -m market_os.cli btc-paper local-assessor replay <run-id>
 ```
+
+The BTC runtime lock uses official CPython 3.11.18 source on both targets,
+separate from the existing U6.4/Electron runtime baseline. Linux builds with
+the host compiler; Windows uses CPython's `PCbuild` and `PC/layout` flow and
+requires the Visual Studio C++ build tools. Bootstrap does not overwrite an
+existing runtime that fails the lock check: preserve or move that directory
+before rebuilding. The workstation's recorded Windows 3.11.9 runtime predates
+this lock and must be rebuilt before the updated assessor can start.
+
+On Linux x64, bootstrap and launch with the target-native interpreter:
+
+```bash
+python3 scripts/bootstrap_btc_local_assessor.py --target linux-x64-cpu
+.market_os/runtimes/btc-assessor-py311/bin/python3.11 -m market_os.cli btc-paper local-assessor health --install-root .market_os/local-evidence-runtime/linux-x64-cpu
+.market_os/runtimes/btc-assessor-py311/bin/python3.11 -m market_os.cli btc-paper local-assessor assess --packet <eligible-b31-packet.json> --install-root .market_os/local-evidence-runtime/linux-x64-cpu
+.market_os/runtimes/btc-assessor-py311/bin/python3.11 -m market_os.cli btc-paper local-assessor replay <run-id>
+```
+
+On either target, `health` and `assess` automatically enter the local OS
+isolation boundary; `replay` stays local file inspection.
 
 The real historical Binance packet still fails the point-in-time availability
 gate because its local receipt was after the B2 decisions and the archive has

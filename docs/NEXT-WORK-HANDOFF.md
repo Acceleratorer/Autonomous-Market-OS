@@ -48,11 +48,17 @@ CUDA build uses llama.cpp's 2,048 MiB adaptive free-memory target; this does
 not hard-cap VRAM. A synthetic inference and offline replay passed, and the
 runtime smoke evidence is in
 [`btc-local-assessor-resource-guard-2026-11-20.json`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
-The full Python suite passed: 692 passed, 7 skipped.
-Health remains degraded because no OS-level egress block or complete packet
-trace is available. This Windows account is non-admin, and Linux has no
-configured cgroup supervisor. Do not call this zero-egress or production-ready
-until those boundaries are enforced and verified.
+Windows health remains degraded because the executable-scoped firewall rules
+are absent. The Linux path now launches local-assessor `health` and `assess`
+inside a transient user systemd scope plus a user/network namespace, then
+checks the effective cgroup-v2 CPU, memory, and task limits; namespace
+membership; loopback-only interface; and IPv4/IPv6 route devices. It fails
+closed if any check is missing. Linux tests use mocked OS state only, and this
+Windows workstation has no WSL distribution, so the Linux boundary and GPU
+device access remain unverified on a real target host. Do not call either
+platform production-ready until its target boundary is observed.
+The runtime/bootstrap and mocked-isolation evidence is in
+[`btc-assessor-runtime-isolation-implementation-2026-11-20.json`](evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json).
 
 The Windows workstation now has the U6.4-baseline CPython 3.11.9 runtime at
 `.market_os/runtimes/btc-assessor-py311`, with verified DuckDB 2.0.0 and PyArrow
@@ -61,10 +67,14 @@ HTTP 200 and the Job Object enforced 25% CPU and 6 GiB. Health remains degraded
 because egress rules are absent. No model inference or packet assessment ran,
 and no firewall policy changed. Provenance is in
 [`btc-assessor-cpython-3.11-runtime-2026-11-20.json`](evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json).
-The older CPython 3.12 feasibility venv is left intact. A repeatable setup and
-the Linux CPython 3.11.14 source build remain open.
+The older CPython 3.12 feasibility venv is left intact. That 3.11.9 runtime is
+historical U6.4 baseline evidence and no longer matches the updated BTC lock,
+which uses official CPython 3.11.18 source on both targets. The Windows source
+build and Linux build remain unverified locally; this workstation lacks the
+Visual Studio C++ build tools and a WSL distribution. CI must verify both
+target builds before the new pinned runtime is usable here.
 
-**Checkpoint base:** `main` at `f316f5f` after PR #52 merged. The Windows
+**Checkpoint base:** `main` at `3f8cccf` after PR #53 merged. The Windows
 firewall installer remains opt-in and unrun; the ActiveStore verifier did not
 find installed rules. No new market-data capture has been run.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
@@ -74,12 +84,12 @@ B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
 packets are assessed locally with Qwen. The prospective Binance stream remains
 an unapproved timestamp/provenance pilot; the proposal authorizes no request.
 
-The next engineering slice is to make the CPython 3.11 provisioning repeatable
-for Windows and Linux, then finish Linux OS-level egress and cgroup isolation
-for the standalone assessor path. The owner’s receipt-time decision does not
-approve a new Binance stream: any prospective run still needs current terms and
-regional review, a defensible UTC error bound throughout the run, and separate
-date-bound approval.
+The CPython 3.11.18 source provisioning and Linux isolation implementation are
+now in code; next verify the Windows/Linux CI matrix and run the Linux boundary
+on a real supported Linux x64 host. The owner’s receipt-time decision resolves the B3.1
+eligibility rule but does not approve a new Binance stream: any prospective
+run still needs current terms and regional review, a defensible UTC error bound
+throughout the run, and separate date-bound approval.
 
 ## Where the project stands
 
@@ -264,7 +274,11 @@ offline packaging work and does not reopen connected or live execution.
    comparison before looking at held-out results. Keep Jev's support,
    contradiction, and abstention labels semantic; Market OS owns all market
    probability, calibration, stability, risk, and execution decisions.
-7. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
+7. Verify the pinned Windows and Linux CPython bootstrap in CI. Then run Linux
+   `btc-paper local-assessor health` and one synthetic-only assessment on a
+   supported Linux x64 host; preserve the actual scope, cgroup, namespace, and
+   GPU-access evidence. Until then Linux health remains unverified.
+8. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
    direction benchmark unpromoted and retain the project-wide LightRAG choice.
 
 ## Reference artifacts

@@ -15,7 +15,7 @@ market-os = "market_os.cli:main"
 include = ["market_os*"]
 
 [tool.setuptools.package-data]
-market_os = ["*.ps1"]
+market_os = ["*.ps1", "models/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["market_os/tests"]
