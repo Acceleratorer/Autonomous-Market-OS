@@ -13,7 +13,7 @@
     "archive_sha256": "5f62711b12470fd435f83f1451c1b1ef4a179aebc715c716874b0967567d814e",
     "targets": ["windows-x64", "linux-x64"],
     "ci_evidence_artifact": "market-os-btc-assessor-runtime-<target>",
-    "target_build_verification": "pending CI"
+    "target_build_verification": "passed for Windows x64 and Linux x64 in GitHub Actions CI run 44644535859 on PR #54"
   },
   "python_runtime": {
     "target": "windows-x64",
@@ -52,6 +52,31 @@
     "command": "python -m pytest -q",
     "result": "706 passed, 0 failed, 7 skipped",
     "note": "A previous full run hit a transient WinError 10053 in the unrelated synthetic-catalog loopback test; the later full rerun passed."
+  },
+  "ci_verification": {
+    "pull_request": 54,
+    "head_sha": "ca0c360f470efb04f156af67e5763c36c8691646",
+    "merge_commit_sha": "8132c5765d53a3b92486d1c76adaa6f35ddd32ff",
+    "workflow_run_id": 44644535859,
+    "workflow_result": "success",
+    "target_runtime_builds": {
+      "windows-x64": {
+        "job": "u6-4-release-hardening (windows-x64, windows-latest)",
+        "result": "success",
+        "artifact_name": "market-os-btc-assessor-runtime-windows-x64",
+        "artifact_id": 14587174448,
+        "artifact_zip_sha256": "ac54dfd9f64c8b4633b288c14971b3925705ee1316704723416b9861a1cfdc02"
+      },
+      "linux-x64": {
+        "job": "u6-4-release-hardening (linux-x64, ubuntu-latest)",
+        "result": "success",
+        "artifact_name": "market-os-btc-assessor-runtime-linux-x64",
+        "artifact_id": 14587689287,
+        "artifact_zip_sha256": "eaf63814eb9c4a4c90d0c8deebd3cca93b917739076d980eea1b5a600b08408a"
+      }
+    },
+    "runtime_evidence_records_runner_image_versions_and_hashes": true,
+    "linux_isolation_target_host_verification": "not run"
   },
   "network_activity": {
     "binance_market_data_requests": 0,

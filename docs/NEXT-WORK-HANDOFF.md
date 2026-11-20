@@ -59,6 +59,12 @@ device access remain unverified on a real target host. Do not call either
 platform production-ready until its target boundary is observed.
 The runtime/bootstrap and mocked-isolation evidence is in
 [`btc-assessor-runtime-isolation-implementation-2026-11-20.json`](evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json).
+PR #54 merged as `8132c5765d53a3b92486d1c76adaa6f35ddd32ff`. GitHub Actions
+run [44644535859](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/44644535859)
+passed the Windows and Linux CPython 3.11.18 target builds and uploaded both
+runtime evidence artifacts. This proves source-build and packaging steps on
+the hosted runners; it does not prove Linux isolation or GPU access on a
+supported target host.
 
 The Windows workstation now has the U6.4-baseline CPython 3.11.9 runtime at
 `.market_os/runtimes/btc-assessor-py311`, with verified DuckDB 2.0.0 and PyArrow
@@ -71,10 +77,11 @@ The older CPython 3.12 feasibility venv is left intact. That 3.11.9 runtime is
 historical U6.4 baseline evidence and no longer matches the updated BTC lock,
 which uses official CPython 3.11.18 source on both targets. The Windows source
 build and Linux build remain unverified locally; this workstation lacks the
-Visual Studio C++ build tools and a WSL distribution. CI must verify both
-target builds before the new pinned runtime is usable here.
+Visual Studio C++ build tools and a WSL distribution. The pinned builds passed
+in CI, but the Windows workstation still needs its own CPython 3.11.18 runtime
+before the updated assessor can start.
 
-**Checkpoint base:** `main` at `3f8cccf` after PR #53 merged. The Windows
+**Checkpoint base:** `main` at `8132c57` after PR #54 merged. The Windows
 firewall installer remains opt-in and unrun; the ActiveStore verifier did not
 find installed rules. No new market-data capture has been run.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
@@ -84,12 +91,16 @@ B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
 packets are assessed locally with Qwen. The prospective Binance stream remains
 an unapproved timestamp/provenance pilot; the proposal authorizes no request.
 
-The CPython 3.11.18 source provisioning and Linux isolation implementation are
-now in code; next verify the Windows/Linux CI matrix and run the Linux boundary
-on a real supported Linux x64 host. The owner’s receipt-time decision resolves the B3.1
-eligibility rule but does not approve a new Binance stream: any prospective
-run still needs current terms and regional review, a defensible UTC error bound
-throughout the run, and separate date-bound approval.
+The CPython 3.11.18 Windows/Linux source builds passed in CI run 44644535859;
+PR #54 is merged and its branch is deleted. Next, install the pinned runtime
+on a supported Windows target when the required C++ build tools are available,
+then verify its local health and firewall boundary with the owner's approval.
+On Linux, run `health` and one synthetic-only assessment on a supported x64
+host and preserve actual cgroup, namespace, loopback, and GPU-access evidence.
+The owner’s receipt-time decision resolves the B3.1 eligibility rule but does
+not approve a new Binance stream: any prospective run still needs current
+terms and regional review, a defensible UTC error bound throughout the run,
+and separate date-bound approval.
 
 ## Where the project stands
 
@@ -122,11 +133,11 @@ throughout the run, and separate date-bound approval.
   recognized Linux network-mount roots in the shared history-store boundary.
   The acquisition deadline now reaches canonicalization, Parquet writes, and
   DuckDB catalog ingestion, with an expiry check before commit. Regression
-  tests cover UNC rejection and archive-ingest expiry; the current suite passes
-  683 tests with 7 skips. Coverage also rejects fixture-supplied raw-file paths
-  outside their content-addressed storage names. Secret scan, 93-file evidence
-  validation, web artifact, MLOps manifest, Python compilation, and whitespace
-  checks pass.
+  tests cover UNC rejection and archive-ingest expiry; the 2026-11-19
+  checkpoint passed 683 tests with 7 skips. The later PR #54 full suite passed
+  706 tests with 7 skips. Coverage also rejects fixture-supplied raw-file paths
+  outside their content-addressed storage names. Secret scan, evidence
+  validation, Python compilation, and whitespace checks passed.
 - B3.1 normalized 14 recorded synthetic fixture cases (5 usable; 9 rejected,
   unavailable, stale, or abstained). A BTC-only MiniRAG adapter, future-free
   packet builder, alignment-only helper, and a 43,200-document local source

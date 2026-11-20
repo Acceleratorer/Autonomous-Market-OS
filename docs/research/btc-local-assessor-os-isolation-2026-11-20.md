@@ -36,12 +36,15 @@ Linux. Windows uses the official `PCbuild` plus `PC/layout` embeddable-layout
 flow; Linux uses the source `configure`/`make` flow. The U6.4/Electron runtime
 baseline remains unchanged. The existing workstation 3.11.9 tree does not
 match the new BTC runtime lock and has not been replaced: Visual Studio C++
-build tools are absent locally. The source-build paths require CI verification,
-and each target job now uploads a runtime evidence JSON with the exact runner
-image, archive SHA-256, runtime-manifest/tree hashes, and dependency wheels.
-The Linux path still requires live supported-host isolation and GPU
-verification. A future Windows per-program firewall rule must target the new
-dedicated interpreter so it does not block unrelated Python workloads. See
+build tools are absent locally. Both target-native CPython 3.11.18 builds
+passed in [GitHub Actions CI run 44644535859](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/44644535859),
+triggered by PR #54. The Windows and Linux jobs uploaded runtime evidence
+artifacts with exact runner image, archive SHA-256, runtime-manifest/tree
+hashes, and dependency wheels. The CI build does not verify the Linux
+isolation boundary on a target host; live cgroup, namespace, loopback, and GPU
+verification remain open. A future Windows per-program firewall rule must
+target the new dedicated interpreter so it does not block unrelated Python
+workloads. See
 the [Python 3.11.18 release](https://www.python.org/downloads/release/python-31118/),
 CPython's [Windows build instructions](https://github.com/python/cpython/blob/v3.11.18/PCbuild/readme.txt),
 and the [3.11.18 embed layout options](https://github.com/python/cpython/blob/v3.11.18/PC/layout/support/options.py).
