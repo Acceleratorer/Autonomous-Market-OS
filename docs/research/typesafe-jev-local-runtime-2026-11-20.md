@@ -1,7 +1,7 @@
 # TypeSafe Jev local runtime and identity
 
 **Checked:** 2026-11-20
-**Scope:** Current public TypeSafe documentation, enterprise material, legal terms, and official GitHub repositories. No Jev API call was made.
+**Scope:** Current public TypeSafe documentation, enterprise material, legal terms, and official GitHub repositories; read-only local-runtime discovery. No new Jev API call was made during this local-runtime check.
 
 ## Conclusion
 
@@ -30,6 +30,16 @@ TypeSafe's [Master Customer Agreement](https://typesafe.ai/legal/mca) defines th
 ## What needs direct confirmation
 
 The [enterprise page](https://typesafe.ai/enterprise) invites discussion of data requirements and lists “Can we run Jev in our own VPC or on-premises?”, but its public page does not provide an answer or deployment details. The official [Help Center](https://help.typesafe.ai/articles/8737694518-who-should-i-reach-out-to-with-support-requests) routes enterprise plans, procurement, and contracts to `sales@typesafe.ai`. No inquiry has been sent. Ask TypeSafe in writing whether it offers a customer-VPC, on-premises, or air-gapped Jev deployment; what exact Jev version, weights, runtime, and integrity identifiers it supplies; and what the agreement permits for local inference, copying/backups, modification, and redistribution. Confirm that the deployment is the same Jev version and retains its identity, rather than a compatible or Jev-style substitute.
+
+### Follow-up availability check — 2026-11-20
+
+The official [model catalog](https://docs.typesafe.ai/models), [System One API reference](https://docs.typesafe.ai/api/system-one), and [Quick Start](https://docs.typesafe.ai/introduction/quickstart) still describe Jev 1.14/1.13 through the authenticated `https://api.typesafe.ai/v1/systemone` endpoint. The [enterprise FAQ](https://typesafe.ai/enterprise) lists the VPC/on-premises question but shows no public answer. I found no TypeSafe Jev weight files, authenticated local runtime manifest, or local-serving instructions in the official materials checked. This is a bounded public-source search, not proof that TypeSafe has no private offer.
+
+An unrelated public project, [`amithgc/local-jev`](https://github.com/amithgc/local-jev/tree/64a0b31ff343dca32142496cf9edca5a0174a18d), advertises a local server compatible with the System One wire format. Its README says it uses open models such as Qwen and DeBERTa, is a research project, and is not affiliated with or supported by TypeSafe. It is therefore a **compatible substitute, not TypeSafe Jev**. The project reports MIT code and per-model licenses; those statements do not provide a license to TypeSafe Jev weights or evidence of model identity. I did not install or run it.
+
+A read-only check of this Windows workstation found only the `TYPESAFE_API_KEY` name among `JEV`/`TYPESAFE`/`LOCAL_JEV` environment-variable names; its value was not read or printed. No `local-jev` executable, `jev`/`typesafe` Python module, Jev/TypeSafe-named model entry in configured or common Hugging Face cache roots, or local listener on ports 8765, 8000, or 8001 was found. A targeted Gmail search for TypeSafe/Jev plus VPC, on-premises, or local-deployment terms returned no messages. These checks do not cover every possible custom path, process port, mailbox, or private vendor channel.
+
+No TypeSafe API request or vendor inquiry was made for this follow-up. The existing 2026-11-19 synthetic hosted connectivity probe remains the only recorded live Jev request in this project; it established hosted connectivity only, not local availability or BTC-packet assessment. The current state is therefore: **authentic local Jev remains unverified and was not found on this workstation; only hosted access is evidenced.**
 
 ## Project boundary
 
