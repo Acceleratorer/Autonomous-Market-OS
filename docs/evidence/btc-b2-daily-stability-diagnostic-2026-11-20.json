@@ -1,0 +1,524 @@
+{
+  "schema": "market-os.btc-b2-daily-stability-diagnostic@v1",
+  "created_at": "2026-11-20",
+  "status": "exploratory_diagnostic",
+  "scope": {
+    "run_id": "btc-b2-dde76de3b2965ac6f66a",
+    "source_artifact": ".market_os/btc-b2/runs/btc-b2-dde76de3b2965ac6f66a/predictions.json",
+    "source_sha256": "1fc1109037edd19f4e9aa1414369e39ee19527c68bc5d5c3824f22b41feb0a14",
+    "split": "test",
+    "prediction_rows": 25899,
+    "models": [
+      "conditional_rate",
+      "empirical_rate",
+      "naive_0_5"
+    ],
+    "unique_timestamps": 8633,
+    "duplicate_model_timestamp_rows": 0,
+    "matched_target_end_times_across_arms": true,
+    "non_minute_steps": 0,
+    "test_start_utc": "2026-11-12T00:03:00Z",
+    "test_end_utc": "2026-11-17T23:55:00Z"
+  },
+  "method": {
+    "grouping": "UTC calendar date derived from feature_close_time_ms",
+    "outcome": "up is positive; down and flat are non-positive",
+    "classification_threshold": "probability_up >= 0.5 predicts up",
+    "probability_metrics": [
+      "Brier score",
+      "log loss"
+    ],
+    "calibration_error": "mean_probability_up - observed_up_rate",
+    "calibration": "use the persisted one-bin probability; do not refit",
+    "rounding": "full Python double precision in machine-readable values",
+    "test_set_policy": "read-only; no tuning, refitting, or arm selection"
+  },
+  "label_counts": {
+    "positive": 4015,
+    "negative": 4614,
+    "flat_non_positive": 4,
+    "non_positive_total": 4618,
+    "positive_rate": 0.46507587165527625
+  },
+  "overall_by_model": {
+    "conditional_rate": {
+      "n": 8633,
+      "observed_up_rate": 0.46507587165527625,
+      "raw": {
+        "accuracy_at_0_5": 0.5349241283447237,
+        "brier_score": 0.2493703314187236,
+        "log_loss": 0.691887636991313,
+        "mean_probability_up": 0.4888999414246765,
+        "predicted_up_rate_at_0_5": 0.0
+      },
+      "calibrated": {
+        "accuracy_at_0_5": 0.5349241283447237,
+        "brier_score": 0.24966290327104185,
+        "log_loss": 0.6924729636343667,
+        "mean_probability_up": 0.49478442280945756,
+        "predicted_up_rate_at_0_5": 0.0
+      },
+      "calibration_error_raw": 0.02382406976940027,
+      "calibration_error_calibrated": 0.029708551154181306
+    },
+    "empirical_rate": {
+      "n": 8633,
+      "observed_up_rate": 0.46507587165527625,
+      "raw": {
+        "accuracy_at_0_5": 0.5349241283447237,
+        "brier_score": 0.24936100799849353,
+        "log_loss": 0.6918690151019312,
+        "mean_probability_up": 0.4891736462233201,
+        "predicted_up_rate_at_0_5": 0.0
+      },
+      "calibrated": {
+        "accuracy_at_0_5": 0.5349241283447237,
+        "brier_score": 0.24966290327104185,
+        "log_loss": 0.6924729636343667,
+        "mean_probability_up": 0.49478442280945756,
+        "predicted_up_rate_at_0_5": 0.0
+      },
+      "calibration_error_raw": 0.02409777456804385,
+      "calibration_error_calibrated": 0.029708551154181306
+    },
+    "naive_0_5": {
+      "n": 8633,
+      "observed_up_rate": 0.46507587165527625,
+      "raw": {
+        "accuracy_at_0_5": 0.46507587165527625,
+        "brier_score": 0.25,
+        "log_loss": 0.6931471805599453,
+        "mean_probability_up": 0.5,
+        "predicted_up_rate_at_0_5": 1.0
+      },
+      "calibrated": {
+        "accuracy_at_0_5": 0.5349241283447237,
+        "brier_score": 0.24966290327104185,
+        "log_loss": 0.6924729636343667,
+        "mean_probability_up": 0.49478442280945756,
+        "predicted_up_rate_at_0_5": 0.0
+      },
+      "calibration_error_raw": 0.03492412834472375,
+      "calibration_error_calibrated": 0.029708551154181306
+    }
+  },
+  "daily_utc": {
+    "2026-11-12": {
+      "n": 1437,
+      "positive": 658,
+      "positive_rate": 0.45789839944328464,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1437,
+          "observed_up_rate": 0.45789839944328464,
+          "raw": {
+            "accuracy_at_0_5": 0.5421016005567154,
+            "brier_score": 0.24919765262709231,
+            "log_loss": 0.6915422060667809,
+            "mean_probability_up": 0.4889353888305967,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5421016005567154,
+            "brier_score": 0.24958803395033263,
+            "log_loss": 0.6923232195616239,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.03103698938731203,
+          "calibration_error_calibrated": 0.036886023366172915
+        },
+        "empirical_rate": {
+          "n": 1437,
+          "observed_up_rate": 0.45789839944328464,
+          "raw": {
+            "accuracy_at_0_5": 0.5421016005567154,
+            "brier_score": 0.2492055962917149,
+            "log_loss": 0.6915581430992485,
+            "mean_probability_up": 0.4891736462233201,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5421016005567154,
+            "brier_score": 0.24958803395033263,
+            "log_loss": 0.6923232195616239,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.03127524678003546,
+          "calibration_error_calibrated": 0.036886023366172915
+        },
+        "naive_0_5": {
+          "n": 1437,
+          "observed_up_rate": 0.45789839944328464,
+          "raw": {
+            "accuracy_at_0_5": 0.45789839944328464,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5421016005567154,
+            "brier_score": 0.24958803395033263,
+            "log_loss": 0.6923232195616239,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.04210160055671536,
+          "calibration_error_calibrated": 0.036886023366172915
+        }
+      }
+    },
+    "2026-11-13": {
+      "n": 1440,
+      "positive": 670,
+      "positive_rate": 0.4652777777777778,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4652777777777778,
+          "raw": {
+            "accuracy_at_0_5": 0.5347222222222222,
+            "brier_score": 0.24937946244017362,
+            "log_loss": 0.6919059086494531,
+            "mean_probability_up": 0.48890108152448075,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5347222222222222,
+            "brier_score": 0.24966500938497616,
+            "log_loss": 0.6924771760150213,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.02362330374670296,
+          "calibration_error_calibrated": 0.029506645031679768
+        },
+        "empirical_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4652777777777778,
+          "raw": {
+            "accuracy_at_0_5": 0.5347222222222222,
+            "brier_score": 0.2493653798127173,
+            "log_loss": 0.6918777600972169,
+            "mean_probability_up": 0.48917364622332016,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5347222222222222,
+            "brier_score": 0.24966500938497616,
+            "log_loss": 0.6924771760150213,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.023895868445542368,
+          "calibration_error_calibrated": 0.029506645031679768
+        },
+        "naive_0_5": {
+          "n": 1440,
+          "observed_up_rate": 0.4652777777777778,
+          "raw": {
+            "accuracy_at_0_5": 0.4652777777777778,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5347222222222222,
+            "brier_score": 0.24966500938497616,
+            "log_loss": 0.6924771760150213,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.03472222222222221,
+          "calibration_error_calibrated": 0.029506645031679768
+        }
+      }
+    },
+    "2026-11-14": {
+      "n": 1440,
+      "positive": 640,
+      "positive_rate": 0.4444444444444444,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4444444444444444,
+          "raw": {
+            "accuracy_at_0_5": 0.5555555555555556,
+            "brier_score": 0.24901466329363345,
+            "log_loss": 0.6911762141824614,
+            "mean_probability_up": 0.4889092599670532,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5555555555555556,
+            "brier_score": 0.24944769366870356,
+            "log_loss": 0.6920425288175125,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.04446481552260878,
+          "calibration_error_calibrated": 0.05033997836501314
+        },
+        "empirical_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4444444444444444,
+          "raw": {
+            "accuracy_at_0_5": 0.5555555555555556,
+            "brier_score": 0.24891428173868896,
+            "log_loss": 0.6909754229143472,
+            "mean_probability_up": 0.48917364622332016,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5555555555555556,
+            "brier_score": 0.24944769366870356,
+            "log_loss": 0.6920425288175125,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.04472920177887574,
+          "calibration_error_calibrated": 0.05033997836501314
+        },
+        "naive_0_5": {
+          "n": 1440,
+          "observed_up_rate": 0.4444444444444444,
+          "raw": {
+            "accuracy_at_0_5": 0.4444444444444444,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5555555555555556,
+            "brier_score": 0.24944769366870356,
+            "log_loss": 0.6920425288175125,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.05555555555555558,
+          "calibration_error_calibrated": 0.05033997836501314
+        }
+      }
+    },
+    "2026-11-15": {
+      "n": 1440,
+      "positive": 702,
+      "positive_rate": 0.4875,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4875,
+          "raw": {
+            "accuracy_at_0_5": 0.5125,
+            "brier_score": 0.249767387614228,
+            "log_loss": 0.6926818500459974,
+            "mean_probability_up": 0.48891334918833945,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5125,
+            "brier_score": 0.24989681281566697,
+            "log_loss": 0.6929407996923642,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.0014133491883394633,
+          "calibration_error_calibrated": 0.007284422809457569
+        },
+        "empirical_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4875,
+          "raw": {
+            "accuracy_at_0_5": 0.5125,
+            "brier_score": 0.24984655109168083,
+            "log_loss": 0.6928402530922777,
+            "mean_probability_up": 0.48917364622332016,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5125,
+            "brier_score": 0.24989681281566697,
+            "log_loss": 0.6929407996923642,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.0016736462233201688,
+          "calibration_error_calibrated": 0.007284422809457569
+        },
+        "naive_0_5": {
+          "n": 1440,
+          "observed_up_rate": 0.4875,
+          "raw": {
+            "accuracy_at_0_5": 0.4875,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5125,
+            "brier_score": 0.24989681281566697,
+            "log_loss": 0.6929407996923642,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.012500000000000011,
+          "calibration_error_calibrated": 0.007284422809457569
+        }
+      }
+    },
+    "2026-11-16": {
+      "n": 1440,
+      "positive": 650,
+      "positive_rate": 0.4513888888888889,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4513888888888889,
+          "raw": {
+            "accuracy_at_0_5": 0.5486111111111112,
+            "brier_score": 0.24907274468644888,
+            "log_loss": 0.6912923449715654,
+            "mean_probability_up": 0.4888103723624546,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5486111111111112,
+            "brier_score": 0.24952013224079445,
+            "log_loss": 0.692187411216682,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.03742148347356572,
+          "calibration_error_calibrated": 0.04339553392056866
+        },
+        "empirical_rate": {
+          "n": 1440,
+          "observed_up_rate": 0.4513888888888889,
+          "raw": {
+            "accuracy_at_0_5": 0.5486111111111112,
+            "brier_score": 0.24906464776336507,
+            "log_loss": 0.6912762019753038,
+            "mean_probability_up": 0.48917364622332016,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5486111111111112,
+            "brier_score": 0.24952013224079445,
+            "log_loss": 0.692187411216682,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.03778475733443126,
+          "calibration_error_calibrated": 0.04339553392056866
+        },
+        "naive_0_5": {
+          "n": 1440,
+          "observed_up_rate": 0.4513888888888889,
+          "raw": {
+            "accuracy_at_0_5": 0.4513888888888889,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.5486111111111112,
+            "brier_score": 0.24952013224079445,
+            "log_loss": 0.692187411216682,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.048611111111111105,
+          "calibration_error_calibrated": 0.04339553392056866
+        }
+      }
+    },
+    "2026-11-17": {
+      "n": 1436,
+      "positive": 695,
+      "positive_rate": 0.483983286908078,
+      "by_model": {
+        "conditional_rate": {
+          "n": 1436,
+          "observed_up_rate": 0.483983286908078,
+          "raw": {
+            "accuracy_at_0_5": 0.516016713091922,
+            "brier_score": 0.24979088631131768,
+            "log_loss": 0.6927289152679617,
+            "mean_probability_up": 0.4889303550060677,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.516016713091922,
+            "brier_score": 0.24986012943849112,
+            "log_loss": 0.6928674302768516,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.004947068097989671,
+          "calibration_error_calibrated": 0.010801135901379544
+        },
+        "empirical_rate": {
+          "n": 1436,
+          "observed_up_rate": 0.483983286908078,
+          "raw": {
+            "accuracy_at_0_5": 0.516016713091922,
+            "brier_score": 0.2497704047315524,
+            "log_loss": 0.6926879365650301,
+            "mean_probability_up": 0.4891736462233201,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.516016713091922,
+            "brier_score": 0.24986012943849112,
+            "log_loss": 0.6928674302768516,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.005190359315242088,
+          "calibration_error_calibrated": 0.010801135901379544
+        },
+        "naive_0_5": {
+          "n": 1436,
+          "observed_up_rate": 0.483983286908078,
+          "raw": {
+            "accuracy_at_0_5": 0.483983286908078,
+            "brier_score": 0.25,
+            "log_loss": 0.6931471805599453,
+            "mean_probability_up": 0.5,
+            "predicted_up_rate_at_0_5": 1.0
+          },
+          "calibrated": {
+            "accuracy_at_0_5": 0.516016713091922,
+            "brier_score": 0.24986012943849112,
+            "log_loss": 0.6928674302768516,
+            "mean_probability_up": 0.49478442280945756,
+            "predicted_up_rate_at_0_5": 0.0
+          },
+          "calibration_error_raw": 0.016016713091921986,
+          "calibration_error_calibrated": 0.010801135901379544
+        }
+      }
+    }
+  },
+  "summary_checks": {
+    "empirical_raw_predicts_non_positive_every_day": true,
+    "conditional_raw_predicts_non_positive_every_day": true,
+    "one_bin_calibration_worse_brier_than_both_raw_arms_on_every_day": true,
+    "one_bin_calibration_worse_log_loss_than_both_raw_arms_on_every_day": true,
+    "daily_positive_rate_min": 0.4444444444444444,
+    "daily_positive_rate_max": 0.4875
+  },
+  "interpretation_limits": [
+    "This is a descriptive check of one frozen six-day test window, not multi-period or regime stability.",
+    "Each feature close advances one minute while the target looks five minutes ahead; adjacent outcomes overlap and are temporally dependent.",
+    "The empirical and conditional raw arms predict non-positive for every row, so their accuracy equals that day's non-positive share and does not show row-level discrimination.",
+    "The persisted one-bin calibrated probability scores worse than both raw statistical arms on each of the six UTC days; this comparison does not authorize retuning on the test set.",
+    "No profitability, execution-cost, paper-fill, or live-trading claim follows from these scores."
+  ]
+}

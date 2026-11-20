@@ -193,6 +193,42 @@ price path. The positive-label share ranges from 44.44% to 48.75% across the
 six UTC dates, which is descriptive coverage of one short test window, not
 regime stability.
 
+#### Frozen-test daily probability scores (2026-11-20)
+
+A second read-only diagnostic grouped the persisted probabilities by UTC
+feature-close date without changing the fit or selecting a model. The six daily
+observed up-rates ranged from 44.44% to 48.75%. For the empirical and
+conditional arms, raw daily Brier scores ranged from 0.248914 to 0.249847 and
+raw log loss ranged from 0.690975 to 0.692840. The persisted one-bin
+calibrated probability scored worse than both raw arms on **all six days** for
+both Brier score and log loss. Daily class accuracy remains the majority-class
+rate because both raw probability arms predict non-positive throughout.
+
+| UTC date | n | Up rate | Empirical raw Brier | Conditional raw Brier | Calibrated Brier |
+|---|---:|---:|---:|---:|---:|
+| 2026-11-12 | 1,437 | 45.79% | 0.249206 | 0.249198 | 0.249588 |
+| 2026-11-13 | 1,440 | 46.53% | 0.249365 | 0.249379 | 0.249665 |
+| 2026-11-14 | 1,440 | 44.44% | 0.248914 | 0.249015 | 0.249448 |
+| 2026-11-15 | 1,440 | 48.75% | 0.249847 | 0.249767 | 0.249897 |
+| 2026-11-16 | 1,440 | 45.14% | 0.249065 | 0.249073 | 0.249520 |
+| 2026-11-17 | 1,436 | 48.40% | 0.249770 | 0.249791 | 0.249860 |
+
+| UTC date | Empirical raw log loss | Conditional raw log loss | Calibrated log loss |
+|---|---:|---:|---:|
+| 2026-11-12 | 0.691558 | 0.691542 | 0.692323 |
+| 2026-11-13 | 0.691878 | 0.691906 | 0.692477 |
+| 2026-11-14 | 0.690975 | 0.691176 | 0.692043 |
+| 2026-11-15 | 0.692840 | 0.692682 | 0.692941 |
+| 2026-11-16 | 0.691276 | 0.691292 | 0.692187 |
+| 2026-11-17 | 0.692688 | 0.692729 | 0.692867 |
+
+These are six descriptive slices of the same dependent holdout; they do not
+create six independent periods or establish stability. The full per-day
+metrics, source fingerprint, and validation checks can be regenerated locally
+with py -3.12 scripts/btc_b2_daily_stability.py when the local B2 artifact is
+present. See
+[btc-b2-daily-stability-diagnostic-2026-11-20.json](evidence/btc-b2-daily-stability-diagnostic-2026-11-20.json).
+
 An exploratory paired circular moving-block bootstrap kept the train-fitted
 empirical probability fixed and compared it with the 0.5 baseline. It used
 10,000 resamples per block length, a fixed seed derived from the audit date

@@ -17,7 +17,8 @@ Until TypeSafe provides written local-deployment terms and an identifiable
 Jev runtime artifact, do not claim the local Qwen assessor is Jev, do not use
 hosted Jev outputs to train an imitator, and do not send BTC packets to hosted
 Jev. The existing ADR-0058 boundary remains in force while authentic local Jev
-is unverified. No Jev API call or vendor inquiry was made for this review.
+is unverified. This public-source review made no Jev API call; the separate
+TypeSafe Sales inquiry and follow-up status are recorded below.
 
 ## Current continuation update — 2026-11-20
 
@@ -27,6 +28,12 @@ Jev stays at connectivity-only for this BTC work; BTC B3.1 packet content and
 assessment stay local with the separately identified Qwen assessor. The
 reauthorized synthetic U3 probe passed its response contract but assessed no
 BTC packet. Do not send packet text, citations, or assessment context to Jev.
+
+The TypeSafe Sales inquiry and same-thread clarification about local-deployment
+identity, artifact hashes, and written terms were sent on 2026-11-20. The
+mailbox currently shows those messages as sent, with no vendor reply. Neither
+message included an API key or BTC research data. See the
+[local Jev runtime note](research/typesafe-jev-local-runtime-2026-11-20.md).
 
 The local Qwen runtime has only been exercised on synthetic packets. Those
 smokes validate local inference and audit plumbing, not BTC prediction,
