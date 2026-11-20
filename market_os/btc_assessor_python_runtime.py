@@ -243,7 +243,7 @@ def _verify_runtime(runtime_root: Path, project_root: Path, spec: dict[str, Any]
     if not interpreter.is_relative_to(runtime_root.resolve()) or not interpreter.is_file():
         raise AssessorPythonRuntimeError("pinned BTC assessor Python interpreter is missing or escapes its runtime")
     result = _run(
-        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow,market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
+        [str(interpreter), "-B", "-c", "import json,sys,duckdb,pyarrow; print(json.dumps({'sys_path':sys.path}), file=sys.stderr); import market_os.cli; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3]))}))"],
         cwd=project_root,
         env={**_pip_environment(), "PYTHONPATH": ""},
         timeout=30,
