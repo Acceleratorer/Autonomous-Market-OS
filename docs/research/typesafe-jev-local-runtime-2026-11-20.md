@@ -31,7 +31,7 @@ TypeSafe's [Master Customer Agreement](https://typesafe.ai/legal/mca) defines th
 
 The official [model catalog](https://docs.typesafe.ai/models), [System One API reference](https://docs.typesafe.ai/api/system-one), and [Quick Start](https://docs.typesafe.ai/introduction/quickstart) describe Jev 1.14/1.13 through the authenticated `https://api.typesafe.ai/v1/systemone` endpoint. On a direct browser check, I expanded the [Enterprise FAQ](https://typesafe.ai/enterprise) item asking about VPC/on-premises; it says Jev is currently available only through TypeSafe's hosted API. I found no Jev weight files, authenticated local runtime manifest, or local-serving instructions in the public materials checked. This is a bounded public-source search, not proof that no private exception exists.
 
-On 2026-11-20, I sent TypeSafe Sales an inquiry asking whether an officially supported customer-VPC, on-premises, or air-gapped deployment exists; for the exact Jev version and verifiable runtime/weight artifact hashes; and for written local-inference and research-use terms, including model identity and offline/telemetry requirements. After reviewing section 2.3(b) of the public Master Customer Agreement, I sent a same-thread clarification asking whether that integration is permitted under the applicable agreement and whether a separate order or license is required. The official [Help Center](https://help.typesafe.ai/articles/8737694518-who-should-i-reach-out-to-with-support-requests) routes enterprise plans, procurement, and contracts to `sales@typesafe.ai`. The mailbox shows both messages sent and no vendor reply as of this check. Neither message included an API key, market data, BTC packet, or citations.
+The earlier 2026-11-20 research record says two messages were sent to TypeSafe Sales: an inquiry about a customer-VPC, on-premises, or air-gapped Jev deployment, artifact hashes, and written local-use terms, followed by a clarification about the public agreement and whether a separate license is required. A later search of the authenticated Gmail account available for this follow-up found no matching sent message or draft. Their delivery and reply status therefore remain unverified from this account; this older record is not proof that TypeSafe received them. The official [Help Center](https://help.typesafe.ai/articles/8737694518-who-should-i-reach-out-to-with-support-requests) routes enterprise plans, procurement, and contracts to `sales@typesafe.ai`. A new, explicitly approved inquiry was sent on 2026-11-21 and is recorded below.
 
 ### Hosted gateway routes do not provide offline inference
 
@@ -45,9 +45,9 @@ The broader public model search surfaced [`autotrust/JEV-27B`](https://huggingfa
 
 An unrelated public project, [`amithgc/local-jev`](https://github.com/amithgc/local-jev/tree/64a0b31ff343dca32142496cf9edca5a0174a18d), advertises a local server compatible with the System One wire format. Its README says it uses open models such as Qwen and DeBERTa, is a research project, and is not affiliated with or supported by TypeSafe. It is therefore a **compatible substitute, not TypeSafe Jev**. The project reports MIT code and per-model licenses; those statements do not provide a license to TypeSafe Jev weights or evidence of model identity. I did not install or run it.
 
-A read-only check of this Windows workstation confirmed `TYPESAFE_API_KEY` is defined in the current shell; its value was not read or printed. This confirms only that the variable is set and does not establish local Jev availability. No `local-jev` executable, `jev`/`typesafe` Python module, Jev/TypeSafe-named model entry in configured or common Hugging Face cache roots, or local listener on ports 8765, 8000, or 8001 was found. A targeted Gmail search before the inquiry found no pre-existing TypeSafe/Jev messages about VPC, on-premises, or local deployment. These checks do not cover every possible custom path, process port, mailbox, or private vendor channel.
+A read-only workstation check found no `local-jev` executable, `jev`/`typesafe` Python module, Jev/TypeSafe-named model entry in configured or common Hugging Face cache roots, or local listener on ports 8765, 8000, or 8001. No API credential value was read or used in this local-availability check; a hosted API credential alone would not establish local Jev availability. A targeted Gmail search before the inquiry found no pre-existing TypeSafe/Jev messages about VPC, on-premises, or local deployment. These checks do not cover every possible custom path, process port, mailbox, or private vendor channel.
 
-No TypeSafe API request was made for this follow-up. The 2026-11-20 inquiry remains unanswered. The existing 2026-11-19 synthetic hosted connectivity probe remains the only recorded live Jev request in this project; it established hosted connectivity only, not local availability or BTC-packet assessment. The current state is therefore: **authentic local Jev remains unverified and was not found on this workstation; only hosted access is evidenced.**
+No TypeSafe API request was made for this follow-up. The 2026-11-20 messages described above remain unverified against the authenticated mailbox, so their reply status cannot be determined. The 2026-11-19 synthetic hosted connectivity probe remains the only recorded live Jev API request in this project; it established hosted connectivity only, not local availability or BTC-packet assessment. The separately approved 2026-11-21 vendor inquiry is visible in Sent and is awaiting a reply. The current state is therefore: **authentic local Jev remains unverified and was not found on this workstation; only hosted access is evidenced.**
 
 ### Recheck — 2026-11-21
 
@@ -59,11 +59,12 @@ currently available only through its hosted API. The current
 to describe Jev through the authenticated hosted endpoint; I found no public
 local runtime manifest or verifiable Jev weight artifacts in this recheck.
 
-I searched the existing Gmail thread. It contains the two sent messages from
-2026-11-20 and no TypeSafe reply as of 2026-11-21. No additional message or
-Jev API request was sent during this recheck. A separately licensed private
-deployment remains possible but unverified until the vendor replies with
-written terms and verifiable runtime and weight hashes.
+The prior research record says two messages were sent on 2026-11-20. A later
+search in the authenticated Gmail account available for this follow-up found
+no matching sent message or draft, so that earlier delivery claim could not be
+verified from this account. A separately licensed private deployment remains
+possible but unverified until the vendor replies with written terms and
+verifiable runtime and weight hashes.
 
 The Windows local runtime verification recorded in
 [the 2026-11-21 OS-isolation report](btc-local-assessor-os-isolation-2026-11-21.md)
@@ -78,3 +79,42 @@ Therefore, a loopback server that accepts the System One wire format, or changin
 ## Project boundary
 
 [ADR-0058](../decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md) keeps BTC packet content, citations, and assessment context local and prohibits sending them to hosted Jev. It also requires separate explicit approval for future Jev connectivity calls. This research does not change that boundary or authorize packet egress.
+
+### Follow-up — 2026-11-21: direct FAQ and workstation check
+
+I expanded the VPC/on-premises question in TypeSafe's current
+[Enterprise FAQ](https://typesafe.ai/enterprise). It explicitly says Jev is
+currently available only through the hosted API. The current
+[model catalog](https://docs.typesafe.ai/models),
+[System One API reference](https://docs.typesafe.ai/api/system-one), and
+[Quick Start](https://docs.typesafe.ai/introduction/quickstart) likewise
+describe authenticated requests to TypeSafe's API; none provides a local
+inference package or offline mode. The public
+[TypeSafe GitHub organization](https://github.com/typesafe-ai) and official
+[Hugging Face organization](https://huggingface.co/typesafeAI/models) expose no
+verifiable Jev checkpoint or local-serving runtime in the listings checked.
+
+A bounded Windows workstation check found no `jev` or `typesafe` executable,
+installed TypeSafe Python distribution, Jev-named artifact in the project
+runtime/model directory or common Hugging Face model cache, or matching local
+assessor process/listener on the checked ports. The project's configured local
+evidence model remains `Qwen3-4B-Q4_K_M.gguf`; it is Qwen, not Jev. This check
+cannot rule out a private vendor package or an artifact stored in an unchecked
+custom path.
+
+The earlier note recorded two Sales emails sent on 2026-11-20. A fresh search in
+the authenticated Gmail account available for this follow-up found no matching
+sent message or draft, so I cannot reconcile that earlier mailbox record from
+this account. After explicit approval of the exact recipient and content, I
+sent a new inquiry to TypeSafe Sales at `sales@typesafe.ai` on 2026-11-21. It
+asks whether an authentic local/VPC deployment exists and requests written
+local-use terms plus a verifiable model/runtime/hash manifest. It contains no
+BTC market data, evidence packet, API key, or other project secret. The message
+is visible in Sent; a vendor reply is pending.
+
+**Current gate:** public evidence says hosted API only, and this workstation
+contains Qwen rather than Jev. Keep the local Qwen assessor identified as Qwen
+and keep BTC packets local. Resume an authentic local Jev integration only if
+TypeSafe supplies written local-use terms and verifiable runtime/model
+artifacts; a wire-compatible endpoint or API credential alone does not satisfy
+that gate.
