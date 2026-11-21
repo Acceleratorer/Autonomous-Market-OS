@@ -24,7 +24,42 @@ Jev. The existing ADR-0058 boundary remains in force while authentic local Jev
 is unverified. This public-source review made no Jev API call; the separate
 TypeSafe Sales inquiry and follow-up status are recorded below.
 
-## Current continuation update — 2026-11-20
+## Current verification — 2026-11-21
+
+The [official TypeSafe Enterprise FAQ](https://typesafe.ai/enterprise) still
+states Jev is currently available only through the hosted API. The Gmail
+thread contains the two owner-approved inquiry messages sent on 2026-11-20
+and no TypeSafe reply as of this check. No vendor-authenticated local runtime
+manifest or artifact hashes have been received; a private offer remains
+unverified. Keep the BTC packet boundary in ADR-0058.
+
+The Windows x64 local Qwen runtime now has executable-scoped outbound block
+rules for the pinned CPython 3.11.18 and llama-server processes. ActiveStore
+verification reported enforcement with all three firewall profiles enabled.
+A bounded connection attempt to 1.1.1.1:443 was denied by Windows Firewall.
+Loopback health returned HTTP 200 with the 25% CPU and 6 GiB Job Object limits
+enforced; the 2 GiB CUDA free-memory margin remains adaptive, not a hard VRAM
+cap.
+
+One synthetic-only B3.1 run used local Qwen, abstained, and remained
+advisory-only, uncalibrated, and ineligible for market fusion and paper
+decisions. Offline replay verified the saved bundle with zero inference calls
+and zero network requests. This assessed no BTC observation and made no Jev
+or market-data request. The raw packet and response remain local in ignored
+storage; the sanitized report is
+[btc-local-assessor-windows-egress-2026-11-21.json](evidence/btc-local-assessor-windows-egress-2026-11-21.json).
+The Windows isolation report is
+[btc-local-assessor-os-isolation-2026-11-21.md](research/btc-local-assessor-os-isolation-2026-11-21.md).
+
+This verifies the bounded Windows Qwen path only. Authentic local Jev remains
+unverified and Qwen is not Jev. Linux target isolation/GPU access and a
+prospective, point-in-time eligible BTC packet remain open gates. Continue
+with a real Jev runtime only after TypeSafe provides written local-use terms
+and a vendor-authenticated version/runtime/weight manifest. Keep numerical
+probability, calibration, stability, risk, and paper decisions owned by Market
+OS.
+
+## Historical continuation update — 2026-11-20
 
 The current owner decision is recorded in
 [ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md):
@@ -336,13 +371,10 @@ offline packaging work and does not reopen connected or live execution.
    comparison before looking at held-out results. Keep Jev's support,
    contradiction, and abstention labels semantic; Market OS owns all market
    probability, calibration, stability, risk, and execution decisions.
-7. Windows CPython 3.11.18 and the assessor install manifest now verify
-   locally. Health returns 200 with resource limits enforced but remains
-   degraded until the owner approves installing the two executable-scoped
-   outbound-block rules and ActiveStore verification succeeds. Then run the
-   bounded denial and loopback probes before one synthetic-only assessment.
-   Linux still needs a supported x64 host to verify the live scope, cgroup,
-   namespace, loopback, and GPU access.
+7. The Windows egress rules, denial probe, loopback health, synthetic-only
+   Qwen abstention, and offline replay are now verified in the 2026-11-21
+   evidence linked above. Linux still needs a supported x64 host to verify the
+   live scope, cgroup, namespace, loopback, and GPU access.
 8. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
    direction benchmark unpromoted and retain the project-wide LightRAG choice.
 
