@@ -30,6 +30,9 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     if ($Rule.Enabled -ne "True" -or $Rule.Direction -ne "Outbound" -or $Rule.Action -ne "Block" -or [string]$Rule.Profile -ne "Any") {
         return $false
     }
+    if ([string]$Rule.Group -ne $group) {
+        return $false
+    }
     if ((-not [string]::IsNullOrWhiteSpace([string]$Rule.Owner) -and [string]$Rule.Owner -ne "Any") -or
         [string]$Rule.LocalOnlyMapping -eq "True" -or [string]$Rule.LooseSourceMapping -eq "True") {
         return $false
@@ -39,7 +42,7 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     if ($applications.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$applications[0].Program)) {
         return $false
     }
-    if ([string]$applications[0].Package -ne "Any") {
+    if ([string]$applications[0].Package -notin @("", "Any")) {
         return $false
     }
     if (-not [string]::Equals((Get-FullPath ([string]$applications[0].Program)), (Get-FullPath $Executable), [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -87,20 +90,30 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     }
 
     $securityFilters = @($Rule | Get-NetFirewallSecurityFilter)
-    if ($securityFilters.Count -ne 1) {
+    if ($securityFilters.Count -gt 1) {
         return $false
     }
-    $security = $securityFilters[0]
-    if ([string]$security.Authentication -ne "NotRequired" -or
-        [string]$security.Encryption -ne "NotRequired" -or
-        [string]$security.OverrideBlockRules -ne "False" -or
-        [string]$security.LocalUser -ne "Any" -or
-        [string]$security.RemoteUser -ne "Any" -or
-        [string]$security.RemoteMachine -ne "Any") {
-        return $false
+    if ($securityFilters.Count -eq 1) {
+        $security = $securityFilters[0]
+        if ([string]$security.Authentication -ne "NotRequired" -or
+            [string]$security.Encryption -ne "NotRequired" -or
+            [string]$security.OverrideBlockRules -ne "False" -or
+            [string]$security.LocalUser -ne "Any" -or
+            [string]$security.RemoteUser -ne "Any" -or
+            [string]$security.RemoteMachine -ne "Any") {
+            return $false
+        }
     }
 
     return -not [bool](Compare-Object -ReferenceObject $expected -DifferenceObject $actual -CaseSensitive)
+}
+
+function Test-RuleEnforced($Rule) {
+    if ([string]$Rule.PrimaryStatus -ne "OK") {
+        return $false
+    }
+    $statuses = @($Rule.EnforcementStatus | ForEach-Object { [string]$_ })
+    return ($statuses -contains "Enforced") -or ($statuses -contains "Full")
 }
 
 function Test-FirewallProfiles {
@@ -188,7 +201,10 @@ try {
                 if (-not (Test-ExpectedRule $existing[0] $specification.Executable)) {
                     throw "The persistent managed firewall rule $($specification.Name) exists with unexpected settings; review it manually"
                 }
-                continue
+                if (Test-RuleEnforced $existing[0]) {
+                    continue
+                }
+                Remove-NetFirewallRule -PolicyStore PersistentStore -Name $specification.Name
             }
             New-NetFirewallRule `
                 -PolicyStore PersistentStore `
@@ -199,25 +215,7 @@ try {
                 -Direction Outbound `
                 -Action Block `
                 -Program $specification.Executable `
-                -Package Any `
                 -RemoteAddress $blockedRemoteAddresses `
-                -LocalAddress Any `
-                -Protocol Any `
-                -LocalPort Any `
-                -RemotePort Any `
-                -IcmpType Any `
-                -DynamicTarget Any `
-                -Service Any `
-                -InterfaceAlias Any `
-                -InterfaceType Any `
-                -Authentication NotRequired `
-                -Encryption NotRequired `
-                -OverrideBlockRules $false `
-                -LocalUser Any `
-                -RemoteUser Any `
-                -RemoteMachine Any `
-                -LocalOnlyMapping $false `
-                -LooseSourceMapping $false `
                 -Profile Any `
                 -Enabled True | Out-Null
             $createdRuleNames += $specification.Name
@@ -236,6 +234,14 @@ try {
         if ($effective.Count -ne 1 -or -not (Test-ExpectedRule $effective[0] $specification.Executable)) {
             Remove-CreatedRules
             $result = Get-VerificationResult "unverified" "missing_or_mismatched_active_store_rule"
+            $result | ConvertTo-Json -Depth 5 -Compress
+            exit 2
+        }
+        if (-not (Test-RuleEnforced $effective[0])) {
+            Remove-CreatedRules
+            $statuses = @($effective[0].EnforcementStatus | ForEach-Object { [string]$_ })
+            $reason = "active_store_rule_not_enforced:primary_status=$($effective[0].PrimaryStatus);enforcement_status=$($statuses -join ',')"
+            $result = Get-VerificationResult "unverified" $reason
             $result | ConvertTo-Json -Depth 5 -Compress
             exit 2
         }

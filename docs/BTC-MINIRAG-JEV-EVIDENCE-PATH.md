@@ -149,10 +149,12 @@ an operating-system egress boundary only when its platform checks pass. Linux
 `health` and `assess` run in a rootless systemd user scope and a loopback-only
 network namespace; the runtime checks effective cgroup-v2 limits and namespace
 membership. Missing user namespaces or cgroup controls fail closed. Linux has
-not yet been exercised on a target host. Windows health remains degraded until
-the opt-in executable-scoped firewall rules are installed and verified.
-Bootstrap may download the pinned artifacts during setup; assessment and replay
-use local files only.
+not yet been exercised on a target host. As of 2026-11-21, the Windows target
+has verified executable-scoped firewall enforcement and healthy loopback
+runtime status; see the
+[Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md).
+Bootstrap may download pinned artifacts during setup; the verified assessment
+and replay used installed local files and loopback IPC only.
 Before inference, the local assessor recomputes the B2 feature fingerprint and
 decision clock, checks the six candle references, and validates event time,
 publication or bounded-receipt availability, MiniRAG completion, source
@@ -228,22 +230,44 @@ Windows. The test also exercised a 128 MiB memory limit against a synthetic
 child allocation. The runtime now enables llama.cpp's adaptive `--fit` target
 with a 2,048 MiB free-memory margin; this is not a hard VRAM quota. The host
 does not grant the privilege required for a working-set cap. The local smoke
-completed and replayed offline, but health remains `degraded` because OS-level
-egress isolation is still unverified. The Linux runtime has no cgroup
-supervisor and has not been resource-verified. The U5.5 systemd unit files
+completed and replayed offline, but health was `degraded` at that checkpoint
+because OS-level egress isolation was still unverified. The Linux runtime now
+uses a transient systemd scope and user/network namespace, but has not been
+resource-verified on a target host. The U5.5 systemd unit files
 configure loopback-only IP access, but that disabled deployment package has
 not been verified on a target host and the standalone assessor CLI does not
 run inside those units. Its policy therefore does not isolate this launch
 path. See the
 [`OS isolation readiness note`](research/btc-local-assessor-os-isolation-2026-11-20.md)
 and [`resource-guard evidence`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
-Windows now has a read-only ActiveStore verifier and an opt-in, executable-
-scoped firewall installer. Neither has changed host policy; health remains
-degraded until the exact target runtime rules are configured and a bounded
-non-loopback denial probe succeeds while loopback inference still works.
-The latest local health evidence records loopback HTTP 200, Windows Job Object
-resource limits enforced, and egress rules absent in ActiveStore
-([`OS-isolation evidence`](evidence/btc-local-assessor-os-isolation-2026-11-20.json)).
+At that 2026-11-20 checkpoint, Windows had a read-only ActiveStore verifier
+and an opt-in executable-scoped firewall installer, but the host rules had not
+yet been installed. The dated health evidence records that historical state:
+loopback HTTP 200, Job Object resource limits enforced, and egress rules
+absent from ActiveStore
+([`2026-11-20 OS-isolation evidence`](evidence/btc-local-assessor-os-isolation-2026-11-20.json)).
+
+### Windows runtime egress verification — 2026-11-21
+
+The owner-approved installer now has two active outbound block rules for the
+pinned Python and llama-server executables. The verifier checks their
+effective ActiveStore filters and enforcement status, along with enabled
+Domain, Private, and Public profiles. Health returned HTTP 200 over loopback
+and reported both network isolation and resource limits as enforced. A
+non-loopback TCP attempt from the pinned Python runtime to 1.1.1.1:443 was
+blocked with Windows error 10013. The local IPC path remained available.
+
+One synthetic-only Qwen B3.1 assessment abstained. Its result is uncalibrated,
+advisory-only, and ineligible for market fusion or paper decisions. Offline
+replay verified the stored bundle with zero inference calls and zero network
+requests. No BTC observation, Jev request, or market-data request was used.
+The raw packet and response remain in ignored local storage; sanitized
+identifiers and results are recorded in
+[`Windows egress evidence`](evidence/btc-local-assessor-windows-egress-2026-11-21.json).
+
+This verifies the local Qwen path on this Windows target only. Qwen is not
+Jev, Linux runtime isolation and GPU access remain unverified on a target
+host, and the synthetic packet provides no market or calibration evidence.
 
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is
@@ -408,7 +432,8 @@ Market OS stays paper-only and owns every risk and execution decision.
    error bound; use receipt plus bound for availability. This does not turn
    local receipt into publication time. The capture proposal is not approval;
    obtain separate date-bound approval before any new data request.
-4. After an eligible packet exists, assess it locally with Qwen and persist the
+4. The synthetic path has been exercised and replayed locally. After a
+   prospectively eligible BTC packet exists, assess it locally and persist the
    B3.1-shaped response against its exact fingerprint and forward observation
    lineage. The prospective pilot alone is not a market study.
 5. Freeze an offline matched comparison protocol before reading held-out
@@ -421,7 +446,8 @@ Market OS stays paper-only and owns every risk and execution decision.
 - [ADR-0057: Strict recorded availability for BTC evidence](decisions/ADR-0057-btc-strict-recorded-availability.md)
 - [ADR-0058: Jev connectivity-only and local BTC packet assessment](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md)
 - [BTC prospective capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md)
-- [BTC local assessor OS-isolation readiness](research/btc-local-assessor-os-isolation-2026-11-20.md)
+- [BTC local assessor Windows OS-isolation verification](research/btc-local-assessor-os-isolation-2026-11-21.md)
+- [BTC local assessor OS-isolation implementation checkpoint](research/btc-local-assessor-os-isolation-2026-11-20.md)
 - [U3 API connectivity evidence](evidence/u3-api-connectivity.json)
 - [B3.1 question contract](B3-1-QUESTION-CONTRACT.md)
 - [B3.1 offline evaluation protocol](B3.1-OFFLINE-EVALUATION-PROTOCOL.md)

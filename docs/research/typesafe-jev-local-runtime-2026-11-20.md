@@ -1,6 +1,6 @@
 # TypeSafe Jev local runtime and identity
 
-**Checked:** 2026-11-20
+**Checked:** 2026-11-20; public FAQ and inquiry thread rechecked 2026-11-21
 **Scope:** Current public TypeSafe documentation, enterprise material, legal terms, and official GitHub repositories; read-only local-runtime discovery. No new Jev API call was made during this local-runtime check.
 
 ## Conclusion
@@ -48,6 +48,26 @@ An unrelated public project, [`amithgc/local-jev`](https://github.com/amithgc/lo
 A read-only check of this Windows workstation confirmed `TYPESAFE_API_KEY` is defined in the current shell; its value was not read or printed. This confirms only that the variable is set and does not establish local Jev availability. No `local-jev` executable, `jev`/`typesafe` Python module, Jev/TypeSafe-named model entry in configured or common Hugging Face cache roots, or local listener on ports 8765, 8000, or 8001 was found. A targeted Gmail search before the inquiry found no pre-existing TypeSafe/Jev messages about VPC, on-premises, or local deployment. These checks do not cover every possible custom path, process port, mailbox, or private vendor channel.
 
 No TypeSafe API request was made for this follow-up. The 2026-11-20 inquiry remains unanswered. The existing 2026-11-19 synthetic hosted connectivity probe remains the only recorded live Jev request in this project; it established hosted connectivity only, not local availability or BTC-packet assessment. The current state is therefore: **authentic local Jev remains unverified and was not found on this workstation; only hosted access is evidenced.**
+
+### Recheck — 2026-11-21
+
+I opened and expanded the current VPC/on-premises question on TypeSafe’s
+[Enterprise FAQ](https://typesafe.ai/enterprise). It still answers that Jev is
+currently available only through its hosted API. The current
+[model catalog](https://docs.typesafe.ai/models) and
+[System One API reference](https://docs.typesafe.ai/api/system-one) continue
+to describe Jev through the authenticated hosted endpoint; I found no public
+local runtime manifest or verifiable Jev weight artifacts in this recheck.
+
+I searched the existing Gmail thread. It contains the two sent messages from
+2026-11-20 and no TypeSafe reply as of 2026-11-21. No additional message or
+Jev API request was sent during this recheck. A separately licensed private
+deployment remains possible but unverified until the vendor replies with
+written terms and verifiable runtime and weight hashes.
+
+The Windows local runtime verification recorded in
+[the 2026-11-21 OS-isolation report](btc-local-assessor-os-isolation-2026-11-21.md)
+used Qwen, not Jev, and does not change the Jev availability finding.
 
 ### Repository integration boundary
 
