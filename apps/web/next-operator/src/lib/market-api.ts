@@ -91,6 +91,28 @@ export type BtcHistoryCandlePage = {
   };
 };
 
+export type BtcRealtimeCapture = {
+  capture: {
+    runId: string;
+    status: "running" | "completed" | "interrupted";
+    symbol: "BTCUSDT";
+    interval: "1m";
+    pollIntervalSeconds: number;
+    requestedPolls: number;
+    requestCount: number;
+    failedPolls: number;
+    newClosedCandles: number;
+    startedAt: string;
+    updatedAt: string;
+    finishedAt: string | null;
+    sourcePublishedAt: null;
+    clockErrorBoundMs: null;
+    packetEligible: false;
+    eligibilityReason: string;
+  };
+  candles: (BtcHistoryCandle & { receivedAt: string | null })[];
+};
+
 export type BtcIngestionManifestSummary = {
   manifestId: string;
   datasetRevision: string;
@@ -553,6 +575,14 @@ function asCount(value: unknown): number {
   return value;
 }
 
+function asUtcTimestamp(value: unknown): string {
+  const timestamp = asText(value);
+  if (!/(?:Z|\+00:00)$/.test(timestamp) || !Number.isFinite(Date.parse(timestamp))) {
+    throw new LocalApiError("invalid");
+  }
+  return timestamp;
+}
+
 function asBoolean(value: unknown): boolean {
   if (typeof value !== "boolean") throw new LocalApiError("invalid");
   return value;
@@ -749,6 +779,76 @@ export async function getBtcHistoryCandlePage(
     throw new LocalApiError("invalid");
   }
   return { dataset, candles, page };
+}
+
+export async function getBtcRealtimeCapture(): Promise<BtcRealtimeCapture> {
+  const payload = asObject(await readJson("/v1/btc/realtime/latest"));
+  if (payload.api_version !== "market-os.btc-realtime-capture@v1") throw new LocalApiError("invalid");
+
+  const captureRow = asObject(payload.capture);
+  const status = asText(captureRow.status);
+  const capture = {
+    runId: asText(captureRow.run_id),
+    status,
+    symbol: asText(captureRow.symbol),
+    interval: asText(captureRow.interval),
+    pollIntervalSeconds: asCount(captureRow.poll_interval_seconds),
+    requestedPolls: asCount(captureRow.requested_polls),
+    requestCount: asCount(captureRow.request_count),
+    failedPolls: asCount(captureRow.failed_polls),
+    newClosedCandles: asCount(captureRow.new_closed_candles),
+    startedAt: asUtcTimestamp(captureRow.started_at),
+    updatedAt: asUtcTimestamp(captureRow.updated_at),
+    finishedAt: captureRow.finished_at === null ? null : asUtcTimestamp(captureRow.finished_at),
+    sourcePublishedAt: captureRow.source_published_at,
+    clockErrorBoundMs: captureRow.clock_error_bound_ms,
+    packetEligible: captureRow.packet_eligible,
+    eligibilityReason: asText(captureRow.eligibility_reason),
+  };
+  if (
+    !/^btc-live-\d{8}T\d{6}Z-[0-9a-f]{8}$/.test(capture.runId)
+    || !["running", "completed", "interrupted"].includes(capture.status)
+    || capture.symbol !== "BTCUSDT"
+    || capture.interval !== "1m"
+    || capture.pollIntervalSeconds !== 180
+    || capture.requestedPolls < 1
+    || capture.requestedPolls > 432
+    || capture.requestCount > capture.requestedPolls
+    || capture.failedPolls > capture.requestCount
+    || capture.sourcePublishedAt !== null
+    || capture.clockErrorBoundMs !== null
+    || capture.packetEligible !== false
+  ) {
+    throw new LocalApiError("invalid");
+  }
+
+  const rows = asArray(payload.candles);
+  if (rows.length > 64) throw new LocalApiError("invalid");
+  const candles = rows.map((value): BtcHistoryCandle & { receivedAt: string | null } => {
+    const row = asObject(value);
+    const candle = {
+      openTimeMs: asCount(row.open_time_ms),
+      closeTimeMs: asCount(row.close_time_ms),
+      open: asCandleDecimal(row.open),
+      high: asCandleDecimal(row.high),
+      low: asCandleDecimal(row.low),
+      close: asCandleDecimal(row.close),
+      volume: asCandleDecimal(row.volume, { allowZero: true }),
+      receivedAt: row.received_at === null ? null : asUtcTimestamp(row.received_at),
+    };
+    if (
+      candle.openTimeMs > MAX_JS_DATE_TIME_MS
+      || candle.closeTimeMs > MAX_JS_DATE_TIME_MS
+      || candle.closeTimeMs - candle.openTimeMs !== 60_000
+    ) {
+      throw new LocalApiError("invalid");
+    }
+    return candle;
+  });
+  if (candles.some((candle, index) => index > 0 && candles[index - 1].openTimeMs >= candle.openTimeMs)) {
+    throw new LocalApiError("invalid");
+  }
+  return { capture: capture as BtcRealtimeCapture["capture"], candles };
 }
 
 function parseBtcManifestSummary(value: unknown, expectedDatasetRevision: string): BtcIngestionManifestSummary {

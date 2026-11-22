@@ -213,3 +213,72 @@ Observed result:
 Fingerprints, normalized synthetic answers, and explicit limits are recorded
 in [`jev-connectivity-reauthorized-2026-11-19.json`](evidence/jev-connectivity-reauthorized-2026-11-19.json).
 The raw key and raw provider response body are not included.
+
+## Owner-requested Jev smoke and bounded BTC capture — 2026-11-22
+
+The owner requested a fresh Jev API connectivity check followed by a short
+real-time BTCUSDT capture. The Jev check reused the existing bounded CLI with
+`jev-1.14.0`, the fixed synthetic descriptive request, one request, zero
+retries, paper-only mode, and the `$0.05` local estimate guard. The process
+environment contained `TYPESAFE_API_KEY`; its value was not read into output,
+logged, or persisted.
+
+Observed Jev result:
+
+- Status: valid; requested and resolved model: `jev-1.14.0`.
+- Request count: `1`; retry count: `0`; latency: `467 ms`.
+- Provider usage: `484` input tokens and `92` output tokens.
+- The recorded estimate was `$0.0000089775`; this is not a provider invoice or
+  a guaranteed billing ceiling.
+- Probe ID: `connectivity-ff090f36f3f734431879`; the normalized result and
+  fingerprints remain under the ignored local path
+  `.market_os/jev-connectivity-live-2026-11-22/`.
+- The request used only the synthetic contract
+  `btc.connectivity.synthetic-descriptive.v1`. It included no live BTC price,
+  MiniRAG result, or B3.1 packet and produced no market signal or trade action.
+
+The public Binance probe then confirmed one BTCUSDT ticker read. The bounded
+capture command is `python -m market_os.btc_realtime_capture
+--allow-live-capture --samples N`: it polls the existing allowlisted public
+1-minute kline endpoint once every 180 seconds, requires a finite sample count,
+uses one attempt per poll, and stores JSONL plus an atomic manifest under the
+ignored `.market_os/btc-realtime-captures/` directory. It does not start a
+background service or call Jev.
+
+The owner-requested two-poll sample ran on 2026-11-22 at 15:17:28 UTC and
+15:20:28 UTC. Both requests succeeded, with zero retries, and yielded seven
+new closed candles. Its local run is
+`btc-live-20261122T151728Z-ce0cadf6`; the candle values remain in ignored
+local files and are not included in this repository. The manifest keeps
+`source_published_at` and `clock_error_bound_ms` unknown and marks every record
+`packet_eligible: false`. This sample is useful for capture-path verification
+and local chart data only; it is not eligible for a B3.1 point-in-time packet.
+
+No BTC evidence was sent to TypeSafe. ADR-0058 remains in force. A longer
+capture still needs a bounded run plan and review of the applicable Binance
+terms/retention conditions.
+
+## Local chart integration — 2026-11-22
+
+The read-only gateway now exposes `GET /v1/btc/realtime/latest` from its
+configured Market OS store root. The local Next.js operator reaches it through
+a same-origin server route; the browser refreshes that route every 180 seconds
+with caching disabled. The chart shows the newest 64 validated closed candles
+from the capture and falls back to the registered historical dataset when no
+live run is available. The capture process itself remains finite and must be
+started explicitly:
+
+```text
+python -m market_os.btc_realtime_capture --allow-live-capture --samples 30
+```
+
+`--samples` accepts 1 through 432 polls; each poll is one request, spaced 180
+seconds apart. The runner uses `MARKET_OS_STORE_ROOT`, or `.market_os/` by
+default, so it shares the local store with the gateway. No service is installed
+or started automatically. The web chart never calls Binance directly and
+does not call Jev.
+
+The existing two-poll local run supplies the chart with seven candles. The
+clock error bound remains unknown, so the capture is explicitly excluded from
+B3.1 and paper decisions. No new market-data requests or Jev calls were needed
+to wire the local chart.
