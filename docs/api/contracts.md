@@ -219,6 +219,25 @@ does not grow with file size. The response contains UTC timestamps and bounded
 decimal strings, without filesystem paths or provenance payloads. Replay is
 still required to verify canonical-content equivalence.
 
+## Local BTC realtime chart capture
+
+`python -m market_os.btc_realtime_capture --allow-live-capture --samples <1..432>`
+polls Binance Spot BTCUSDT 1-minute closed candles once every 180 seconds,
+with one request per poll and no automatic retry. It writes to
+`<MARKET_OS_STORE_ROOT>/btc-realtime-captures/` (or `.market_os/` when the
+environment variable is unset). The run is finite; the command does not
+install or launch a background service.
+
+`GET /v1/btc/realtime/latest` reads the newest local capture from the gateway's
+configured store root, returns at most 64 ascending candles, and rejects
+unsupported query parameters or malformed capture files. The Next.js chart
+uses a same-origin server route to read this endpoint and refreshes its view
+every 180 seconds with caching disabled. Neither the browser nor Jev receives
+the BTC packet. The response preserves `source_published_at` and
+`clock_error_bound_ms` as unknown and hard-codes `packet_eligible: false` until
+a defensible UTC clock error bound is established; the chart is read-only and
+does not submit paper decisions or orders.
+
 The local Next.js ingestion-manifest surface is bound to the same configured
 HistoryStore. Manifest catalog pages return at most 100 validated catalog
 summaries in manifest-ID order; the exclusive cursor must identify a manifest

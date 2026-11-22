@@ -59,6 +59,50 @@ and a vendor-authenticated version/runtime/weight manifest. Keep numerical
 probability, calibration, stability, risk, and paper decisions owned by Market
 OS.
 
+## Live connectivity follow-up — 2026-11-22
+
+The owner requested a fresh synthetic Jev API smoke and a three-minute BTC
+update path. The Jev API returned a valid `jev-1.14.0` result from one
+synthetic-only request; this verified hosted connectivity, not local Jev or
+BTC evidence assessment. The first capture implementation wrote public
+BTCUSDT 1-minute candles locally every 180 seconds and required a finite
+`--samples` count; the later chart integration is recorded below.
+
+The two-poll capture completed with 2 requests, 0 retries, and 7 new closed
+candles. Its data remains in ignored `.market_os/` storage. The workstation
+UTC error bound is unknown, so the run marks all records ineligible for B3.1.
+No BTC packet went to Jev. See the dated evidence in the
+[U3 connectivity report](U3-API-CONNECTIVITY-REPORT.md).
+
+Next: establish a defensible clock error bound before treating receipts as
+point-in-time evidence and review Binance terms/retention before planning a
+longer bounded capture. Keep hosted Jev at the synthetic connectivity boundary
+while BTC packets remain local.
+
+## Local chart continuation — 2026-11-22
+
+The local chart integration is now complete. `market_os.btc_realtime_capture`
+stores a finite public BTCUSDT Spot 1m capture under the configured
+`MARKET_OS_STORE_ROOT` (default `.market_os/`). The read-only Python route
+`GET /v1/btc/realtime/latest` validates and returns up to 64 latest closed
+candles. The local Next.js chart reads it through a same-origin route and
+refreshes every 180 seconds; it shows registered history while no live capture
+is present. The browser does not call Binance, and BTC evidence never goes to
+hosted Jev. The chart marks receipts as not B3.1 or paper-decision eligible
+while the workstation UTC error bound is unknown.
+
+To run a bounded 30-poll sample, start
+`python -m market_os.btc_realtime_capture --allow-live-capture --samples 30`
+from the repository with the same `MARKET_OS_STORE_ROOT` as the gateway. This
+is a 90-minute run with one public request every three minutes; it does not
+install an always-on background task. Change the finite sample count only with
+a bounded capture plan and after reviewing Binance terms/retention.
+
+Next work: verify a defensible local UTC clock error bound and capture lineage;
+then determine whether a prospective packet can pass the existing B3.1 gates.
+Do not enable hosted Jev packet egress or call Qwen Jev. Keep math,
+probability, calibration, stability, risk, and paper decisions in Market OS.
+
 ## Historical continuation update — 2026-11-20
 
 The current owner decision is recorded in

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { MarketChart, MarketContextStrip, SyntheticFixturePreview } from "@/components/market-desk";
+import { LiveBtcChart } from "@/components/live-btc-chart";
 import { EvidenceChain, PanelHeading, RiskLedger, ServiceState } from "@/components/ui";
 import {
+  getBtcRealtimeCapture,
   getBtcHistoryCandlePage,
   getBtcHistoryDatasetCatalog,
   getBtcResearchRunPage,
@@ -11,6 +12,7 @@ import {
   LocalApiError,
   type BtcHistoryCandlePage,
   type BtcHistoryDatasetPage,
+  type BtcRealtimeCapture,
   type BtcResearchRunPage,
   type PortfolioDetail,
   type PortfolioCatalogPage,
@@ -43,11 +45,12 @@ function datasetHref(datasetRevision: string): string {
 }
 
 export default async function MarketDeskPage() {
-  const [datasets, portfolios, b2Runs, b3Runs] = await Promise.all([
+  const [datasets, portfolios, b2Runs, b3Runs, realtime] = await Promise.all([
     readResource<BtcHistoryDatasetPage>(() => getBtcHistoryDatasetCatalog({ limit: 5 })),
     readResource<PortfolioCatalogPage>(() => getPortfolioCatalog({ limit: 5 })),
     readResource<BtcResearchRunPage>(() => getBtcResearchRunPage("b2", { limit: 3 })),
     readResource<BtcResearchRunPage>(() => getBtcResearchRunPage("b3", { limit: 3 })),
+    readResource<BtcRealtimeCapture>(() => getBtcRealtimeCapture()),
   ]);
 
   let candles: ResourceResult<BtcHistoryCandlePage> | null = null;
@@ -62,7 +65,7 @@ export default async function MarketDeskPage() {
     portfolioDetail = await readResource(() => getPortfolioDetail(firstPortfolio.portfolioId));
   }
 
-  const resources = [datasets, portfolios, b2Runs, b3Runs, ...(candles ? [candles] : []), ...(portfolioDetail ? [portfolioDetail] : [])];
+  const resources = [datasets, portfolios, b2Runs, b3Runs, realtime, ...(candles ? [candles] : []), ...(portfolioDetail ? [portfolioDetail] : [])];
   const gatewayStatus = resources.some(gatewayIsAvailable) ? "available" : "unavailable";
   const researchCount = (b2Runs.ok ? b2Runs.value.runs.length : 0) + (b3Runs.ok ? b3Runs.value.runs.length : 0);
   const hasStoredData = Boolean(firstDataset && candles?.ok);
@@ -74,10 +77,10 @@ export default async function MarketDeskPage() {
           <div className="desk-instrument-identity">
             <p className="desk-kicker">MARKET DESK / BTCUSDT SPOT</p>
             <h1 id="desk-instrument-title">{firstDataset?.symbol ?? "BTCUSDT"}</h1>
-            <p>Bitcoin / Tether <span>Local synthetic observation surface</span></p>
+            <p>Bitcoin / Tether <span>Local market observation surface</span></p>
           </div>
           <div className="desk-instrument-badges" role="group" aria-label="Desk mode">
-            <span className="desk-badge desk-badge-cyan">Synthetic fixture</span>
+            <span className="desk-badge desk-badge-cyan">{realtime.ok ? "Binance capture" : hasStoredData ? "Validated history" : "Synthetic preview"}</span>
             <span className="desk-badge desk-badge-green">Paper</span>
             <span className="desk-badge desk-badge-neutral">Read only</span>
             <span className="desk-badge desk-badge-amber">Execution off</span>
@@ -86,31 +89,23 @@ export default async function MarketDeskPage() {
 
         <section className="desk-status-ribbon" role="status" aria-label="Market desk status">
           <div className={`desk-status-cell desk-status-${gatewayStatus}`}><span>Gateway</span><strong>{gatewayStatus === "available" ? "Available" : "Unavailable"}</strong></div>
-          <div><span>Data</span><strong>{hasStoredData ? "Validated page" : "Fixture preview"}</strong></div>
+          <div><span>Data</span><strong>{realtime.ok ? "Local BTC capture" : hasStoredData ? "Validated history" : "Fixture preview"}</strong></div>
           <div><span>Authority</span><strong>Python broker</strong></div>
-          <div><span>Venue</span><strong>None</strong></div>
+          <div><span>Venue</span><strong>{realtime.ok ? "Binance public" : firstDataset?.venue ?? "None"}</strong></div>
         </section>
-
-        <MarketContextStrip dataset={firstDataset} candles={candles?.ok ? candles.value.candles : undefined} />
 
         <div className="desk-workspace-grid">
           <section className="panel desk-chart-panel" aria-label="Primary market chart">
             <PanelHeading
-              kicker={firstDataset ? `${firstDataset.symbol} / ${firstDataset.interval}` : "BTCUSDT / SPOT"}
+              kicker="BTCUSDT / BINANCE SPOT"
               title="Price structure"
-              meta={hasStoredData ? "OHLCV" : "FIXTURE PREVIEW"}
+              meta="LOCAL · 3 MIN POLL"
             />
-            {candles?.ok && firstDataset ? (
-              <MarketChart dataset={firstDataset} candles={candles.value.candles} />
-            ) : datasets.ok ? (
-              <SyntheticFixturePreview symbol={firstDataset?.symbol ?? "BTCUSDT"} />
-            ) : candles && !candles.ok ? (
-              <div className="panel-body"><ServiceState kind={candles.kind} resource="BTC dataset candles" title="Market chart unavailable" /></div>
-            ) : !datasets.ok ? (
-              <div className="panel-body"><ServiceState kind={datasets.kind} resource="BTC dataset catalog" title="Market data unavailable" /></div>
-            ) : (
-              <div className="panel-body"><ServiceState kind="invalid" resource="BTC dataset catalog" title="Market data unavailable" /></div>
-            )}
+            <LiveBtcChart
+              initialCapture={realtime.ok ? realtime.value : null}
+              initialStatus={realtime.ok ? "ready" : realtime.kind}
+              fallback={firstDataset && candles?.ok ? { dataset: firstDataset, candles: candles.value.candles } : null}
+            />
           </section>
 
           <aside className="desk-right-rail" aria-label="Portfolio and execution context">
@@ -157,7 +152,7 @@ export default async function MarketDeskPage() {
                   <div><dt>Venue</dt><dd>None</dd></div>
                   <div><dt>Access</dt><dd>GET only</dd></div>
                 </dl>
-                <Link className="action-link" href="/">Review portfolios</Link>
+                <Link className="action-link" href="/" prefetch={false}>Review portfolios</Link>
               </div>
             </section>
           </aside>

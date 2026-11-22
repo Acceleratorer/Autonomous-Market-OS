@@ -24,10 +24,21 @@ function compareDecimalStrings(left: string, right: string): number {
 export function MarketCandleChart({
   dataset,
   candles,
+  symbol,
+  interval,
+  sourceLabel,
+  note,
 }: {
-  dataset: BtcHistoryDataset;
+  dataset?: BtcHistoryDataset;
   candles: BtcHistoryCandle[];
+  symbol?: string;
+  interval?: string;
+  sourceLabel?: string;
+  note?: string;
 }) {
+  const chartSymbol = dataset?.symbol ?? symbol ?? "BTCUSDT";
+  const chartInterval = dataset?.interval ?? interval ?? "1m";
+  const chartSourceLabel = sourceLabel ?? (dataset ? "OHLCV from the current bounded candle page" : "OHLCV from the local BTC capture");
   const points = candles.map((candle) => ({
     time: candle.openTimeMs,
     open: Number(candle.open),
@@ -71,7 +82,7 @@ export function MarketCandleChart({
     : (plotLeft + plotRight) / 2;
   const yFor = (value: number) => plotTop + ((plotMaximum - value) / (plotMaximum - plotMinimum)) * plotHeight;
   const yVolume = (value: number) => volumeBottom - (value / volumeMax) * (volumeBottom - volumeTop);
-  const description = `${dataset.symbol} ${dataset.interval} candlestick chart for ${points.length} bounded candles from ${formatUtc(points[0].time)} to ${formatUtc(points.at(-1)!.time)} UTC. Filled bodies close above their open; hollow bodies close below their open. Exact OHLCV values remain in the dataset detail table.`;
+  const description = `${chartSymbol} ${chartInterval} candlestick chart for ${points.length} candles from ${formatUtc(points[0].time)} to ${formatUtc(points.at(-1)!.time)} UTC. Filled bodies close above their open; hollow bodies close below their open.`;
   const pageHigh = candles.reduce((highest, candle) =>
     compareDecimalStrings(candle.high, highest.high) > 0 ? candle : highest,
   );
@@ -82,7 +93,7 @@ export function MarketCandleChart({
   return (
     <figure className="market-chart-figure">
       <figcaption className="market-chart-caption">
-        <span>OHLCV from the current bounded candle page</span>
+        <span>{chartSourceLabel}</span>
         <span className="market-chart-caption-meta">{points.length} samples</span>
       </figcaption>
       <div className="market-chart-readouts" aria-label="Current market readouts">
@@ -106,7 +117,7 @@ export function MarketCandleChart({
         role="img"
         aria-labelledby="market-desk-chart-title market-desk-chart-description"
       >
-        <title id="market-desk-chart-title">{`${dataset.symbol} ${dataset.interval} candlestick chart`}</title>
+        <title id="market-desk-chart-title">{`${chartSymbol} ${chartInterval} candlestick chart`}</title>
         <desc id="market-desk-chart-description">{description}</desc>
         {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
           const y = plotTop + fraction * plotHeight;
@@ -153,7 +164,7 @@ export function MarketCandleChart({
         <li><span className="market-legend-swatch market-legend-down" aria-hidden="true" />Down candle</li>
         <li><span className="market-legend-swatch market-legend-volume" aria-hidden="true" />Volume</li>
       </ul>
-      <p className="market-chart-note">Read-only chart. Exact OHLCV values remain below; no quote stream, return inference, or order action is added.</p>
+      <p className="market-chart-note">{note ?? "Read-only OHLCV view. No signal, paper decision, or order action is generated."}</p>
     </figure>
   );
 }

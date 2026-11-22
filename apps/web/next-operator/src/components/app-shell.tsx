@@ -92,6 +92,7 @@ function RuntimeIcon() {
 
 export function AppShell({ children, current, gatewayStatus = "unknown" }: AppShellProps) {
   const connected = isConnectedMode();
+  const marketDesk = current === "desk";
   const gatewayAddress = connected
     ? "Private loopback gateway"
     : `127.0.0.1:${process.env.MARKET_OS_API_PORT ?? "8787"}`;
@@ -116,7 +117,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
     <div className="app-layout">
       <a className="skip-link" href="#main-content">Skip to content</a>
       <aside className="sidebar">
-        <Link className="brand-link" href={connected ? "/" : "/overview"} aria-label="Market OS local operator home">
+        <Link className="brand-link" href={connected ? "/" : "/overview"} prefetch={current !== "desk"} aria-label="Market OS local operator home">
           <span className="brand-mark"><BrandMark /></span>
           <span>
             <span className="brand-name">MARKET OS</span>
@@ -127,13 +128,13 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
         <p className="nav-label">Workspace</p>
         <nav aria-label="Primary navigation">
           {!connected && (
-            <Link className="nav-link" href="/overview" aria-current={navigationCurrent(current, "overview")}>
+            <Link className="nav-link" href="/overview" prefetch={current !== "desk"} aria-current={navigationCurrent(current, "overview")}>
               <OverviewIcon />
               <span>Overview</span>
             </Link>
           )}
           {!connected && (
-            <Link className="nav-link" href="/desk" aria-current={navigationCurrent(current, "desk")}>
+            <Link className="nav-link" href="/desk" prefetch={current !== "desk"} aria-current={navigationCurrent(current, "desk")}>
               <DeskIcon />
               <span>Market desk</span>
             </Link>
@@ -141,6 +142,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
           <Link
             className="nav-link"
             href="/"
+            prefetch={current !== "desk"}
             aria-current={navigationCurrent(current, "registry", "portfolio")}
           >
             <PortfolioIcon />
@@ -152,6 +154,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
               <Link
                 className="nav-link"
                 href="/datasets"
+                prefetch={current !== "desk"}
                 aria-current={navigationCurrent(current, "datasets", "datasetDetail")}
               >
                 <DatasetIcon />
@@ -160,12 +163,13 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
               <Link
                 className="nav-link"
                 href="/experiments"
+                prefetch={current !== "desk"}
                 aria-current={navigationCurrent(current, "experiments", "experimentDetail")}
               >
                 <ResearchIcon />
                 <span>BTC research</span>
               </Link>
-              <Link className="nav-link" href="/runtime" aria-current={navigationCurrent(current, "runtime")}>
+              <Link className="nav-link" href="/runtime" prefetch={current !== "desk"} aria-current={navigationCurrent(current, "runtime")}>
                 <RuntimeIcon />
                 <span>Runtime / release</span>
               </Link>
@@ -190,11 +194,11 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
           </div>
           <div className="topbar-meta">
             <div className="topbar-tags" role="group" aria-label="Environment boundaries">
-              <span className="topbar-tag topbar-tag-synthetic">Synthetic</span>
+              <span className="topbar-tag topbar-tag-synthetic">{marketDesk ? "Public BTC data" : "Synthetic"}</span>
               <span className="topbar-tag topbar-tag-paper">Paper</span>
               <span className="topbar-tag topbar-tag-read-only">Read only</span>
               <span className="topbar-tag topbar-tag-execution">Execution off</span>
-              <span className="topbar-tag topbar-tag-local topbar-tag-mobile">Synthetic · paper · read only · off</span>
+              <span className="topbar-tag topbar-tag-local topbar-tag-mobile">{marketDesk ? "Public BTC · paper · read only · off" : "Synthetic · paper · read only · off"}</span>
             </div>
             <span
               className={`topbar-gateway topbar-gateway-${gatewayStatus}`}
@@ -211,7 +215,7 @@ export function AppShell({ children, current, gatewayStatus = "unknown" }: AppSh
 
         <footer className="footer-note">
           <span>GET-only local inspection · paper-only broker</span>
-          <span>No credentials · no provider calls · no live venue</span>
+          <span>{marketDesk ? "Binance capture stays local · no BTC packets sent to Jev" : "No credentials · no provider calls · no live venue"}</span>
         </footer>
       </div>
     </div>

@@ -60,6 +60,10 @@ class _BtcResearchQueryError(ValueError):
     """A malformed bounded BTC research-run query."""
 
 
+class _BtcRealtimeQueryError(ValueError):
+    """A malformed local BTC realtime-capture query."""
+
+
 class _PostBodyError(ValueError):
     """A malformed or oversized local API request body."""
 
@@ -1070,6 +1074,32 @@ def make_handler(
             if self.path == "/readyz":
                 self._send(200, {"api_version": "market-os.v1", "service": "market-os", "status": "ready"})
                 self._audit(200)
+                return
+            if urllib.parse.urlsplit(self.path).path == "/v1/btc/realtime/latest":
+                status = 200
+                error_type = None
+                try:
+                    parsed = urllib.parse.urlsplit(self.path)
+                    if parsed.query or parsed.fragment:
+                        raise _BtcRealtimeQueryError("BTC realtime chart does not accept query parameters")
+                    from .btc_realtime_capture import inspect_latest_capture
+
+                    result = inspect_latest_capture(workflow.store.root)
+                    self._send(200, result)
+                except _BtcRealtimeQueryError as exc:
+                    status = 400
+                    error_type = type(exc).__name__
+                    self._send(400, {"error": {"code": "btc_realtime_query_rejected", "message": str(exc), "api_version": "market-os.btc-realtime-capture@v1"}})
+                except FileNotFoundError:
+                    status = 404
+                    error_type = "FileNotFoundError"
+                    self._send(404, {"error": "local BTC realtime capture not found", "api_version": "market-os.btc-realtime-capture@v1"})
+                except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+                    status = 409
+                    error_type = type(exc).__name__
+                    self._send(409, {"error": {"code": "btc_realtime_integrity_error", "message": "local BTC realtime capture failed validation", "api_version": "market-os.btc-realtime-capture@v1"}})
+                finally:
+                    self._audit(status, error_type=error_type)
                 return
             if urllib.parse.urlsplit(self.path).path == "/metrics":
                 raw = metrics_registry.render()
