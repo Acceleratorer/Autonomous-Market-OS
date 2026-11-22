@@ -1,5 +1,22 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current milestone — qualify UTC receipt clock — 2026-11-22
+
+The live chart and finite Binance capture are integrated, but captures remain
+ineligible for B3.1 because `clock_error_bound_ms` is unknown. The latest
+read-only Windows check found W32Time stopped in Manual start mode;
+`w32tm /query /status` returned `0x80070426`. No time server was queried and
+no service or clock configuration was changed. See the
+[UTC clock research note](research/btc-utc-clock-error-bound.md).
+
+Next, qualify a fresh host-time uncertainty estimate and define how its
+freshness, holdover drift, clock steps, suspend/resume, and sync loss invalidate
+receipt evidence. Only then thread a valid bound into capture lineage and
+re-evaluate prospective B3.1 eligibility. n8n may schedule a one-shot capture,
+but it is not a time source. Keep packet eligibility false until the clock gate
+passes; hosted Jev remains synthetic-connectivity-only and BTC packets stay
+local.
+
 ## Owner goal: verify authentic local Jev — 2026-11-20
 
 The owner now wants the BTC evidence flow to run locally and use authentic Jev
