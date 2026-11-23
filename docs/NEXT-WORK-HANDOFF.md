@@ -3,19 +3,28 @@
 ## Current milestone — qualify UTC receipt clock — 2026-11-23
 
 The live chart and finite Binance capture are integrated, but captures remain
-ineligible for B3.1 because `clock_error_bound_ms` is unknown. The latest
-read-only Windows check found W32Time stopped in Manual start mode;
-`w32tm /query /status` returned `0x80070426`. No time server was queried and
-no service or clock configuration was changed. See the
-[UTC clock research note](research/btc-utc-clock-error-bound.md).
+ineligible for B3.1 because `clock_error_bound_ms` is unknown. The authorized
+60-minute observation completed: 10 minutes of W32Time status checks and 50
+minutes of unprivileged wall-clock versus monotonic-clock sampling. The local
+clock showed no interval at the diagnostic step threshold, but this only
+measures relative stability. W32Time remained stopped/manual. A separate
+stripchart diagnostic did not expose root dispersion or establish a UTC error
+bound. Raw workstation telemetry remains in ignored `.market_os/clock/` files;
+see the sanitized [UTC clock research note](research/btc-utc-clock-error-bound.md).
 
-Next, qualify a fresh host-time uncertainty estimate and define how its
-freshness, holdover drift, clock steps, suspend/resume, and sync loss invalidate
-receipt evidence. Only then thread a valid bound into capture lineage and
-re-evaluate prospective B3.1 eligibility. n8n may schedule a one-shot capture,
-but it is not a time source. Keep packet eligibility false until the clock gate
-passes; hosted Jev remains synthetic-connectivity-only and BTC packets stay
-local.
+Next, obtain fresh synchronization-quality data from an approved time source
+and define the bound's freshness, holdover drift, and invalidation behavior for
+clock steps, suspend/resume, or sync loss. Do not retry the canceled elevated
+service launch automatically. Only thread a defensible bound into capture
+lineage after these conditions are met; otherwise keep `packet_eligible: false`.
+n8n may schedule a one-shot capture, but it is not a time source. Hosted Jev
+remains synthetic-connectivity-only and BTC packets stay local.
+
+The capture proposal's original window starts at `2026-11-23T00:00:00Z` and
+cannot be run in full now. Rebase it to a future UTC window, recheck Binance
+terms, regional eligibility, and retention, and obtain fresh date-bound
+approval before any new market-data connection. See the
+[prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
 
 ## Owner goal: verify authentic local Jev — 2026-11-20
 

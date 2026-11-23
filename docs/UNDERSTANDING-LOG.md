@@ -1,5 +1,19 @@
 # Understanding log
 
+## 2026-11-23 — BTC UTC receipt-clock observation
+
+- Completed the authorized 60-minute local observation: a W32Time status
+  window followed by an unprivileged wall-clock/monotonic comparison. The
+  relative samples did not reach the diagnostic step threshold, but W32Time
+  remained stopped/manual and no absolute UTC error bound was established.
+- A separate stripchart diagnostic did not provide root-dispersion evidence
+  or a defensible continuous bound. Keep `clock_error_bound_ms` unknown and
+  BTC packet eligibility false; raw local telemetry remains ignored.
+- Refreshed the clock research note and next-work handoff. The prospective
+  capture window beginning `2026-11-23T00:00:00Z` can no longer be run in full;
+  no prospective market-data request was made. Rebase and obtain separate
+  date-bound approval before any future connection.
+
 ## 2026-11-16 — U6.4-F hosted installation evidence
 
 - CI run `43740383177` on merged commit `19367f4` passed 15 checks with no
