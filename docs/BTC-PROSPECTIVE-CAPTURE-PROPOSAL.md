@@ -13,6 +13,10 @@ service was not started, so no defensible UTC error bound was available. This
 keeps the proposal diagnostics-only until a qualified time source and
 continuous bound monitoring are available. See the
 [clock and source preflight](evidence/btc-prospective-capture-preflight-2026-11-20.json).
+**Status update (2026-11-23):** The proposed window begins at
+`2026-11-23T00:00:00Z` and is no longer executable in full. No prospective
+capture was made. Replace the UTC range, recheck the source and regional
+conditions below, and obtain separate date-bound approval before connecting.
 
 ## Purpose
 

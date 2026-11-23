@@ -1,8 +1,8 @@
 # BTC UTC clock error qualification
 
-**Checked:** 2026-11-22
+**Checked:** 2026-11-23
 
-**Scope:** Official timekeeping specifications and platform documentation only. No workstation clock measurement, time-server request, or runtime configuration change was made.
+**Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. No time-service configuration or system-clock change was made.
 
 ## Current status
 
@@ -17,6 +17,26 @@ queried, and no service or clock configuration was changed. There is no active
 source state or root-distance evidence to turn into an error estimate; the
 capture must continue to record `clock_error_bound_ms: null` and
 `packet_eligible: false`.
+
+## Follow-up diagnostics — 2026-11-23
+
+The authorized observation window completed as a 10-minute W32Time status
+window followed by a 50-minute unprivileged comparison of the local UTC wall
+clock with a monotonic clock. W32Time remained stopped/manual. The relative
+wall/monotonic samples showed no interval at or above the diagnostic 250 ms
+step threshold. The follow-up did not query a time source, market-data service,
+or Jev, and did not start or configure W32Time.
+
+A separate, bounded `w32tm /stripchart` diagnostic against the configured peer
+recorded offset and round-trip samples, but W32Time could not be started or
+resynchronized from the current process and root dispersion was unavailable.
+Those samples therefore do not establish a defensible UTC error bound. The
+full local samples remain in ignored `.market_os/clock/` files and are not
+committed.
+
+**Result:** keep `clock_error_bound_ms: null` and `packet_eligible: false`.
+Relative stability against a monotonic clock is not evidence of absolute UTC
+accuracy. No BTC data was captured during this observation.
 
 ## What an NTP estimate means
 
@@ -48,3 +68,10 @@ chronyc sources -v
 Record the active source, leap/synchronization state, system-time correction, root delay, root dispersion, and source selection. If chrony is not the active time service, identify the actual provider before interpreting the host clock.
 
 These diagnostics establish what the installed service reports; they do not by themselves qualify a capture. A follow-up design must define the accepted uncertainty threshold, freshness window, drift allowance, and invalidation behavior for clock steps, suspend/resume, or synchronization loss, then store that qualification with each local receipt.
+
+The next qualification attempt must obtain fresh synchronization-quality data
+from an approved time source, including enough source, sync, root-distance,
+and holdover information to calculate a stated operational uncertainty. Do
+not repeat a relative-clock observation as a substitute. If the required
+fields or assumptions are unavailable, retain the unknown bound and keep
+packet eligibility false.
