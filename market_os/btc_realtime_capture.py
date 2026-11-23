@@ -177,10 +177,8 @@ def replay_capture_run(run_root: str | Path) -> dict[str, object]:
         raise FileNotFoundError("local BTC capture run does not exist") from exc
     if not resolved_root.is_dir() or CAPTURE_RUN_PATTERN.fullmatch(resolved_root.name) is None:
         raise ValueError("local BTC capture run path is invalid")
-    if resolved_root.parent.name != "btc-realtime-captures":
-        raise ValueError("local BTC capture run must be under btc-realtime-captures")
-    store_root = resolve_local_storage_root(resolved_root.parent.parent)
-    if resolved_root != store_root / "btc-realtime-captures" / resolved_root.name:
+    local_parent = resolve_local_storage_root(resolved_root.parent)
+    if resolved_root != local_parent / resolved_root.name:
         raise ValueError("local BTC capture run path is invalid")
 
     manifest_path = resolved_root / "manifest.json"
