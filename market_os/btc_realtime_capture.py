@@ -336,6 +336,8 @@ def main(argv: list[str] | None = None) -> int:
     candles_path = run_root / "candles.jsonl"
     polls_path = run_root / "polls.jsonl"
     manifest_path = run_root / "manifest.json"
+    candles_path.touch()
+    polls_path.touch()
 
     started_at = _utc_now()
     started_monotonic = time.monotonic()
@@ -448,7 +450,14 @@ def main(argv: list[str] | None = None) -> int:
         status = "interrupted"
         interrupted = True
     finally:
-        manifest.update({"status": status, "finished_at": _utc_now()})
+        manifest.update({
+            "status": status,
+            "finished_at": _utc_now(),
+            "artifact_sha256": {
+                "candles.jsonl": hashlib.sha256(candles_path.read_bytes()).hexdigest(),
+                "polls.jsonl": hashlib.sha256(polls_path.read_bytes()).hexdigest(),
+            },
+        })
         _write_manifest(manifest_path, manifest)
 
     print(json.dumps({
