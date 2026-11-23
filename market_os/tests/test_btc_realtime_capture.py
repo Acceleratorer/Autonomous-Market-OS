@@ -4,7 +4,11 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
+import pytest
+
+from market_os import btc_realtime_capture as capture
 from market_os.btc_realtime_capture import replay_capture_run
 
 
@@ -112,3 +116,53 @@ def test_offline_capture_replay_is_repeatable_and_never_packet_eligible(tmp_path
     assert first["candles"][0]["close"] == 101.0
     assert first["clock_error_bound_ms"] is None
     assert first["packet_eligible"] is False
+
+
+@pytest.mark.parametrize("during_setup", [False, True])
+def test_capture_exception_never_claims_completion(tmp_path: Path, monkeypatch, during_setup: bool) -> None:
+    def fail(*args, **kwargs):
+        raise RuntimeError("synthetic adapter failure")
+
+    monkeypatch.setattr(capture, "BinancePublicAdapter", fail if during_setup else lambda: SimpleNamespace(klines=fail))
+    with pytest.raises(RuntimeError, match="synthetic adapter failure"):
+        capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)])
+
+    manifest_path, = tmp_path.glob("btc-realtime-captures/*/manifest.json")
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["status"] == "failed"
+    assert manifest["finished_at"] is not None
+    assert manifest["request_count"] == (0 if during_setup else 1)
+    with pytest.raises(ValueError, match="manifest failed validation"):
+        replay_capture_run(manifest_path.parent)
+
+
+def test_capture_empty_response_can_be_replayed(tmp_path: Path, monkeypatch) -> None:
+    result = SimpleNamespace(candles=[], response_fingerprint="c" * 64,
+                             received_at="2026-11-23T01:01:03+00:00", excluded_open_candles=1)
+    monkeypatch.setattr(capture, "BinancePublicAdapter", lambda: SimpleNamespace(klines=lambda **kwargs: (result, 1)))
+    assert capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)]) == 0
+    manifest_path, = tmp_path.glob("btc-realtime-captures/*/manifest.json")
+    replay = replay_capture_run(manifest_path.parent)
+    assert replay["integrity_status"] == "verified"
+    assert replay["candles"] == []
+    assert replay["network_requests"] == 0
+
+
+def test_capture_interrupt_records_attempt_and_returns_130(tmp_path: Path, monkeypatch) -> None:
+    def interrupt(**kwargs):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(capture, "BinancePublicAdapter", lambda: SimpleNamespace(klines=interrupt))
+    assert capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)]) == 130
+    manifest_path, = tmp_path.glob("btc-realtime-captures/*/manifest.json")
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["status"] == "interrupted"
+    assert manifest["request_count"] == 1
+
+
+def test_replay_rejects_changed_artifact(tmp_path: Path) -> None:
+    run_root = _write_completed_capture(tmp_path)
+    with (run_root / "candles.jsonl").open("ab") as stream:
+        stream.write(b"{}\n")
+    with pytest.raises(ValueError, match="hash mismatch"):
+        replay_capture_run(run_root)

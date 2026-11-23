@@ -2,11 +2,11 @@
 
 **Checked:** 2026-11-23
 
-**Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. No time-service configuration or system-clock change was made.
+**Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. The later authorized observation temporarily started W32Time and restored its initial stopped/manual state. No manual resynchronization or time-service configuration change was requested by that runner.
 
 ## Current status
 
-The BTC capture path has no measured UTC error bound. Keep its receipt availability and B3.1 eligibility unknown until the host time service is inspected and a bounded, fresh estimate can be recorded. A scheduler such as n8n controls when a job starts; it does not establish the accuracy of the host clock.
+The BTC capture path has no qualified UTC error bound. Keep its receipt availability unknown and B3.1 eligibility false until a bounded, fresh estimate can be recorded with each receipt. A scheduler such as n8n controls when a job starts; it does not establish the accuracy of the host clock.
 
 ## Local read-only preflight — 2026-11-22
 
@@ -37,6 +37,23 @@ committed.
 **Result:** keep `clock_error_bound_ms: null` and `packet_eligible: false`.
 Relative stability against a monotonic clock is not evidence of absolute UTC
 accuracy. No BTC data was captured during this observation.
+
+### Authorized elevated retry — completed
+
+The subsequent elevated W32Time observation ran from `2026-11-23T12:53:44Z`
+to `2026-11-23T13:43:44Z`: 3,000 seconds, 100 status samples at 30-second
+intervals, and no reported runner failure. Its final record confirms restoration
+to the original `Stopped` service state and `Manual` start mode.
+
+The first sample was unsynchronized (leap 3, stratum 0). The final sample
+reported leap 0, stratum 5, root delay `0.0512878 s`, root dispersion
+`7.8498412 s`, and phase offset `0.0797699 s`. No wall/monotonic interval
+reached the diagnostic 250 ms threshold. These observations show a transition
+to reported synchronization; they do not establish a continuous, capture-time
+UTC error qualification. The runner's bound remains `null` and packet
+eligibility remains `false`. Its local evidence is
+`.market_os/clock/w32time-observation-50m-20261123.json`; raw telemetry remains
+ignored and is not uploaded. The runner made no BTC or Jev request.
 
 ## What an NTP estimate means
 

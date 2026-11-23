@@ -373,10 +373,10 @@ def main(argv: list[str] | None = None) -> int:
     }
     _write_manifest(manifest_path, manifest)
 
-    adapter = BinancePublicAdapter()
-    status = "completed"
+    status = "failed"
     interrupted = False
     try:
+        adapter = BinancePublicAdapter()
         for index in range(args.samples):
             if index:
                 due = started_monotonic + index * POLL_SECONDS
@@ -446,12 +446,16 @@ def main(argv: list[str] | None = None) -> int:
                 "updated_at": _utc_now(),
             })
             _write_manifest(manifest_path, manifest)
+        status = "completed"
     except KeyboardInterrupt:
         status = "interrupted"
         interrupted = True
     finally:
         manifest.update({
             "status": status,
+            "request_count": request_count,
+            "failed_polls": failed_polls,
+            "new_closed_candles": candle_count,
             "finished_at": _utc_now(),
             "artifact_sha256": {
                 "candles.jsonl": hashlib.sha256(candles_path.read_bytes()).hexdigest(),
