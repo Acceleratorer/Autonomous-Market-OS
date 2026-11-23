@@ -20,6 +20,7 @@ from .btc_connectivity import (
     ConnectivityError,
 )
 from .btc_history import resolve_local_storage_root
+from .btc_clock import capture_clock_status
 
 
 POLL_SECONDS = 180
@@ -29,7 +30,7 @@ SCHEMA = "market-os.btc-realtime-capture.v1"
 CAPTURE_RUN_PATTERN = re.compile(r"^btc-live-\d{8}T\d{6}Z-[0-9a-f]{8}$")
 MAX_CAPTURE_MANIFEST_BYTES = 16 * 1024
 MAX_CAPTURE_CANDLE_BYTES = 4 * 1024 * 1024
-MAX_CAPTURE_POLL_BYTES = 1024 * 1024
+MAX_CAPTURE_POLL_BYTES = 4 * 1024 * 1024  # Includes two bounded clock diagnostics per poll.
 LIVE_CHART_CANDLE_LIMIT = 64
 
 
@@ -382,11 +383,15 @@ def main(argv: list[str] | None = None) -> int:
                 due = started_monotonic + index * POLL_SECONDS
                 time.sleep(max(0.0, due - time.monotonic()))
 
+            clock_before = capture_clock_status()
             request_started_at = _utc_now()
             request_started_monotonic_ns = time.monotonic_ns()
             request_count += 1
             try:
                 result, attempts = adapter.klines(limit=KLINES_PER_POLL, max_attempts=1)
+                adapter_returned_at = _utc_now()
+                adapter_returned_monotonic_ns = time.monotonic_ns()
+                clock_after = capture_clock_status()
                 new_candles = [candle for candle in result.candles if candle.open_time not in seen_open_times]
                 for candle in new_candles:
                     seen_open_times.add(candle.open_time)
@@ -411,6 +416,10 @@ def main(argv: list[str] | None = None) -> int:
                     "request_started_at": request_started_at,
                     "request_started_monotonic_ns": request_started_monotonic_ns,
                     "received_at": result.received_at,
+                    "adapter_returned_at": adapter_returned_at,
+                    "adapter_returned_monotonic_ns": adapter_returned_monotonic_ns,
+                    "clock_before": clock_before,
+                    "clock_after": clock_after,
                     "request_count": attempts,
                     "retry_count": attempts - 1,
                     "response_fingerprint": result.response_fingerprint,
@@ -423,17 +432,21 @@ def main(argv: list[str] | None = None) -> int:
                     "trading_action": "none",
                 })
             except ConnectivityError as exc:
+                failed_at = _utc_now()
+                clock_after = capture_clock_status()
                 failed_polls += 1
                 attempts = max(1, exc.attempts)
                 _append_jsonl(polls_path, {
                     "poll_index": index + 1,
                     "request_started_at": request_started_at,
                     "request_started_monotonic_ns": request_started_monotonic_ns,
-                    "received_at": _utc_now(),
+                    "received_at": failed_at,
                     "request_count": attempts,
                     "retry_count": attempts - 1,
                     "status": "failed",
                     "failure": {"code": exc.code, "status": exc.status, "retryable": exc.retryable},
+                    "clock_before": clock_before,
+                    "clock_after": clock_after,
                     "packet_eligible": False,
                     "trading_action": "none",
                 })
