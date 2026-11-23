@@ -1,6 +1,6 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-## Current milestone — qualify UTC receipt clock — 2026-11-22
+## Current milestone — qualify UTC receipt clock — 2026-11-23
 
 The live chart and finite Binance capture are integrated, but captures remain
 ineligible for B3.1 because `clock_error_bound_ms` is unknown. The latest
@@ -24,31 +24,28 @@ if TypeSafe provides a lawful, technically supported local runtime. Market OS
 continues to own market math, probability, calibration, stability, risk, and
 paper decisions.
 
-The official [Enterprise FAQ](https://typesafe.ai/enterprise) now says Jev is
-currently available only through its hosted API. Cloudflare, Vercel, Netlify,
-and OpenRouter expose managed hosted routes; the public TypeSafe registries
-reviewed expose no verifiable Jev weights or offline runtime. A separate
-deployment may still exist privately. TypeSafe Sales was emailed on 2026-11-20
-with a follow-up about written local-use terms and artifact identity; both
-messages are sent and no reply has arrived. The complete source, contract, and
-mailbox record is in the
-[Jev local-runtime research note](research/typesafe-jev-local-runtime-2026-11-20.md).
+The public [Enterprise FAQ](https://typesafe.ai/enterprise) says Jev is
+currently available only through its hosted API. The public TypeSafe
+repositories reviewed expose no verifiable Jev weights or offline runtime.
+Public documentation does not rule out a private deployment. See the
+[2026-11-23 public-source recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md)
+for the current documentation, API, and agreement evidence.
 
 Until TypeSafe provides written local-deployment terms and an identifiable
 Jev runtime artifact, do not claim the local Qwen assessor is Jev, do not use
 hosted Jev outputs to train an imitator, and do not send BTC packets to hosted
 Jev. The existing ADR-0058 boundary remains in force while authentic local Jev
-is unverified. This public-source review made no Jev API call; the separate
-TypeSafe Sales inquiry and follow-up status are recorded below.
+is unverified. The public-source review made no Jev API call.
 
-## Current verification — 2026-11-21
+## Current verification — 2026-11-23
 
-The [official TypeSafe Enterprise FAQ](https://typesafe.ai/enterprise) still
-states Jev is currently available only through the hosted API. The Gmail
-thread contains the two owner-approved inquiry messages sent on 2026-11-20
-and no TypeSafe reply as of this check. No vendor-authenticated local runtime
-manifest or artifact hashes have been received; a private offer remains
-unverified. Keep the BTC packet boundary in ADR-0058.
+The [2026-11-23 public-source recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md)
+confirms that public TypeSafe materials document hosted Jev only. No
+vendor-verified local runtime or local-use terms are evidenced by the public
+sources reviewed; a private offer remains unverified. The separately named
+`jev-ai/jev-model` repository is an unaffiliated static website, not model
+weights or an official TypeSafe runtime. Keep the BTC packet boundary in
+ADR-0058.
 
 The Windows x64 local Qwen runtime now has executable-scoped outbound block
 rules for the pinned CPython 3.11.18 and llama-server processes. ActiveStore
