@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict
 from datetime import datetime, timezone
+import hashlib
 import json
 import math
 import os
@@ -18,6 +19,7 @@ from .btc_connectivity import (
     BinancePublicAdapter,
     ConnectivityError,
 )
+from .btc_history import resolve_local_storage_root
 
 
 POLL_SECONDS = 180
@@ -27,6 +29,7 @@ SCHEMA = "market-os.btc-realtime-capture.v1"
 CAPTURE_RUN_PATTERN = re.compile(r"^btc-live-\d{8}T\d{6}Z-[0-9a-f]{8}$")
 MAX_CAPTURE_MANIFEST_BYTES = 16 * 1024
 MAX_CAPTURE_CANDLE_BYTES = 4 * 1024 * 1024
+MAX_CAPTURE_POLL_BYTES = 1024 * 1024
 LIVE_CHART_CANDLE_LIMIT = 64
 
 
@@ -76,7 +79,7 @@ def _capture_timestamp_ms(value: object) -> int:
 
 def inspect_latest_capture(store_root: str | Path) -> dict[str, object]:
     """Read the newest bounded local capture for the read-only operator chart."""
-    capture_root = Path(store_root).expanduser().resolve() / "btc-realtime-captures"
+    capture_root = resolve_local_storage_root(store_root) / "btc-realtime-captures"
     if capture_root.is_symlink() or not capture_root.is_dir():
         raise FileNotFoundError("no local BTC realtime capture is available")
     candidates = sorted(
@@ -163,6 +166,165 @@ def inspect_latest_capture(store_root: str | Path) -> dict[str, object]:
     raise FileNotFoundError("no local BTC realtime capture is available")
 
 
+def replay_capture_run(run_root: str | Path) -> dict[str, object]:
+    """Verify and replay a completed local capture without network access."""
+    supplied_root = Path(run_root).expanduser()
+    if supplied_root.is_symlink() or supplied_root.parent.is_symlink():
+        raise ValueError("local BTC capture path must not be a symlink")
+    try:
+        resolved_root = supplied_root.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError("local BTC capture run does not exist") from exc
+    if not resolved_root.is_dir() or CAPTURE_RUN_PATTERN.fullmatch(resolved_root.name) is None:
+        raise ValueError("local BTC capture run path is invalid")
+    if resolved_root.parent.name != "btc-realtime-captures":
+        raise ValueError("local BTC capture run must be under btc-realtime-captures")
+    store_root = resolve_local_storage_root(resolved_root.parent.parent)
+    if resolved_root != store_root / "btc-realtime-captures" / resolved_root.name:
+        raise ValueError("local BTC capture run path is invalid")
+
+    manifest_path = resolved_root / "manifest.json"
+    candles_path = resolved_root / "candles.jsonl"
+    polls_path = resolved_root / "polls.jsonl"
+    paths = {"candles.jsonl": candles_path, "polls.jsonl": polls_path}
+    if manifest_path.is_symlink() or not manifest_path.is_file() or manifest_path.stat().st_size > MAX_CAPTURE_MANIFEST_BYTES:
+        raise ValueError("local BTC capture manifest failed validation")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError("local BTC capture manifest is unreadable") from exc
+    if (
+        not isinstance(manifest, dict)
+        or manifest.get("schema") != SCHEMA
+        or manifest.get("run_id") != resolved_root.name
+        or manifest.get("status") != "completed"
+        or manifest.get("provider") != "binance_public"
+        or manifest.get("symbol") != "BTCUSDT"
+        or manifest.get("market") != "spot"
+        or manifest.get("interval") != "1m"
+        or manifest.get("poll_interval_seconds") != POLL_SECONDS
+        or manifest.get("source_published_at") is not None
+        or manifest.get("clock_error_bound_ms") is not None
+        or manifest.get("packet_eligible") is not False
+        or manifest.get("redistribution") is not False
+        or manifest.get("trading_action") != "none"
+    ):
+        raise ValueError("local BTC capture manifest failed validation")
+
+    hashes = manifest.get("artifact_sha256")
+    if not isinstance(hashes, dict) or set(hashes) != set(paths) or any(
+        not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None
+        for value in hashes.values()
+    ):
+        raise ValueError("local BTC capture artifact hashes failed validation")
+    artifact_bytes: dict[str, bytes] = {}
+    for name, path in paths.items():
+        limit = MAX_CAPTURE_CANDLE_BYTES if name == "candles.jsonl" else MAX_CAPTURE_POLL_BYTES
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > limit:
+            raise ValueError(f"local BTC capture {name} failed validation")
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != hashes[name]:
+            raise ValueError(f"local BTC capture {name} hash mismatch")
+        artifact_bytes[name] = raw
+
+    def records_from(raw: bytes, name: str) -> list[dict[str, object]]:
+        if raw and not raw.endswith(b"\n"):
+            raise ValueError(f"local BTC capture {name} has an incomplete record")
+        try:
+            records = [json.loads(line) for line in raw.splitlines()]
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise ValueError(f"local BTC capture {name} contains invalid JSON") from exc
+        if any(not isinstance(record, dict) for record in records):
+            raise ValueError(f"local BTC capture {name} contains an invalid record")
+        return records
+
+    poll_records = records_from(artifact_bytes["polls.jsonl"], "polls.jsonl")
+    candle_records = records_from(artifact_bytes["candles.jsonl"], "candles.jsonl")
+    requested_polls = manifest.get("requested_polls")
+    if type(requested_polls) is not int or not 1 <= requested_polls <= MAX_POLLS:
+        raise ValueError("local BTC capture poll count failed validation")
+    for index, record in enumerate(poll_records, start=1):
+        if (
+            record.get("poll_index") != index
+            or record.get("status") not in {"valid", "failed"}
+            or type(record.get("request_count")) is not int
+            or record.get("request_count") != 1
+            or type(record.get("retry_count")) is not int
+            or record.get("retry_count") != 0
+            or record.get("clock_error_bound_ms") is not None
+            or record.get("packet_eligible") is not False
+            or record.get("trading_action") != "none"
+        ):
+            raise ValueError("local BTC capture poll record failed validation")
+    if (
+        manifest.get("request_cap") != requested_polls
+        or manifest.get("request_count") != len(poll_records)
+        or manifest.get("retry_count") != 0
+        or manifest.get("failed_polls") != sum(record.get("status") == "failed" for record in poll_records)
+        or len(poll_records) != requested_polls
+        or manifest.get("new_closed_candles") != len(candle_records)
+    ):
+        raise ValueError("local BTC capture manifest counts do not match its artifacts")
+
+    candles: list[dict[str, object]] = []
+    for record in candle_records:
+        candle = record.get("candle")
+        if (
+            record.get("schema") != "market-os.btc-realtime-candle.v1"
+            or record.get("provider") != "binance_public"
+            or record.get("symbol") != "BTCUSDT"
+            or record.get("interval") != "1m"
+            or record.get("packet_eligible") is not False
+            or record.get("clock_error_bound_ms") is not None
+            or record.get("source_published_at") is not None
+            or record.get("trading_action") != "none"
+            or not isinstance(candle, dict)
+            or candle.get("symbol") != "BTCUSDT"
+            or candle.get("interval") != "1m"
+        ):
+            raise ValueError("local BTC capture candle record failed validation")
+        open_time_ms = _capture_timestamp_ms(candle.get("open_time"))
+        close_time_ms = _capture_timestamp_ms(candle.get("close_time"))
+        values = {name: candle.get(name) for name in ("open", "high", "low", "close", "volume")}
+        if any(isinstance(value, bool) or not isinstance(value, (int, float)) for value in values.values()):
+            raise ValueError("local BTC capture candle values failed validation")
+        if any(not math.isfinite(value) for value in values.values()):
+            raise ValueError("local BTC capture candle values failed validation")
+        if (
+            close_time_ms - open_time_ms != 60_000
+            or min(values["open"], values["high"], values["low"], values["close"]) <= 0
+            or values["volume"] < 0
+            or values["high"] < max(values["open"], values["close"], values["low"])
+            or values["low"] > min(values["open"], values["close"], values["high"])
+            or (candles and candles[-1]["open_time_ms"] >= open_time_ms)
+        ):
+            raise ValueError("local BTC capture candle range or ordering failed validation")
+        candles.append({
+            "open_time_ms": open_time_ms,
+            "close_time_ms": close_time_ms,
+            **values,
+            "received_at": candle.get("received_at"),
+        })
+
+    replay_fingerprint = hashlib.sha256(json.dumps(
+        {"run_id": resolved_root.name, "artifact_sha256": hashes, "schema": SCHEMA},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")).hexdigest()
+    return {
+        "api_version": "market-os.btc-realtime-replay@v1",
+        "run_id": resolved_root.name,
+        "integrity_status": "verified",
+        "replay_fingerprint": replay_fingerprint,
+        "candles": candles,
+        "candle_count": len(candles),
+        "clock_error_bound_ms": None,
+        "packet_eligible": False,
+        "trading_action": "none",
+        "network_requests": 0,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if not 1 <= args.samples <= MAX_POLLS:
@@ -170,7 +332,7 @@ def main(argv: list[str] | None = None) -> int:
 
     repository_root = Path(__file__).resolve().parents[1]
     run_id = f"btc-live-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex[:8]}"
-    store_root = Path(args.store_root or os.environ.get("MARKET_OS_STORE_ROOT") or repository_root / ".market_os").expanduser().resolve()
+    store_root = resolve_local_storage_root(args.store_root or os.environ.get("MARKET_OS_STORE_ROOT") or repository_root / ".market_os")
     run_root = store_root / "btc-realtime-captures" / run_id
     run_root.mkdir(parents=True, exist_ok=False)
     candles_path = run_root / "candles.jsonl"

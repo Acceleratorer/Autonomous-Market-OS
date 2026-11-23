@@ -167,6 +167,11 @@ def _local_storage_root(root: Path) -> Path:
     return resolved
 
 
+def resolve_local_storage_root(root: str | Path) -> Path:
+    """Resolve a BTC data root and reject network-backed storage."""
+    return _local_storage_root(Path(root))
+
+
 def _require_int(value: Any, field: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise HistoryError("invalid_range", f"{field} must be an integer")
@@ -992,8 +997,7 @@ class IngestResult:
 
 class HistoryStore:
     def __init__(self, root: str | Path, *, read_only: bool = False) -> None:
-        self.root = Path(root)
-        self.root = _local_storage_root(self.root)
+        self.root = resolve_local_storage_root(root)
         self.read_only = read_only
         self.raw_dir = self.root / "raw"
         self.dataset_dir = self.root / "datasets"
