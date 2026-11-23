@@ -55,6 +55,28 @@ eligibility remains `false`. Its local evidence is
 `.market_os/clock/w32time-observation-50m-20261123.json`; raw telemetry remains
 ignored and is not uploaded. The runner made no BTC or Jev request.
 
+## Receipt-linked diagnostics
+
+New realtime captures record bounded, read-only W32Time status queries before
+and after each Binance adapter call in `polls.jsonl`. Each query retains its
+wall/monotonic start and finish, source identity, synchronization fields and
+typed failure status. The existing artifact hash covers these records. Source
+identity stays in local capture storage, outside chart responses and CLI summaries.
+Non-Windows hosts report `unsupported_platform`; this implementation does not
+start a service, change configuration, resynchronize, or query an external server.
+
+The local observation script previously omitted the final `Time` in the
+documented `Time since Last Good Sync Time` label; all 100 historical samples
+therefore lack that parsed field. The new collector uses the full label. Existing
+observations are not retroactively repaired or qualified.
+
+These snapshots remain diagnostics: they do not exclude a clock step, suspend,
+or synchronization loss between samples. `adapter_returned_at` and its monotonic
+marker describe the return from parsing the response, not the transport receipt.
+The older per-candle `received_monotonic_ns` is sampled during persistence and
+must not be paired with transport `received_at` as a simultaneous clock reading.
+No numeric error bound is inferred; packet eligibility remains false.
+
 ## What an NTP estimate means
 
 NTPv4 defines synchronization distance as root dispersion plus half the root delay (`epsilon + delta / 2`) and presents it as the maximum-error estimate within the protocol's clock model. chrony reports the estimated maximum system-clock error as root distance plus the remaining system-clock correction. A capture-time estimate should also account for clock drift during holdover and become stale after a configured age. See [RFC 5905](https://www.rfc-editor.org/rfc/rfc5905.html) and the [chrony FAQ](https://chrony-project.org/faq.html).

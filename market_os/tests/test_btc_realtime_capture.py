@@ -12,6 +12,13 @@ from market_os import btc_realtime_capture as capture
 from market_os.btc_realtime_capture import replay_capture_run
 
 
+@pytest.fixture(autouse=True)
+def no_host_clock_queries(monkeypatch):
+    monkeypatch.setattr(capture, "capture_clock_status", lambda: {
+        "status": "unavailable", "clock_error_bound_ms": None,
+    })
+
+
 def _jsonl_record(value: dict[str, object]) -> bytes:
     return (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode()
 
@@ -137,11 +144,17 @@ def test_capture_exception_never_claims_completion(tmp_path: Path, monkeypatch, 
 
 
 def test_capture_empty_response_can_be_replayed(tmp_path: Path, monkeypatch) -> None:
+    snapshots = iter([{"status": "before"}, {"status": "after"}])
+    monkeypatch.setattr(capture, "capture_clock_status", lambda: next(snapshots))
     result = SimpleNamespace(candles=[], response_fingerprint="c" * 64,
                              received_at="2026-11-23T01:01:03+00:00", excluded_open_candles=1)
     monkeypatch.setattr(capture, "BinancePublicAdapter", lambda: SimpleNamespace(klines=lambda **kwargs: (result, 1)))
     assert capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)]) == 0
     manifest_path, = tmp_path.glob("btc-realtime-captures/*/manifest.json")
+    poll = json.loads((manifest_path.parent / "polls.jsonl").read_text())
+    assert poll["clock_before"] == {"status": "before"}
+    assert poll["clock_after"] == {"status": "after"}
+    assert poll["adapter_returned_monotonic_ns"] >= poll["request_started_monotonic_ns"]
     replay = replay_capture_run(manifest_path.parent)
     assert replay["integrity_status"] == "verified"
     assert replay["candles"] == []
@@ -166,3 +179,31 @@ def test_replay_rejects_changed_artifact(tmp_path: Path) -> None:
         stream.write(b"{}\n")
     with pytest.raises(ValueError, match="hash mismatch"):
         replay_capture_run(run_root)
+
+
+def test_failed_poll_keeps_clock_evidence_and_original_failure_time(tmp_path, monkeypatch):
+    events = []
+
+    def clock():
+        events.append("clock")
+        return {"status": "timeout"}
+
+    def now():
+        events.append("timestamp")
+        return "2026-11-23T01:01:03+00:00"
+
+    def fail(**kwargs):
+        events.append("failure")
+        raise capture.ConnectivityError("timeout", "synthetic", attempts=1)
+
+    monkeypatch.setattr(capture, "capture_clock_status", clock)
+    monkeypatch.setattr(capture, "_utc_now", now)
+    monkeypatch.setattr(capture, "BinancePublicAdapter", lambda: SimpleNamespace(klines=fail))
+    capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)])
+    failure_index = events.index("failure")
+    assert events[failure_index + 1:failure_index + 3] == ["timestamp", "clock"]
+    poll_path, = tmp_path.glob("btc-realtime-captures/*/polls.jsonl")
+    poll = json.loads(poll_path.read_text())
+    assert poll["request_count"] == 1
+    assert poll["clock_before"] == poll["clock_after"] == {"status": "timeout"}
+    assert poll["packet_eligible"] is False
