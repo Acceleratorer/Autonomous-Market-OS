@@ -9,7 +9,8 @@ hosted API, the public repositories expose no Jev weights/runtime, and the
 2026-11-21 inquiry to `sales@typesafe.ai` has no reply. Keep the local Qwen
 assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
-[2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md).
+[2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
+for current first-party sources and a bounded local artifact check.
 
 The primary/current-checkout health record from commit
 `4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` because the
