@@ -1,5 +1,30 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current status — 2026-11-25
+
+The goal remains local-only BTC research with Market OS owning math,
+probability, calibration, stability, risk, and paper decisions. Authentic
+local Jev is still unverified: current TypeSafe docs show its authenticated
+hosted API, the public repositories expose no Jev weights/runtime, and the
+2026-11-21 inquiry to `sales@typesafe.ai` has no reply. Keep the local Qwen
+assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
+to hosted Jev or call Qwen Jev. See the
+[2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md).
+
+The current checkout's pinned-runtime health returned `unavailable` because
+the enforced Windows ActiveStore rules target executable paths in an alternate
+checkout. The fail-closed preflight did not start llama-server. No firewall
+change was applied; an elevated update still needs a successful Windows
+approval, followed by health and a bounded non-loopback denial probe. See the
+[current-checkout health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json)
+and [isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md).
+
+Linux host isolation, a hard CUDA VRAM cap, ongoing monitoring beyond the
+one-shot health command, and eligible prospective BTC evidence remain open.
+The UTC error bound remains unknown; the previously completed 60-minute clock
+observation is not to be repeated. Do not treat the historical Binance archive
+or the synthetic Qwen run as market evidence.
+
 ## Current milestone — qualify UTC receipt clock — 2026-11-23
 
 The live chart and finite Binance capture are integrated, but captures remain
