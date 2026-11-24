@@ -156,6 +156,10 @@ rules target an alternate checkout; the current checkout is not yet verified
 as isolated. See the
 [Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md)
 and [current-checkout health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
+Authentic local Jev availability and its offline-use terms remain unverified;
+the Windows CUDA fit margin also does not provide a hard VRAM cap. See the
+[local Jev runtime check](research/jev-local-runtime-availability-2026-11-25.md)
+and [VRAM budgeting options](research/btc-assessor-vram-budgeting-2026-11-25.md).
 Bootstrap may download pinned artifacts during setup; the verified assessment
 and replay used installed local files and loopback IPC only.
 Before inference, the local assessor recomputes the B2 feature fingerprint and
