@@ -12,13 +12,20 @@ import threading
 import time
 from typing import Any
 from unittest import skipUnless
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from market_os.btc_evidence_packet import EvidencePacketError, SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
-from market_os.btc_local_assessor import LocalAssessorError, LocalB31Assessor, LocalLlamaRuntime, _WindowsResourceJob, _verify_windows_egress_rules
+from market_os.btc_local_assessor import (
+    LocalAssessorError,
+    LocalB31Assessor,
+    LocalLlamaRuntime,
+    _WindowsResourceJob,
+    _verify_windows_egress_rules,
+    local_runtime_health,
+)
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -355,6 +362,26 @@ def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() 
             raise AssertionError("local runtime started without verified network isolation")
 
 
+def test_local_runtime_health_uses_the_fail_closed_startup_preflight() -> None:
+    runtime = Mock()
+    health = {"status": "healthy", "network_isolation": {"status": "enforced"}}
+    startup_failure = LocalAssessorError("network_isolation_unverified", "synthetic missing policy")
+    runtime.start.side_effect = startup_failure
+    runtime.health.return_value = health
+
+    with patch("market_os.btc_local_assessor.LocalLlamaRuntime", return_value=runtime):
+        result = local_runtime_health("unused-install-root")
+
+    runtime.start.assert_called_once_with()
+    runtime.health.assert_called_once_with()
+    runtime.stop.assert_called_once_with()
+    assert result["status"] == "unavailable"
+    assert result["startup_failure"] == {
+        "code": "network_isolation_unverified",
+        "message": "synthetic missing policy",
+    }
+
+
 def test_linux_runtime_cannot_bypass_unverified_isolation_for_health() -> None:
     runtime = object.__new__(LocalLlamaRuntime)
     runtime._lock = threading.RLock()
@@ -448,7 +475,8 @@ def test_local_assessment_store_replays_typed_runtime_start_failure(tmp_path) ->
             raise LocalAssessorError("startup_timeout", "synthetic startup failure", retryable=True)
 
     packet = _packet()
-    record = LocalB31Assessor(StartFailureRuntime(_usable_response())).assess(packet)
+    with LocalB31Assessor(StartFailureRuntime(_usable_response())) as assessor:
+        record = assessor.assess(packet)
     store = LocalAssessmentStore(tmp_path)
     store.persist(packet, record)
 

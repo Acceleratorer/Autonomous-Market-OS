@@ -1200,9 +1200,7 @@ class LocalB31Assessor:
             )
 
     def __enter__(self) -> "LocalB31Assessor":
-        start = getattr(self.runtime, "start", None)
-        if callable(start):
-            start()
+        """Defer startup until a packet has passed the assessor's gates."""
         return self
 
     def __exit__(self, *_exc: object) -> None:
@@ -1215,7 +1213,15 @@ def local_runtime_health(installation_root: str | Path) -> dict[str, Any]:
     """Start, inspect, and stop the local model runtime without a model call."""
     runtime = LocalLlamaRuntime(installation_root)
     try:
-        runtime.start(require_network_isolation=os.name != "nt")
+        try:
+            runtime.start()
+        except LocalAssessorError as exc:
+            if exc.code != "network_isolation_unverified":
+                raise
+            health = runtime.health()
+            health["status"] = "unavailable"
+            health["startup_failure"] = {"code": exc.code, "message": str(exc)}
+            return health
         return runtime.health()
     finally:
         runtime.stop()
