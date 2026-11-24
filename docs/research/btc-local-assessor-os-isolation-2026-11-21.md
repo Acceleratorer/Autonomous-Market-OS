@@ -73,3 +73,24 @@ authentic local Jev.
 
 This is verified Windows runtime hardening for the local Qwen path. It does
 not establish full cross-platform production readiness or Jev availability.
+
+## Follow-up — 2026-11-25: health preflight and BTC verification
+
+A code review found that the Windows health command started `llama-server`
+before checking the effective outbound firewall policy. Health now uses the
+same fail-closed startup preflight as assessment. If network isolation cannot
+be verified, it returns an unavailable health record with the isolation
+failure and does not leave the inference server running. The assessor context
+manager also defers runtime startup until the packet passes its eligibility
+gates, so a runtime-start failure can be returned and persisted as a typed
+assessment result by the CLI path.
+
+Verification on the local CPython 3.12 environment:
+
+- `python -m pytest -q market_os/tests -k btc` — 200 passed.
+- `git diff --check` — passed.
+
+These checks use synthetic fixtures. They do not constitute a live BTC packet
+assessment or a new Jev request. Linux host isolation remains unverified, CUDA
+VRAM still has no hard cap, and the prior Windows evidence remains specific to
+the pinned Qwen runtime and installed firewall policy.
