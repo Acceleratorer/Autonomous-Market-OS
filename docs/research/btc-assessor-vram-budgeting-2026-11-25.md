@@ -2,11 +2,26 @@
 
 **Checked:** 2026-11-25
 
-**Scope:** Research only. No GPU or server was launched; no code, runtime, or firewall configuration was changed. No product decision is made here.
+**Scope:** Source research only; this review launched no GPU or server and made
+no code, runtime, or firewall changes. It incorporates a separately recorded
+health observation; no product decision is made here.
 
 ## Current Windows evidence
 
-NVIDIA lists the GeForce RTX 5060 Laptop GPU with 8 GB GDDR7. That is the product specification, not a measurement of free VRAM on this workstation. The existing Windows assessor evidence reports a 2,048 MiB CUDA fit margin and explicitly marks `cuda_vram_hard_cap` false. The current checkout's 2026-11-25 health record did not start the server, so it adds no current GPU inventory or memory-use evidence. The earlier report does not record the GPU model; whether that run used this exact RTX 5060 Laptop GPU is unverified. See [NVIDIA's RTX 50 laptop specifications](https://www.nvidia.com/en-us/geforce/laptops/50-series/), the [prior Windows assessor evidence](../evidence/btc-local-assessor-windows-egress-2026-11-21.json), and the [current-checkout health evidence](../evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
+NVIDIA lists the GeForce RTX 5060 Laptop GPU with 8 GB GDDR7. That is the
+product specification, not a measurement of free VRAM on this workstation.
+The existing Windows assessor evidence reports a 2,048 MiB CUDA fit margin
+and explicitly marks `cuda_vram_hard_cap` false. The current-checkout
+2026-11-25 health record did not start the server and therefore adds no GPU-use
+evidence. A separate 50-minute health observation recorded aggregate use of
+5,320–5,323 MiB out of 8,151 MiB while the local Qwen server was running. It
+did not record adapter identity or per-process memory attribution, and it does
+not establish a hard cap. Whether the observed adapter is this exact RTX 5060
+Laptop GPU remains unverified. See [NVIDIA's RTX 50 laptop
+specifications](https://www.nvidia.com/en-us/geforce/laptops/50-series/), the
+[prior Windows assessor evidence](../evidence/btc-local-assessor-windows-egress-2026-11-21.json),
+the [current-checkout health evidence](../evidence/btc-local-assessor-current-checkout-health-2026-11-25.json),
+and the [50-minute observation report](btc-local-assessor-50m-observation-2026-11-25.md).
 
 The project sets `CUDA_FREE_MEMORY_MARGIN_MIB = 2048` and passes `--fit on --fit-target 2048` to llama.cpp ([assessor source](../../market_os/btc_local_assessor.py#L55), [launch arguments](../../market_os/btc_local_assessor.py#L735)). Its Windows Job Object commit limit covers host process memory; the existing evidence records no working-set limit and no CUDA VRAM hard cap.
 
