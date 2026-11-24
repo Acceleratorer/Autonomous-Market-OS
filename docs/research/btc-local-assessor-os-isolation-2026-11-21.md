@@ -94,3 +94,30 @@ These checks use synthetic fixtures. They do not constitute a live BTC packet
 assessment or a new Jev request. Linux host isolation remains unverified, CUDA
 VRAM still has no hard cap, and the prior Windows evidence remains specific to
 the pinned Qwen runtime and installed firewall policy.
+
+## Follow-up — 2026-11-25: current checkout firewall mismatch
+
+The current clean project checkout is at commit
+`4882cf047c951064c67130a2e4009ad2126d490f`. Its pinned CPython 3.11.18 and
+`llama-server.exe` are not the executable paths selected by the workstation's
+current ActiveStore rules. Both managed rules are enabled and enforced, but
+their application filters target an alternate checkout. The exact-path check
+therefore fails even though the old and current llama-server files have the
+same SHA-256; Windows Firewall rules bind to the executable path as well as
+the rule's other filters.
+
+The current checkout's pinned-runtime health command returned exit code 2,
+`status: unavailable`, and `startup_failure.code: network_isolation_unverified`
+with reason `missing_or_mismatched_active_store_rule`. Resource status was
+`not_running`; the health preflight did not start llama-server or perform model
+inference. No BTC market-data request, Jev request, or non-loopback denial
+probe was made. Sanitized output and executable hashes are recorded in
+[`btc-local-assessor-current-checkout-health-2026-11-25.json`](../evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
+
+Two attempts to launch the scoped firewall update through Windows elevation
+were canceled before the helper ran; no firewall policy changed. The
+2026-11-21 enforcement and denial-probe evidence remains a valid historical
+result for the executable paths used then, but it does not prove isolation
+for this current checkout. Re-run health only after the managed rules target
+the current pinned Python and server paths, then collect a bounded
+non-loopback denial probe and confirm loopback IPC.

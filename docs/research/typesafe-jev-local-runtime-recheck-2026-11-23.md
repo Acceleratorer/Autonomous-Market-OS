@@ -3,7 +3,7 @@
 **Checked:** 2026-11-23
 **Scope:** Current public TypeSafe documentation, legal terms, and the official GitHub organization. This was a read-only public-source check. No Jev API request, email to TypeSafe, BTC data, or local model artifact was used.
 
-## Finding
+## Finding recorded on 2026-11-23
 
 Public evidence still supports **hosted-only Jev**. The current [Enterprise FAQ](https://typesafe.ai/enterprise) explicitly answers that Jev is currently available only through TypeSafe's hosted API for the VPC/on-premises question. A direct browser check expanded that FAQ item and confirmed the answer.
 
@@ -69,3 +69,47 @@ compatible Qwen/runtime Jev. To reconsider local Jev, obtain a written offer
 and local-use terms plus a verifiable version/runtime/weight manifest with
 hashes. The existing Qwen assessor remains a separate system; no new BTC
 packet assessment is authorized by this recheck.
+
+## Recheck — 2026-11-25
+
+This read-only recheck used TypeSafe's current public documentation and legal
+terms, the public Hugging Face and GitHub registries, the authenticated Gmail
+search, and the two local project runtime folders. It made no Jev API request,
+sent no message, and used no BTC packet.
+
+The official [Quick Start](https://docs.typesafe.ai/introduction/quickstart)
+lists the SDK, API, agent skill, and browser Playground as ways to use Jev; it
+directs users to obtain a TypeSafe API key. The [System One API reference](https://docs.typesafe.ai/api/system-one)
+shows `POST https://api.typesafe.ai/v1/systemone` and bearer authentication.
+These sources document hosted use. The current fetched [Enterprise page](https://typesafe.ai/enterprise)
+still lists the VPC/on-premises question, but the page text available to this
+check does not expose an answer. The earlier direct browser observation is
+retained above as dated evidence; this fetch cannot independently replay it.
+
+The public [Master Customer Agreement](https://typesafe.ai/legal/mca), updated
+2026-09-23, defines the Services as TypeSafe-hosted web and API services
+(§1), grants access and API integration rights (§2.1), and restricts using
+Services or Output to imitate or develop a similar or competing product
+(§2.3(b)). The public agreement does not expressly grant a right to obtain or
+run Jev weights locally. This records the published contract text, not legal
+advice; a separate written deployment agreement could change the result.
+
+The current public [TypeSafeAI Hugging Face models page](https://huggingface.co/typesafeAI/models)
+and its public model-list API returned no repositories. The [official GitHub
+organization](https://github.com/orgs/typesafe-ai/repositories) lists SDKs,
+skills, examples, adapters, and inference-engine repositories, but no Jev
+checkpoint or local Jev serving package. This bounded public search cannot
+rule out a private vendor offer.
+
+The Gmail search found the owner-approved inquiry sent to `sales@typesafe.ai`
+on 2026-11-21 and no reply from the TypeSafe domain as of this check. The
+inspected `.market_os` runtime folders in both local project checkouts contain
+the Qwen GGUF model and no Jev-named weight or runtime. These checks do not
+cover every possible custom path or private distribution channel.
+
+**Current finding:** authentic local Jev remains technically and legally
+unverified. Keep Jev and Qwen identities separate, preserve the packet-local
+boundary in [ADR-0058](../decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md),
+and require written local-use terms plus a vendor-verifiable version/runtime/
+weight manifest with hashes before claiming or integrating authentic local
+Jev. No TypeSafe credential was used in this check.

@@ -149,10 +149,13 @@ an operating-system egress boundary only when its platform checks pass. Linux
 `health` and `assess` run in a rootless systemd user scope and a loopback-only
 network namespace; the runtime checks effective cgroup-v2 limits and namespace
 membership. Missing user namespaces or cgroup controls fail closed. Linux has
-not yet been exercised on a target host. As of 2026-11-21, the Windows target
-has verified executable-scoped firewall enforcement and healthy loopback
-runtime status; see the
-[Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md).
+not yet been exercised on a target host. The Windows run on 2026-11-21 verified
+executable-scoped firewall enforcement for the paths used in that run. On
+2026-11-25, health for the current checkout failed closed because ActiveStore
+rules target an alternate checkout; the current checkout is not yet verified
+as isolated. See the
+[Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md)
+and [current-checkout health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
 Bootstrap may download pinned artifacts during setup; the verified assessment
 and replay used installed local files and loopback IPC only.
 Before inference, the local assessor recomputes the B2 feature fingerprint and
@@ -265,9 +268,10 @@ The raw packet and response remain in ignored local storage; sanitized
 identifiers and results are recorded in
 [`Windows egress evidence`](evidence/btc-local-assessor-windows-egress-2026-11-21.json).
 
-This verifies the local Qwen path on this Windows target only. Qwen is not
-Jev, Linux runtime isolation and GPU access remain unverified on a target
-host, and the synthetic packet provides no market or calibration evidence.
+This historical run verifies the local Qwen path for the executable paths
+used on that Windows target only. Qwen is not Jev. Current-checkout Windows
+egress isolation, Linux runtime isolation, and target-host GPU access remain
+unverified; the synthetic packet provides no market or calibration evidence.
 
 The five-minute numerical target remains
 `ln(C[t+5]/C[t])`, classified as positive versus non-positive. Jev output is
