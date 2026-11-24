@@ -11,19 +11,31 @@ assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
 [2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md).
 
-The current checkout's pinned-runtime health returned `unavailable` because
-the enforced Windows ActiveStore rules target executable paths in an alternate
-checkout. The fail-closed preflight did not start llama-server. No firewall
-change was applied; an elevated update still needs a successful Windows
-approval, followed by health and a bounded non-loopback denial probe. See the
+The primary/current-checkout health record from commit
+`4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` because the
+Windows ActiveStore rules target executable paths in another checkout. Its
+fail-closed preflight did not start llama-server. A later observation on the
+secondary checkout does not supersede this path-specific result; the primary
+checkout still needs its own exact-path isolation check and bounded denial
+probe. See the
 [current-checkout health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json)
 and [isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md).
 
-Linux host isolation, a hard CUDA VRAM cap, ongoing monitoring beyond the
-one-shot health command, and eligible prospective BTC evidence remain open.
-The UTC error bound remains unknown; the previously completed 60-minute clock
-observation is not to be repeated. Do not treat the historical Binance archive
-or the synthetic Qwen run as market evidence.
+A separate health-only observation completed on the secondary checkout at
+commit `83a2063cf356e5384dac29006edc90556ce1eb63`: 3,000.438 monotonic seconds,
+100/100 healthy HTTP 200 samples, executable-scoped egress isolation and
+resource limits reported enforced, and exit code 0. It exercised local Qwen
+health only; no BTC packet, market-data request, Jev request, or provider
+assessment was part of the run. The raw log remains ignored and local. See the
+[50-minute observation report](research/btc-local-assessor-50m-observation-2026-11-25.md)
+for hashes and evidence limits.
+
+Linux host isolation, a hard CUDA VRAM cap, monitoring beyond this bounded
+secondary-checkout observation, and eligible prospective BTC evidence remain
+open. The 2,048 MiB CUDA margin is adaptive, not a hard cap. The UTC error bound
+remains unknown; the previously completed 60-minute clock observation is not
+to be repeated. Do not treat the historical Binance archive or synthetic Qwen
+run as market evidence.
 
 ## Current milestone — qualify UTC receipt clock — 2026-11-23
 
