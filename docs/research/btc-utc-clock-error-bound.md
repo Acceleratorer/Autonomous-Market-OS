@@ -1,6 +1,6 @@
 # BTC UTC clock error qualification
 
-**Checked:** 2026-11-23
+**Checked:** 2026-11-24
 
 **Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. The later authorized observation temporarily started W32Time and restored its initial stopped/manual state. No manual resynchronization or time-service configuration change was requested by that runner.
 
@@ -54,6 +54,47 @@ UTC error qualification. The runner's bound remains `null` and packet
 eligibility remains `false`. Its local evidence is
 `.market_os/clock/w32time-observation-50m-20261123.json`; raw telemetry remains
 ignored and is not uploaded. The runner made no BTC or Jev request.
+
+### Authorized elevated retry — 2026-11-24
+
+The next elevated observation ran from `2026-11-24T13:31:38Z` to
+`2026-11-24T14:21:38Z` (3,000 seconds). It recorded 100 successful status
+queries at approximately 30-second intervals; the final result and progress
+record each contain 100 samples, with all sample numbers and timestamps
+aligned. Every sample remained unsynchronized (leap 3, stratum 0). The final
+sample reported a last-good-sync age of `2970.2889382s`, root delay
+`0.0000000s`, and root dispersion `0.0000000s` while unsynchronized. The
+maximum absolute wall/monotonic interval delta was `2.202 ms`; no interval
+reached the diagnostic 250 ms threshold. This relative comparison does not
+establish absolute UTC accuracy. No matching W32Time event IDs were recorded
+in the observation window. The runner restored the original `Stopped`/`Manual`
+state and made no BTC or Jev request.
+
+Read-only local registry inspection found `Type=NTP`, the NtpClient provider
+enabled, `NtpServer=time.windows.com,0x9`, `SpecialPollInterval=16384s`,
+`MinPollInterval=10`, and `MaxPollInterval=15` (log2-second exponents); there
+was no policy override.
+A peer query during the run reported `Pending` and `Time Remaining` of
+`14852.4045960s`. Microsoft documents `0x1` as `SpecialInterval` and `0x8` as
+client mode, so `0x9` enables both; when that flag is set, the configured
+`SpecialPollInterval` controls the polling interval. **Inference:** the pending
+time is consistent with the configured 16,384-second poll, which is longer
+than this 3,000-second observation. The passive run therefore did not test
+whether a fresh NTP request could reach or synchronize with the peer. No
+resync or registry change was made. See [Microsoft's W32Time settings
+reference](https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings?tabs=ntpserver)
+and [SpecialPollInterval troubleshooting](https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/w32time-sync-specialpollinterval-ignored).
+
+The full local result is
+`.market_os/clock/w32time-observation-50m-20261124/w32time-observation-50m-20261124-133137-779.json`
+(SHA-256 `FE3F2F7CF4BB2E3300DBB2C3A5482819603114DAD4380352A6E2885F71B8543D`);
+its per-sample progress record is
+`.market_os/clock/w32time-observation-50m-20261124/w32time-observation-50m-20261124-133137-779.progress.json`
+(SHA-256 `2DD086650F1A97CF4D91F152EDB3AA6224D574F77CE5CA4CF8D8B5BD2E1D9EBA`)
+and is also local and ignored by Git. Keep
+`clock_error_bound_ms: null` and `packet_eligible: false`. Any active
+resynchronization or polling-configuration change needs its own approved
+diagnostic plan; it is not covered by this passive observation.
 
 ## Receipt-linked diagnostics
 
