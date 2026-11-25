@@ -24,9 +24,11 @@ never grant execution or risk authority.
 - U8-A and U8-B readiness packs remain gated. U8-C records the owner's
   accepted permanent paper-only decision. Do not reopen connected or live
   work without a new explicit owner decision and complete U8 review.
-- The current product boundary remains local, synthetic, private,
-  paper-only, read-only, and offline. Credentials, providers, mutation routes,
-  public listeners, and live execution remain disabled.
+- The product boundary remains local, private, paper-only, read-only, and
+  offline. Synthetic fixtures cover product contracts; the approved BTC
+  archive is limited to retrospective diagnostics. Credentials, BTC-packet
+  egress, mutation routes, public listeners, and live execution remain
+  disabled.
 - The latest documented full-suite result is `659 passed, 0 failed, 7
   skipped` on U8-B commit `db8c8dd`. Do not describe that as a full-suite run
   on later commits. U6.4-D/E have their own local evidence and focused test
@@ -45,9 +47,14 @@ never grant execution or risk authority.
 - U7-P is complete and remains a local regression gate. It regenerates U7-N/J/K/L
   twice and compares the results with committed U7-O evidence.
 - B2/B3 math-first contracts and the fixture-only B3.1 assessment
-  contract/normalizer already exist. Current B2/B3 evidence has zero
-  leakage-safe labeled samples, so predictive and calibration results are
-  unavailable. Do not claim Jev value or promote it from these fixtures.
+  contract/normalizer already exist. The synthetic B1 fixture still yields
+  zero leakage-safe labeled samples, so its B2/B3 metrics remain unavailable.
+  Separately, the approved archive has a verified retrospective B2 run with
+  43,190 labeled rows, chronological train/calibration/test splits, three
+  numerical baselines, and a six-day test diagnostic. These results do not
+  establish point-in-time performance, stable edge, profitability, or Jev
+  value. See `docs/B2-BTC-FEATURES-BASELINES-REPORT.md` and
+  `docs/NEXT-WORK-HANDOFF.md`.
 - The approved B1 Binance Vision archive is complete and stored locally: 30
   daily archives, 43,200 canonical candles, 60 HTTPS requests, and no gaps.
   Do not extend acquisition without new date-bound approval. Its retrospective
@@ -71,10 +78,12 @@ never grant execution or risk authority.
 
 Continue from the live `main` state; U6.4-F and U7-P are closed. Prioritize the
 BTC quantitative line: B2 math/probability first, Market OS-owned stability,
-calibration and risk, and Jev as an advisory evidence evaluator. The next
-meaningful evaluation requires leakage-safe labeled market history; until it is
-available, preserve the fixture-only/offline boundary and report metrics as
-unavailable.
+calibration and risk, and Jev as an advisory evidence evaluator. The existing
+archive run is retrospective. The next meaningful evaluation requires
+prospective, time-aligned history with recorded receipt and a qualified UTC
+error bound, plus eligible packets for B3.1. Until those gates are met, retain
+the B2 results as retrospective diagnostics and leave the B3.1/Jev comparison
+unrun.
 
 ## Execution rules
 
@@ -91,9 +100,12 @@ unavailable.
    continuous UTC error bound, a current source/region review, and separate
    date-bound approval. Jev stays at connectivity-only; no packet egress,
    credentials, connected runtime, mutation routes, or live trades.
-4. Do not fabricate market labels or infer predictive value from synthetic
-   rows. Keep B2/B3 metrics unavailable until the exact leakage-safe sample
-   exists. Follow ADR-0022's frozen target, split, calibration, and fusion rules.
+4. Do not fabricate labels or infer predictive value from synthetic rows.
+   Keep synthetic-fixture metrics unavailable; treat the real archive B2 run
+   as retrospective only. Leave B3.1/Jev comparison unrun until exact
+   time-aligned packets, recorded assessments, and matched controls are
+   eligible. Follow ADR-0022's frozen target, split, calibration, and fusion
+   rules.
 5. Keep Python as the sole domain/accounting authority; web and Electron remain
    thin adapters. Preserve unrelated worktree files. Do not reset, clean,
    commit, push, deploy, install software on the host, or expose secrets unless
