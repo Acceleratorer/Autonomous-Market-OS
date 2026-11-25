@@ -38,6 +38,17 @@ final stdout/exit code was not retained; the recorded sample series spans
 ineligible. See the
 [retry evidence](evidence/btc-w32time-post-resync-retry-2026-11-25.json).
 
+The owner-requested 2026-11-26 retry then completed 100/100 successful status
+queries over 3,000 seconds. W32Time stayed `Running/Manual`; the last successful
+sync remained `02:31:48` local and aged to `4088.532 s`. Root distance was an
+estimated `7.94837175 s`, not a qualified UTC error bound. A later read-only
+snapshot showed that the same sync time was still current. Keep
+`clock_error_bound_ms` null and B3.1 ineligible. Further passive 50-minute
+observations will not replace a fresh, qualified time source and explicit
+freshness, holdover-drift, and invalidation rules. See the
+[sanitized 2026-11-26 retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26.json)
+and [clock qualification note](research/btc-utc-clock-error-bound.md).
+
 This checkout at `D:\Code\Github\Autonomous-Market-OS` is the secondary
 checkout. Its exact pinned Python and `llama-server.exe` rules are already
 enabled and enforced in ActiveStore under `-SecondaryCheckout` names; the
