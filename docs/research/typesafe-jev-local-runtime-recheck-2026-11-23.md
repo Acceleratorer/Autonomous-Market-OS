@@ -94,9 +94,13 @@ Services or Output to imitate or develop a similar or competing product
 run Jev weights locally. This records the published contract text, not legal
 advice; a separate written deployment agreement could change the result.
 
-The current public [TypeSafeAI Hugging Face models page](https://huggingface.co/typesafeAI/models)
-and its public model-list API returned no repositories. The [official GitHub
-organization](https://github.com/orgs/typesafe-ai/repositories) lists SDKs,
+The Hugging Face [`typesafeAI` models page](https://huggingface.co/typesafeAI/models)
+and its public model-list API returned no repositories. Its profile identifies
+as TypeSafe AI and links to `typesafe.ai` and the official
+[`typesafe-ai` GitHub organization](https://github.com/orgs/typesafe-ai/repositories);
+the vendor site/docs did not link back to the HF profile in the 2026-11-26
+recheck, so I treat the profile links as affiliation evidence rather than
+conclusive vendor attestation. The official GitHub organization lists SDKs,
 skills, examples, adapters, and inference-engine repositories, but no Jev
 checkpoint or local Jev serving package. This bounded public search cannot
 rule out a private vendor offer.

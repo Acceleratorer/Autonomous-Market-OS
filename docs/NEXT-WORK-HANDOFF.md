@@ -1,17 +1,27 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-## Current status — 2026-11-25
+## Current status — 2026-11-26
 
 The goal remains local-only BTC research with Market OS owning math,
 probability, calibration, stability, risk, and paper decisions. Authentic
 local Jev is still unverified: current TypeSafe docs show its authenticated
 hosted API, the public repositories expose no Jev weights/runtime, and the
 2026-11-21 inquiry plus 2026-11-25 follow-up to `sales@typesafe.ai` have no
-vendor reply as of the latest mailbox check. Keep the local Qwen
-assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
+vendor reply as of the 2026-11-26 mailbox check. The GitHub `TypeSafeAI`
+organization is an unofficial community, separate from the official
+`typesafe-ai` organization. The Hugging Face `typesafeAI` profile identifies
+as TypeSafe AI and links to its site and official GitHub org, but lacks a
+reciprocal link from the vendor site/docs in this check; treat that as
+affiliation evidence rather than conclusive attestation. Its models page has
+no public models. The Open-Jev dataset card describes independent data, not
+official Jev training data or predictions; it is not Jev weights or runtime.
+No matching Jev/TypeSafe runtime process or local artifact directory was found
+in the scoped 2026-11-26 check. Keep the local Qwen assessor explicitly
+identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
 [2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md)
-for current first-party sources and a bounded local artifact check.
+and [2026-11-26 source-attribution correction](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
+for current first-party sources and the bounded local artifact check.
 
 The latest search also found a third-party [local-jev implementation](https://github.com/amithgc/local-jev)
 that claims System One wire compatibility while running open models locally.
