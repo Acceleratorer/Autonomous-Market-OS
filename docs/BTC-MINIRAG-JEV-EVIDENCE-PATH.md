@@ -153,10 +153,12 @@ not yet been exercised on a target host. The Windows run on 2026-11-21 verified
 executable-scoped firewall enforcement for the paths used in that run. On
 2026-11-25, the initial current-checkout health check correctly failed closed
 because ActiveStore rules targeted an alternate checkout. The rules were then
-retargeted and verified for both checkouts; the primary checkout completed a
-50-minute health-only observation with 100/100 healthy samples, and a bounded
-RFC 5737 outbound probe was denied locally. This did not run assessment
-inference or establish network behavior for unrelated processes. See the
+retargeted to the primary checkout, and the primary path stayed enforced across
+100/100 health samples. The retarget result records the secondary rules
+preserved; a separate post-run ActiveStore query found those rules enforced,
+but they were not part of the primary-checkout samples. A bounded RFC 5737
+outbound probe was denied locally. This did not run assessment inference or
+establish network behavior for unrelated processes. See the
 [Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md),
 [pre-retarget health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json),
 and [primary-checkout observation report](research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md).

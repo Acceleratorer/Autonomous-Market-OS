@@ -35,7 +35,36 @@
         "executable_sha256": "4c872fce2e47539d58ea0e324f60eb96cfba818c683a55c1afe1a0f55bdb7fa1"
       }
     ],
-    "secondary_checkout_rules_preserved_and_enforced": true,
+    "secondary_checkout_rules": {
+      "retarget_result": "preserved",
+      "post_observation_active_store_check": {
+        "checked_at_utc": "2026-11-25T09:14:37.5145117Z",
+        "status": "enforced",
+        "part_of_primary_observation_samples": false,
+        "rules": [
+          {
+            "name": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock-SecondaryCheckout",
+            "enabled": true,
+            "direction": "Outbound",
+            "action": "Block",
+            "profile": "Any",
+            "primary_status": "OK",
+            "enforcement_status": ["ProfileInactive", "Enforced"],
+            "executable_relative_to_secondary_checkout": ".market_os/runtimes/btc-assessor-py311/python.exe"
+          },
+          {
+            "name": "MarketOS-BTC-LocalAssessor-LlamaServer-OutboundBlock-SecondaryCheckout",
+            "enabled": true,
+            "direction": "Outbound",
+            "action": "Block",
+            "profile": "Any",
+            "primary_status": "OK",
+            "enforcement_status": ["ProfileInactive", "Enforced"],
+            "executable_relative_to_secondary_checkout": ".market_os/local-evidence-runtime/windows-x64-cuda-13.5/engine/llama-server.exe"
+          }
+        ]
+      }
+    },
     "retarget_result_sha256": "cd32966f6d21fc3c6e460e4a9db55e44f2f50ac600d3551d52374f62f71fa313",
     "retarget_backup_sha256": "b3dd918956458a9a0e51b62e30ef26685cb205ede4251d50d3ca8c0b039e993c",
     "denial_probe": {

@@ -33,10 +33,13 @@
 
 Windows Defender Firewall ActiveStore reported the Python and pinned
 `llama-server.exe` outbound block rules enabled and enforced for the primary
-checkout. Separate path-specific rules for the secondary checkout were
-preserved and also reported enforced. Domain, Private, and Public profiles
-were enabled. The rules block non-loopback IPv4 and IPv6 while retaining
-loopback for local HTTP IPC.
+checkout before and across all 100 samples. The retarget result records the
+separate secondary-checkout rules preserved. A separate read-only ActiveStore
+query at `2026-11-25T09:14:37.5145117Z`, after the observation, found both
+secondary rules enabled and enforced; the primary observation did not sample
+the secondary executables. Domain, Private, and Public profiles were enabled.
+The rules block non-loopback IPv4 and IPv6 while retaining loopback for local
+HTTP IPC.
 
 Before the observation, the pinned CPython made one TCP connection attempt to
 `192.0.2.1:443`, the RFC 5737 TEST-NET-1 documentation address. Windows denied

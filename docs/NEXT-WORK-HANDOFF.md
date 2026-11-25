@@ -17,10 +17,13 @@ The pre-retarget health record from commit
 Windows ActiveStore rules targeted executable paths in another checkout. That
 fail-closed result is preserved in the
 [pre-retarget health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
-On 2026-11-25 the rules were retargeted to the primary checkout, with separate
-rules retained for the secondary checkout. ActiveStore then reported both
-checkout paths enforced, and a one-attempt connection to RFC 5737 TEST-NET-1
-was denied locally with Windows error 10013 and no application payload.
+On 2026-11-25 the rules were retargeted to the primary checkout, with the
+retarget result recording separate secondary-checkout rules preserved. The
+primary rules were enforced before and throughout the observation. A separate
+read-only ActiveStore query after the run found the secondary rules enabled and
+enforced; that query was not part of the 50-minute sampling. A one-attempt
+connection to RFC 5737 TEST-NET-1 was denied locally with Windows error 10013
+and no application payload.
 
 The primary checkout at commit `b15584f530b8423e848ba7742d125b71c3d28749`
 then completed a health-only observation lasting 3,000.891 monotonic seconds:
