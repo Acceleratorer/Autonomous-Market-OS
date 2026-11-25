@@ -10,8 +10,15 @@ hosted API, the public repositories expose no Jev weights/runtime, and the
 vendor reply as of the latest mailbox check. Keep the local Qwen
 assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
-[2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
+[2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md)
 for current first-party sources and a bounded local artifact check.
+
+The offline focused suite passed 92 tests on the installed system Python 3.12.0
+across local assessor, Linux isolation mocks, paper replay/contracts, features,
+history, and research inspection. This is code-level verification; it does not
+prove real Jev inference or Linux host isolation. This Windows host has no WSL
+or Docker installation, so live Linux namespace/cgroup and GPU-MPS checks still
+need a supported Linux host.
 
 The pre-retarget health record from commit
 `4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` because the
@@ -63,9 +70,11 @@ see the sanitized [UTC clock research note](research/btc-utc-clock-error-bound.m
 
 The 2026-11-25 retry recorded 100/100 successful status queries over 3,001.074
 monotonic seconds, but all samples were unsynchronized and the peer poll
-remained pending. W32Time was restored to Stopped/Manual; no resync or
-configuration change occurred. Do not repeat passive status windows. The next
-clock step requires a separately approved active-sync or time-source plan,
+remained pending. W32Time was restored to Stopped/Manual. Two subsequent
+elevated launches for one `w32tm /resync` were canceled before the elevated
+process started; no resync or configuration change occurred. Do not repeat
+passive status windows. The next clock step requires a separately approved
+active-sync or time-source plan,
 then a defined freshness window, holdover drift allowance, and invalidation
 behavior for clock steps, suspend/resume, or sync loss. Keep
 `packet_eligible: false` until a defensible bound is recorded with each receipt.
