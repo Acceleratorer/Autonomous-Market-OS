@@ -288,6 +288,10 @@ def test_windows_egress_health_requires_exact_active_store_executable_paths(tmp_
         "schema": "market-os.btc-assessor-firewall.v1",
         "status": "enforced",
         "checked_executables": {"python": sys.executable, "llama_server": str(server)},
+        "checked_rule_names": {
+            "python": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock-SecondaryCheckout",
+            "llama_server": "MarketOS-BTC-LocalAssessor-LlamaServer-OutboundBlock-SecondaryCheckout",
+        },
     }
     powershell = _windows_powershell_fixture(tmp_path)
     calls: list[tuple[list[str], dict[str, Any]]] = []
@@ -303,6 +307,7 @@ def test_windows_egress_health_requires_exact_active_store_executable_paths(tmp_
 
     assert health["status"] == "enforced"
     assert health["checked_executables"] == ["python", "llama-server"]
+    assert health["checked_rule_names"] == payload["checked_rule_names"]
     command, kwargs = calls[0]
     assert command[command.index("-File") + 1] == str(Path(__file__).parents[1] / "btc_assessor_firewall.ps1")
     assert command[command.index("-ExecutionPolicy") + 1] == "Bypass"

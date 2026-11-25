@@ -108,6 +108,36 @@ function Test-ExpectedRule($Rule, [string]$Executable) {
     return -not [bool](Compare-Object -ReferenceObject $expected -DifferenceObject $actual -CaseSensitive)
 }
 
+function Test-RuleTargetsExecutable($Rule, [string]$Executable) {
+    $applications = @($Rule | Get-NetFirewallApplicationFilter)
+    if ($applications.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$applications[0].Program)) {
+        return $false
+    }
+    return [string]::Equals(
+        (Get-FullPath ([string]$applications[0].Program)),
+        (Get-FullPath $Executable),
+        [System.StringComparison]::OrdinalIgnoreCase
+    )
+}
+
+function Get-ManagedRulesForExecutable([string]$PolicyStore, [string]$Executable) {
+    return Get-NetFirewallRule -PolicyStore $PolicyStore -Group $group | Where-Object {
+        [string]$_.Group -eq $group -and (Test-RuleTargetsExecutable $_ $Executable)
+    }
+}
+
+function Get-CheckoutScopedRuleName([string]$BaseName, [string]$Executable) {
+    $identity = [System.Text.Encoding]::UTF8.GetBytes((Get-FullPath $Executable).ToUpperInvariant())
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $digest = [System.BitConverter]::ToString($sha256.ComputeHash($identity)).Replace("-", "")
+    }
+    finally {
+        $sha256.Dispose()
+    }
+    return "$BaseName-$($digest.Substring(0, 16))"
+}
+
 function Test-RuleEnforced($Rule) {
     if ([string]$Rule.PrimaryStatus -ne "OK") {
         return $false
@@ -193,23 +223,46 @@ try {
         }
 
         foreach ($specification in $specifications) {
-            $existing = @(Get-NetFirewallRule -PolicyStore PersistentStore -Name $specification.Name -ErrorAction SilentlyContinue)
-            if ($existing.Count -gt 1) {
-                throw "Multiple persistent firewall rules use the managed rule name $($specification.Name)"
+            $matching = @(Get-ManagedRulesForExecutable "PersistentStore" $specification.Executable)
+            if ($matching.Count -gt 1) {
+                throw "Multiple persistent managed firewall rules target $($specification.Executable)"
             }
-            if ($existing.Count -eq 1) {
-                if (-not (Test-ExpectedRule $existing[0] $specification.Executable)) {
-                    throw "The persistent managed firewall rule $($specification.Name) exists with unexpected settings; review it manually"
+            if ($matching.Count -eq 1) {
+                $ruleName = [string]$matching[0].Name
+                if (-not (Test-ExpectedRule $matching[0] $specification.Executable)) {
+                    throw "The persistent managed firewall rule $ruleName exists with unexpected settings; review it manually"
                 }
-                if (Test-RuleEnforced $existing[0]) {
-                    continue
+                continue
+            }
+            else {
+                $legacy = @(Get-NetFirewallRule -PolicyStore PersistentStore -Name $specification.Name -ErrorAction SilentlyContinue)
+                if ($legacy.Count -gt 1) {
+                    throw "Multiple persistent firewall rules use the managed rule name $($specification.Name)"
                 }
-                Remove-NetFirewallRule -PolicyStore PersistentStore -Name $specification.Name
+                $ruleName = $specification.Name
+                if ($legacy.Count -eq 1 -and -not (Test-RuleTargetsExecutable $legacy[0] $specification.Executable)) {
+                    # Preserve the existing rule for its other checkout and add a path-scoped rule here.
+                    $ruleName = Get-CheckoutScopedRuleName $specification.Name $specification.Executable
+                }
+
+                $existing = @(Get-NetFirewallRule -PolicyStore PersistentStore -Name $ruleName -ErrorAction SilentlyContinue)
+                if ($existing.Count -gt 1) {
+                    throw "Multiple persistent firewall rules use the managed rule name $ruleName"
+                }
+                if ($existing.Count -eq 1) {
+                    if (-not (Test-ExpectedRule $existing[0] $specification.Executable)) {
+                        throw "The persistent managed firewall rule $ruleName exists with unexpected settings; review it manually"
+                    }
+                    if (Test-RuleEnforced $existing[0]) {
+                        continue
+                    }
+                    Remove-NetFirewallRule -PolicyStore PersistentStore -Name $ruleName
+                }
             }
             New-NetFirewallRule `
                 -PolicyStore PersistentStore `
-                -Name $specification.Name `
-                -DisplayName $specification.Name `
+                -Name $ruleName `
+                -DisplayName $ruleName `
                 -Group $group `
                 -Description "Block non-loopback outbound traffic for the local BTC evidence assessor." `
                 -Direction Outbound `
@@ -218,7 +271,7 @@ try {
                 -RemoteAddress $blockedRemoteAddresses `
                 -Profile Any `
                 -Enabled True | Out-Null
-            $createdRuleNames += $specification.Name
+            $createdRuleNames += $ruleName
         }
     }
 
@@ -229,14 +282,17 @@ try {
         exit 2
     }
 
+    $checkedRuleNames = [ordered]@{}
     foreach ($specification in $specifications) {
-        $effective = @(Get-NetFirewallRule -PolicyStore ActiveStore -Name $specification.Name -ErrorAction SilentlyContinue)
+        $effective = @(Get-ManagedRulesForExecutable "ActiveStore" $specification.Executable)
         if ($effective.Count -ne 1 -or -not (Test-ExpectedRule $effective[0] $specification.Executable)) {
             Remove-CreatedRules
             $result = Get-VerificationResult "unverified" "missing_or_mismatched_active_store_rule"
             $result | ConvertTo-Json -Depth 5 -Compress
             exit 2
         }
+        $ruleName = [string]$effective[0].Name
+        $checkedRuleNames[$specification.Name] = $ruleName
         if (-not (Test-RuleEnforced $effective[0])) {
             Remove-CreatedRules
             $statuses = @($effective[0].EnforcementStatus | ForEach-Object { [string]$_ })
@@ -248,6 +304,7 @@ try {
     }
 
     $result = Get-VerificationResult "enforced" ""
+    $result.checked_rule_names = $checkedRuleNames
     $result | ConvertTo-Json -Depth 5 -Compress
     exit 0
 }
