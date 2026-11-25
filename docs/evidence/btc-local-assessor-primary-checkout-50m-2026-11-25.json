@@ -1,0 +1,164 @@
+{
+  "schema": "market-os.btc-local-assessor-primary-checkout-50m-evidence.v1",
+  "recorded_on": "2026-11-25",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "path_at_observation": "primary local checkout",
+    "branch": "main",
+    "commit": "b15584f530b8423e848ba7742d125b71c3d28749",
+    "working_tree_clean_before_documentation": true
+  },
+  "firewall": {
+    "supervisor": "Windows Defender Firewall ActiveStore",
+    "status": "enforced",
+    "profiles_enabled": ["Domain", "Private", "Public"],
+    "scope": "outbound non-loopback IPv4 and IPv6; loopback retained for local HTTP IPC",
+    "current_checkout_rules": [
+      {
+        "name": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock",
+        "enabled": true,
+        "direction": "Outbound",
+        "action": "Block",
+        "profile": "Any",
+        "enforcement_status": ["ProfileInactive", "Enforced"],
+        "executable": ".market_os/runtimes/btc-assessor-py311/python.exe",
+        "executable_sha256": "2aa502336aa5207d58590f5317c7c0a82601d2fa541a59075eabf55dff9a2e16"
+      },
+      {
+        "name": "MarketOS-BTC-LocalAssessor-LlamaServer-OutboundBlock",
+        "enabled": true,
+        "direction": "Outbound",
+        "action": "Block",
+        "profile": "Any",
+        "enforcement_status": ["ProfileInactive", "Enforced"],
+        "executable": ".market_os/local-evidence-runtime/windows-x64-cuda-13.5/engine/llama-server.exe",
+        "executable_sha256": "4c872fce2e47539d58ea0e324f60eb96cfba818c683a55c1afe1a0f55bdb7fa1"
+      }
+    ],
+    "secondary_checkout_rules": {
+      "retarget_result": "preserved",
+      "post_observation_active_store_check": {
+        "checked_at_utc": "2026-11-25T09:14:37.5145117Z",
+        "status": "enforced",
+        "part_of_primary_observation_samples": false,
+        "rules": [
+          {
+            "name": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock-SecondaryCheckout",
+            "enabled": true,
+            "direction": "Outbound",
+            "action": "Block",
+            "profile": "Any",
+            "primary_status": "OK",
+            "enforcement_status": ["ProfileInactive", "Enforced"],
+            "executable_relative_to_secondary_checkout": ".market_os/runtimes/btc-assessor-py311/python.exe"
+          },
+          {
+            "name": "MarketOS-BTC-LocalAssessor-LlamaServer-OutboundBlock-SecondaryCheckout",
+            "enabled": true,
+            "direction": "Outbound",
+            "action": "Block",
+            "profile": "Any",
+            "primary_status": "OK",
+            "enforcement_status": ["ProfileInactive", "Enforced"],
+            "executable_relative_to_secondary_checkout": ".market_os/local-evidence-runtime/windows-x64-cuda-13.5/engine/llama-server.exe"
+          }
+        ]
+      }
+    },
+    "retarget_result_sha256": "cd32966f6d21fc3c6e460e4a9db55e44f2f50ac600d3551d52374f62f71fa313",
+    "retarget_backup_sha256": "b3dd918956458a9a0e51b62e30ef26685cb205ede4251d50d3ca8c0b039e993c",
+    "denial_probe": {
+      "executable": ".market_os/runtimes/btc-assessor-py311/python.exe",
+      "destination": "192.0.2.1:443/TCP",
+      "destination_class": "RFC 5737 TEST-NET-1 documentation address",
+      "attempts": 1,
+      "timeout_seconds": 2,
+      "result": "firewall_denied",
+      "exception": "PermissionError",
+      "errno": 13,
+      "winerror": 10013,
+      "application_payload_sent": false,
+      "record_sha256": "40d8a62ced52d53e9e4c38d07c19633207f4d0fbc419648b11c0059a6f7ab16b"
+    }
+  },
+  "observation": {
+    "id": "e21fd706489041f999a5201eabdd88f4",
+    "status": "completed",
+    "runtime_ready_at_utc": "2026-11-25T08:03:52.020638+00:00",
+    "stopped_at_utc": "2026-11-25T08:53:52.923160+00:00",
+    "duration_seconds_monotonic": 3000.891,
+    "duration_limit_seconds_after_startup": 3000,
+    "sample_interval_seconds": 30,
+    "sample_indices": [0, 99],
+    "sample_count": 100,
+    "healthy_samples": 100,
+    "http_200_samples": 100,
+    "firewall_enforced_samples": 100,
+    "resource_enforced_samples": 100,
+    "failed_samples": 0,
+    "observer_exit_code": 0,
+    "runtime_stopped": true,
+    "raw_log": {
+      "local_path": ".market_os/btc-assessor-observations/e21fd706489041f999a5201eabdd88f4.jsonl",
+      "committed": false,
+      "bytes": 126428,
+      "sha256": "74ce03ce7fccb5af51f96a61bb286352a7f4c86848e231f76ab15e68e0bc1bce",
+      "size_limit_bytes": 1048576
+    },
+    "earlier_interrupted_attempt": {
+      "id": "d011f738635e435c9695dc39db57d83d",
+      "status": "failed_closed",
+      "duration_seconds_monotonic": 2173.844,
+      "samples": 73,
+      "healthy_samples": 72,
+      "degraded_samples": 1,
+      "failure": "Windows PowerShell ActiveStore verification exceeded its 8-second deadline",
+      "log_bytes": 92572,
+      "log_sha256": "8a789d333c4665019967c83e003f5b60ef7017853f11858bc09ae1ea4177e35f"
+    }
+  },
+  "runtime": {
+    "provider": "local_qwen_evidence_assessor",
+    "is_typesafe_jev": false,
+    "model": "Qwen3-4B-Q4_K_M.gguf",
+    "model_revision": "bc640142c66e1fdd12af0bd68f40445458f3869b:Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "runtime": "llama.cpp-b12478",
+    "runtime_manifest_fingerprint": "790f547e3d70f8a22028aa213fbac4a314d8bdfbccea57ae331a92c207fd21f6",
+    "llama_server_sha256": "4c872fce2e47539d58ea0e324f60eb96cfba818c683a55c1afe1a0f55bdb7fa1",
+    "python_version": "3.11.18",
+    "python_sha256": "2aa502336aa5207d58590f5317c7c0a82601d2fa541a59075eabf55dff9a2e16"
+  },
+  "resource_limits": {
+    "status": "enforced",
+    "supervisor": "Windows Job Object",
+    "cpu_hard_cap_percent": 25,
+    "process_commit_limit_bytes": 6442450944,
+    "job_commit_limit_bytes": 6442450944,
+    "working_set_limit_bytes": null,
+    "cuda_free_memory_margin_mib": 2048,
+    "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap"
+  },
+  "gpu_memory": {
+    "adapter_reported_by_nvidia_smi": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "scope": "aggregate_gpu",
+    "memory_total_mib": 8151,
+    "memory_used_min_mib": 6804,
+    "memory_used_max_mib": 7445,
+    "hard_cap": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0
+  },
+  "limitations": [
+    "Health-only loopback monitoring; no inference call, packet assessment, or market decision was performed.",
+    "The probe and path-specific rules do not constitute a packet capture or an internet-wide audit of unrelated workstation processes.",
+    "GPU memory values are aggregate device measurements and are not attributable to the assessor process.",
+    "The CUDA margin is adaptive and does not enforce a hard VRAM cap.",
+    "Wall-clock timestamps are unqualified trace metadata and cannot establish BTC evidence availability.",
+    "Linux OS isolation remains unverified on a supported Linux host.",
+    "Authentic local Jev runtime availability and local-use terms remain unverified; Qwen is not Jev."
+  ]
+}
