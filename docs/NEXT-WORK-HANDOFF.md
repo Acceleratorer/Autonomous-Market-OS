@@ -68,16 +68,20 @@ stripchart diagnostic did not expose root dispersion or establish a UTC error
 bound. Raw workstation telemetry remains in ignored `.market_os/clock/` files;
 see the sanitized [UTC clock research note](research/btc-utc-clock-error-bound.md).
 
-The 2026-11-25 retry recorded 100/100 successful status queries over 3,001.074
-monotonic seconds, but all samples were unsynchronized and the peer poll
-remained pending. W32Time was restored to Stopped/Manual. Two subsequent
-elevated launches for one `w32tm /resync` were canceled before the elevated
-process started; no resync or configuration change occurred. Do not repeat
-passive status windows. The next clock step requires a separately approved
-active-sync or time-source plan,
-then a defined freshness window, holdover drift allowance, and invalidation
-behavior for clock steps, suspend/resume, or sync loss. Keep
-`packet_eligible: false` until a defensible bound is recorded with each receipt.
+The 2026-11-25 unsynchronized status retry recorded 100/100 successful queries
+over 3,001.074 monotonic seconds; W32Time was restored to Stopped/Manual. After
+two canceled resync launches, an explicitly approved elevated retry started
+W32Time and `w32tm /resync` succeeded at approximately `2026-11-25T11:34:41Z`.
+The subsequent 3,000.022-second observation recorded 100/100 synchronized
+status samples, zero query failures, and 10/10 peer snapshots still `Pending`.
+Root distance remained `8.1482255 s`; wall/monotonic offset change was about
+`195.3 ms`, below the diagnostic 250 ms threshold. This is relative
+stability evidence, not absolute UTC qualification. W32Time remains
+`Running/Manual`. Keep `clock_error_bound_ms` unknown and
+`packet_eligible: false` until a defensible bound, freshness, holdover drift,
+and invalidation behavior for clock steps, suspend/resume, or sync loss are
+defined. See the [sanitized post-resync evidence](evidence/btc-w32time-post-resync-observation-2026-11-25.json)
+and [clock research note](research/btc-utc-clock-error-bound.md).
 n8n may schedule a one-shot capture, but it is not a time source. Hosted Jev
 remains synthetic-connectivity-only and BTC packets stay local.
 

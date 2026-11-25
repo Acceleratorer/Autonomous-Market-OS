@@ -1,8 +1,8 @@
 # BTC UTC clock error qualification
 
-**Checked:** 2026-11-24
+**Checked:** 2026-11-25
 
-**Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. The later authorized observation temporarily started W32Time and restored its initial stopped/manual state. No manual resynchronization or time-service configuration change was requested by that runner.
+**Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. The 2026-11-23 elevated observation temporarily started W32Time and restored its initial stopped/manual state; that runner made no resynchronization or time-service configuration change.
 
 ## Current status
 
@@ -92,9 +92,9 @@ its per-sample progress record is
 `.market_os/clock/w32time-observation-50m-20261124/w32time-observation-50m-20261124-133137-779.progress.json`
 (SHA-256 `2DD086650F1A97CF4D91F152EDB3AA6224D574F77CE5CA4CF8D8B5BD2E1D9EBA`)
 and is also local and ignored by Git. Keep
-`clock_error_bound_ms: null` and `packet_eligible: false`. Any active
-resynchronization or polling-configuration change needs its own approved
-diagnostic plan; it is not covered by this passive observation.
+`clock_error_bound_ms: null` and `packet_eligible: false`. That passive
+observation did not authorize an active resynchronization or polling change;
+the separately approved one-shot resync and follow-up are documented below.
 
 ### Owner-authorized elevated status retry — 2026-11-25
 
@@ -127,8 +127,43 @@ The 78,555-byte raw trace remains local and ignored at
 The local runner is retained beside it (SHA-256
 `2CDB49600D517F0A46F0BDDD0172CEB4FD59852176C51A3D6533517EEF3423FE`).
 Keep `clock_error_bound_ms: null` and `packet_eligible: false`. Do not repeat
-another passive 50-minute window; obtaining fresh synchronization-quality
-data now requires a separately approved active-sync or time-source plan.
+another passive 50-minute window as a substitute for synchronization-quality
+data. The separately approved active resync and post-resync observation are
+recorded below.
+
+### Explicitly approved resync and follow-up — 2026-11-25
+
+After explicit user approval, W32Time was started in its existing `Manual`
+start mode and the elevated `w32tm /resync` command completed successfully at
+approximately `2026-11-25T11:34:41Z`. No time-service configuration or polling
+settings were changed. A status query at `2026-11-25T11:37:29Z` reported source
+`time.windows.com,0x9`, leap indicator 0, stratum 5, root delay `0.0471320 s`,
+and root dispersion `8.1246595 s`. Root dispersion plus half root delay gives
+an NTP synchronization-distance estimate of `8.1482255 s` (`8148.2255 ms`).
+This is an operational estimate under the time service's model, not a qualified
+capture-time hard guarantee. Source accuracy, network-path assumptions,
+holdover drift, freshness, and invalidation behavior remain unqualified.
+
+The post-resync observation completed `3000.022` monotonic seconds from
+`2026-11-25T11:42:13.9623036Z`. It recorded 100/100 synchronized status
+samples (leap 0, stratum 5), zero query failures, and 10 successful peer
+snapshots. Every peer snapshot remained `Pending`; no fresh scheduled poll was
+observed. Root delay and dispersion stayed at `0.0471320 s` and `8.1246595 s`,
+for an NTP synchronization-distance estimate of `8.1482255 s` (`8148.2255 ms`).
+The age of the last successful sync grew from `452.454 s` to `3422.658 s`.
+
+Using the trace's monotonic values rounded to milliseconds, the derived
+wall/monotonic offset changed by about `195.3 ms` relative to sample 0; the
+largest adjacent-sample change was about `4.7 ms`, below the diagnostic
+`250 ms` threshold. This measures relative clock behavior only. It
+does not establish absolute UTC accuracy. W32Time remained `Running/Manual` at
+the end, with no service or polling configuration change during the window.
+No BTC market-data, Jev, or model-provider request was made. The sanitized
+[observation evidence](../evidence/btc-w32time-post-resync-observation-2026-11-25.json)
+records the result and the limits of the local trace. Keep
+`clock_error_bound_ms: null` and `packet_eligible: false` until a defensible
+capture-time qualification, freshness, holdover, and invalidation rules are
+defined and satisfied.
 
 ## Receipt-linked diagnostics
 
