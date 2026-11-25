@@ -19,9 +19,11 @@ No matching Jev/TypeSafe runtime process or local artifact directory was found
 in the scoped 2026-11-26 check. Keep the local Qwen assessor explicitly
 identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
-[2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md)
-and [2026-11-26 source-attribution correction](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
-for current first-party sources and the bounded local artifact check.
+[2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md),
+[2026-11-26 source-attribution correction](research/typesafe-jev-local-runtime-recheck-2026-11-25.md),
+and [2026-11-26 primary-source and host recheck](research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md)
+for current first-party sources, the empty vendor-reply search, and the bounded
+local artifact check.
 
 The latest search also found a third-party [local-jev implementation](https://github.com/amithgc/local-jev)
 that claims System One wire compatibility while running open models locally.
