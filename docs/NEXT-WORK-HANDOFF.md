@@ -6,7 +6,8 @@ The goal remains local-only BTC research with Market OS owning math,
 probability, calibration, stability, risk, and paper decisions. Authentic
 local Jev is still unverified: current TypeSafe docs show its authenticated
 hosted API, the public repositories expose no Jev weights/runtime, and the
-2026-11-21 inquiry to `sales@typesafe.ai` has no reply. Keep the local Qwen
+2026-11-21 inquiry plus 2026-11-25 follow-up to `sales@typesafe.ai` have no
+vendor reply as of the latest mailbox check. Keep the local Qwen
 assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
 [2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
@@ -41,8 +42,11 @@ The earlier [secondary-checkout observation](research/btc-local-assessor-50m-obs
 remains historical evidence for that checkout. Linux host isolation, a hard
 CUDA VRAM cap, and eligible prospective BTC evidence remain open. The 2,048
 MiB CUDA margin is adaptive, not a hard cap. The UTC error bound remains
-unknown; the completed 60-minute clock observation is not to be repeated. Do
-not treat the historical Binance archive or synthetic Qwen run as market
+unknown. The earlier 60-minute relative-clock observation remains historical;
+a separate owner-authorized elevated W32Time status retry on 2026-11-25 also
+remained unsynchronized. See the [clock research note](research/btc-utc-clock-error-bound.md)
+and [sanitized retry evidence](evidence/btc-w32time-observation-50m-2026-11-25.json).
+Do not treat the historical Binance archive or synthetic Qwen run as market
 evidence.
 
 ## Current milestone — qualify UTC receipt clock — 2026-11-23
@@ -57,11 +61,14 @@ stripchart diagnostic did not expose root dispersion or establish a UTC error
 bound. Raw workstation telemetry remains in ignored `.market_os/clock/` files;
 see the sanitized [UTC clock research note](research/btc-utc-clock-error-bound.md).
 
-Next, obtain fresh synchronization-quality data from an approved time source
-and define the bound's freshness, holdover drift, and invalidation behavior for
-clock steps, suspend/resume, or sync loss. Do not retry the canceled elevated
-service launch automatically. Only thread a defensible bound into capture
-lineage after these conditions are met; otherwise keep `packet_eligible: false`.
+The 2026-11-25 retry recorded 100/100 successful status queries over 3,001.074
+monotonic seconds, but all samples were unsynchronized and the peer poll
+remained pending. W32Time was restored to Stopped/Manual; no resync or
+configuration change occurred. Do not repeat passive status windows. The next
+clock step requires a separately approved active-sync or time-source plan,
+then a defined freshness window, holdover drift allowance, and invalidation
+behavior for clock steps, suspend/resume, or sync loss. Keep
+`packet_eligible: false` until a defensible bound is recorded with each receipt.
 n8n may schedule a one-shot capture, but it is not a time source. Hosted Jev
 remains synthetic-connectivity-only and BTC packets stay local.
 

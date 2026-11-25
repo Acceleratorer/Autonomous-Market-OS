@@ -1,0 +1,82 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-25",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_observation": "main",
+    "commit": "ff7e8030e66cc32ff107efd9cd41e5afd28d2497",
+    "working_tree_clean_before_observation": true
+  },
+  "observation": {
+    "id": "w32time-50m-20261125-163340",
+    "status": "completed",
+    "started_at_utc_unqualified_trace": "2026-11-25T09:34:30.4299527+00:00",
+    "first_sample_at_utc_unqualified_trace": "2026-11-25T09:34:30.5005143+00:00",
+    "last_sample_at_utc_unqualified_trace": "2026-11-25T10:24:00.4778168+00:00",
+    "duration_seconds_monotonic": 3001.074,
+    "sample_interval_seconds": 30,
+    "status_sample_count": 100,
+    "status_query_failures": 0,
+    "synchronized_samples": 0,
+    "peer_snapshot_count": 10
+  },
+  "service": {
+    "baseline_state": "Stopped",
+    "baseline_start_mode": "Manual",
+    "final_state": "Stopped",
+    "final_start_mode": "Manual",
+    "state_restored": true
+  },
+  "reported_status": {
+    "all_samples": {
+      "leap_indicator": "3 (not synchronized)",
+      "stratum": 0,
+      "root_delay_seconds": 0,
+      "root_dispersion_seconds": 0,
+      "last_successful_sync_time": null,
+      "source": "Local CMOS Clock",
+      "last_sync_error": "1 (no time data was available)"
+    },
+    "interpretation": "Zero root delay and dispersion reported while unsynchronized are not a zero-error estimate."
+  },
+  "peer_observation": {
+    "peer": "time.windows.com,0x9",
+    "first_snapshot": {
+      "sample_index": 0,
+      "state": "Active",
+      "time_remaining_seconds": 16383.6410896
+    },
+    "last_snapshot": {
+      "sample_index": 90,
+      "state": "Pending",
+      "time_remaining_seconds": 13683.7075117
+    },
+    "fresh_poll_observed": false
+  },
+  "actions": {
+    "service_started_temporarily": true,
+    "service_restored_to_baseline": true,
+    "forced_resynchronization": false,
+    "configuration_changed": false,
+    "packet_capture_performed": false,
+    "normal_w32time_network_traffic_measured": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0
+  },
+  "local_artifacts": {
+    "raw_log_path": ".market_os/clock/w32time-50m-20261125-163340.jsonl",
+    "raw_log_committed": false,
+    "raw_log_bytes": 78555,
+    "raw_log_sha256": "C57185AD9071931624C8ED2A403F76224340552503390A7075FA527B0F819796",
+    "runner_path": ".market_os/clock/w32time-50m-20261125-163340.ps1",
+    "runner_sha256": "2CDB49600D517F0A46F0BDDD0172CEB4FD59852176C51A3D6533517EEF3423FE"
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "Every sample remained unsynchronized and the configured peer did not complete a fresh poll during the observation."
+  }
+}
