@@ -1,5 +1,17 @@
 # Understanding log
 
+## 2026-11-25 — W32Time status retry
+
+- After the owner explicitly requested a retry, temporarily started W32Time
+  under elevation and observed 100 successful status samples over 3,001.074
+  monotonic seconds. The service was restored to Stopped/Manual.
+- All samples remained unsynchronized; the peer moved from Active with a
+  16,384-second countdown to Pending, with no fresh poll observed. No resync or
+  configuration change was made.
+- Keep the UTC error bound unknown and BTC packet eligibility false. Sanitized
+  evidence is in `docs/evidence/btc-w32time-observation-50m-2026-11-25.json`;
+  the raw trace remains local and ignored.
+
 ## 2026-11-23 — BTC UTC receipt-clock observation
 
 - Completed the authorized 60-minute local observation: a W32Time status

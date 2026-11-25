@@ -96,6 +96,40 @@ and is also local and ignored by Git. Keep
 resynchronization or polling-configuration change needs its own approved
 diagnostic plan; it is not covered by this passive observation.
 
+### Owner-authorized elevated status retry — 2026-11-25
+
+After the owner explicitly requested a retry, a temporary elevated W32Time
+status observation ran for 3,001.074 monotonic seconds. It recorded 100 status
+samples at 30-second intervals and 10 local peer snapshots; all status queries
+succeeded. Every sample remained unsynchronized (leap 3, stratum 0, source
+`Local CMOS Clock`, no last successful sync). Root delay and dispersion were
+reported as zero in this unsynchronized state; those values do not establish
+zero clock error.
+
+The first peer snapshot reported `time.windows.com,0x9` as Active with
+16,383.641 seconds remaining. The last snapshot, at sample 90, reported it
+Pending with 13,683.708 seconds remaining. No fresh poll or synchronization
+was observed. This is consistent with the previously recorded 16,384-second
+special polling interval, but the countdown alone does not establish peer
+reachability. Microsoft documents polling flags and interval behavior in its
+[W32Time settings reference](https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings?tabs=ntpserver)
+and [SpecialPollInterval troubleshooting note](https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/w32time-sync-specialpollinterval-ignored).
+No forced resynchronization or configuration change was made.
+The service returned to its original Stopped/Manual state. No BTC market-data,
+Jev, or model-provider request was made; no packet capture was run, so normal
+W32Time network traffic was not measured.
+
+The sanitized evidence is
+[btc-w32time-observation-50m-2026-11-25.json](../evidence/btc-w32time-observation-50m-2026-11-25.json).
+The 78,555-byte raw trace remains local and ignored at
+`.market_os/clock/w32time-50m-20261125-163340.jsonl` (SHA-256
+`C57185AD9071931624C8ED2A403F76224340552503390A7075FA527B0F819796`).
+The local runner is retained beside it (SHA-256
+`2CDB49600D517F0A46F0BDDD0172CEB4FD59852176C51A3D6533517EEF3423FE`).
+Keep `clock_error_bound_ms: null` and `packet_eligible: false`. Do not repeat
+another passive 50-minute window; obtaining fresh synchronization-quality
+data now requires a separately approved active-sync or time-source plan.
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before
