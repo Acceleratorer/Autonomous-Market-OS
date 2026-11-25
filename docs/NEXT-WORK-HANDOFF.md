@@ -49,6 +49,12 @@ freshness, holdover-drift, and invalidation rules. See the
 [sanitized 2026-11-26 retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26.json)
 and [clock qualification note](research/btc-utc-clock-error-bound.md).
 
+The local Qwen assessment store now caps aggregate run-file bytes at 1 GiB per
+store root and rejects new runs with typed `store_capacity_exceeded` once full.
+It preserves prior records and does not prune automatically; the quota check
+and write-once commit are serialized across writers. See
+[ADR-0060](decisions/ADR-0060-btc-local-assessment-store-quota.md).
+
 This checkout at `D:\Code\Github\Autonomous-Market-OS` is the secondary
 checkout. Its exact pinned Python and `llama-server.exe` rules are already
 enabled and enforced in ActiveStore under `-SecondaryCheckout` names; the
