@@ -151,11 +151,15 @@ network namespace; the runtime checks effective cgroup-v2 limits and namespace
 membership. Missing user namespaces or cgroup controls fail closed. Linux has
 not yet been exercised on a target host. The Windows run on 2026-11-21 verified
 executable-scoped firewall enforcement for the paths used in that run. On
-2026-11-25, health for the current checkout failed closed because ActiveStore
-rules target an alternate checkout; the current checkout is not yet verified
-as isolated. See the
-[Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md)
-and [current-checkout health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
+2026-11-25, the initial current-checkout health check correctly failed closed
+because ActiveStore rules targeted an alternate checkout. The rules were then
+retargeted and verified for both checkouts; the primary checkout completed a
+50-minute health-only observation with 100/100 healthy samples, and a bounded
+RFC 5737 outbound probe was denied locally. This did not run assessment
+inference or establish network behavior for unrelated processes. See the
+[Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md),
+[pre-retarget health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json),
+and [primary-checkout observation report](research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md).
 Authentic local Jev availability and its offline-use terms remain unverified;
 the Windows CUDA fit margin also does not provide a hard VRAM cap. See the
 [local Jev runtime check](research/jev-local-runtime-availability-2026-11-25.md)
