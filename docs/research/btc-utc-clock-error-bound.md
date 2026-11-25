@@ -165,6 +165,30 @@ records the result and the limits of the local trace. Keep
 capture-time qualification, freshness, holdover, and invalidation rules are
 defined and satisfied.
 
+### Owner-authorized 50-minute retry — 2026-11-25 (latest)
+
+The later retry recorded 100 status samples and 10 peer snapshots over a
+configured 3,000-second window. Its raw status series spans 2,970.009 monotonic
+seconds from sample 0 to sample 99; the runner was configured to hold until
+3,000 seconds, and the observer process was absent at the next poll, but its
+final stdout and exit code were not retained. All 100 status commands succeeded
+and reported leap 0 / stratum 5. However, `Last Sync Error: 2` appeared in 73
+samples, beginning at sample 27 (810.033 monotonic seconds), while the peer
+was Pending in the final four snapshots (samples 60–90). The sampled age of
+the last good sync grew from `234.868 s` to `3204.955 s`.
+
+Root delay was `0.0747092 s` and root dispersion `7.9045297 s`, for an estimated
+root distance of `7.9418843 s`. The raw UTC trace and monotonic counter differed
+by at most `70.990 ms` relative to sample 0, with a maximum adjacent interval
+difference of `2.726 ms`; that is a relative-stability diagnostic only. The
+peer's final remaining-time estimate was `13448.948 s`, and no fresh poll was
+observed. These results show that leap/stratum fields alone can look
+synchronized while the status reports stale data. They do not establish a
+capture-time UTC error bound. Keep `clock_error_bound_ms: null` and
+`packet_eligible: false`. See the
+[retry evidence](../evidence/btc-w32time-post-resync-retry-2026-11-25.json);
+the raw trace remains local and ignored.
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before

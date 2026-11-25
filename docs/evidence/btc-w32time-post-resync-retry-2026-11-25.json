@@ -1,0 +1,119 @@
+{
+  "schema": "market-os.btc-w32time-post-resync-retry.v1",
+  "recorded_on": "2026-11-25",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_observation": "main",
+    "commit": "ff40ce1f61fa968372a4008a3123a4b08ca0e36b",
+    "working_tree_clean_before_observation": true
+  },
+  "observation": {
+    "id": "w32time-post-resync-50m-20261125-retry-220236",
+    "status": "samples_complete_process_terminal_observed",
+    "requested_duration_seconds": 3000,
+    "sample_interval_seconds": 30,
+    "status_sample_count": 100,
+    "status_query_failures": 0,
+    "peer_snapshot_count": 10,
+    "peer_query_failures": 0,
+    "started_at_utc_trace": "2026-11-25T15:02:39.5158257+00:00",
+    "last_sample_at_utc_trace": "2026-11-25T15:52:09.5958154+00:00",
+    "sampled_wall_span_seconds": 2970.0799897,
+    "first_sample_monotonic_elapsed_seconds": 0.028,
+    "last_sample_monotonic_elapsed_seconds": 2970.037,
+    "sampled_monotonic_span_seconds": 2970.009,
+    "observer_process_absent_after_final_sample_interval": true,
+    "observer_exit_code_captured": false,
+    "duration_note": "The runner is configured to wait until 3000 monotonic seconds after the 100th sample. Its final stdout and exit code were not retained; the direct sample series ends at 2970.037 seconds."
+  },
+  "service": {
+    "state_during_observation": "Running",
+    "start_mode_during_observation": "Manual",
+    "service_state_samples": 100
+  },
+  "synchronization": {
+    "source": "time.windows.com,0x9",
+    "leap_indicator": "0 (no warning)",
+    "stratum": 5,
+    "status_query_exit_codes": {
+      "0": 100
+    },
+    "last_sync_error_codes": {
+      "0": 27,
+      "2": 73
+    },
+    "first_stale_time_error_sample_index": 27,
+    "first_stale_time_error_monotonic_elapsed_seconds": 810.033,
+    "root_delay_seconds": 0.0747092,
+    "root_dispersion_seconds": 7.9045297,
+    "root_distance_estimate_seconds": 7.9418843,
+    "phase_offset_seconds": {
+      "first_sample": 0.134458,
+      "last_sample": 0.0689593
+    },
+    "last_good_sync_age_seconds": {
+      "first_sample": 234.8679486,
+      "last_sample": 3204.9550464
+    }
+  },
+  "peer_observation": {
+    "peer": "time.windows.com,0x9",
+    "snapshot_count": 10,
+    "states_by_sample_index": {
+      "0": "Active",
+      "10": "Active",
+      "20": "Active",
+      "30": "Active",
+      "40": "Active",
+      "50": "Active",
+      "60": "Pending",
+      "70": "Pending",
+      "80": "Pending",
+      "90": "Pending"
+    },
+    "last_time_remaining_seconds": 13448.9483381,
+    "fresh_peer_poll_observed": false
+  },
+  "relative_clock_comparison": {
+    "method": "Raw UTC trace timestamps compared with Stopwatch monotonic elapsed time, relative to sample 0",
+    "maximum_absolute_relative_offset_change_milliseconds": 70.9897,
+    "maximum_absolute_adjacent_interval_difference_milliseconds": 2.7258,
+    "diagnostic_threshold_milliseconds": 250,
+    "threshold_crossed": false,
+    "interpretation": "Relative wall/monotonic stability only; this does not establish absolute UTC accuracy or a clock error bound."
+  },
+  "actions": {
+    "w32time_resync_during_observation": false,
+    "time_service_configuration_changed": false,
+    "polling_configuration_changed": false,
+    "packet_capture_performed": false,
+    "observer_queries_local_w32time_only": true
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "ntp_peer_traffic_packet_captured": false
+  },
+  "local_artifacts": {
+    "raw_log_path": ".market_os/clock/w32time-post-resync-50m-20261125-retry-220236.jsonl",
+    "raw_log_committed": false,
+    "raw_log_bytes": 89214,
+    "raw_log_sha256": "E4152F677447F2D4A5EB8D41393CAE692E7203EFDF1B2E6C2D99B3B612FD8294",
+    "runner_path": ".market_os/clock/w32time-post-resync-50m-20261125-retry-220236.ps1",
+    "runner_committed": false,
+    "runner_sha256": "826B97C066D6C6822F41EA20D8972899811889D2D6D36BF02D41736681C67279"
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "Although all status queries returned Leap Indicator 0 and stratum 5, 73 samples reported stale time data, the peer was Pending for the final four snapshots, and the final observed last-good-sync age exceeded 3200 seconds. The root-distance estimate is not an unconditional accuracy guarantee."
+  },
+  "limitations": [
+    "The samples are intermittent and do not prove synchronization between observations.",
+    "The exact observer process exit code and final 3000-second elapsed value were not captured.",
+    "The relative wall/monotonic comparison is not an absolute UTC accuracy bound.",
+    "No packet capture characterized normal W32Time peer traffic.",
+    "The peer snapshot uses the Windows time service's configured time.windows.com source; no BTC, Jev, or model-provider endpoint was contacted by this observer."
+  ]
+}

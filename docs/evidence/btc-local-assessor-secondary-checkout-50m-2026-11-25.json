@@ -1,0 +1,104 @@
+{
+  "schema": "market-os.btc-local-assessor-secondary-checkout-50m-evidence.v1",
+  "recorded_on_utc": "2026-11-25",
+  "recorded_on_local": "2026-11-26",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "path_role": "secondary local checkout",
+    "branch_at_observation": "fix/btc-checkout-scoped-egress",
+    "commit_at_observation": "ff40ce1f61fa968372a4008a3123a4b08ca0e36b",
+    "working_tree_dirty_at_observation": true,
+    "firewall_script_sha256": "1cbc3fb51cdc3354f7bfd247134741e66f58b80f8525f42b515db8b967184984"
+  },
+  "firewall": {
+    "supervisor": "Windows Defender Firewall ActiveStore",
+    "status": "enforced",
+    "profiles_enabled": ["Domain", "Private", "Public"],
+    "policy_changed_during_run": false,
+    "checked_rule_names": {
+      "python": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock-SecondaryCheckout",
+      "llama_server": "MarketOS-BTC-LocalAssessor-LlamaServer-OutboundBlock-SecondaryCheckout"
+    },
+    "scope": "outbound non-loopback IPv4 and IPv6 for the pinned Python and llama-server executables; loopback retained",
+    "denial_probe": {
+      "recorded_at_utc": "2026-11-25T16:39:34.827688+00:00",
+      "executable": ".market_os/runtimes/btc-assessor-py311/python.exe",
+      "destination": "192.0.2.1:443/TCP",
+      "destination_class": "RFC 5737 TEST-NET-1 documentation address",
+      "attempts": 1,
+      "timeout_seconds": 2,
+      "result": "firewall_denied",
+      "exception": "PermissionError",
+      "errno": 13,
+      "winerror": 10013,
+      "application_payload_sent": false
+    }
+  },
+  "observation": {
+    "id": "660aff8e96b24a8ebb62c7f29e777498",
+    "status": "completed",
+    "runtime_ready_at_utc": "2026-11-25T16:42:04.810640+00:00",
+    "first_sample_at_utc": "2026-11-25T16:42:14.273484+00:00",
+    "last_sample_at_utc": "2026-11-25T17:31:43.929798+00:00",
+    "stopped_at_utc": "2026-11-25T17:32:05.997062+00:00",
+    "duration_seconds_after_startup": 3001.172,
+    "duration_limit_seconds_after_startup": 3000,
+    "sample_interval_seconds": 30,
+    "sample_indices": [0, 99],
+    "sample_count": 100,
+    "healthy_samples": 100,
+    "http_200_samples": 100,
+    "firewall_enforced_samples": 100,
+    "resource_enforced_samples": 100,
+    "observer_exit_code": 0,
+    "runtime_stopped": true,
+    "inference_calls": 0,
+    "raw_log": {
+      "local_path": ".market_os/btc-assessor-observations/660aff8e96b24a8ebb62c7f29e777498.jsonl",
+      "committed": false,
+      "bytes": 141099,
+      "sha256": "853B6D4BF547A7DE572CAABE398E384AC31EBC2F6D41DF1E1B213A119DC89D20",
+      "size_limit_bytes": 1048576
+    }
+  },
+  "runtime": {
+    "provider": "local_qwen_evidence_assessor",
+    "is_typesafe_jev": false,
+    "model": "Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "runtime": "llama.cpp-b12478",
+    "python_version": "3.11.18",
+    "bind_host": "127.0.0.1"
+  },
+  "resource_limits": {
+    "status": "enforced",
+    "supervisor": "Windows Job Object",
+    "cpu_hard_cap_percent": 25,
+    "process_commit_limit_bytes": 6442450944,
+    "job_commit_limit_bytes": 6442450944,
+    "working_set_limit_bytes": null,
+    "cuda_free_memory_margin_mib": 2048,
+    "cuda_limit_kind": "adaptive_free_memory_margin_not_hard_cap"
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0
+  },
+  "result": {
+    "health_only": true,
+    "btc_packet_assessed": false,
+    "market_decision_made": false,
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "This run verifies Windows local-Qwen health and executable-scoped egress enforcement; it does not establish an absolute UTC error bound."
+  },
+  "limitations": [
+    "The observation checked only the pinned Python and llama-server executables and sampled their effective firewall policy; it is not a packet capture or a claim about unrelated workstation processes.",
+    "The single RFC 5737 denial probe proves only that this connection attempt was blocked at the time of the probe.",
+    "No model inference, BTC packet assessment, market decision, Jev request, or provider request occurred.",
+    "The adaptive CUDA memory margin is not a hard VRAM cap.",
+    "Linux host isolation remains unverified on a supported target host.",
+    "Authentic local Jev runtime availability and local-use terms remain unverified; Qwen is not Jev."
+  ]
+}

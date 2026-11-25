@@ -60,9 +60,12 @@ never grant execution or risk authority.
   before expanding the local assessor. Do not use Jev outputs to train, tune,
   or evaluate it.
 - The Windows CPython 3.11.18 runtime is installed and verified locally. The
-  assessor health returned HTTP 200 with resource limits enforced but remains
-  degraded because executable-scoped firewall rules are not installed. Linux
-  target-host isolation remains unverified.
+  2026-11-20 health check returned HTTP 200 but was degraded because its
+  checkout-specific firewall rule was absent. On 2026-11-25, the current
+  secondary checkout's existing rules were matched by exact executable path;
+  fresh health and a bounded denial probe passed without changing firewall
+  policy. A subsequent 50-minute health-only observation completed 100/100
+  healthy samples. Linux target-host isolation remains unverified.
 
 ## Objective
 

@@ -362,6 +362,7 @@ def _verify_windows_egress_rules(server_path: Path) -> dict[str, Any]:
         "status": "enforced",
         "supervisor": "Windows Defender Firewall (ActiveStore)",
         "checked_executables": ["python", "llama-server"],
+        "checked_rule_names": payload.get("checked_rule_names", {}),
         "verification": "effective_block_rules_and_enabled_profiles",
     }
 

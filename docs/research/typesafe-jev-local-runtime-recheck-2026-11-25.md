@@ -23,6 +23,10 @@ The [Master Customer Agreement](https://typesafe.ai/legal/mca), last updated 202
 
 This is an interpretation of the posted text, not legal advice and not a conclusion about a separate agreement. The public agreement does not supply a local-use license or local artifact manifest. In particular, hosted Jev outputs should not be used to train or tune a local Jev-like substitute under the public terms without written terms that expressly allow it.
 
+## Third-party compatibility lead
+
+The search also surfaced [amithgc/local-jev](https://github.com/amithgc/local-jev), an independent project whose README claims local/offline serving with the same `/v1/systemone` wire format. Its README identifies locally run open models, including a Qwen instruction model and an entailment model, and describes the project as research software rather than a finished product. The repository's software license is MIT; that does not establish the licenses or terms for each model-weight artifact. It is not TypeSafe Jev, does not provide TypeSafe weights, and has no stated TypeSafe affiliation or endorsement. No code or model was installed or run in this check. This is a possible Jev-compatible protocol implementation only; it does not satisfy the authentic Jev runtime requirement and must not be labeled Jev.
+
 ## Bounded local artifact check
 
 The bounded local check found no Jev/TypeSafe model directory in the targeted Hugging Face, LM Studio, and project local-evidence runtime directories. The pinned Python runtime contained no Jev, TypeSafe, or System One package, and no Jev/TypeSafe process was running. These checks cover only the named locations and processes; they do not search every custom path or vendor channel.

@@ -13,6 +13,37 @@ to hosted Jev or call Qwen Jev. See the
 [2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md)
 for current first-party sources and a bounded local artifact check.
 
+The latest search also found a third-party [local-jev implementation](https://github.com/amithgc/local-jev)
+that claims System One wire compatibility while running open models locally.
+It is not TypeSafe Jev or Jev weights, was not installed, and does not meet the
+authentic Jev requirement. It must remain labeled as a compatible substitute
+if ever evaluated.
+
+The 2026-11-25 W32Time retry log records 100 successful status commands and
+10 peer snapshots. `Last Sync Error: 2` appeared in 73 samples, and the peer
+was Pending for the final four snapshots. The final sampled last-good-sync age
+was 3,204.955 seconds. The observer process was later observed absent, but its
+final stdout/exit code was not retained; the recorded sample series spans
+2,970.009 monotonic seconds. Keep `clock_error_bound_ms` null and B3.1
+ineligible. See the
+[retry evidence](evidence/btc-w32time-post-resync-retry-2026-11-25.json).
+
+This checkout at `D:\Code\Github\Autonomous-Market-OS` is the secondary
+checkout. Its exact pinned Python and `llama-server.exe` rules are already
+enabled and enforced in ActiveStore under `-SecondaryCheckout` names; the
+unsuffixed rules are for `D:\Code\Github\HKUDS\Autonomous-Market-OS`. The
+current verifier initially missed the valid secondary names and failed closed.
+It now locates managed rules by exact executable path, validates all rule
+filters, and reports the names it checked. Install mode reuses an existing
+valid persistent rule, so no elevated policy change was needed. The corrected
+health check returned HTTP 200 with network isolation and resource limits
+enforced; one pinned-Python RFC 5737 connection attempt was denied with WinError
+10013. The subsequent 50-minute, health-only observation completed with
+100/100 healthy samples and observer exit code 0. Its sanitized
+[report](research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md)
+and [evidence](evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json)
+record the result. It performed no inference or external provider request.
+
 The offline focused suite passed 92 tests on the installed system Python 3.12.0
 across local assessor, Linux isolation mocks, paper replay/contracts, features,
 history, and research inspection. This is code-level verification; it does not
@@ -20,18 +51,19 @@ prove real Jev inference or Linux host isolation. This Windows host has no WSL
 or Docker installation, so live Linux namespace/cgroup and GPU-MPS checks still
 need a supported Linux host.
 
-The pre-retarget health record from commit
-`4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` because the
-Windows ActiveStore rules targeted executable paths in another checkout. That
-fail-closed result is preserved in the
+The health record from commit
+`4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` with
+`missing_or_mismatched_active_store_rule`; it is preserved in the
 [pre-retarget health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json).
-On 2026-11-25 the rules were retargeted to the primary checkout, with the
-retarget result recording separate secondary-checkout rules preserved. The
-primary rules were enforced before and throughout the observation. A separate
-read-only ActiveStore query after the run found the secondary rules enabled and
-enforced; that query was not part of the 50-minute sampling. A one-attempt
-connection to RFC 5737 TEST-NET-1 was denied locally with Windows error 10013
-and no application payload.
+Later read-only inspection showed that the secondary checkout already had
+exact-path rules under `-SecondaryCheckout` names; the previous verifier did
+not recognize those names. The primary-checkout rules were also enforced
+before and throughout their separate observation. The secondary checkout now
+passes its own exact-path verification and 50-minute observation; no firewall
+policy change was needed. A one-attempt connection to RFC 5737 TEST-NET-1 was
+denied locally with Windows error 10013 and no application payload. See the
+[secondary-checkout report](research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md)
+and [evidence](evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json).
 
 The primary checkout at commit `b15584f530b8423e848ba7742d125b71c3d28749`
 then completed a health-only observation lasting 3,000.891 monotonic seconds:
@@ -256,8 +288,12 @@ CUDA build uses llama.cpp's 2,048 MiB adaptive free-memory target; this does
 not hard-cap VRAM. A synthetic inference and offline replay passed, and the
 runtime smoke evidence is in
 [`btc-local-assessor-resource-guard-2026-11-20.json`](evidence/btc-local-assessor-resource-guard-2026-11-20.json).
-Windows health remains degraded because the executable-scoped firewall rules
-are absent. The Linux path now launches local-assessor `health` and `assess`
+The 2026-11-20 Windows health evidence was degraded because the
+executable-scoped rules were absent at that checkpoint. On 2026-11-25, the
+secondary checkout's existing rules were matched by exact executable path;
+fresh health and a bounded denial probe passed without a firewall policy
+change. The 50-minute health-only observation completed with 100/100 healthy
+samples. The Linux path now launches local-assessor `health` and `assess`
 inside a transient user systemd scope plus a user/network namespace, then
 checks the effective cgroup-v2 CPU, memory, and task limits; namespace
 membership; loopback-only interface; and IPv4/IPv6 route devices. It fails
@@ -298,10 +334,14 @@ The incremental Understand graph is current at `75a3bbf`: 656 files analyzed,
 candidate call edges to provider classes absent from the graph were dropped by
 the merge validator.
 
-The Windows firewall installer remains opt-in and unrun; ActiveStore has no
-matching executable rules. No new market-data capture or B3.1 packet
-assessment has run; Jev remains at the existing synthetic U3 connectivity
-scope.
+At the 2026-11-20 checkpoint, the Windows firewall installer was unrun and
+ActiveStore had no matching rules. Later observations installed rules for the
+primary checkout and preserved separate rules for this secondary checkout.
+The current code now recognizes both rule-name sets by their exact executable
+paths. The secondary checkout passed a fresh health check and RFC 5737 denial
+probe, then completed a 50-minute observation with 100/100 healthy samples. No
+new market-data capture or B3.1 packet assessment has run; Jev remains at
+synthetic U3 connectivity only.
 U6.4-F/U7-P, B1, and B2 remain closed. ADR-0057 preserves unknown source
 publication time while allowing a contemporaneous local receipt with a
 defensible UTC error bound to establish future availability. The retrospective
@@ -309,12 +349,9 @@ B1 archive remains ineligible. Jev stays connectivity-only, and eligible BTC
 packets are assessed locally with Qwen. The prospective Binance stream remains
 an unapproved timestamp/provenance pilot; the proposal authorizes no request.
 
-Next, if the owner approves the two executable-scoped Windows firewall rules,
-run the installer elevated, verify ActiveStore, then perform the bounded
-non-loopback denial probe and confirm loopback health before one synthetic-only
-Qwen assessment. The current PowerShell session is not elevated. On Linux,
-verify `health`, cgroup limits, namespace, loopback, and GPU access on a
-supported x64 host; this workstation has neither WSL nor Docker. The
+Next, verify `health`, cgroup limits, namespace, loopback, and GPU access on a
+supported Linux x64 host; this workstation has neither WSL nor Docker. Keep
+synthetic-only Qwen assessment separate from the health window. The
 receipt-time decision resolves B3.1 eligibility but does not approve a Binance
 stream: any prospective run still needs current terms and regional review, a
 defensible UTC error bound throughout the run, and separate date-bound

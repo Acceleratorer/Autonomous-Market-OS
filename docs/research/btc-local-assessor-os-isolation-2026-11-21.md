@@ -99,12 +99,12 @@ the pinned Qwen runtime and installed firewall policy.
 
 The current clean project checkout is at commit
 `4882cf047c951064c67130a2e4009ad2126d490f`. Its pinned CPython 3.11.18 and
-`llama-server.exe` are not the executable paths selected by the workstation's
-current ActiveStore rules. Both managed rules are enabled and enforced, but
-their application filters target an alternate checkout. The exact-path check
-therefore fails even though the old and current llama-server files have the
-same SHA-256; Windows Firewall rules bind to the executable path as well as
-the rule's other filters.
+`llama-server.exe` did not match the unsuffixed ActiveStore rule names; those
+rules were enabled and enforced but bound to the primary checkout. The health
+check therefore returned `missing_or_mismatched_active_store_rule`. A later
+read-only inspection found separate `-SecondaryCheckout` rules already bound
+to these pinned executable paths. The failure was a rule-name lookup mismatch,
+not proof that no matching secondary-checkout rule existed.
 
 The current checkout's pinned-runtime health command returned exit code 2,
 `status: unavailable`, and `startup_failure.code: network_isolation_unverified`
@@ -118,6 +118,26 @@ Two attempts to launch the scoped firewall update through Windows elevation
 were canceled before the helper ran; no firewall policy changed. The
 2026-11-21 enforcement and denial-probe evidence remains a valid historical
 result for the executable paths used then, but it does not prove isolation
-for this current checkout. Re-run health only after the managed rules target
-the current pinned Python and server paths, then collect a bounded
-non-loopback denial probe and confirm loopback IPC.
+for the then-current secondary checkout. The follow-up below records the later
+ActiveStore inspection, corrected path lookup, and new health verification.
+
+## Follow-up — 2026-11-26: secondary-checkout rule-name mismatch
+
+The earlier health record preserves the verifier's fail-closed result, but its
+`missing_or_mismatched_active_store_rule` reason did not mean that no rule
+targeted the secondary checkout. A later read-only inspection found both
+exact-path rules already enabled in ActiveStore under names ending in
+`-SecondaryCheckout`; the unsuffixed rules remained bound to the primary
+checkout. The verifier had searched for only the base or a hash-suffixed name,
+so it missed those valid rules.
+
+The verifier now discovers managed rules by exact executable path, validates
+all expected filters, and reports the names it checked. The corrected health
+check passed with loopback HTTP 200 and both isolation and resource limits
+enforced. A single pinned-Python attempt to `192.0.2.1:443` was denied with
+WinError 10013. A 50-minute health-only observation then passed 100/100
+samples and stopped the runtime with observer exit code 0. No firewall policy
+was changed. The observation made no inference, packet assessment, Jev request,
+or provider request. See the
+[secondary-checkout report](btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md)
+and [sanitized evidence](../evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json).

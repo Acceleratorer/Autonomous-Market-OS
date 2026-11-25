@@ -162,6 +162,32 @@ establish network behavior for unrelated processes. See the
 [Windows isolation report](research/btc-local-assessor-os-isolation-2026-11-21.md),
 [pre-retarget health evidence](evidence/btc-local-assessor-current-checkout-health-2026-11-25.json),
 and [primary-checkout observation report](research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md).
+
+The active checkout at `D:\Code\Github\Autonomous-Market-OS` is the secondary
+checkout. Its pinned Python and `llama-server.exe` already have enabled,
+enforced ActiveStore rules named with the `-SecondaryCheckout` suffix; the
+unsuffixed rules remain bound to `D:\Code\Github\HKUDS\Autonomous-Market-OS`.
+The current code initially failed closed because it searched only the base and
+hash-suffixed names, missing the valid secondary rules. The verifier now finds
+rules in the managed group by exact executable path and checks the complete
+rule settings. Install mode reuses an exact, valid persistent rule, preserving
+both checkout policies without creating duplicates. The corrected read-only
+verification and pinned-runtime health check passed; a single connection
+attempt from pinned Python to RFC 5737 `192.0.2.1:443` was denied with WinError
+10013 and no payload. No firewall policy was changed. The subsequent
+health-only observation completed 100/100 healthy samples over 3,001.172
+monotonic seconds, with egress and resource limits enforced throughout. It
+made no inference or external request. See its
+[report](research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md)
+and [evidence](evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json).
+
+The latest W32Time retry recorded 100 status samples and 10 peer snapshots.
+All status commands succeeded and reported Leap Indicator 0 / stratum 5, but
+73 samples reported stale time data and the peer was Pending for the final four
+snapshots. The observed series still cannot establish an absolute UTC error
+bound, so B3.1 remains ineligible. See the
+[retry evidence](evidence/btc-w32time-post-resync-retry-2026-11-25.json).
+
 Authentic local Jev availability and its offline-use terms remain unverified;
 the Windows CUDA fit margin also does not provide a hard VRAM cap. See the
 [local Jev runtime check](research/jev-local-runtime-availability-2026-11-25.md)
