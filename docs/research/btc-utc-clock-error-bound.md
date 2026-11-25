@@ -1,6 +1,6 @@
 # BTC UTC clock error qualification
 
-**Checked:** 2026-11-25
+**Checked:** 2026-11-26
 
 **Scope:** Official timekeeping specifications and platform documentation, plus bounded local diagnostics. The 2026-11-23 elevated observation temporarily started W32Time and restored its initial stopped/manual state; that runner made no resynchronization or time-service configuration change.
 
@@ -188,6 +188,29 @@ capture-time UTC error bound. Keep `clock_error_bound_ms: null` and
 `packet_eligible: false`. See the
 [retry evidence](../evidence/btc-w32time-post-resync-retry-2026-11-25.json);
 the raw trace remains local and ignored.
+
+### Owner-requested passive retry — 2026-11-26
+
+The repeat observation completed its configured 3,000-second window with 100
+successful status queries and no query failures. W32Time remained `Running` in
+`Manual` mode, as it was before the observation; no resync, clock adjustment,
+or time-service configuration change was performed. The last successful sync
+time stayed at `2026-11-26 02:31:48` local while its reported age increased from
+`1118.479 s` to `4088.532 s`. The service reported leap 0 / stratum 5, root
+delay `0.0482767 s`, and root dispersion `7.9242334 s`. Root dispersion plus
+half root delay gives a `7.94837175 s` root-distance estimate under the NTP
+model. No relative wall/monotonic step indication reached `250 ms`.
+
+A separate read-only status snapshot at `2026-11-25T21:09:32Z` still reported
+the same last successful sync time and root dispersion. This confirms that the
+passive retry did not refresh the source. The root-distance estimate
+is not a qualified packet timestamp bound: source accuracy, freshness policy,
+holdover drift, and invalidation after clock steps, suspend/resume, or sync
+loss remain unverified. No Binance, Jev, or model-provider request was made;
+normal W32Time service traffic was not measured. Keep
+`clock_error_bound_ms: null` and `packet_eligible: false`. See the
+[sanitized retry evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26.json);
+the raw report remains local and ignored.
 
 ## Receipt-linked diagnostics
 
