@@ -1,14 +1,16 @@
 """Immutable, local-only storage and deterministic replay for BTC assessments."""
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import asdict
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import stat
 import tempfile
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping
 
 from .btc_evidence_packet import packet_fingerprint
 from .btc_local_assessor import (
@@ -24,12 +26,63 @@ from .btc_local_assessor import (
 
 MAX_PACKET_BYTES = 64 * 1024
 MAX_RUN_BYTES = 2 * 1024 * 1024
+MAX_STORE_BYTES = 1024 * 1024 * 1024
 _RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 _BUNDLE_SCHEMA = "market-os.btc-local-assessment-run.v1"
+_STORE_LOCK_NAME = ".writer.lock"
 
 
 class LocalAssessmentStoreError(ValueError):
     """A local assessment bundle failed integrity, identity, or storage checks."""
+
+
+class LocalAssessmentStoreCapacityError(LocalAssessmentStoreError):
+    """The local assessment store reached its configured byte limit."""
+
+    code = "store_capacity_exceeded"
+
+
+@contextmanager
+def _exclusive_store_lock(runs: Path) -> Iterator[None]:
+    descriptor = os.open(runs / _STORE_LOCK_NAME, os.O_CREAT | os.O_RDWR, 0o600)
+    try:
+        if os.name == "nt":
+            import msvcrt
+
+            if os.fstat(descriptor).st_size == 0:
+                os.write(descriptor, b"\0")
+            os.lseek(descriptor, 0, os.SEEK_SET)
+            msvcrt.locking(descriptor, msvcrt.LK_LOCK, 1)
+            try:
+                yield
+            finally:
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+    finally:
+        os.close(descriptor)
+
+
+def _store_usage_bytes(runs: Path) -> int:
+    total = 0
+    lock_path = runs / _STORE_LOCK_NAME
+    for path in runs.rglob("*"):
+        if path == lock_path:
+            continue
+        try:
+            entry = path.lstat()
+        except FileNotFoundError:
+            continue
+        if stat.S_ISREG(entry.st_mode) or stat.S_ISLNK(entry.st_mode):
+            total += entry.st_size
+    return total
 
 
 def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -104,7 +157,7 @@ def _replay_clock(record: LocalAssessmentRecord):
 
 
 class LocalAssessmentStore:
-    """Store each bounded input/output bundle as a write-once local JSON file."""
+    """Store bounded write-once bundles under a fail-closed aggregate byte cap."""
 
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root).resolve()
@@ -139,38 +192,47 @@ class LocalAssessmentStore:
 
         self.runs.mkdir(parents=True, exist_ok=True)
         destination = self.runs / f"{record.run_id}.json"
-        if destination.exists():
-            existing = self._load(record.run_id)
-            if existing["bundle_fingerprint"] == fingerprint:
-                return destination
-            raise LocalAssessmentStoreError("run ID already exists with different assessment content")
-
-        handle, temporary_name = tempfile.mkstemp(prefix=".assessment-", suffix=".tmp", dir=self.runs)
-        temporary = Path(temporary_name)
         try:
-            if os.name != "nt":
-                os.chmod(temporary, 0o600)
-            with os.fdopen(handle, "wb") as stream:
-                stream.write(encoded)
-                stream.flush()
-                os.fsync(stream.fileno())
-            try:
-                os.link(temporary, destination)
-            except FileExistsError:
-                existing = self._load(record.run_id)
-                if existing["bundle_fingerprint"] != fingerprint:
+            with _exclusive_store_lock(self.runs):
+                if destination.exists():
+                    existing = self._load(record.run_id)
+                    if existing["bundle_fingerprint"] == fingerprint:
+                        return destination
                     raise LocalAssessmentStoreError("run ID already exists with different assessment content")
-            if os.name != "nt":
-                directory_fd = os.open(self.runs, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+
+                used_bytes = _store_usage_bytes(self.runs)
+                if used_bytes + len(encoded) > MAX_STORE_BYTES:
+                    raise LocalAssessmentStoreCapacityError(
+                        "[store_capacity_exceeded] assessment store byte limit would be exceeded: "
+                        f"{used_bytes} + {len(encoded)} > {MAX_STORE_BYTES}"
+                    )
+
+                handle, temporary_name = tempfile.mkstemp(prefix=".assessment-", suffix=".tmp", dir=self.runs)
+                temporary = Path(temporary_name)
                 try:
-                    os.fsync(directory_fd)
+                    with os.fdopen(handle, "wb") as stream:
+                        if os.name != "nt":
+                            os.chmod(temporary, 0o600)
+                        stream.write(encoded)
+                        stream.flush()
+                        os.fsync(stream.fileno())
+                    try:
+                        os.link(temporary, destination)
+                    except FileExistsError:
+                        existing = self._load(record.run_id)
+                        if existing["bundle_fingerprint"] != fingerprint:
+                            raise LocalAssessmentStoreError("run ID already exists with different assessment content")
+                    if os.name != "nt":
+                        directory_fd = os.open(self.runs, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+                        try:
+                            os.fsync(directory_fd)
+                        finally:
+                            os.close(directory_fd)
+                    return destination
                 finally:
-                    os.close(directory_fd)
-            return destination
+                    temporary.unlink(missing_ok=True)
         except OSError as exc:
             raise LocalAssessmentStoreError("could not durably persist the local assessment bundle") from exc
-        finally:
-            temporary.unlink(missing_ok=True)
 
     def _load(self, run_id: str) -> dict[str, Any]:
         if not _RUN_ID.fullmatch(run_id):

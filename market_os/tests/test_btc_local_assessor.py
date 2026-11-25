@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import hashlib
@@ -16,6 +17,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from market_os import btc_local_assessor_store as assessor_store
 from market_os.btc_evidence_packet import EvidencePacketError, SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
 from market_os.btc_local_assessor import (
@@ -460,6 +462,62 @@ def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp
     assert replay["network_requests"] == 0
     assert replay["packet_fingerprint"] == record.packet_fingerprint
     assert store.persist(packet, record) == path
+
+
+def test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full(tmp_path, monkeypatch) -> None:
+    packet = _packet()
+    record = LocalB31Assessor(FakeRuntime(_usable_response())).assess(packet)
+    store = LocalAssessmentStore(tmp_path)
+    first_path = store.persist(packet, record)
+    monkeypatch.setattr(assessor_store, "MAX_STORE_BYTES", first_path.stat().st_size)
+
+    assert store.persist(packet, record) == first_path
+
+    second_response = _usable_response()
+    second_response["support"][0]["label"] = "mixed"
+    second_record = LocalB31Assessor(FakeRuntime(second_response)).assess(packet)
+    assert second_record.run_id != record.run_id
+
+    with pytest.raises(assessor_store.LocalAssessmentStoreCapacityError, match="store byte limit") as exc:
+        store.persist(packet, second_record)
+
+    assert exc.value.code == "store_capacity_exceeded"
+    assert first_path.is_file()
+    assert not (store.runs / f"{second_record.run_id}.json").exists()
+    assert store.replay(record.run_id)["status"] == "verified"
+
+
+def test_local_assessment_store_serializes_concurrent_writes_at_total_limit(tmp_path, monkeypatch) -> None:
+    packet = _packet()
+    first_record = LocalB31Assessor(FakeRuntime(_usable_response())).assess(packet)
+    second_response = _usable_response()
+    second_response["support"][0]["label"] = "mixed"
+    second_record = LocalB31Assessor(FakeRuntime(second_response)).assess(packet)
+
+    first_candidate = LocalAssessmentStore(tmp_path / "candidate-first").persist(packet, first_record)
+    second_candidate = LocalAssessmentStore(tmp_path / "candidate-second").persist(packet, second_record)
+    quota = max(first_candidate.stat().st_size, second_candidate.stat().st_size)
+    monkeypatch.setattr(assessor_store, "MAX_STORE_BYTES", quota)
+    store = LocalAssessmentStore(tmp_path / "shared")
+    barrier = threading.Barrier(3)
+
+    def persist(record):
+        barrier.wait(timeout=10)
+        try:
+            store.persist(packet, record)
+            return "stored"
+        except assessor_store.LocalAssessmentStoreCapacityError:
+            return "full"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = [executor.submit(persist, record) for record in (first_record, second_record)]
+        barrier.wait(timeout=10)
+        outcomes = [future.result(timeout=20) for future in futures]
+
+    committed = list(store.runs.glob("*.json"))
+    assert sorted(outcomes) == ["full", "stored"]
+    assert len(committed) == 1
+    assert sum(path.stat().st_size for path in committed) <= quota
 
 
 def test_local_assessment_store_does_not_accept_a_jev_identity(tmp_path) -> None:
