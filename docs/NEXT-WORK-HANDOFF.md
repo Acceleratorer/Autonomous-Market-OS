@@ -10,8 +10,15 @@ hosted API, the public repositories expose no Jev weights/runtime, and the
 vendor reply as of the latest mailbox check. Keep the local Qwen
 assessor explicitly identified as Qwen under ADR-0058; do not send BTC packets
 to hosted Jev or call Qwen Jev. See the
-[2026-11-25 Jev recheck](research/typesafe-jev-local-runtime-recheck-2026-11-25.md)
+[2026-11-25 Jev recheck](research/jev-local-runtime-availability-2026-11-25.md)
 for current first-party sources and a bounded local artifact check.
+
+The offline focused suite passed 92 tests on the installed system Python 3.12.0
+across local assessor, Linux isolation mocks, paper replay/contracts, features,
+history, and research inspection. This is code-level verification; it does not
+prove real Jev inference or Linux host isolation. This Windows host has no WSL
+or Docker installation, so live Linux namespace/cgroup and GPU-MPS checks still
+need a supported Linux host.
 
 The pre-retarget health record from commit
 `4882cf047c951064c67130a2e4009ad2126d490f` returned `unavailable` because the
@@ -61,14 +68,20 @@ stripchart diagnostic did not expose root dispersion or establish a UTC error
 bound. Raw workstation telemetry remains in ignored `.market_os/clock/` files;
 see the sanitized [UTC clock research note](research/btc-utc-clock-error-bound.md).
 
-The 2026-11-25 retry recorded 100/100 successful status queries over 3,001.074
-monotonic seconds, but all samples were unsynchronized and the peer poll
-remained pending. W32Time was restored to Stopped/Manual; no resync or
-configuration change occurred. Do not repeat passive status windows. The next
-clock step requires a separately approved active-sync or time-source plan,
-then a defined freshness window, holdover drift allowance, and invalidation
-behavior for clock steps, suspend/resume, or sync loss. Keep
-`packet_eligible: false` until a defensible bound is recorded with each receipt.
+The 2026-11-25 unsynchronized status retry recorded 100/100 successful queries
+over 3,001.074 monotonic seconds; W32Time was restored to Stopped/Manual. After
+two canceled resync launches, an explicitly approved elevated retry started
+W32Time and `w32tm /resync` succeeded at approximately `2026-11-25T11:34:41Z`.
+The subsequent 3,000.022-second observation recorded 100/100 synchronized
+status samples, zero query failures, and 10/10 peer snapshots still `Pending`.
+Root distance remained `8.1482255 s`; wall/monotonic offset change was about
+`195.3 ms`, below the diagnostic 250 ms threshold. This is relative
+stability evidence, not absolute UTC qualification. W32Time remains
+`Running/Manual`. Keep `clock_error_bound_ms` unknown and
+`packet_eligible: false` until a defensible bound, freshness, holdover drift,
+and invalidation behavior for clock steps, suspend/resume, or sync loss are
+defined. See the [sanitized post-resync evidence](evidence/btc-w32time-post-resync-observation-2026-11-25.json)
+and [clock research note](research/btc-utc-clock-error-bound.md).
 n8n may schedule a one-shot capture, but it is not a time source. Hosted Jev
 remains synthetic-connectivity-only and BTC packets stay local.
 
