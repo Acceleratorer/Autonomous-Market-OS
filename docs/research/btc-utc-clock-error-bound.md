@@ -165,7 +165,7 @@ records the result and the limits of the local trace. Keep
 capture-time qualification, freshness, holdover, and invalidation rules are
 defined and satisfied.
 
-### Owner-authorized 50-minute retry — 2026-11-25 (latest)
+### Owner-authorized 50-minute retry — 2026-11-25
 
 The later retry recorded 100 status samples and 10 peer snapshots over a
 configured 3,000-second window. Its raw status series spans 2,970.009 monotonic
@@ -189,7 +189,7 @@ capture-time UTC error bound. Keep `clock_error_bound_ms: null` and
 [retry evidence](../evidence/btc-w32time-post-resync-retry-2026-11-25.json);
 the raw trace remains local and ignored.
 
-### Owner-requested passive retry — 2026-11-26
+### First owner-requested passive retry — 2026-11-26 02:50 +07:00
 
 The repeat observation completed its configured 3,000-second window with 100
 successful status queries and no query failures. W32Time remained `Running` in
@@ -211,6 +211,33 @@ normal W32Time service traffic was not measured. Keep
 `clock_error_bound_ms: null` and `packet_eligible: false`. See the
 [sanitized retry evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26.json);
 the raw report remains local and ignored.
+
+### Second owner-requested passive retry — 2026-11-26 04:58 +07:00
+
+W32Time was already `Running/Manual`, so the observer did not start or stop the
+service and required no elevation. It made no resync, clock adjustment,
+polling change, BTC request, Jev request, or model-provider request. The run
+completed its configured 3,000-second wall window (`3,000.036` seconds) and
+recorded 100 successful status samples over a `2,969.997`-second monotonic
+sample span. There were no W32Time event IDs and no query failures.
+
+Leap remained 0 and stratum 5, with root delay `0.0482767 s` and root
+dispersion `7.9242334 s`. Their derived root-distance estimate is
+`7.94837175 s`, not a qualified capture-time bound. The last successful sync
+was still `2026-11-26 02:31:48 +07:00`; its reported age increased from
+`8,811.304 s` at the start to `11,781.320 s` at the end, so no fresh sync was
+observed. The maximum absolute adjacent wall/monotonic delta was `1.001 ms`,
+with no interval at or above the `250 ms` diagnostic threshold. This reflects
+relative behavior only and cannot establish absolute UTC accuracy.
+
+Keep `clock_error_bound_ms: null` and `packet_eligible: false`. Another passive
+status window would repeat the same limitation; the remaining need is a fresh,
+qualified time source plus explicit source-accuracy, holdover-drift, freshness,
+and invalidation rules. Sanitized evidence is in
+[btc-w32time-observation-50m-retry-2026-11-26-045839.json](../evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json).
+The raw trace remains local and ignored at
+`.market_os/clock/w32time-observation-50m-retry-20261126-045839.json` with
+SHA-256 `9B23EEA6AE369CBDD0EBC9DB32ABEA2A309189FA1E6F24E8C10FE80BF6FFA787`.
 
 ## Receipt-linked diagnostics
 

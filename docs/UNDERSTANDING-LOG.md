@@ -1,5 +1,21 @@
 # Understanding log
 
+## 2026-11-26 — W32Time passive retry at 04:58 +07:00
+
+- W32Time was already `Running/Manual`; the 50-minute observer needed no
+  elevation and made no service, clock, or polling changes. It recorded 100/100
+  successful status queries over 3,000.036 wall seconds and a 2,969.997-second
+  monotonic sample span.
+- The last reported successful sync stayed at `02:31:48 +07:00` and aged from
+  `8,811.304 s` to `11,781.320 s`. Root distance remained an estimated
+  `7.94837175 s`. No wall/monotonic interval delta reached 250 ms; the maximum
+  absolute adjacent delta was `1.001 ms`. These measurements show relative
+  stability only, not absolute UTC accuracy.
+- Keep `clock_error_bound_ms` unknown and B3.1 ineligible. Sanitized evidence
+  is in
+  `docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json`;
+  the raw trace remains local and ignored.
+
 ## 2026-11-25 — W32Time status retry
 
 - After the owner explicitly requested a retry, temporarily started W32Time

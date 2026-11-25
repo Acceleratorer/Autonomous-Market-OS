@@ -1,0 +1,74 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-26",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_observation": "feat/btc-local-store-quota-20261126",
+    "commit": "4465e78a5d4dab9d4279d520c9806b7cf4aaeab1"
+  },
+  "observation": {
+    "id": "w32time-observation-50m-retry-20261126-045839",
+    "status": "completed",
+    "started_at": "2026-11-26T04:58:40.1303386+07:00",
+    "last_sample_at": "2026-11-26T05:48:10.1596436+07:00",
+    "ended_at": "2026-11-26T05:48:40.1661756+07:00",
+    "configured_duration_seconds": 3000,
+    "observation_wall_span_seconds": 3000.036,
+    "sampled_monotonic_span_seconds": 2969.997,
+    "sample_interval_seconds": 30,
+    "status_sample_count": 100,
+    "successful_status_queries": 100,
+    "status_query_failures": 0,
+    "w32time_event_ids": []
+  },
+  "service": {
+    "state_before": "Running",
+    "start_mode_before": "Manual",
+    "state_after": "Running",
+    "start_mode_after": "Manual",
+    "restored_to_initial_state": true
+  },
+  "synchronization": {
+    "source_identity": "redacted",
+    "leap_indicator": "0 (no warning)",
+    "stratum": 5,
+    "root_delay_seconds": 0.0482767,
+    "root_dispersion_seconds": 7.9242334,
+    "root_distance_estimate_seconds": 7.94837175,
+    "last_successful_sync_time_reported_local": "2026-11-26 02:31:48 +07:00",
+    "last_good_sync_age_seconds": {
+      "start": 8811.3043043,
+      "end": 11781.3198606
+    },
+    "fresh_successful_sync_observed": false
+  },
+  "relative_clock_comparison": {
+    "wall_minus_monotonic_step_indication_ge_250ms": false,
+    "max_absolute_adjacent_delta_ms": 1.001,
+    "interpretation": "Relative stability only; this observation does not establish absolute UTC accuracy."
+  },
+  "actions": {
+    "resync_performed": false,
+    "system_clock_adjusted": null,
+    "time_service_configuration_changed": false,
+    "polling_configuration_changed": false,
+    "btc_packet_capture_performed": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-observation-50m-retry-20261126-045839.json",
+    "raw_report_committed": false,
+    "raw_report_sha256": "9B23EEA6AE369CBDD0EBC9DB32ABEA2A309189FA1E6F24E8C10FE80BF6FFA787"
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "packet_eligible": false,
+    "reason": "The approximately 7.948-second root-distance estimate is not a qualified capture-time bound; the last successful sync was about 11,781 seconds old at the end, while source accuracy, holdover drift, and invalidation behavior remain unverified."
+  }
+}
