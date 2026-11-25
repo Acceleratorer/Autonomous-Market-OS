@@ -49,6 +49,18 @@ freshness, holdover-drift, and invalidation rules. See the
 [sanitized 2026-11-26 retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26.json)
 and [clock qualification note](research/btc-utc-clock-error-bound.md).
 
+A second owner-requested passive retry ran from `04:58:40` to `05:48:40 +07:00`
+on 2026-11-26. It completed 100/100 successful status queries over 3,000.036
+wall seconds, with a 2,969.997-second monotonic sample span. W32Time remained
+`Running/Manual`; the last successful sync was still `02:31:48 +07:00` and its
+age grew from `8,811.304 s` to `11,781.320 s`. Estimated root distance remained
+`7.94837175 s`. No wall/monotonic interval delta reached 250 ms (maximum
+absolute delta `1.001 ms`). This is relative stability evidence only and does
+not qualify the clock. Keep `clock_error_bound_ms` null and B3.1 ineligible;
+further passive retries cannot replace a qualified time source and explicit
+freshness, holdover-drift, and invalidation rules. See the
+[second retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json).
+
 The local Qwen assessment store now caps aggregate run-file bytes at 1 GiB per
 store root and rejects new runs with typed `store_capacity_exceeded` once full.
 It preserves prior records and does not prune automatically; the quota check
