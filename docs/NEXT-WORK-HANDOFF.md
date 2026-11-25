@@ -95,8 +95,9 @@ unknown. The earlier 60-minute relative-clock observation remains historical;
 a separate owner-authorized elevated W32Time status retry on 2026-11-25 also
 remained unsynchronized. See the [clock research note](research/btc-utc-clock-error-bound.md)
 and [sanitized retry evidence](evidence/btc-w32time-observation-50m-2026-11-25.json).
-Do not treat the historical Binance archive or synthetic Qwen run as market
-evidence.
+The historical Binance archive supports retrospective B2 math diagnostics,
+not event-time evidence or an execution result. The synthetic Qwen run does
+not establish BTC prediction quality or validate Jev.
 
 ## Current milestone — qualify UTC receipt clock — 2026-11-23
 
@@ -388,7 +389,11 @@ approval. Keep Jev connectivity-only and BTC packets local to Qwen.
   `btc-b2-dde76de3b2965ac6f66a` has 43,190 chronological samples, including
   8,633 test rows. Baselines are near chance; this is a retrospective
   chronological diagnostic, not a contemporaneous feed replay or execution
-  result.
+  result. The 2026-11-26 read-only replay matched current-code feature and
+  label fingerprints, splits, predictions, and metrics; all eight artifact
+  hashes and the replay fingerprint matched, with zero network requests.
+  Archive receipt was 2026-11-18, after the historical candle event times, so
+  these rows do not establish point-in-time B2 availability or qualify B3.1.
 - A read-only local recheck matched all 30 checksum files to their 30 ZIPs and
   the registered manifest, read 43,200 rows from Parquet, and matched both the
   Parquet and 43,200-document MiniRAG corpus hashes to their manifests. It made
