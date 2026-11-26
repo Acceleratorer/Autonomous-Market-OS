@@ -12,6 +12,34 @@ still leaves `clock_error_bound_ms` unknown and packet eligibility false.
 Continue only after the approved synchronization-quality source and holdover
 assumptions are available.
 
+### Local-only Qwen runtime check — 2026-11-26
+
+The pinned CPython 3.11.18 runtime launched the installed Qwen3-4B
+`Q4_K_M` model (`sha256: 7485fe6f…53fdf5`) under llama.cpp `b12478`. The
+health command returned `healthy` with HTTP 200 on `127.0.0.1`. Windows
+Defender Firewall verified effective outbound block rules for both the pinned
+Python executable and `llama-server.exe`; the Windows Job Object enforced a
+25% CPU cap and a 6 GiB process/job commit limit. The CUDA fit target retains
+a 2,048 MiB free-memory margin, which is adaptive rather than a hard VRAM cap.
+
+A fresh assessment used the current **synthetic** BTC packet from
+`.market_os/btc-local-assessor-verification/packet.json` with
+`TYPESAFE_API_KEY` removed from that command's child environment. It completed
+as `abstained`, identified the provider as `local_qwen_evidence_assessor` and
+the model as `Qwen/Qwen3-4B-GGUF`, and persisted run
+`23ba010959b58e50327337eb68922763` under the ignored local assessment store.
+Offline replay returned `verified`, with zero network requests and zero
+inference calls. This verifies the local Qwen path and its typed abstention;
+it is not real-market evidence and does not validate Jev.
+
+The previously saved 2026-11-20 synthetic run `0d6520c40bd388a5b3eb779b19310d48`
+also replays successfully. Five older 2026-11-19 bundles in the default local
+store remain intact but are rejected by the current B3.1 gate because their
+B2 rows are no longer eligible under the frozen feature contract. Do not
+describe those legacy bundles as replay-verified. Authentic local Jev remains
+unverified and the local Qwen assessor remains a separate system under
+[ADR-0058](decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md).
+
 The goal remains local-only BTC research with Market OS owning math,
 probability, calibration, stability, risk, and paper decisions. Authentic
 local Jev is still unverified: current TypeSafe docs show its authenticated
