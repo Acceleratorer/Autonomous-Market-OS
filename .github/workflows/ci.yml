@@ -38,6 +38,21 @@ jobs:
         run: python -m pytest -q -m "not integration"
       - name: Offline integration-marked tests
         run: python -m pytest -q -m integration
+      - name: Live Linux BTC assessor isolation smoke
+        if: runner.os == 'Linux'
+        env:
+          MARKET_OS_LINUX_ISOLATION_SMOKE: "1"
+          MARKET_OS_LINUX_ISOLATION_REPORT: ${{ runner.temp }}/market-os-btc-assessor-isolation.json
+        run: >-
+          python -m pytest -q -s
+          market_os/tests/test_btc_assessor_linux_isolation.py::test_live_linux_isolation_scope_reports_enforced_limits_and_loopback
+      - name: Upload live Linux BTC assessor isolation evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: market-os-btc-assessor-linux-isolation
+          path: ${{ runner.temp }}/market-os-btc-assessor-isolation.json
+          if-no-files-found: ignore
       - name: Full test suite
         run: python -m pytest -q
       - name: Render U7-G quality benchmark report

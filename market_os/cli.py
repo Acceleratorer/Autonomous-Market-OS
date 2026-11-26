@@ -196,6 +196,7 @@ def build_parser() -> argparse.ArgumentParser:
     local_assessor_commands = local_assessor.add_subparsers(dest="local_assessor_command", required=True)
     local_assessor_health = local_assessor_commands.add_parser("health")
     local_assessor_health.add_argument("--install-root", required=True)
+    local_assessor_commands.add_parser("isolation")
     local_assessor_run = local_assessor_commands.add_parser("assess")
     local_assessor_run.add_argument("--packet", required=True)
     local_assessor_run.add_argument("--install-root", required=True)
@@ -276,7 +277,7 @@ def main(argv: list[str] | None = None) -> int:
     if (
         args.command == "btc-paper"
         and args.btc_command == "local-assessor"
-        and args.local_assessor_command in {"health", "assess"}
+        and args.local_assessor_command in {"health", "assess", "isolation"}
     ):
         from .btc_assessor_linux_isolation import run_assessor_in_isolation
 
@@ -749,6 +750,12 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(store.persist(result), indent=2, sort_keys=True, default=str))
             return 0
         if args.btc_command == "local-assessor":
+            if args.local_assessor_command == "isolation":
+                from .btc_assessor_linux_isolation import verify_linux_isolation
+
+                result = verify_linux_isolation()
+                print(json.dumps(result, indent=2, sort_keys=True))
+                return 0 if result.get("status") == "enforced" else 2
             from .btc_local_assessor import (
                 MAX_PACKET_BYTES,
                 LocalAssessorError,
