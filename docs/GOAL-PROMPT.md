@@ -66,13 +66,18 @@ never grant execution or risk authority.
   or outputs; check any account-specific agreement or obtain written clearance
   before expanding the local assessor. Do not use Jev outputs to train, tune,
   or evaluate it.
-- The Windows CPython 3.11.18 runtime is installed and verified locally. The
-  2026-11-20 health check returned HTTP 200 but was degraded because its
-  checkout-specific firewall rule was absent. On 2026-11-25, the current
-  secondary checkout's existing rules were matched by exact executable path;
-  fresh health and a bounded denial probe passed without changing firewall
-  policy. A subsequent 50-minute health-only observation completed 100/100
-  healthy samples. Linux target-host isolation remains unverified.
+- The Windows CPython 3.11.18 runtime is installed locally. Historical health
+  and denial probes from 2026-11-25 do not prove the current boundary: on
+  2026-11-27, a direct TCP connection from the pinned Python to `1.1.1.1:443`
+  completed even though ActiveStore metadata reported its outbound block rule as
+  enforced. An initial PR draft repeated that probe at runtime; it was removed
+  because a failed boundary could let the check itself send an outbound TCP
+  handshake. The current branch fails closed with
+  `active_store_policy_does_not_prove_runtime_egress_denial` and does not open a
+  socket. The read-only WFP filter diagnostic still needs an accepted UAC
+  prompt. `llama-server` behavior is not independently verified, and Linux
+  target-host isolation remains unverified; WSL is not installed on the
+  workstation.
 
 ## Objective
 

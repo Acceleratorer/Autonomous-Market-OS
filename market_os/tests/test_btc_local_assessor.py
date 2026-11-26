@@ -318,10 +318,15 @@ def test_windows_egress_health_requires_exact_active_store_executable_paths(tmp_
 
     with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
         "market_os.btc_local_assessor.Path.is_file", return_value=True
-    ), patch("market_os.btc_local_assessor.subprocess.run", side_effect=run):
+    ), patch("market_os.btc_local_assessor.subprocess.run", side_effect=run), patch(
+        "market_os.btc_local_assessor.socket.socket",
+        side_effect=AssertionError("Windows egress verification must not open a socket"),
+    ):
         health = _verify_windows_egress_rules(server)
 
-    assert health["status"] == "enforced"
+    assert health["status"] == "unverified"
+    assert health["policy_status"] == "enforced"
+    assert health["reason"] == "active_store_policy_does_not_prove_runtime_egress_denial"
     assert health["checked_executables"] == ["python", "llama-server"]
     assert health["checked_rule_names"] == payload["checked_rule_names"]
     command, kwargs = calls[0]
@@ -364,6 +369,31 @@ def test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy(t
         return_value=subprocess.CompletedProcess([], 2, "\udcff", "\udcff"),
     ):
         assert _verify_windows_egress_rules(server)["status"] == "unverified"
+
+
+def test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof(tmp_path: Path) -> None:
+    server = Path(sys.executable).parent / "llama-server.exe"
+    powershell = _windows_powershell_fixture(tmp_path)
+    payload = {
+        "schema": "market-os.btc-assessor-firewall.v1",
+        "status": "enforced",
+        "checked_executables": {"python": sys.executable, "llama_server": str(server)},
+        "checked_rule_names": {"python": "python-block", "llama_server": "server-block"},
+    }
+    with patch("market_os.btc_local_assessor._windows_powershell_path", return_value=powershell), patch(
+        "market_os.btc_local_assessor.Path.is_file", return_value=True
+    ), patch(
+        "market_os.btc_local_assessor.subprocess.run",
+        return_value=subprocess.CompletedProcess([], 0, json.dumps(payload), ""),
+    ), patch(
+        "market_os.btc_local_assessor.socket.socket",
+        side_effect=AssertionError("Windows egress verification must not open a socket"),
+    ):
+        health = _verify_windows_egress_rules(server)
+
+    assert health["status"] == "unverified"
+    assert health["policy_status"] == "enforced"
+    assert health["reason"] == "active_store_policy_does_not_prove_runtime_egress_denial"
 
 
 def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() -> None:
@@ -417,6 +447,17 @@ def test_linux_runtime_cannot_bypass_unverified_isolation_for_health() -> None:
             assert exc.code == "network_isolation_unverified"
         else:
             raise AssertionError("Linux runtime bypassed network isolation during health startup")
+
+
+def test_windows_runtime_cannot_disable_egress_preflight() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    with patch("market_os.btc_local_assessor.os.name", "nt"):
+        with pytest.raises(LocalAssessorError) as caught:
+            runtime.start(require_network_isolation=False)
+
+    assert caught.value.code == "network_isolation_unverified"
+    assert str(caught.value) == "runtime egress isolation cannot be disabled"
 
 
 def test_local_runtime_rejects_a_different_python_executable_before_loading_model(tmp_path: Path) -> None:

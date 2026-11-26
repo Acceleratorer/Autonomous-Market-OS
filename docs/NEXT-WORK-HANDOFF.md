@@ -1,5 +1,34 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## New highest-priority blocker — Windows egress contradiction (2026-11-27)
+
+This section supersedes the earlier Windows health and denial-probe claims
+below. ActiveStore metadata still reports outbound block rules as enforced for
+the pinned Python and `llama-server` paths, but a fresh direct TCP connection
+from pinned CPython to `1.1.1.1:443` completed. No application payload was sent;
+the TCP handshake did complete, so current zero-egress is not proven.
+
+The branch
+`fix/btc-windows-egress-behavioral-check` originally added a runtime TCP probe
+to `1.1.1.1:443`. It completed a handshake despite matching ActiveStore
+metadata. That probe itself could create outbound traffic when the boundary is
+broken, so the current branch removes it and fails closed with
+`active_store_policy_does_not_prove_runtime_egress_denial` when Windows policy
+metadata is the only available evidence. Startup remains unavailable and
+`llama-server` is not launched. A focused regression test asserts policy
+verification opens no socket. No inference, BTC packet assessment, Jev request,
+or model-provider request occurred during the runtime preflight.
+
+The attempted read-only `netsh wfp show filters` diagnostic requires elevation;
+the UAC launch was canceled before the command ran. No firewall policy changed.
+Next, reconcile the active WFP filter table with this successful connection, or
+implement and verify a stronger process sandbox. The server executable still
+has metadata-only verification. WSL is not installed on this workstation, and
+no Linux target host has been verified. Keep the assessor disabled, B3.1
+ineligible, and BTC packets local.
+See [the live egress evidence](evidence/btc-local-assessor-windows-egress-2026-11-27.json)
+and [diagnostic report](research/btc-local-assessor-windows-egress-2026-11-27.md).
+
 ### Linux assessor isolation diagnostic and CI evidence — 2026-11-26
 
 The Linux local-assessor CLI now has `btc-paper local-assessor isolation`, which
@@ -65,7 +94,8 @@ This verifies local Qwen health only and does not identify Qwen as Jev.
 The 2026-11-27 Jev local-runtime recheck found no public authentic Jev runtime,
 weights, download URL, or verifiable manifest. The current Enterprise FAQ shows
 the VPC/on-premises question without an exposed answer. The existing Sales
-inquiry thread still contains two sent messages and no vendor reply. Independent
+inquiry thread contains three sent messages and no vendor reply as of the
+2026-11-27 mailbox recheck. Independent
 projects such as `local-jev` and Nimble offer distinct local models; they are
 not TypeSafe Jev, and none has been installed or selected. Keep the BTC packet
 boundary unchanged and do not treat Qwen or a wire-compatible model as Jev.
@@ -75,7 +105,7 @@ The bounded workstation inventory recorded in that note found no authentic Jev
 runtime or weights in the checked local locations; only connectivity reservation
 files were present. No WSL Linux distribution is installed on this workstation.
 
-### Current-main local runtime revalidation — 2026-11-27
+### Historical current-main local runtime revalidation — 2026-11-27 (superseded)
 
 At source commit `590e8f69c1ae77250b4e291750042a055a9ca178`, the pinned CPython
 3.11.18 runtime passed `btc-paper local-assessor health` with exit code 0.
@@ -144,8 +174,8 @@ The goal remains local-only BTC research with Market OS owning math,
 probability, calibration, stability, risk, and paper decisions. Authentic
 local Jev is still unverified: current TypeSafe docs show its authenticated
 hosted API, the public repositories expose no Jev weights/runtime, and the
-2026-11-21 inquiry plus 2026-11-25 follow-up to `sales@typesafe.ai` have no
-vendor reply as of the 2026-11-26 mailbox check. The GitHub `TypeSafeAI`
+2026-11-21 inquiry plus later same-thread follow-ups to `sales@typesafe.ai` have
+no vendor reply as of the 2026-11-27 mailbox check. The GitHub `TypeSafeAI`
 organization is an unofficial community, separate from the official
 `typesafe-ai` organization. The Hugging Face `typesafeAI` profile identifies
 as TypeSafe AI and links to its site and official GitHub org, but lacks a
@@ -487,11 +517,11 @@ assessment stay local with the separately identified Qwen assessor. The
 reauthorized synthetic U3 probe passed its response contract but assessed no
 BTC packet. Do not send packet text, citations, or assessment context to Jev.
 
-The TypeSafe Sales inquiry and same-thread clarification about local-deployment
-identity, artifact hashes, and written terms were sent on 2026-11-20. The
-mailbox currently shows those messages as sent, with no vendor reply. Neither
-message included an API key or BTC research data. See the
-[local Jev runtime note](research/typesafe-jev-local-runtime-2026-11-20.md).
+The TypeSafe Sales inquiry was sent on 2026-11-21, followed by two same-thread
+requests for local-deployment confirmation. The 2026-11-27 mailbox recheck shows
+all three messages as sent with no vendor reply. They included no API key or BTC
+research data. See the
+[local Jev runtime note](research/typesafe-jev-local-runtime-recheck-2026-11-27.md).
 
 The local Qwen runtime has only been exercised on synthetic packets. Those
 smokes validate local inference and audit plumbing, not BTC prediction,

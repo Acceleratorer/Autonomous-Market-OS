@@ -294,7 +294,7 @@ def _windows_powershell_path() -> Path | None:
 
 
 def _verify_windows_egress_rules(server_path: Path) -> dict[str, Any]:
-    """Read the effective firewall policy for this Python and inference image."""
+    """Inspect ActiveStore rules without treating metadata as zero-egress proof."""
     powershell = _windows_powershell_path()
     script = Path(__file__).with_name("btc_assessor_firewall.ps1")
     unverified = {
@@ -359,11 +359,11 @@ def _verify_windows_egress_rules(server_path: Path) -> dict[str, Any]:
     if result.returncode != 0 or payload.get("schema") != "market-os.btc-assessor-firewall.v1" or payload.get("status") != "enforced" or observed != expected:
         return {**unverified, "reason": str(payload.get("reason") or unverified["reason"])}
     return {
-        "status": "enforced",
-        "supervisor": "Windows Defender Firewall (ActiveStore)",
+        **unverified,
+        "reason": "active_store_policy_does_not_prove_runtime_egress_denial",
+        "policy_status": "enforced",
         "checked_executables": ["python", "llama-server"],
         "checked_rule_names": payload.get("checked_rule_names", {}),
-        "verification": "effective_block_rules_and_enabled_profiles",
     }
 
 
@@ -706,8 +706,9 @@ class LocalLlamaRuntime:
 
     def start(self, *, require_network_isolation: bool = True) -> None:
         with self._lock:
-            if require_network_isolation or os.name != "nt":
-                self.require_network_isolation()
+            if not require_network_isolation:
+                raise LocalAssessorError("network_isolation_unverified", "runtime egress isolation cannot be disabled")
+            self.require_network_isolation()
             if self._process is not None:
                 if self._process.poll() is None:
                     return
