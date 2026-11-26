@@ -156,29 +156,52 @@ def test_live_linux_isolation_scope_reports_enforced_limits_and_loopback() -> No
         text=True,
         timeout=60,
     )
-    try:
-        report = json.loads(result.stdout)
+    runner = {
+        key: os.environ.get(key)
+        for key in ("ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH")
+    }
+    host_blocks_userns = (
+        result.returncode != 0
+        and "write failed /proc/self/uid_map:" in result.stderr
+        and "Operation not permitted" in result.stderr
+    )
+    if host_blocks_userns:
+        report = {
+            "status": "unavailable",
+            "reason": "host runner denied unprivileged user-namespace UID mapping",
+        }
         parse_error = None
-    except json.JSONDecodeError as exc:
-        report = None
-        parse_error = str(exc)
+    else:
+        try:
+            report = json.loads(result.stdout)
+            parse_error = None
+        except json.JSONDecodeError as exc:
+            report = None
+            parse_error = str(exc)
     if not isinstance(report, dict):
         parse_error = parse_error or "isolation report is not a JSON object"
     evidence = {
-        "runner": {
-            key: os.environ.get(key)
-            for key in ("ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH")
-        },
+        "runner": runner,
         "exit_code": result.returncode,
         "isolation": report,
     }
-    if parse_error:
+    if host_blocks_userns:
+        evidence["stderr"] = result.stderr[:16 * 1024]
+    elif parse_error:
         evidence["parse_error"] = parse_error
         evidence["stdout"] = result.stdout[:16 * 1024]
         evidence["stderr"] = result.stderr[:16 * 1024]
     report_path = os.environ.get("MARKET_OS_LINUX_ISOLATION_REPORT")
     if report_path:
-        Path(report_path).write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        Path(report_path).write_text(
+            json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    if host_blocks_userns:
+        print("LIVE_LINUX_ISOLATION_REPORT=" + json.dumps(evidence, sort_keys=True))
+        pytest.skip(
+            "host runner blocks unprivileged user namespaces; target isolation remains unverified"
+        )
 
     assert result.returncode == 0, f"exit={result.returncode}\nstdout={result.stdout}\nstderr={result.stderr}"
     assert parse_error is None, f"invalid isolation report: {parse_error}"
