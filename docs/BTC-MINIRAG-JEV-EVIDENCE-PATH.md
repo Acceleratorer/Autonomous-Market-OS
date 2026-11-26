@@ -69,9 +69,14 @@ local-model training or evaluation data.
 
 The official TypeSafe [Quick Start](https://docs.typesafe.ai/introduction/quickstart)
 and [System One API reference](https://docs.typesafe.ai/api/system-one) describe
-Jev through an authenticated hosted endpoint. The [Enterprise FAQ](https://typesafe.ai/enterprise)
-now answers that Jev is currently available only through the hosted API. Public
-Cloudflare, Vercel, Netlify, and OpenRouter routes are hosted gateways; the
+Jev through an authenticated hosted endpoint. The 2026-11-20 check recorded the
+[Enterprise FAQ](https://typesafe.ai/enterprise) as answering that Jev was then
+available only through the hosted API. On 2026-11-26, the live page still listed
+“Can we run Jev in our own VPC or on-premises?” but exposed no answer in the page
+content reviewed. Treat the earlier wording as a dated observation, not current
+vendor confirmation; local/VPC availability remains unconfirmed. See the
+[2026-11-26 primary-source check](research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md).
+Public Cloudflare, Vercel, Netlify, and OpenRouter routes are hosted gateways; the
 public TypeSafe registries reviewed expose no verifiable Jev weights or local
 runtime. TypeSafe Sales was asked whether a separately licensed or private
 deployment exists and for a runtime manifest and written local-use terms; no
