@@ -1,5 +1,26 @@
 # Understanding log
 
+## 2026-11-26 — W32Time retry after accepted elevation at 14:36 +07:00
+
+- The owner-authorized 50-minute passive observation ran from `14:36:11.368`
+  to `15:26:11.393 +07:00`. It completed 100/100 successful status queries
+  over `3,000.025` wall seconds and a `2,970.007`-second monotonic sample
+  span. W32Time remained `Running/Manual`; no event IDs or query failures
+  were recorded.
+- The elevated read-only configuration query succeeded. Its peer identity
+  and configuration values are omitted from committed evidence. The observer
+  made no service, clock, resync, or time-service configuration change.
+- The last successful sync remained `11:37:57 +07:00` and its reported age
+  grew from `10,694.002 s` to `13,664.034 s`. Root distance was an estimated
+  `7.8962888 s`, not a qualified UTC error bound. Maximum adjacent
+  wall/monotonic delta was `2.005 ms`; no interval reached the `250 ms`
+  diagnostic threshold.
+- Keep `clock_error_bound_ms` unknown and B3.1 ineligible. No BTC, Jev, or
+  model-provider request occurred; normal W32Time network traffic was not
+  measured. Sanitized evidence is in
+  `docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json`;
+  raw telemetry remains local and ignored.
+
 ## 2026-11-26 — W32Time passive retry at 08:51 +07:00
 
 - The owner-requested 50-minute read-only retry ran from `08:51:31.435` to

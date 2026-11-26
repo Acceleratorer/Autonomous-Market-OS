@@ -1,0 +1,89 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-26",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_start": "main",
+    "commit_at_start": "f23e188cfdd5e751f638d26a183c662dee45669",
+    "working_tree_clean_before_observation": true
+  },
+  "observation": {
+    "id": "w32time-passive-observation-20261126-143540",
+    "status": "completed",
+    "runner_exit_code": 0,
+    "started_at": "2026-11-26T14:36:11.368+07:00",
+    "first_sample_at": "2026-11-26T14:36:11.379+07:00",
+    "last_sample_at": "2026-11-26T15:25:41.398+07:00",
+    "ended_at": "2026-11-26T15:26:11.393+07:00",
+    "configured_duration_seconds": 3000,
+    "observation_wall_span_seconds": 3000.025,
+    "sampled_monotonic_span_seconds": 2970.007,
+    "sample_interval_seconds": 30,
+    "status_sample_count": 100,
+    "successful_status_queries": 100,
+    "status_query_failures": 0,
+    "status_query_timeouts": 0,
+    "w32time_event_ids": []
+  },
+  "service": {
+    "state_before": "Running",
+    "start_mode_before": "Manual",
+    "state_after": "Running",
+    "start_mode_after": "Manual",
+    "service_state_changed": false,
+    "start_mode_changed": false,
+    "time_service_configuration_changed": false
+  },
+  "configuration_diagnostics": {
+    "elevated_read_only_query": "succeeded",
+    "query_exit_code": 0,
+    "timed_out": false,
+    "sanitized_fact_count": 14,
+    "peer_identity_and_configuration_values": "omitted"
+  },
+  "synchronization": {
+    "source_identity": "redacted",
+    "leap_indicator": "0 (no warning)",
+    "stratum": 5,
+    "root_delay_seconds": 0.0479012,
+    "root_dispersion_seconds": 7.8723382,
+    "root_distance_estimate_seconds": 7.8962888,
+    "last_successful_sync_time_reported_local": "2026-11-26 11:37:57 +07:00",
+    "fresh_successful_sync_observed": false,
+    "last_good_sync_age_seconds": {
+      "first_sample": 10694.002,
+      "last_sample": 13664.034
+    },
+    "interpretation": "The root-distance estimate is conditional; it is not a qualified capture-time UTC error bound."
+  },
+  "relative_clock_comparison": {
+    "wall_minus_monotonic_step_indication_ge_250ms": false,
+    "max_absolute_adjacent_delta_ms": 2.005,
+    "interpretation": "Relative wall/monotonic stability only; this does not establish absolute UTC accuracy."
+  },
+  "actions": {
+    "service_started_or_stopped_by_observer": false,
+    "resync_performed": false,
+    "system_clock_adjusted_by_observer": false,
+    "time_service_configuration_changed": false,
+    "packet_capture_performed": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-passive-observation-20261126-143540.json",
+    "raw_report_committed": false,
+    "raw_report_bytes": 122401,
+    "raw_report_sha256": "D192287D46194439214A9FCDD07D424243DE1CAE7E91D11D97B28088D067C8B2"
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "packet_eligible": false,
+    "reason": "The host reported no fresh synchronization during the window. Source accuracy, holdover drift, freshness criteria, and invalidation behavior remain unqualified; passive status and relative-clock observations cannot supply those inputs."
+  }
+}
