@@ -270,6 +270,24 @@ The raw report remains local and ignored at
 `.market_os/clock/w32time-observation-50m-retry-20261126-062923.json` with
 SHA-256 `5E9CB8DC00B1BA43F4CB28E5DC2FBE364C1413A254F853F356FD63CC73CD413F`.
 
+### Read-only status retry — 2026-11-26 about 08:16 +07:00
+
+A later unprivileged status query still reported the last successful sync at
+`07:04:53 +07:00`, now aged `4,278.583 s`, with `Last Sync Error: 2` (stale
+time data). Leap remained 0 and stratum 5. Root delay was `0.0448849 s` and
+root dispersion `4.0988124 s`, for the same conditional root-distance estimate
+of `4.12125485 s`. The peer remained `Active` and reported `12,105.070 s`
+until its next poll. These fields still do not establish source accuracy,
+holdover drift, or a capture-time UTC error bound.
+
+The unprivileged `w32tm /query /configuration /verbose` call returned
+`Access is denied`. The owner-authorized read-only elevation attempt was
+canceled before the elevated process started. W32Time remained `Running/Manual`;
+no service, clock, or polling configuration was changed, and no BTC market-data
+request was made. Keep `clock_error_bound_ms: null` and
+`packet_eligible: false`; another passive 50-minute window would not provide
+the missing source-accuracy or holdover guarantees.
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before
