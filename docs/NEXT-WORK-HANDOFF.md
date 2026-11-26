@@ -20,7 +20,7 @@ the unprivileged user-namespace UID map. The report artifact records
 runner limitation. This is runner-capability evidence, not a verified Linux
 isolation result.
 
-## Current status — 2026-11-26
+## Current status — 2026-11-27
 
 The owner retried the elevated, read-only `w32tm /query /configuration` query;
 it returned exit code 0. The observer made no W32Time service, clock, or
@@ -38,6 +38,24 @@ assumptions are available.
 The earlier elevated query returned exit code 0. A later retry around 18:59
 local was canceled by Windows before the query process launched; it produced no
 new configuration facts and made no system changes.
+
+The 2026-11-27 elevated retry was also canceled at the UAC step before the
+query process started. A non-elevated registry fallback found `Type=NTP`,
+`NtpServer=time.windows.com,0x9`, NTP client `Enabled=1`, and
+`SpecialPollInterval=16384` seconds. `sc.exe qc w32time` reported
+`DEMAND_START`; the active peer query showed Mode 3, stratum 4, 1,024-second
+host/peer poll intervals, and 15,237 seconds to the next poll. The status
+snapshot’s NTP distance estimate is `1.06610145 s`, conditional on the NTP
+model. This still does not qualify a capture-time UTC bound; keep
+`clock_error_bound_ms` null and B3.1 ineligible.
+
+The local Qwen health observation completed 100/100 healthy HTTP 200 samples
+over `3,000.36` monotonic seconds with exit code 0. It made no inference calls
+and the BTC, model-provider, and TypeSafe/Jev request counters were zero.
+Firewall and Job Object limits were enforced; GPU readings were aggregate
+telemetry, not a hard cap. The ignored raw log is
+`.market_os/btc-assessor-observations/7fbdabad799b43a0ab8c8e865f9fe4e8.jsonl`.
+This verifies local Qwen health only and does not identify Qwen as Jev.
 
 ### Local-only Qwen runtime check — 2026-11-26
 
