@@ -1,5 +1,35 @@
 # Understanding log
 
+## 2026-11-27 — W32Time configuration fallback
+
+- The owner retried the elevated, read-only `w32tm /query /configuration`
+  launch; the UAC step was canceled before the command process started. A
+  non-elevated registry fallback found `Type=NTP`,
+  `NtpServer=time.windows.com,0x9`, NTP client `Enabled=1`, and
+  `SpecialPollInterval=16384` seconds. The W32Time policy registry paths queried
+  were absent; `sc.exe qc w32time` reported demand-start mode.
+- The peer query reported `time.windows.com,0x9` active, Mode 3, stratum 4,
+  1,024-second host/peer poll intervals, and 15,237 seconds to the next poll.
+  The status query reported root delay `0.0413353 s` and root dispersion
+  `1.0454338 s`, giving a conditional NTP distance of `1.06610145 s`.
+- These are configuration and status diagnostics, not a capture-time UTC
+  error bound. No service, registry, or clock settings changed. Keep
+  `clock_error_bound_ms` unknown and B3.1 ineligible.
+
+## 2026-11-27 — 50-minute local Qwen health observation
+
+- The local-only health observer recorded 100/100 healthy HTTP 200 samples
+  over `3,000.36` monotonic seconds and exited with code 0. It performed health
+  checks only; there were no inference calls and the BTC market-data,
+  model-provider, and TypeSafe/Jev request counters remained zero.
+- Firewall and Windows Job Object limits were enforced. Observed GPU memory
+  use of `4,698 / 8,151 MiB` is aggregate telemetry, not a hard device cap.
+  The log remains local and ignored at
+  `.market_os/btc-assessor-observations/7fbdabad799b43a0ab8c8e865f9fe4e8.jsonl`.
+- This confirms health of the local Qwen assessor process only; Qwen is not
+  Jev, and this observation does not establish Jev compatibility, calibration,
+  market evidence, or B3.1 eligibility.
+
 ## 2026-11-26 — W32Time retry after accepted elevation at 20:22 +07:00
 
 - The passive observer recorded 100/100 successful status queries from
