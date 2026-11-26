@@ -288,6 +288,30 @@ request was made. Keep `clock_error_bound_ms: null` and
 `packet_eligible: false`; another passive 50-minute window would not provide
 the missing source-accuracy or holdover guarantees.
 
+### Owner-requested retry after canceled elevation — 2026-11-26 08:51 +07:00
+
+The passive observer ran from `08:51:31.435` to `09:41:31.467 +07:00`, exactly
+3,000 wall seconds. It completed 100/100 successful status queries, with no
+timeouts, query failures, or W32Time event IDs. The monotonic sample span was
+`2,970.004 s`. W32Time remained `Running/Manual`; the observer did not start or
+stop the service, resynchronize, or adjust the system clock.
+
+The last successful sync remained `07:04:53 +07:00`, and its reported age grew
+from `6,398.259 s` to `9,368.287 s`. Leap remained 0 and stratum 5. The final
+root delay was `0.0448849 s`, root dispersion `4.0988124 s`, and derived root
+distance estimate `4.12125485 s`. The maximum absolute adjacent
+wall/monotonic delta was `1.224 ms`, with no interval at or above `250 ms`.
+The unprivileged configuration query returned `Access is denied`; the second
+owner-authorized elevated retry was canceled before the process launched, so
+no privileged configuration facts were collected.
+
+These readings show relative clock behavior and the service's reported sync
+age only. They do not establish the time source's accuracy, holdover drift,
+freshness criteria, or invalidation behavior. No BTC, Jev, or model-provider
+request was made. Keep `clock_error_bound_ms: null` and
+`packet_eligible: false`; further passive windows cannot replace the missing
+qualification inputs. See the [sanitized evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json).
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before
