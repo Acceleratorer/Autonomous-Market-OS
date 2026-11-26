@@ -243,6 +243,10 @@ def replay_capture_run(run_root: str | Path) -> dict[str, object]:
     if type(requested_polls) is not int or not 1 <= requested_polls <= MAX_POLLS:
         raise ValueError("local BTC capture poll count failed validation")
     for index, record in enumerate(poll_records, start=1):
+        receipt_monotonic = record.get("response_received_monotonic_ns")
+        receipt_pair_uncertainty = record.get("response_received_pair_uncertainty_ns")
+        request_monotonic = record.get("request_started_monotonic_ns")
+        adapter_monotonic = record.get("adapter_returned_monotonic_ns")
         if (
             record.get("poll_index") != index
             or record.get("status") not in {"valid", "failed"}
@@ -253,6 +257,16 @@ def replay_capture_run(run_root: str | Path) -> dict[str, object]:
             or record.get("clock_error_bound_ms") is not None
             or record.get("packet_eligible") is not False
             or record.get("trading_action") != "none"
+            or (receipt_monotonic is not None and (
+                type(receipt_monotonic) is not int
+                or type(request_monotonic) is not int
+                or type(adapter_monotonic) is not int
+                or not request_monotonic <= receipt_monotonic <= adapter_monotonic
+            ))
+            or ((receipt_monotonic is None) != (receipt_pair_uncertainty is None))
+            or (receipt_pair_uncertainty is not None and (
+                type(receipt_pair_uncertainty) is not int or receipt_pair_uncertainty <= 0
+            ))
         ):
             raise ValueError("local BTC capture poll record failed validation")
     if (
@@ -268,6 +282,8 @@ def replay_capture_run(run_root: str | Path) -> dict[str, object]:
     candles: list[dict[str, object]] = []
     for record in candle_records:
         candle = record.get("candle")
+        receipt_monotonic = record.get("response_received_monotonic_ns")
+        receipt_pair_uncertainty = record.get("response_received_pair_uncertainty_ns")
         if (
             record.get("schema") != "market-os.btc-realtime-candle.v1"
             or record.get("provider") != "binance_public"
@@ -277,6 +293,11 @@ def replay_capture_run(run_root: str | Path) -> dict[str, object]:
             or record.get("clock_error_bound_ms") is not None
             or record.get("source_published_at") is not None
             or record.get("trading_action") != "none"
+            or (receipt_monotonic is not None and (type(receipt_monotonic) is not int or receipt_monotonic <= 0))
+            or ((receipt_monotonic is None) != (receipt_pair_uncertainty is None))
+            or (receipt_pair_uncertainty is not None and (
+                type(receipt_pair_uncertainty) is not int or receipt_pair_uncertainty <= 0
+            ))
             or not isinstance(candle, dict)
             or candle.get("symbol") != "BTCUSDT"
             or candle.get("interval") != "1m"
@@ -392,6 +413,18 @@ def main(argv: list[str] | None = None) -> int:
                 adapter_returned_at = _utc_now()
                 adapter_returned_monotonic_ns = time.monotonic_ns()
                 clock_after = capture_clock_status()
+                response_received_monotonic_ns = getattr(result, "received_monotonic_ns", None)
+                response_received_pair_uncertainty_ns = getattr(result, "received_pair_uncertainty_ns", None)
+                if (
+                    (response_received_monotonic_ns is None) != (response_received_pair_uncertainty_ns is None)
+                    or (response_received_monotonic_ns is not None and (
+                        type(response_received_monotonic_ns) is not int
+                        or not request_started_monotonic_ns <= response_received_monotonic_ns <= adapter_returned_monotonic_ns
+                        or type(response_received_pair_uncertainty_ns) is not int
+                        or response_received_pair_uncertainty_ns <= 0
+                    ))
+                ):
+                    raise ValueError("transport receipt clock metadata failed validation")
                 new_candles = [candle for candle in result.candles if candle.open_time not in seen_open_times]
                 for candle in new_candles:
                     seen_open_times.add(candle.open_time)
@@ -403,6 +436,8 @@ def main(argv: list[str] | None = None) -> int:
                         "candle": asdict(candle),
                         "response_fingerprint": result.response_fingerprint,
                         "received_monotonic_ns": time.monotonic_ns(),
+                        "response_received_monotonic_ns": response_received_monotonic_ns,
+                        "response_received_pair_uncertainty_ns": response_received_pair_uncertainty_ns,
                         "source_published_at": None,
                         "clock_error_bound_ms": None,
                         "packet_eligible": False,
@@ -416,6 +451,8 @@ def main(argv: list[str] | None = None) -> int:
                     "request_started_at": request_started_at,
                     "request_started_monotonic_ns": request_started_monotonic_ns,
                     "received_at": result.received_at,
+                    "response_received_monotonic_ns": response_received_monotonic_ns,
+                    "response_received_pair_uncertainty_ns": response_received_pair_uncertainty_ns,
                     "adapter_returned_at": adapter_returned_at,
                     "adapter_returned_monotonic_ns": adapter_returned_monotonic_ns,
                     "clock_before": clock_before,

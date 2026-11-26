@@ -1,0 +1,12 @@
+{
+  "schema": "market-os.w32time-read-only-query.v1",
+  "date": "2026-11-26",
+  "command": "w32tm /query /configuration",
+  "execution": "elevated after owner-authorized UAC",
+  "exit_code": 0,
+  "read_only": true,
+  "service_or_clock_changed": false,
+  "raw_configuration_committed": false,
+  "clock_error_bound_ms": null,
+  "packet_eligible": false
+}

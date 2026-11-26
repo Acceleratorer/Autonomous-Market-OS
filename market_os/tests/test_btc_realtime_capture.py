@@ -10,6 +10,7 @@ import pytest
 
 from market_os import btc_realtime_capture as capture
 from market_os.btc_realtime_capture import replay_capture_run
+from market_os.btc_paper import ClosedCandle
 
 
 @pytest.fixture(autouse=True)
@@ -161,6 +162,49 @@ def test_capture_empty_response_can_be_replayed(tmp_path: Path, monkeypatch) -> 
     assert replay["network_requests"] == 0
 
 
+def test_capture_persists_transport_receipt_and_replays_it(tmp_path: Path, monkeypatch) -> None:
+    snapshots = iter([{"status": "before"}, {"status": "after"}])
+    monotonic_samples = iter([10, 30, 35])
+    monkeypatch.setattr(capture, "capture_clock_status", lambda: next(snapshots))
+    monkeypatch.setattr(capture.time, "monotonic_ns", lambda: next(monotonic_samples))
+    candle = ClosedCandle(
+        symbol="BTCUSDT",
+        interval="1m",
+        open_time="2026-11-23T01:00:00+00:00",
+        close_time="2026-11-23T01:01:00+00:00",
+        open=100.0,
+        high=102.0,
+        low=99.0,
+        close=101.0,
+        volume=2.5,
+        source_timestamp="2026-11-23T01:01:00+00:00",
+        received_at="2026-11-23T01:01:03+00:00",
+        availability_timestamp="2026-11-23T01:01:03+00:00",
+        provenance_id="a" * 64,
+        candle_fingerprint="b" * 64,
+    )
+    result = SimpleNamespace(
+        candles=[candle],
+        response_fingerprint="c" * 64,
+        received_at=candle.received_at,
+        received_monotonic_ns=20,
+        received_pair_uncertainty_ns=500_000,
+        excluded_open_candles=0,
+    )
+    monkeypatch.setattr(capture, "BinancePublicAdapter", lambda: SimpleNamespace(klines=lambda **kwargs: (result, 1)))
+
+    assert capture.main(["--allow-live-capture", "--samples", "1", "--store-root", str(tmp_path)]) == 0
+
+    manifest_path, = tmp_path.glob("btc-realtime-captures/*/manifest.json")
+    poll = json.loads((manifest_path.parent / "polls.jsonl").read_text())
+    candle_record = json.loads((manifest_path.parent / "candles.jsonl").read_text())
+    assert poll["request_started_monotonic_ns"] <= poll["response_received_monotonic_ns"] <= poll["adapter_returned_monotonic_ns"]
+    assert poll["response_received_pair_uncertainty_ns"] == 500_000
+    assert candle_record["response_received_monotonic_ns"] == 20
+    assert candle_record["received_monotonic_ns"] == 35  # Persistence sample remains distinct.
+    assert replay_capture_run(manifest_path.parent)["packet_eligible"] is False
+
+
 def test_capture_interrupt_records_attempt_and_returns_130(tmp_path: Path, monkeypatch) -> None:
     def interrupt(**kwargs):
         raise KeyboardInterrupt
@@ -178,6 +222,26 @@ def test_replay_rejects_changed_artifact(tmp_path: Path) -> None:
     with (run_root / "candles.jsonl").open("ab") as stream:
         stream.write(b"{}\n")
     with pytest.raises(ValueError, match="hash mismatch"):
+        replay_capture_run(run_root)
+
+
+def test_replay_rejects_receipt_marker_after_adapter_return(tmp_path: Path) -> None:
+    run_root = _write_completed_capture(tmp_path)
+    poll_path = run_root / "polls.jsonl"
+    poll = json.loads(poll_path.read_text())
+    poll.update({
+        "adapter_returned_monotonic_ns": 150,
+        "response_received_monotonic_ns": 200,
+        "response_received_pair_uncertainty_ns": 500_000,
+    })
+    poll_bytes = _jsonl_record(poll)
+    poll_path.write_bytes(poll_bytes)
+    manifest_path = run_root / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["artifact_sha256"]["polls.jsonl"] = hashlib.sha256(poll_bytes).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="poll record failed validation"):
         replay_capture_run(run_root)
 
 

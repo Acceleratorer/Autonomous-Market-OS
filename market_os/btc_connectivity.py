@@ -127,6 +127,8 @@ class HttpResponse:
     headers: dict[str, str]
     body: bytes
     received_at: str
+    received_monotonic_ns: int | None = None
+    received_pair_uncertainty_ns: int | None = None
 
 
 class HttpTransport(Protocol):
@@ -185,16 +187,35 @@ class UrllibTransport:
                 response_headers = {key: value for key, value in response.headers.items()}
             if len(raw) > max_bytes:
                 raise ConnectivityError("response_too_large", "provider response exceeds the bounded byte limit")
-            return HttpResponse(status, response_headers, raw, _iso_now())
+            received_at, received_monotonic_ns, pair_uncertainty_ns = _receipt_timestamp_pair()
+            return HttpResponse(
+                status, response_headers, raw, received_at,
+                received_monotonic_ns, pair_uncertainty_ns,
+            )
         except urllib.error.HTTPError as response:
             raw = response.read(max_bytes + 1)
             if len(raw) > max_bytes:
                 raise ConnectivityError("response_too_large", "provider response exceeds the bounded byte limit")
-            return HttpResponse(response.code, {key: value for key, value in response.headers.items()}, raw, _iso_now())
+            received_at, received_monotonic_ns, pair_uncertainty_ns = _receipt_timestamp_pair()
+            return HttpResponse(
+                response.code, {key: value for key, value in response.headers.items()}, raw,
+                received_at, received_monotonic_ns, pair_uncertainty_ns,
+            )
         except (TimeoutError, socket.timeout) as exc:
             raise ConnectivityError("timeout", "provider request timed out", retryable=True) from exc
         except (urllib.error.URLError, OSError) as exc:
             raise ConnectivityError("transport", "provider connection failed", retryable=True) from exc
+
+
+def _receipt_timestamp_pair() -> tuple[str, int, int]:
+    """Pair response-completion UTC with a monotonic sample and bounded sample skew."""
+    monotonic_before = time.monotonic_ns()
+    received_at = _iso_now()
+    monotonic_after = time.monotonic_ns()
+    sample_span = monotonic_after - monotonic_before
+    # The wall timestamp is truncated to milliseconds by _iso_now().
+    uncertainty_ns = (sample_span + 1) // 2 + 1_000_000
+    return received_at, (monotonic_before + monotonic_after) // 2, uncertainty_ns
 
 
 @dataclass(frozen=True)
@@ -215,6 +236,8 @@ class BinanceKlineResult:
     excluded_open_candles: int
     received_at: str
     response_fingerprint: str
+    received_monotonic_ns: int | None = None
+    received_pair_uncertainty_ns: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -223,6 +246,8 @@ class BinanceKlineResult:
             "excluded_open_candles": self.excluded_open_candles,
             "received_at": self.received_at,
             "response_fingerprint": self.response_fingerprint,
+            "received_monotonic_ns": self.received_monotonic_ns,
+            "received_pair_uncertainty_ns": self.received_pair_uncertainty_ns,
         }
 
 
@@ -250,8 +275,20 @@ def _epoch_ms(value: datetime) -> int:
     return int(value.timestamp() * 1000)
 
 
-def parse_kline_payload(raw: bytes, *, received_at: str) -> BinanceKlineResult:
+def parse_kline_payload(
+    raw: bytes,
+    *,
+    received_at: str,
+    received_monotonic_ns: int | None = None,
+    received_pair_uncertainty_ns: int | None = None,
+) -> BinanceKlineResult:
     received = _utc(received_at, "received_at")
+    if (
+        (received_monotonic_ns is None) != (received_pair_uncertainty_ns is None)
+        or (received_monotonic_ns is not None and (type(received_monotonic_ns) is not int or received_monotonic_ns <= 0))
+        or (received_pair_uncertainty_ns is not None and (type(received_pair_uncertainty_ns) is not int or received_pair_uncertainty_ns <= 0))
+    ):
+        raise ConnectivityError("invalid_timestamp", "monotonic receipt and pair uncertainty must be positive integers recorded together")
     payload = _load_json(raw, "kline")
     if not isinstance(payload, list) or not payload:
         raise ConnectivityError("invalid_kline", "kline response must be a non-empty array")
@@ -289,7 +326,10 @@ def parse_kline_payload(raw: bytes, *, received_at: str) -> BinanceKlineResult:
     gaps = tuple((previous + 60_000, current) for previous, current in zip(opens, opens[1:]) if current != previous + 60_000)
     if gaps:
         raise ConnectivityError("kline_gap", "kline gap detected in finalized response")
-    return BinanceKlineResult(tuple(candle for candle, _open_ms in finalized), gaps, excluded, received_at, _sha_bytes(raw))
+    return BinanceKlineResult(
+        tuple(candle for candle, _open_ms in finalized), gaps, excluded, received_at,
+        _sha_bytes(raw), received_monotonic_ns, received_pair_uncertainty_ns,
+    )
 
 
 SYNTHETIC_JEV_REQUEST: dict[str, Any] = {
@@ -665,7 +705,12 @@ class BinancePublicAdapter:
             attempts=max_attempts,
             wait=self.wait,
         )
-        return parse_kline_payload(response.body, received_at=response.received_at), attempts
+        return parse_kline_payload(
+            response.body,
+            received_at=response.received_at,
+            received_monotonic_ns=response.received_monotonic_ns,
+            received_pair_uncertainty_ns=response.received_pair_uncertainty_ns,
+        ), attempts
 
 
 class FixtureConnectivityAdapter:
