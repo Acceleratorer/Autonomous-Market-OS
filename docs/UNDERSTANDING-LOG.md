@@ -1,5 +1,34 @@
 # Understanding log
 
+## 2026-11-26 — W32Time retry after accepted elevation at 20:22 +07:00
+
+- The passive observer recorded 100/100 successful status queries from
+  `20:21:54.449` to `21:11:24.490 +07:00`, a `2,970.042 s` wall span and
+  `2,969.989 s` monotonic sample span. The script targeted 3,000 seconds, but
+  did not persist its final result JSON; its exact process exit code and final
+  elapsed duration were not retained. Summary values were reconstructed from
+  the complete sample log and endpoint snapshots.
+- W32Time reported `Running` in all samples; endpoint snapshots reported
+  `Manual`. The elevated read-only configuration query succeeded with exit
+  code 0; configuration values and peer identity were omitted.
+- An early-window status snapshot reported last good sync at `16:11:01 +07:00`
+  with `Last Sync Error: 2` and age `15,539.002 s`. The post-window snapshot
+  reported a newer successful sync at `20:44:05 +07:00`, error 0, and age
+  `1,838.492 s`. Its derived `2.05339785 s` root-distance estimate remains
+  conditional, not a qualified UTC error bound.
+- Maximum relative wall/monotonic offset change was `52.617 ms`; maximum
+  adjacent interval difference was `5.389 ms`, below the `250 ms` diagnostic
+  threshold. This is relative stability evidence only. Keep
+  `clock_error_bound_ms` unknown and B3.1 ineligible because source accuracy,
+  holdover drift, freshness criteria, and invalidation behavior remain
+  unqualified.
+- No BTC, Jev, model-provider, explicit time-source request, resync, clock
+  adjustment, or time-service configuration change occurred. Normal W32Time
+  network traffic was not measured. Sanitized evidence is in
+  `docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json`;
+  the raw log remains local and ignored with SHA-256
+  `79DA3C99607484BFC446B52B667285997E5CA442D6CD8E5E457E2CBDE98E00D8`.
+
 ## 2026-11-26 — W32Time retry after accepted elevation at 14:36 +07:00
 
 - The owner-authorized 50-minute passive observation ran from `14:36:11.368`

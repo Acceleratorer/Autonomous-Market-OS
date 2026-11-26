@@ -3,12 +3,15 @@
 ## Current status — 2026-11-26
 
 The owner retried the elevated, read-only `w32tm /query /configuration` query;
-it returned exit code 0. No W32Time service, clock, or configuration changes
-were made, and no BTC or Jev request was issued. The previous 50-minute
-observation already completed 100/100 status queries; its findings remain
-diagnostic only. The transport/capture path now records a monotonic marker at
-response receipt plus the measured wall/monotonic pairing uncertainty. It
-still leaves `clock_error_bound_ms` unknown and packet eligibility false.
+it returned exit code 0. The observer made no W32Time service, clock, or
+configuration changes, and no BTC or Jev request was issued. The latest passive retry
+recorded 100/100 successful status queries over a `2,970.042 s` sample span;
+the runner did not retain its final result file or exact exit code. A later
+status snapshot reported a new successful sync during that window, but the
+findings remain diagnostic only. The transport/capture path now records a
+monotonic marker at response receipt plus the measured wall/monotonic pairing
+uncertainty. It still leaves `clock_error_bound_ms` unknown and packet
+eligibility false.
 Continue only after the approved synchronization-quality source and holdover
 assumptions are available.
 
@@ -179,6 +182,24 @@ or model-provider request was made, and ordinary W32Time network traffic was
 not measured. Do not repeat passive windows as a substitute for a qualified
 time source. See the [sanitized evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json)
 and [clock qualification note](research/btc-utc-clock-error-bound.md).
+
+The subsequent owner-requested passive retry recorded 100/100 successful
+status queries from `20:21:54.449` to `21:11:24.490 +07:00`, spanning
+`2,970.042` wall seconds and `2,969.989` monotonic seconds. The runner targeted
+3,000 seconds but failed to persist its expected result JSON; the exact runner
+exit code and elapsed duration are unavailable. Its complete local sample log
+was independently parsed to reconstruct the summary. W32Time reported
+`Running` in all samples. An early-window snapshot showed the prior sync at
+`16:11:01 +07:00` and `Last Sync Error: 2`; a post-window snapshot reported a
+new sync at `20:44:05 +07:00`, error 0, and age `1,838.492 s`. The final
+root-distance estimate (`2.05339785 s`) is conditional, not a capture-time UTC
+error bound. Relative wall/monotonic drift stayed below the 250 ms diagnostic
+threshold (`52.617 ms` maximum relative offset change). Keep
+`clock_error_bound_ms` null and B3.1 ineligible; source accuracy, holdover
+drift, freshness, and invalidation rules remain unqualified. No BTC, Jev,
+provider, explicit time-source, resync, or configuration request was made.
+See the [sanitized retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json);
+the raw log remains local and ignored.
 
 The local Qwen assessment store now caps aggregate run-file bytes at 1 GiB per
 store root and rejects new runs with typed `store_capacity_exceeded` once full.

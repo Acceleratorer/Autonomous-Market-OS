@@ -1,0 +1,113 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-26",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_start": "main",
+    "commit_at_start": "e004d1ede05ce728961a41300c467591bef25b1f",
+    "working_tree_clean_before_observation": true
+  },
+  "observation": {
+    "id": "w32time-passive-50m-20261126-202154",
+    "status": "sample_series_complete_finalization_not_captured",
+    "configured_duration_seconds": 3000,
+    "sample_interval_seconds": 30,
+    "first_sample_at_local": "2026-11-26T20:21:54.4485654+07:00",
+    "last_sample_at_local": "2026-11-26T21:11:24.4901827+07:00",
+    "sampled_wall_span_seconds": 2970.041617,
+    "first_sample_monotonic_elapsed_seconds": 0.048,
+    "last_sample_monotonic_elapsed_seconds": 2970.037,
+    "sampled_monotonic_span_seconds": 2969.989,
+    "status_sample_count": 100,
+    "status_query_exit_codes": {
+      "0": 100
+    },
+    "status_query_failures": 0,
+    "service_status_samples": {
+      "Running": 100
+    },
+    "runner_exit_code_captured": false,
+    "runner_result_file_persisted": false,
+    "observer_process_absent_after_target_window": true,
+    "finalization_note": "The write-once sample log contains all 100 records. The runner did not persist its expected result JSON, and its exact process exit code and elapsed duration were not retained; summary statistics below were reconstructed from the sample log and endpoint snapshots."
+  },
+  "configuration_diagnostics": {
+    "elevated_read_only_query": "succeeded",
+    "started_at_local": "2026-11-26T20:22:19.9634253+07:00",
+    "finished_at_local": "2026-11-26T20:22:20.0262179+07:00",
+    "query_exit_code": 0,
+    "output_line_count": 48,
+    "configuration_values_saved": false,
+    "peer_identity_and_configuration_values": "omitted"
+  },
+  "synchronization": {
+    "source_identity": "omitted",
+    "early_window_status_snapshot_at_local": "approximately 2026-11-26 20:29 +07:00",
+    "early_window_status_snapshot": {
+      "last_successful_sync_time_local": "2026-11-26 16:11:01 +07:00",
+      "last_sync_error_code": 2,
+      "last_good_sync_age_seconds": 15539.002,
+      "leap_indicator": "0 (no warning)",
+      "stratum": 5,
+      "root_delay_seconds": 0.0402543,
+      "root_dispersion_seconds": 4.0095651,
+      "root_distance_estimate_seconds": 4.02969225
+    },
+    "final_status_snapshot_at_local": "2026-11-26T21:14:11.1444178+07:00",
+    "last_successful_sync_time_local": "2026-11-26 20:44:05 +07:00",
+    "newer_successful_sync_reported_during_observation": true,
+    "last_sync_error_code_at_final_snapshot": 0,
+    "last_good_sync_age_seconds_at_final_snapshot": 1838.492,
+    "leap_indicator_at_final_snapshot": "0 (no warning)",
+    "stratum_at_final_snapshot": 5,
+    "root_delay_seconds_at_final_snapshot": 0.0414777,
+    "root_dispersion_seconds_at_final_snapshot": 2.0326590,
+    "root_distance_estimate_seconds_at_final_snapshot": 2.05339785,
+    "root_distance_interpretation": "Conditional estimate only; it is not a qualified capture-time UTC error bound."
+  },
+  "relative_clock_comparison": {
+    "method": "Sample UTC timestamps compared with Stopwatch monotonic elapsed time, relative to sample 0",
+    "max_absolute_relative_offset_change_milliseconds": 52.617,
+    "max_absolute_adjacent_interval_difference_milliseconds": 5.389,
+    "diagnostic_threshold_milliseconds": 250,
+    "threshold_crossed": false,
+    "interpretation": "Relative wall/monotonic stability only; this does not establish absolute UTC accuracy."
+  },
+  "service": {
+    "state_in_sample_log": "Running for all 100 samples",
+    "state_at_status_snapshots": "Running",
+    "start_mode_at_early_and_final_snapshots": "Manual",
+    "service_state_changed_by_observer": false,
+    "start_mode_changed_by_observer": false,
+    "time_service_configuration_changed": false
+  },
+  "actions": {
+    "service_started_or_stopped_by_observer": false,
+    "resync_performed_by_observer": false,
+    "system_clock_adjusted_by_observer": false,
+    "time_service_configuration_changed_by_observer": false,
+    "packet_capture_performed": false,
+    "raw_status_text_stored": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-passive-50m-20261126-202154.jsonl",
+    "raw_report_committed": false,
+    "raw_report_bytes": 22349,
+    "raw_report_sha256": "79DA3C99607484BFC446B52B667285997E5CA442D6CD8E5E457E2CBDE98E00D8",
+    "runner_path": ".market_os/clock/w32time-passive-50m-20261126-202154.ps1",
+    "runner_sha256": "9E3CD73B3E87DF2024CE5F90B5C7A10062A745BCA98508F1E9BA6FB649C142A7",
+    "runner_committed": false
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "W32Time reported a newer successful sync during the window and the final relative-clock delta stayed below the 250 ms diagnostic threshold. The conditional root-distance estimate, source accuracy, holdover drift, freshness criteria, and invalidation behavior remain unqualified, so these observations do not establish a capture-time UTC error bound."
+  }
+}

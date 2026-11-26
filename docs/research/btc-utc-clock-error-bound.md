@@ -368,6 +368,35 @@ The raw report remains local and ignored at
 `.market_os/clock/w32time-passive-observation-20261126-143540.json` (SHA-256
 `D192287D46194439214A9FCDD07D424243DE1CAE7E91D11D97B28088D067C8B2`).
 
+### Owner-requested passive retry — 2026-11-26 20:21 +07:00
+
+The observer recorded 100/100 successful status queries from
+`20:21:54.449` to `21:11:24.490 +07:00`, a `2,970.042 s` wall span and
+`2,969.989 s` monotonic sample span. It targeted 3,000 seconds but did not
+persist its final result JSON; its exact exit code and final elapsed time are
+unknown. The sample log was complete and its summary was reconstructed from
+that log and endpoint snapshots. W32Time reported `Running` in every sample.
+
+The elevated read-only configuration query succeeded with exit code 0; peer
+identity and configuration values were not retained. An early-window status
+snapshot reported the last successful sync at `16:11:01 +07:00`,
+`Last Sync Error: 2`, and age `15,539.002 s`. A post-window snapshot reported
+a newer successful sync at `20:44:05 +07:00`, error 0, and age `1,838.492 s`.
+The final root-distance estimate was `2.05339785 s`. It is conditional and
+does not include a qualified bound on source accuracy or holdover drift.
+
+Maximum relative wall/monotonic offset change was `52.617 ms`; the maximum
+adjacent interval difference was `5.389 ms`, both below the `250 ms`
+diagnostic threshold. These are relative stability diagnostics only. No
+resync, clock adjustment, time-service configuration change, BTC, Jev, model
+provider, or explicit time-source request occurred. Normal W32Time network
+traffic was not measured. Keep `clock_error_bound_ms: null` and
+`packet_eligible: false`; freshness and invalidation rules also remain
+unqualified. See the [sanitized evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json).
+The raw local log is ignored at
+`.market_os/clock/w32time-passive-50m-20261126-202154.jsonl` (SHA-256
+`79DA3C99607484BFC446B52B667285997E5CA442D6CD8E5E457E2CBDE98E00D8`).
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before
