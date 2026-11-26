@@ -20,7 +20,7 @@ the unprivileged user-namespace UID map. The report artifact records
 runner limitation. This is runner-capability evidence, not a verified Linux
 isolation result.
 
-## Current status — 2026-11-27
+## Current status — 2026-11-27 Asia/Ho_Chi_Minh (UTC+07:00; 2026-11-26 UTC)
 
 The owner retried the elevated, read-only `w32tm /query /configuration` query;
 it returned exit code 0. The observer made no W32Time service, clock, or

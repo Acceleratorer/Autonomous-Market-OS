@@ -1,5 +1,8 @@
 # Understanding log
 
+Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
+(UTC+07:00), unless an entry explicitly says UTC.
+
 ## 2026-11-27 — W32Time configuration fallback
 
 - The owner retried the elevated, read-only `w32tm /query /configuration`

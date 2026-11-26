@@ -1,6 +1,6 @@
 # TypeSafe Jev local runtime recheck
 
-**Checked:** 2026-11-27
+**Checked:** 2026-11-27 Asia/Ho_Chi_Minh (UTC+07:00; 2026-11-26 UTC)
 
 **Scope:** Official public TypeSafe/Jev documentation, terms, and artifact listings, plus the already-sent TypeSafe inquiry thread. Read-only; no Jev API request, outbound vendor contact, installation, or BTC packet was made.
 
