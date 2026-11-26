@@ -49,6 +49,11 @@ snapshot’s NTP distance estimate is `1.06610145 s`, conditional on the NTP
 model. This still does not qualify a capture-time UTC bound; keep
 `clock_error_bound_ms` null and B3.1 ineligible.
 
+An owner-authorized 50-minute passive observer retry prepared around
+`05:03 +07:00` was canceled during UAC elevation. The child process never
+started, so it produced no observation samples or result file and changed no
+service, registry, or clock settings.
+
 The local Qwen health observation completed 100/100 healthy HTTP 200 samples
 over `3,000.36` monotonic seconds with exit code 0. It made no inference calls
 and the BTC, model-provider, and TypeSafe/Jev request counters were zero.
@@ -65,6 +70,28 @@ projects such as `local-jev` and Nimble offer distinct local models; they are
 not TypeSafe Jev, and none has been installed or selected. Keep the BTC packet
 boundary unchanged and do not treat Qwen or a wire-compatible model as Jev.
 See [the recheck note](research/typesafe-jev-local-runtime-recheck-2026-11-27.md).
+
+The bounded workstation inventory recorded in that note found no authentic Jev
+runtime or weights in the checked local locations; only connectivity reservation
+files were present. No WSL Linux distribution is installed on this workstation.
+
+### Current-main local runtime revalidation — 2026-11-27
+
+At source commit `590e8f69c1ae77250b4e291750042a055a9ca178`, the pinned CPython
+3.11.18 runtime passed `btc-paper local-assessor health` with exit code 0.
+The Qwen3-4B `Q4_K_M` server bound to `127.0.0.1` and returned HTTP 200.
+Windows Defender Firewall ActiveStore verified outbound block rules for the
+current Python and `llama-server` executables; the Windows Job Object enforced
+a 25% CPU hard cap and 6 GiB process/job commit caps. The CUDA fit margin was
+2,048 MiB and remains adaptive rather than a hard VRAM limit. The command's
+environment omitted `TYPESAFE_API_KEY` and performed no model inference.
+
+The same checkout replayed run `41e51ef9e69f6bb54629bd6ef14a27ff` as
+`verified`, with `network_requests=0` and `inference_calls=0`. Its outcome is
+still an abstention on a synthetic packet. This verifies the current Windows
+Qwen health and persistence/replay path; it does not verify Jev, real-market
+evidence, or Linux target isolation. Full details are in
+[`btc-local-assessor-current-main-verification-2026-11-27.json`](evidence/btc-local-assessor-current-main-verification-2026-11-27.json).
 
 ### Local-only Qwen runtime check — 2026-11-26
 

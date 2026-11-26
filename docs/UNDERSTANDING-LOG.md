@@ -23,6 +23,27 @@ Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
   observation samples or new configuration facts were produced, and no
   service, registry, or clock settings changed.
 
+## 2026-11-27 — Current-main local assessor and Jev inventory check
+
+- At `590e8f69c1ae77250b4e291750042a055a9ca178`, the pinned Windows CPython
+  3.11.18 local assessor health check returned `healthy` with HTTP 200 on
+  `127.0.0.1`. ActiveStore egress rules were enforced for Python and
+  `llama-server`; Windows Job Object limits enforced 25% CPU and 6 GiB process
+  and job commit caps. `TYPESAFE_API_KEY` was absent from the command
+  environment, and the health check made no inference call.
+- Offline replay of run `41e51ef9e69f6bb54629bd6ef14a27ff` returned
+  `verified`, `network_requests=0`, and `inference_calls=0`. It is a synthetic
+  Qwen record, not Jev or market evidence. CUDA has only an adaptive free-memory
+  margin; Linux target-host isolation remains unverified.
+- The bounded local inventory found only Jev connectivity reservation files,
+  no local Jev weights/runtime/manifest, and no WSL distribution. The current
+  TypeSafe inquiry still has no vendor reply. See the dated recheck note and
+  [current-main verification evidence](evidence/btc-local-assessor-current-main-verification-2026-11-27.json).
+- The retry requested in this session prepared an observer at about 05:03
+  +07:00, but Windows reported that the UAC elevation was canceled by the
+  user. The elevated child never started; no result or progress file was
+  produced, and no service, registry, or clock setting changed.
+
 ## 2026-11-27 — 50-minute local Qwen health observation
 
 - The local-only health observer recorded 100/100 healthy HTTP 200 samples
