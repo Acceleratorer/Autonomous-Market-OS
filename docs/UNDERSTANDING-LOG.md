@@ -1,5 +1,8 @@
 # Understanding log
 
+Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
+(UTC+07:00), unless an entry explicitly says UTC.
+
 ## 2026-11-27 — W32Time configuration fallback
 
 - The owner retried the elevated, read-only `w32tm /query /configuration`
@@ -15,6 +18,10 @@
 - These are configuration and status diagnostics, not a capture-time UTC
   error bound. No service, registry, or clock settings changed. Keep
   `clock_error_bound_ms` unknown and B3.1 ineligible.
+- After the owner requested another attempt, two elevated observer launches
+  were canceled by Windows before the query/observer process started. No
+  observation samples or new configuration facts were produced, and no
+  service, registry, or clock settings changed.
 
 ## 2026-11-27 — 50-minute local Qwen health observation
 
