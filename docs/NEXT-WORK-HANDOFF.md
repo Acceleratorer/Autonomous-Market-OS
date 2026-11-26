@@ -57,6 +57,15 @@ telemetry, not a hard cap. The ignored raw log is
 `.market_os/btc-assessor-observations/7fbdabad799b43a0ab8c8e865f9fe4e8.jsonl`.
 This verifies local Qwen health only and does not identify Qwen as Jev.
 
+The 2026-11-27 Jev local-runtime recheck found no public authentic Jev runtime,
+weights, download URL, or verifiable manifest. The current Enterprise FAQ shows
+the VPC/on-premises question without an exposed answer. The existing Sales
+inquiry thread still contains two sent messages and no vendor reply. Independent
+projects such as `local-jev` and Nimble offer distinct local models; they are
+not TypeSafe Jev, and none has been installed or selected. Keep the BTC packet
+boundary unchanged and do not treat Qwen or a wire-compatible model as Jev.
+See [the recheck note](research/typesafe-jev-local-runtime-recheck-2026-11-27.md).
+
 ### Local-only Qwen runtime check — 2026-11-26
 
 The pinned CPython 3.11.18 runtime launched the installed Qwen3-4B
