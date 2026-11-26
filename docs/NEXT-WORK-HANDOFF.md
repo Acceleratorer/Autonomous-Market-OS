@@ -2,6 +2,16 @@
 
 ## Current status — 2026-11-26
 
+The owner retried the elevated, read-only `w32tm /query /configuration` query;
+it returned exit code 0. No W32Time service, clock, or configuration changes
+were made, and no BTC or Jev request was issued. The previous 50-minute
+observation already completed 100/100 status queries; its findings remain
+diagnostic only. The transport/capture path now records a monotonic marker at
+response receipt plus the measured wall/monotonic pairing uncertainty. It
+still leaves `clock_error_bound_ms` unknown and packet eligibility false.
+Continue only after the approved synchronization-quality source and holdover
+assumptions are available.
+
 The goal remains local-only BTC research with Market OS owning math,
 probability, calibration, stability, risk, and paper decisions. Authentic
 local Jev is still unverified: current TypeSafe docs show its authenticated

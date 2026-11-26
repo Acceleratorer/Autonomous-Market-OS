@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+import market_os.btc_connectivity as btc_connectivity
 from market_os.btc_connectivity import (
     BINANCE_KLINE_PATH,
     BINANCE_TICKER_PATH,
@@ -108,6 +109,34 @@ def test_valid_ticker_and_kline_payloads_are_normalized() -> None:
     ]
     assert result.gaps == ()
     assert result.excluded_open_candles == 0
+
+
+def test_kline_result_preserves_receipt_monotonic_pair() -> None:
+    result = parse_kline_payload(
+        json.dumps([_kline(BASE_MS)]).encode(),
+        received_at="2026-01-01T00:02:00+00:00",
+        received_monotonic_ns=123_000_000,
+        received_pair_uncertainty_ns=500_000,
+    )
+    assert result.received_monotonic_ns == 123_000_000
+    assert result.received_pair_uncertainty_ns == 500_000
+    assert result.to_dict()["received_monotonic_ns"] == 123_000_000
+
+
+@pytest.mark.parametrize(
+    "received_monotonic_ns, received_pair_uncertainty_ns",
+    [(-1, 1), (True, 1), (1, 0), (1, None), (None, 1)],
+)
+def test_kline_result_rejects_invalid_receipt_monotonic_pair(
+    received_monotonic_ns, received_pair_uncertainty_ns,
+) -> None:
+    with pytest.raises(ConnectivityError, match="monotonic receipt"):
+        parse_kline_payload(
+            json.dumps([_kline(BASE_MS)]).encode(),
+            received_at="2026-01-01T00:02:00+00:00",
+            received_monotonic_ns=received_monotonic_ns,
+            received_pair_uncertainty_ns=received_pair_uncertainty_ns,
+        )
 
 
 @pytest.mark.parametrize(
@@ -229,7 +258,11 @@ class FakeTransport:
         response = self.responses.pop(0)
         if response.status == -1:
             raise TimeoutError("synthetic timeout")
-        return HttpResponse(response.status, response.headers, response.body, datetime.now(timezone.utc).isoformat(timespec="milliseconds"))
+        return HttpResponse(
+            response.status, response.headers, response.body,
+            datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            response.received_monotonic_ns, response.received_pair_uncertainty_ns,
+        )
 
 
 def _http(status: int, body: bytes, headers: dict[str, str] | None = None) -> HttpResponse:
@@ -252,6 +285,30 @@ def test_binance_adapter_builds_only_public_market_data_requests() -> None:
     transport = FakeTransport([_http(200, json.dumps([_kline(BASE_MS)]).encode())])
     BinancePublicAdapter(transport=transport).klines(limit=1)
     assert transport.calls[0]["url"] == f"{BINANCE_BASE_URL}{BINANCE_KLINE_PATH}?symbol=BTCUSDT&interval=1m&limit=1"
+
+
+def test_binance_kline_adapter_preserves_transport_receipt_pair() -> None:
+    response = HttpResponse(
+        200,
+        {},
+        json.dumps([_kline(BASE_MS)]).encode(),
+        "2026-01-01T00:02:00+00:00",
+        123_000_000,
+        500_000,
+    )
+    result, attempts = BinancePublicAdapter(transport=FakeTransport([response])).klines(limit=1)
+    assert attempts == 1
+    assert result.received_monotonic_ns == 123_000_000
+    assert result.received_pair_uncertainty_ns == 500_000
+
+
+def test_receipt_timestamp_pair_accounts_for_millisecond_quantization(monkeypatch) -> None:
+    samples = iter([100, 120])
+    monkeypatch.setattr(btc_connectivity.time, "monotonic_ns", lambda: next(samples))
+    monkeypatch.setattr(btc_connectivity, "_iso_now", lambda: "2026-01-01T00:02:00.000+00:00")
+    assert btc_connectivity._receipt_timestamp_pair() == (
+        "2026-01-01T00:02:00.000+00:00", 110, 1_000_010,
+    )
 
 
 @pytest.mark.parametrize("status", [403, 451])

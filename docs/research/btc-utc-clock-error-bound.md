@@ -386,9 +386,26 @@ observations are not retroactively repaired or qualified.
 These snapshots remain diagnostics: they do not exclude a clock step, suspend,
 or synchronization loss between samples. `adapter_returned_at` and its monotonic
 marker describe the return from parsing the response, not the transport receipt.
-The older per-candle `received_monotonic_ns` is sampled during persistence and
-must not be paired with transport `received_at` as a simultaneous clock reading.
-No numeric error bound is inferred; packet eligibility remains false.
+The transport now samples a monotonic counter on both sides of the millisecond
+UTC receipt timestamp after reading the response body. It stores the midpoint as
+`received_monotonic_ns` and the half-span plus one millisecond of timestamp
+quantization as `received_pair_uncertainty_ns`. Realtime capture copies these to
+`response_received_monotonic_ns` and
+`response_received_pair_uncertainty_ns` in both poll and candle records. Replay
+checks the receipt marker falls between request start and adapter return and
+validates the paired values; older captures without these fields remain valid.
+This uncertainty only describes the wall/monotonic sampling pair. The older
+per-candle `received_monotonic_ns` is still sampled during persistence and must
+not be paired with transport `received_at`. No absolute UTC error bound is
+inferred; `clock_error_bound_ms` remains null and packet eligibility remains
+false.
+
+On 2026-11-26 the owner requested retry of the elevated read-only
+`w32tm /query /configuration`; it returned exit code 0. The query did not
+resynchronize W32Time, alter service or clock configuration, or contact market
+or Jev APIs. Configuration output is not committed. This local query does not
+change the clock qualification decision or replace fresh synchronization
+quality and holdover evidence from an approved time source.
 
 ## What an NTP estimate means
 
