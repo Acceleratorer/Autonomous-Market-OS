@@ -67,10 +67,11 @@ A third owner-requested passive retry ran from `06:29:24.721` to
 `07:19:24.784 +07:00` on 2026-11-26. It completed 100/100 successful status
 queries over `3,000.063` wall seconds and a `2,969.964`-second monotonic sample
 span. W32Time stayed `Running/Manual`. At sample 72 it reported a new successful
-sync at `07:04:53 +07:00`; its reported age was `841.599 s` at the end. The
-final root-distance estimate was `4.12125485 s`, not a qualified UTC error
-bound. No explicit resync, clock adjustment, configuration change, BTC request,
-Jev request, or model-provider request was made. Keep
+sync at `07:04:53 +07:00`; the last sample at `07:18:54.766 +07:00` reported an
+age of `841.599 s`, about 30 seconds before the window ended. The final
+root-distance estimate was `4.12125485 s`, not a qualified UTC error bound. No
+explicit resync, clock adjustment, configuration change, BTC request, Jev
+request, or model-provider request was made. Keep
 `clock_error_bound_ms` null and B3.1 ineligible: source accuracy, holdover
 drift, freshness, and invalidation rules remain unverified. See the [third
 retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json)

@@ -41,7 +41,7 @@
     "last_good_sync_age_seconds": {
       "start": 14255.9148399,
       "at_sync_transition": 1.5644047,
-      "end": 841.598948
+      "last_sample": 841.598948
     }
   },
   "relative_clock_comparison": {

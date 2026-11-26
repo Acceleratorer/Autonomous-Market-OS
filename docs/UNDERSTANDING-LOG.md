@@ -7,10 +7,11 @@
   `Running/Manual`; the observer made no resync, clock adjustment, or
   configuration change.
 - W32Time reported a new last-successful-sync time of `07:04:53 +07:00` at
-  sample 72. Its age was `841.599 s` at the end. The final root-distance
-  estimate was `4.12125485 s`; this is not a qualified capture-time error
-  bound. The maximum adjacent wall/monotonic delta was `2.357 ms`, with no
-  interval at the `250 ms` threshold.
+  sample 72. The last sample at `07:18:54.766 +07:00` reported age
+  `841.599 s`; the observation ended about 30 seconds later. The final
+  root-distance estimate was `4.12125485 s`; this is not a qualified
+  capture-time error bound. The maximum adjacent wall/monotonic delta was
+  `2.357 ms`, with no interval at the `250 ms` threshold.
 - Keep `clock_error_bound_ms` unknown and B3.1 ineligible until source
   accuracy, holdover drift, freshness, and invalidation behavior are defined.
   Sanitized evidence is in

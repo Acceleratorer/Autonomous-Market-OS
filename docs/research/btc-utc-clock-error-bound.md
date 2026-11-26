@@ -250,10 +250,11 @@ provider request.
 
 The initial last-successful-sync time was `02:31:48 +07:00`, with a reported
 age of `14,255.915 s`. At sample 72, W32Time reported a new last-successful
-sync time of `07:04:53 +07:00`, with age `1.564 s`; at the end of the window,
-the reported age was `841.599 s`. Leap remained 0 and stratum 5. The final
-root delay was `0.0448849 s`, root dispersion `4.0988124 s`, and derived
-root-distance estimate `4.12125485 s`. The maximum absolute adjacent
+sync time of `07:04:53 +07:00`, with age `1.564 s`. The last sample, at
+`07:18:54.766 +07:00`, reported age `841.599 s`; the window ended at
+`07:19:24.784 +07:00`, about 30 seconds later. Leap remained 0 and stratum 5.
+The final root delay was `0.0448849 s`, root dispersion `4.0988124 s`, and
+derived root-distance estimate `4.12125485 s`. The maximum absolute adjacent
 wall/monotonic delta was `2.357 ms`, with no interval at or above the
 `250 ms` diagnostic threshold. No resync was requested; ordinary W32Time
 service traffic was not measured.
