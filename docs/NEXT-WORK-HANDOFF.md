@@ -12,7 +12,13 @@ runner evidence only: even a passing run does not verify the owner's Linux
 target host, installed GPU/device access, or GPU MPS limits. The Windows local
 focused suite covers the CLI routing and failure behavior but skips the live
 Linux check. Keep target-host and GPU verification open until tested on the
-intended Linux hardware.
+intended Linux hardware. PR #104 CI run
+[45846897197](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/45846897197)
+used Ubuntu image `ubuntu26` version `20261122.9.1`; the host denied writing
+the unprivileged user-namespace UID map. The report artifact records
+`status: unavailable` and exit code 1, and the smoke test skips this explicit
+runner limitation. This is runner-capability evidence, not a verified Linux
+isolation result.
 
 ## Current status — 2026-11-26
 
