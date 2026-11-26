@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
+import os
 from pathlib import Path, PurePosixPath
+import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -116,3 +120,103 @@ def test_local_assessor_cli_is_moved_into_a_scope_once(monkeypatch: pytest.Monke
     assert command[-1] == "fixture.json"
 
     assert run_assessor_in_isolation(["btc-paper", "local-assessor", "replay", "run-1"]) is None
+    assert run_assessor_in_isolation(["btc-paper", "local-assessor", "isolation"]) == 0
+    assert calls[1][0][-1] == "isolation"
+
+
+def test_local_assessor_isolation_command_reports_unverified_scope(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from market_os.cli import main
+
+    monkeypatch.setenv(SCOPE_ENV, "market-os-btc-assessor-invalid.scope")
+    monkeypatch.setenv(PARENT_NETNS_ENV, "1")
+
+    exit_code = main(["btc-paper", "local-assessor", "isolation"])
+
+    report = json.loads(capsys.readouterr().out)
+    assert exit_code == 2
+    assert report["status"] == "unverified"
+
+
+@pytest.mark.integration
+def test_live_linux_isolation_scope_reports_enforced_limits_and_loopback() -> None:
+    if not sys.platform.startswith("linux"):
+        pytest.skip("the live assessor isolation check requires Linux")
+    if os.environ.get("MARKET_OS_LINUX_ISOLATION_SMOKE") != "1":
+        pytest.skip("enable this live host check explicitly")
+
+    root = Path(__file__).resolve().parents[2]
+    result = subprocess.run(
+        [sys.executable, "-m", "market_os.cli", "btc-paper", "local-assessor", "isolation"],
+        cwd=root,
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=60,
+    )
+    runner = {
+        key: os.environ.get(key)
+        for key in ("ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH")
+    }
+    host_blocks_userns = (
+        result.returncode != 0
+        and "write failed /proc/self/uid_map:" in result.stderr
+        and "Operation not permitted" in result.stderr
+    )
+    if host_blocks_userns:
+        report = {
+            "status": "unavailable",
+            "reason": "host runner denied unprivileged user-namespace UID mapping",
+        }
+        parse_error = None
+    else:
+        try:
+            report = json.loads(result.stdout)
+            parse_error = None
+        except json.JSONDecodeError as exc:
+            report = None
+            parse_error = str(exc)
+    if not isinstance(report, dict):
+        parse_error = parse_error or "isolation report is not a JSON object"
+    evidence = {
+        "runner": runner,
+        "exit_code": result.returncode,
+        "isolation": report,
+    }
+    if host_blocks_userns:
+        evidence["stderr"] = result.stderr[:16 * 1024]
+    elif parse_error:
+        evidence["parse_error"] = parse_error
+        evidence["stdout"] = result.stdout[:16 * 1024]
+        evidence["stderr"] = result.stderr[:16 * 1024]
+    report_path = os.environ.get("MARKET_OS_LINUX_ISOLATION_REPORT")
+    if report_path:
+        Path(report_path).write_text(
+            json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    if host_blocks_userns:
+        print("LIVE_LINUX_ISOLATION_REPORT=" + json.dumps(evidence, sort_keys=True))
+        pytest.skip(
+            "host runner blocks unprivileged user namespaces; target isolation remains unverified"
+        )
+
+    assert result.returncode == 0, f"exit={result.returncode}\nstdout={result.stdout}\nstderr={result.stderr}"
+    assert parse_error is None, f"invalid isolation report: {parse_error}"
+    assert report["status"] == "enforced"
+    limits = report["resource_limits"]
+    network = report["network_isolation"]
+    assert limits["cpu_hard_cap_percent"] <= 25
+    assert limits["memory_max_bytes"] <= 6 * 1024**3
+    assert limits["task_max_count"] <= 128
+    assert limits["cgroup_path"].endswith(limits["scope_unit"])
+    assert limits["process_cgroup_path"] == limits["cgroup_path"]
+    assert network["current_namespace_inode"] != network["parent_namespace_inode"]
+    assert network["process_namespace_inode"] == network["current_namespace_inode"]
+    assert network["interfaces"] == ["lo"]
+    assert network["ipv4_route_devices"] == ["lo"]
+    assert network["ipv6_route_devices"] == ["lo"]
+    serialized_evidence = json.dumps(evidence, sort_keys=True)
+    print("LIVE_LINUX_ISOLATION_REPORT=" + serialized_evidence)

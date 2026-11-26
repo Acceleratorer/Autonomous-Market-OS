@@ -112,6 +112,9 @@ def verify_linux_isolation(process_pid: int | None = None) -> dict[str, Any]:
         if process_cgroup != current_cgroup:
             raise LinuxAssessorIsolationError("assessor and llama-server are in different cgroups")
         resources = _resource_limits(Path("/sys/fs/cgroup"), current_cgroup, scope_unit)
+        resources["scope_unit"] = scope_unit
+        resources["cgroup_path"] = str(current_cgroup)
+        resources["process_cgroup_path"] = str(process_cgroup)
 
         current_netns = _net_namespace_inode("/proc/self/ns/net")
         process_netns = _net_namespace_inode(f"/proc/{process_pid}/ns/net") if process_pid is not None else current_netns
@@ -128,6 +131,9 @@ def verify_linux_isolation(process_pid: int | None = None) -> dict[str, Any]:
             "network_isolation": {
                 "status": "enforced",
                 "supervisor": "unshare user and network namespaces",
+                "current_namespace_inode": current_netns,
+                "parent_namespace_inode": parent_netns,
+                "process_namespace_inode": process_netns,
                 "interfaces": interfaces,
                 "ipv4_route_devices": sorted(ipv4_routes),
                 "ipv6_route_devices": sorted(ipv6_routes),
@@ -171,7 +177,7 @@ def run_assessor_in_isolation(argv: list[str]) -> int | None:
     """Re-run local assessor health/assessment inside its Linux boundary."""
     if not sys.platform.startswith("linux") or os.environ.get(SCOPE_ENV):
         return None
-    if len(argv) < 3 or argv[:2] != ["btc-paper", "local-assessor"] or argv[2] not in {"health", "assess"}:
+    if len(argv) < 3 or argv[:2] != ["btc-paper", "local-assessor"] or argv[2] not in {"health", "assess", "isolation"}:
         return None
     scope_unit = f"market-os-btc-assessor-{secrets.token_hex(8)}.scope"
     environment = os.environ.copy()

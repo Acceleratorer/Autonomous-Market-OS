@@ -1,5 +1,25 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+### Linux assessor isolation diagnostic and CI evidence — 2026-11-26
+
+The Linux local-assessor CLI now has `btc-paper local-assessor isolation`, which
+re-enters the same fail-closed systemd/cgroup-v2 and user/network-namespace
+boundary as `health` and `assess`, then prints a JSON report of the effective
+scope, limits, namespace membership, interfaces, and routes. The CI workflow
+adds a live Linux smoke check and uploads that report with runner image metadata as
+the `market-os-btc-assessor-linux-isolation` artifact. The artifact is hosted
+runner evidence only: even a passing run does not verify the owner's Linux
+target host, installed GPU/device access, or GPU MPS limits. The Windows local
+focused suite covers the CLI routing and failure behavior but skips the live
+Linux check. Keep target-host and GPU verification open until tested on the
+intended Linux hardware. PR #104 CI run
+[45846897197](https://github.com/Acceleratorer/Autonomous-Market-OS/actions/runs/45846897197)
+used Ubuntu image `ubuntu26` version `20261122.9.1`; the host denied writing
+the unprivileged user-namespace UID map. The report artifact records
+`status: unavailable` and exit code 1, and the smoke test skips this explicit
+runner limitation. This is runner-capability evidence, not a verified Linux
+isolation result.
+
 ## Current status — 2026-11-26
 
 The owner retried the elevated, read-only `w32tm /query /configuration` query;
@@ -207,11 +227,12 @@ It preserves prior records and does not prune automatically; the quota check
 and write-once commit are serialized across writers. See
 [ADR-0060](decisions/ADR-0060-btc-local-assessment-store-quota.md).
 
-This checkout at `D:\Code\Github\Autonomous-Market-OS` is the secondary
-checkout. Its exact pinned Python and `llama-server.exe` rules are already
-enabled and enforced in ActiveStore under `-SecondaryCheckout` names; the
-unsuffixed rules are for `D:\Code\Github\HKUDS\Autonomous-Market-OS`. The
-current verifier initially missed the valid secondary names and failed closed.
+During the earlier secondary-checkout check at
+`D:\Code\Github\Autonomous-Market-OS`, its exact pinned Python and
+`llama-server.exe` rules were already enabled and enforced in ActiveStore under
+`-SecondaryCheckout` names; the unsuffixed rules are for
+`D:\Code\Github\HKUDS\Autonomous-Market-OS`. The current verifier initially
+missed the valid secondary names and failed closed.
 It now locates managed rules by exact executable path, validates all rule
 filters, and reports the names it checked. Install mode reuses an existing
 valid persistent rule, so no elevated policy change was needed. The corrected
@@ -473,14 +494,14 @@ executable-scoped rules were absent at that checkpoint. On 2026-11-25, the
 secondary checkout's existing rules were matched by exact executable path;
 fresh health and a bounded denial probe passed without a firewall policy
 change. The 50-minute health-only observation completed with 100/100 healthy
-samples. The Linux path now launches local-assessor `health` and `assess`
-inside a transient user systemd scope plus a user/network namespace, then
-checks the effective cgroup-v2 CPU, memory, and task limits; namespace
-membership; loopback-only interface; and IPv4/IPv6 route devices. It fails
-closed if any check is missing. Linux tests use mocked OS state only, and this
-Windows workstation has no WSL distribution, so the Linux boundary and GPU
-device access remain unverified on a real target host. Do not call either
-platform production-ready until its target boundary is observed.
+samples. The Linux path launches local-assessor `health`, `assess`, and
+`isolation` inside a transient user systemd scope plus a user/network
+namespace, then checks the effective cgroup-v2 CPU, memory, and task limits;
+namespace membership; loopback-only interface; and IPv4/IPv6 route devices. It
+fails closed if any check is missing. The Windows workstation has no WSL
+distribution; mocked tests and a passing hosted Linux smoke do not verify the
+owner's target host or GPU device access. Do not call either platform
+production-ready until its target boundary is observed.
 The runtime/bootstrap and mocked-isolation evidence is in
 [`btc-assessor-runtime-isolation-implementation-2026-11-20.json`](evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json).
 PR #54 merged as `8132c5765d53a3b92486d1c76adaa6f35ddd32ff`. GitHub Actions
