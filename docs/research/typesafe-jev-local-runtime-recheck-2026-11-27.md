@@ -20,6 +20,10 @@ The official [TypeSafe GitHub organization](https://github.com/orgs/typesafe-ai/
 
 The existing TypeSafe Sales inquiry thread was rechecked on 2026-11-27. It contains the sent inquiry and follow-up only; no vendor reply or deployment manifest is present. No new email was sent.
 
+## Local workstation artifact check — 2026-11-27
+
+A bounded, read-only inventory covered the repository's `.market_os` data, common Hugging Face and ModelScope caches, the Codex model directory, and `Documents/Codex` to depth five. The only Jev-named directories were the three `jev-connectivity-live*` stores; each contained a reservation, manifest, and result JSON. The recognized model-weight extensions in those search roots found one model file, the pinned Qwen3-4B GGUF, and no weight file under a Jev/TypeSafe-named directory. No vendor-authenticated Jev runtime or deployment manifest was found. The environment contains a `TYPESAFE_API_KEY` variable name; its value was not read, and its presence is not evidence of a local runtime. `wsl.exe --list --quiet` exited 1 and returned zero distributions, so this workstation has no WSL target for a live Linux isolation check. This bounded local search does not rule out artifacts in unscanned locations or a private TypeSafe delivery channel.
+
 ## Independent local-compatible projects are not Jev
 
 - [local-jev](https://github.com/amithgc/local-jev) describes itself as an offline System One-compatible server that uses open models, including Qwen and an entailment model. Its README says it is offline after the first model download and labels the project a research project, not a finished product. Its reported benchmark figures are author-published and have not been reproduced in this project. This is a third-party model and server, not TypeSafe Jev or a vendor-authenticated Jev runtime.
