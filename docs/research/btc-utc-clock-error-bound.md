@@ -336,6 +336,38 @@ Jev, model-provider, or explicit time-source request was made. Keep
 window cannot replace the missing qualification inputs. See the
 [sanitized evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json).
 
+### Owner-authorized retry after accepted elevation — 2026-11-26 14:36 +07:00
+
+The passive observer ran from `14:36:11.368` to `15:26:11.393 +07:00`, a
+`3,000.025 s` wall span and `2,970.007 s` monotonic sample span. It completed
+100/100 successful status queries, with no timeouts, query failures, or
+W32Time event IDs. W32Time remained `Running/Manual`; the observer did not
+start or stop the service, resynchronize, adjust the clock, or change the
+time-service configuration.
+
+The owner accepted the UAC prompt for the elevated read-only
+`w32tm /query /configuration /verbose` command. It completed with exit code 0;
+peer identity and configuration values are omitted from committed evidence.
+The last successful sync remained `11:37:57 +07:00`, and its reported age grew
+from `10,694.002 s` to `13,664.034 s`. Leap remained 0 and stratum 5. Root
+delay was `0.0479012 s`, root dispersion `7.8723382 s`, and derived root
+distance estimate `7.8962888 s`. The maximum absolute adjacent
+wall/monotonic delta was `2.005 ms`, with no interval at or above the `250 ms`
+diagnostic threshold. No fresh synchronization was observed.
+
+This confirms only the service's reported status and relative wall/monotonic
+behavior. The conditional root-distance estimate is not a capture-time UTC
+error bound; source accuracy, holdover drift, freshness criteria, and
+invalidation behavior remain unqualified. No BTC, Jev, model-provider, or
+explicit time-source request was made. Ordinary W32Time service traffic was
+not measured. Keep `clock_error_bound_ms: null` and `packet_eligible: false`,
+and do not repeat passive windows as a substitute for time-source
+qualification. Sanitized evidence is in
+[btc-w32time-observation-50m-retry-2026-11-26-143611.json](../evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json).
+The raw report remains local and ignored at
+`.market_os/clock/w32time-passive-observation-20261126-143540.json` (SHA-256
+`D192287D46194439214A9FCDD07D424243DE1CAE7E91D11D97B28088D067C8B2`).
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before
