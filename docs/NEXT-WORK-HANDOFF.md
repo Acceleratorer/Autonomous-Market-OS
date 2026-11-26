@@ -77,6 +77,14 @@ drift, freshness, and invalidation rules remain unverified. See the [third
 retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json)
 and [clock qualification note](research/btc-utc-clock-error-bound.md).
 
+A later read-only status check at about `08:16 +07:00` still reported the
+`07:04:53` successful sync as `4,278.583 s` old and `Last Sync Error: 2`; the
+peer was `Active` with `12,105.070 s` until its next poll. The unprivileged
+configuration query returned `Access is denied`, and the owner-authorized UAC
+retry was canceled before it started. W32Time stayed `Running/Manual` with no
+configuration change. Keep `clock_error_bound_ms` null and B3.1 ineligible;
+see the updated [clock qualification note](research/btc-utc-clock-error-bound.md).
+
 The local Qwen assessment store now caps aggregate run-file bytes at 1 GiB per
 store root and rejects new runs with typed `store_capacity_exceeded` once full.
 It preserves prior records and does not prune automatically; the quota check
