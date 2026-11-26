@@ -156,8 +156,32 @@ def test_live_linux_isolation_scope_reports_enforced_limits_and_loopback() -> No
         text=True,
         timeout=60,
     )
+    try:
+        report = json.loads(result.stdout)
+        parse_error = None
+    except json.JSONDecodeError as exc:
+        report = None
+        parse_error = str(exc)
+    if not isinstance(report, dict):
+        parse_error = parse_error or "isolation report is not a JSON object"
+    evidence = {
+        "runner": {
+            key: os.environ.get(key)
+            for key in ("ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH")
+        },
+        "exit_code": result.returncode,
+        "isolation": report,
+    }
+    if parse_error:
+        evidence["parse_error"] = parse_error
+        evidence["stdout"] = result.stdout[:16 * 1024]
+        evidence["stderr"] = result.stderr[:16 * 1024]
+    report_path = os.environ.get("MARKET_OS_LINUX_ISOLATION_REPORT")
+    if report_path:
+        Path(report_path).write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
     assert result.returncode == 0, f"exit={result.returncode}\nstdout={result.stdout}\nstderr={result.stderr}"
-    report = json.loads(result.stdout)
+    assert parse_error is None, f"invalid isolation report: {parse_error}"
     assert report["status"] == "enforced"
     limits = report["resource_limits"]
     network = report["network_isolation"]
@@ -171,12 +195,5 @@ def test_live_linux_isolation_scope_reports_enforced_limits_and_loopback() -> No
     assert network["interfaces"] == ["lo"]
     assert network["ipv4_route_devices"] == ["lo"]
     assert network["ipv6_route_devices"] == ["lo"]
-    evidence = {
-        "runner": {key: os.environ.get(key) for key in ("ImageOS", "ImageVersion", "RUNNER_OS", "RUNNER_ARCH")},
-        "isolation": report,
-    }
     serialized_evidence = json.dumps(evidence, sort_keys=True)
-    report_path = os.environ.get("MARKET_OS_LINUX_ISOLATION_REPORT")
-    if report_path:
-        Path(report_path).write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print("LIVE_LINUX_ISOLATION_REPORT=" + serialized_evidence)
