@@ -312,6 +312,30 @@ request was made. Keep `clock_error_bound_ms: null` and
 `packet_eligible: false`; further passive windows cannot replace the missing
 qualification inputs. See the [sanitized evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json).
 
+### Owner-requested retry after elevation was canceled again — 2026-11-26 10:17 +07:00
+
+The passive observer ran from `10:17:27.739` to `11:07:27.812 +07:00`, a
+`3,000.073 s` wall span. It completed 100/100 successful status queries with
+no timeouts, query failures, or W32Time event IDs. The monotonic sample span
+was `2,970.017 s`. W32Time remained `Running/Manual`; the observer did not
+start or stop the service, resynchronize, or adjust the system clock.
+
+The last successful sync remained `07:04:53 +07:00`, and its reported age grew
+from `11,554.568 s` to `14,524.605 s`. Leap remained 0 and stratum 5. Root
+delay was `0.0448849 s`, root dispersion `4.0988124 s`, and derived root
+distance estimate `4.12125485 s`. The maximum absolute adjacent
+wall/monotonic delta was `1.224 ms`, with no interval at or above `250 ms`.
+The unprivileged configuration query returned `Access is denied`; Windows
+returned `operation was canceled by the user` before the elevated process
+launched, so no privileged configuration facts were collected.
+
+These readings remain relative diagnostics and do not establish source
+accuracy, holdover drift, freshness criteria, or invalidation behavior. No BTC,
+Jev, model-provider, or explicit time-source request was made. Keep
+`clock_error_bound_ms: null` and `packet_eligible: false`; another passive
+window cannot replace the missing qualification inputs. See the
+[sanitized evidence](../evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json).
+
 ## Receipt-linked diagnostics
 
 New realtime captures record bounded, read-only W32Time status queries before

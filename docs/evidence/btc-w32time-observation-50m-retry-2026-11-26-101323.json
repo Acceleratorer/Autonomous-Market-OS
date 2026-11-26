@@ -1,0 +1,84 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-26",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_start": "main",
+    "commit_at_start": "1c8a206ecc43359c4aedab4227acd050f93fe6d6"
+  },
+  "observation": {
+    "id": "w32time-passive-observation-20261126-101323",
+    "status": "completed",
+    "started_at": "2026-11-26T10:17:27.7390657+07:00",
+    "first_sample_at": "2026-11-26T10:17:27.7470658+07:00",
+    "last_sample_at": "2026-11-26T11:06:57.7824768+07:00",
+    "ended_at": "2026-11-26T11:07:27.8121445+07:00",
+    "configured_duration_seconds": 3000,
+    "observation_wall_span_seconds": 3000.073,
+    "sampled_monotonic_span_seconds": 2970.017,
+    "sample_interval_seconds": 30,
+    "status_sample_count": 100,
+    "successful_status_queries": 100,
+    "status_query_failures": 0,
+    "status_query_timeouts": 0,
+    "w32time_event_ids": []
+  },
+  "service": {
+    "state_before": "Running",
+    "start_mode_before": "Manual",
+    "state_after": "Running",
+    "start_mode_after": "Manual",
+    "service_state_changed": false,
+    "start_mode_changed": false
+  },
+  "configuration_diagnostics": {
+    "unprivileged_query": "Access is denied",
+    "unprivileged_query_exit_code": -2147024891,
+    "elevated_retry": "Windows returned operation canceled before elevated process launch",
+    "configuration_facts_collected": false,
+    "time_service_configuration_changed": false
+  },
+  "synchronization": {
+    "source_identity": "redacted",
+    "leap_indicator": "0 (no warning)",
+    "stratum": 5,
+    "root_delay_seconds": 0.0448849,
+    "root_dispersion_seconds": 4.0988124,
+    "root_distance_estimate_seconds": 4.12125485,
+    "last_successful_sync_time_reported_local": "2026-11-26 07:04:53 +07:00",
+    "fresh_successful_sync_observed": false,
+    "last_good_sync_age_seconds": {
+      "start": 11554.5675483,
+      "last_sample": 14524.6050846
+    }
+  },
+  "relative_clock_comparison": {
+    "wall_minus_monotonic_step_indication_ge_250ms": false,
+    "max_absolute_adjacent_delta_ms": 1.224,
+    "interpretation": "Relative stability only; the service-reported sync and root-distance estimate do not establish absolute UTC accuracy."
+  },
+  "actions": {
+    "resync_performed": false,
+    "system_clock_adjusted_by_observer": false,
+    "time_service_configuration_changed": false,
+    "polling_configuration_changed": false,
+    "btc_packet_capture_performed": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-passive-observation-20261126-101323.json",
+    "raw_report_committed": false,
+    "raw_report_sha256": "AE27AD98D0D66622D876745052726F2DC092F09AE08F451596CDC0E9120D5D7D"
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "packet_eligible": false,
+    "reason": "Source accuracy, holdover drift, freshness criteria, and invalidation behavior remain unqualified. A passive relative-clock observation cannot provide those inputs."
+  }
+}
