@@ -92,6 +92,18 @@ and [clock qualification note](research/btc-utc-clock-error-bound.md). This
 repeat observation does not replace source-accuracy, holdover-drift, freshness,
 or invalidation rules.
 
+A further owner-requested passive retry ran from `10:17:27.739` to
+`11:07:27.812 +07:00`. It completed 100/100 successful status queries over
+`3,000.073` wall seconds and a `2,970.017`-second monotonic sample span.
+W32Time stayed `Running/Manual`; the last successful sync remained
+`07:04:53 +07:00` and its age grew from `11,554.568 s` to `14,524.605 s`.
+The `4.12125485 s` root-distance estimate remains an estimate, not a UTC error
+bound; maximum adjacent wall/monotonic delta was `1.224 ms`. The unprivileged
+configuration query was denied and Windows canceled the elevated launch before
+it ran. Keep `clock_error_bound_ms` null and B3.1 ineligible. See the
+[sanitized retry evidence](evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json)
+and [clock qualification note](research/btc-utc-clock-error-bound.md).
+
 The local Qwen assessment store now caps aggregate run-file bytes at 1 GiB per
 store root and rejects new runs with typed `store_capacity_exceeded` once full.
 It preserves prior records and does not prune automatically; the quota check
