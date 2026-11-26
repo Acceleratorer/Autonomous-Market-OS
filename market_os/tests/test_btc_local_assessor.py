@@ -17,6 +17,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from market_os import btc_local_assessor as local_assessor
 from market_os import btc_local_assessor_store as assessor_store
 from market_os.btc_evidence_packet import EvidencePacketError, SourceTimeBounds, build_b31_evidence_packet
 from market_os.btc_features import B2_FEATURE_VERSION
@@ -225,11 +226,13 @@ class FakeRuntime:
     model_version: str = "synthetic-runtime-model-v1"
     runtime_version: str = "fake-local-runtime"
     manifest_fingerprint: str = "a" * 64
+    last_messages: list[dict[str, str]] | None = None
 
     def complete(self, messages: list[dict[str, str]], schema: dict[str, Any], *, timeout_seconds: float) -> tuple[dict[str, Any], int]:
         assert messages[0]["role"] == "system"
         assert schema["type"] == "object"
         assert 1 <= timeout_seconds <= 300
+        self.last_messages = messages
         return {"choices": [{"message": {"content": json.dumps(self.response)}}]}, 5
 
 
@@ -247,6 +250,17 @@ def test_local_assessor_normalizes_typed_results_without_claiming_jev() -> None:
     assert record.assessment["agreement_results"][0]["comparison_evidence_group_ids"] == ("group-b",)
     assert record.assessment["support_results"][0]["probabilities"] == {"supported": 1.0, "mixed": 0.0, "unknown": 0.0, "unsupported": 0.0}
     assert "market_probability_up" not in record.assessment
+
+
+def test_local_prompt_defines_contradiction_and_does_not_abstain_on_classifiable_disagreement() -> None:
+    runtime = FakeRuntime(_usable_response())
+    LocalB31Assessor(runtime).assess(_packet())
+
+    assert runtime.last_messages is not None
+    system_prompt = runtime.last_messages[0]["content"]
+    assert "contradiction means incompatible claims about the same event and horizon" in system_prompt
+    assert "answerable when these semantic labels can be selected from the supplied evidence" in system_prompt
+    assert "abstain only when the assessment is insufficient or unsafe" in system_prompt
 
 
 def test_local_assessor_rejects_model_citations_outside_the_packet() -> None:
@@ -447,12 +461,15 @@ def test_local_runtime_rejects_a_different_python_executable_before_loading_mode
     verify_runtime.assert_called_once_with(Path(__file__).resolve().parents[2], python_target, verify_only=True)
 
 
-def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp_path) -> None:
+def test_local_assessment_store_replays_without_calling_an_inference_runtime(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(local_assessor, "LOCAL_ADAPTER_VERSION", "market-os-btc-local-assessor-v1")
     packet = _packet()
     record = LocalB31Assessor(FakeRuntime(_usable_response())).assess(packet)
     store = LocalAssessmentStore(tmp_path)
 
     path = store.persist(packet, record)
+    monkeypatch.setattr(local_assessor, "_messages", lambda _payload: [{"role": "system", "content": "revised prompt"}])
+    monkeypatch.setattr(local_assessor, "LOCAL_ADAPTER_VERSION", "market-os-btc-local-assessor-v2")
     replay = store.replay(record.run_id)
 
     assert path.is_file()

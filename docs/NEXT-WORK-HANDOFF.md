@@ -12,6 +12,10 @@ still leaves `clock_error_bound_ms` unknown and packet eligibility false.
 Continue only after the approved synchronization-quality source and holdover
 assumptions are available.
 
+The earlier elevated query returned exit code 0. A later retry around 18:59
+local was canceled by Windows before the query process launched; it produced no
+new configuration facts and made no system changes.
+
 ### Local-only Qwen runtime check — 2026-11-26
 
 The pinned CPython 3.11.18 runtime launched the installed Qwen3-4B
@@ -31,6 +35,25 @@ the model as `Qwen/Qwen3-4B-GGUF`, and persisted run
 Offline replay returned `verified`, with zero network requests and zero
 inference calls. This verifies the local Qwen path and its typed abstention;
 it is not real-market evidence and does not validate Jev.
+
+The B3.1 local prompt was clarified and the adapter is now v2. A fresh run on
+the mutually exclusive synthetic packet `packet-clear-contradiction.json`
+used the pinned local Qwen runtime with `TYPESAFE_API_KEY` absent from the child
+process. Run `41e51ef9e69f6bb54629bd6ef14a27ff` selected `contradiction` for
+both hypothesis comparisons, while the packet-level outcome remained
+`abstained` (`model_recommended_abstention`). It is still synthetic,
+uncalibrated, advisory-only, and ineligible for fusion or paper decisions.
+Offline replay returned `verified` with zero network requests and zero
+inference calls.
+
+The replay regression stores a v1 record, then simulates a v2 prompt and adapter
+revision. It verifies the original request and prompt fingerprints while
+re-running packet gates and response normalization. Existing synthetic runs
+`23ba010959b58e50327337eb68922763` and
+`7ba9f54786a84b6f82bbda1e4ffe0c04` also replay under the updated code with
+zero network requests and zero inference calls. The focused seven-module BTC
+suite passed 83 tests. These checks validate local Qwen and replay behavior;
+they provide no evidence about authentic Jev or market calibration.
 
 The previously saved 2026-11-20 synthetic run `0d6520c40bd388a5b3eb779b19310d48`
 also replays successfully. Five older 2026-11-19 bundles in the default local
