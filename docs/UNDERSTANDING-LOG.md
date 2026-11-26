@@ -1,5 +1,23 @@
 # Understanding log
 
+## 2026-11-26 — W32Time passive retry at 08:51 +07:00
+
+- The owner-requested 50-minute read-only retry ran from `08:51:31.435` to
+  `09:41:31.467 +07:00`. It completed 100/100 successful status queries over
+  `3,000.000` wall seconds and a `2,970.004`-second monotonic sample span.
+  W32Time remained `Running/Manual`; there were no W32Time event IDs or query
+  timeouts. The observer did not control the service or adjust the clock.
+- The last successful sync stayed at `07:04:53 +07:00`; its reported age grew
+  from `6,398.259 s` to `9,368.287 s`. Root distance remained an estimated
+  `4.12125485 s`, not a qualified UTC error bound. The maximum adjacent
+  wall/monotonic delta was `1.224 ms`, with no interval at the `250 ms`
+  diagnostic threshold.
+- The unprivileged configuration query returned `Access is denied`; the
+  elevated retry was canceled before process launch. Keep
+  `clock_error_bound_ms` unknown and B3.1 ineligible. Sanitized evidence is in
+  `docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json`;
+  the raw trace remains local and ignored.
+
 ## 2026-11-26 — W32Time passive retry at 06:29 +07:00
 
 - The owner-requested 50-minute retry completed with 100/100 successful status
