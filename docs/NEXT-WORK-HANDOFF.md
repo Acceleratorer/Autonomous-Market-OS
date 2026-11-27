@@ -1,5 +1,32 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28
+
+The latest first-party TypeSafe recheck is recorded in
+[the 2026-11-28 research note](research/typesafe-jev-local-runtime-recheck-2026-11-28.md).
+It confirms that public Jev documentation still describes the hosted
+`POST /v1/systemone` service and says the same weights serve every account.
+The official GitHub organization exposes SDKs, adapters, examples, and serving
+infrastructure, but no Jev checkpoint, offline runtime, signed local manifest,
+or weight download. The public Hugging Face API returned no TypeSafeAI models
+or datasets. The Enterprise VPC/on-prem FAQ question remains unanswered.
+
+Authentic local Jev is therefore still **unverified**. The already-sent Sales
+inquiry remains the only valid next gate: require written local/VPC/on-prem
+terms and a vendor-authenticated manifest for Jev version, runtime/container,
+weight hashes, supported targets, and offline/egress behavior. Do not treat
+Qyvos, Open-Jev, local-jev, Nimble, Kev, Qwen, or any API-compatible service as
+Jev. Do not send BTC packets to hosted Jev or use hosted output to train or
+evaluate a substitute.
+
+The project now has a dependency-free CI validator for the shared knowledge
+checkpoint. It rejects missing or mismatched graph metadata, source changes
+after the analyzed commit, dangling edges, and scan/fingerprint inventory drift.
+The graph remains a committed snapshot; each collaborator starts a local
+dashboard from the same Git state. Market OS still owns math, probability,
+calibration, stability, risk, and paper decisions; B3.1 remains gated by a
+qualified UTC receipt bound and eligible packets.
+
 ## Current collaborator checkpoint — 2026-11-27
 
 The reviewed base was clean `main` at `5e0edd4`. PR #109 (Windows AppContainer

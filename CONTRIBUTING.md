@@ -15,6 +15,8 @@ understanding log. When a change alters a contract, decision, research finding,
 or architecture, update its canonical project document in the same pull
 request and refresh the shared graph. See the
 [shared graph guide](docs/UNDERSTAND-GRAPH.md).
+The exact cadence, source-then-graph commit sequence, dashboard boundary, and
+validator are in [KNOWLEDGE-MAINTENANCE.md](docs/KNOWLEDGE-MAINTENANCE.md).
 
 ## Scope
 
@@ -71,6 +73,7 @@ python scripts/ci_checks.py secret-scan
 python scripts/ci_checks.py validate-evidence
 python scripts/build_web_artifact.py --check
 python scripts/ci_checks.py validate-mlops-manifest
+python scripts/ci_checks.py validate-shared-knowledge
 git diff --check
 ```
 

@@ -1,5 +1,8 @@
 # Shared Understand Anything Graph
 
+The maintenance cadence and source-then-graph commit sequence are centralized
+in [KNOWLEDGE-MAINTENANCE.md](KNOWLEDGE-MAINTENANCE.md).
+
 The committed snapshot under `.ua/` gives every contributor and coding agent the same source-derived map of Autonomous Market OS. It contains file, function, and class nodes; dependency and test edges; architectural layers; and a guided tour. It does not contain market candles, API credentials, private packets, or runtime data. The repository's project goal, decisions, research, and evidence remain the authoritative written knowledge; the graph helps people find and connect that material. Follow the [collaborator workflow](COLLABORATION-WORKFLOW.md) for the shared start, update, and pull-request routine.
 
 ## Shared files

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -105,8 +106,6 @@ def secret_scan() -> None:
 
 
 def validate_mlops_manifest() -> None:
-    import subprocess
-
     completed = subprocess.run(
         [sys.executable, str(ROOT / "mlops" / "validate_manifest.py"), str(ROOT / "mlops" / "experiment-manifest.example.json")],
         cwd=ROOT,
@@ -117,6 +116,94 @@ def validate_mlops_manifest() -> None:
     if completed.returncode:
         raise SystemExit(completed.stderr or completed.stdout or "MLOps manifest validation failed")
     print(completed.stdout.strip())
+
+
+def _git(*args: str) -> str:
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if completed.returncode:
+        raise SystemExit(completed.stderr.strip() or f"git {' '.join(args)} failed")
+    return completed.stdout.strip()
+
+
+def validate_shared_knowledge() -> None:
+    """Validate the committed graph and its source checkpoint."""
+    graph_path = ROOT / ".ua" / "knowledge-graph.json"
+    meta_path = ROOT / ".ua" / "meta.json"
+    fingerprints_path = ROOT / ".ua" / "fingerprints.json"
+    scan_path = ROOT / ".ua" / "intermediate" / "scan-result.json"
+    required = (graph_path, meta_path, fingerprints_path, scan_path)
+    missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
+    if missing:
+        raise SystemExit("shared knowledge files missing: " + ", ".join(missing))
+
+    try:
+        graph = json.loads(graph_path.read_text(encoding="utf-8"))
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        fingerprints = json.loads(fingerprints_path.read_text(encoding="utf-8"))
+        scan = json.loads(scan_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"invalid shared knowledge JSON: {exc}") from exc
+
+    checkpoint = graph.get("project", {}).get("gitCommitHash")
+    hashes = {
+        "graph": checkpoint,
+        "meta": meta.get("gitCommitHash"),
+        "fingerprints": fingerprints.get("gitCommitHash"),
+    }
+    if not checkpoint or len(set(hashes.values())) != 1:
+        raise SystemExit("graph, meta, and fingerprints do not share one gitCommitHash")
+
+    _git("rev-parse", "--verify", f"{checkpoint}^{{commit}}")
+    changed = _git("diff", "--name-only", checkpoint, "HEAD", "--", ".").splitlines()
+    source_changes = [path for path in changed if not path == ".ua" and not path.startswith(".ua/")]
+    if source_changes:
+        raise SystemExit(
+            "source files changed after graph checkpoint "
+            f"{checkpoint[:12]}: " + ", ".join(source_changes[:20])
+        )
+
+    nodes = graph.get("nodes")
+    edges = graph.get("edges")
+    if not isinstance(nodes, list) or not isinstance(edges, list):
+        raise SystemExit("knowledge graph must contain nodes and edges arrays")
+    node_ids = {node.get("id") for node in nodes if isinstance(node, dict)}
+    if None in node_ids:
+        raise SystemExit("knowledge graph contains a node without an id")
+    dangling = [
+        (edge.get("source"), edge.get("target"))
+        for edge in edges
+        if not isinstance(edge, dict)
+        or edge.get("source") not in node_ids
+        or edge.get("target") not in node_ids
+    ]
+    if dangling:
+        raise SystemExit(f"knowledge graph contains {len(dangling)} dangling edges")
+
+    scan_files = {item.get("path") for item in scan.get("files", []) if isinstance(item, dict)}
+    fingerprint_files = set(fingerprints.get("files", {}))
+    if not scan_files or scan_files != fingerprint_files:
+        raise SystemExit("scan-result and fingerprints file inventories differ")
+    graph_paths = {
+        node.get("filePath")
+        for node in nodes
+        if isinstance(node, dict) and node.get("filePath")
+    }
+    missing_files = sorted(path for path in scan_files if path not in graph_paths)
+    if missing_files:
+        raise SystemExit("graph is missing scanned files: " + ", ".join(missing_files[:10]))
+    extra_files = sorted(path for path in graph_paths if path not in scan_files)
+    if extra_files:
+        raise SystemExit("graph has paths outside scan inventory: " + ", ".join(extra_files[:10]))
+    print(
+        "shared knowledge passed: "
+        f"checkpoint={checkpoint[:12]} files={len(scan_files)} nodes={len(nodes)} edges={len(edges)}"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -133,7 +220,10 @@ def main(argv: list[str] | None = None) -> int:
     if command == ["validate-mlops-manifest"]:
         validate_mlops_manifest()
         return 0
-    raise SystemExit("usage: python scripts/ci_checks.py validate-evidence|validate-m2-8-evidence|validate-mlops-manifest|secret-scan")
+    if command == ["validate-shared-knowledge"]:
+        validate_shared_knowledge()
+        return 0
+    raise SystemExit("usage: python scripts/ci_checks.py validate-evidence|validate-m2-8-evidence|validate-mlops-manifest|validate-shared-knowledge|secret-scan")
 
 
 if __name__ == "__main__":
