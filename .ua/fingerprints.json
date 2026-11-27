@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "1fa0ffac21bd43ccbc1040226a7b9866145307f3",
-  "generatedAt": "2026-11-27T15:01:49.426Z",
+  "gitCommitHash": "a7772b75b6cf2ee9ae205a47ceacf5d62fce642c",
+  "generatedAt": "2026-11-27T15:51:30.180Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -75,12 +75,12 @@
     },
     "CONTRIBUTING.md": {
       "filePath": "CONTRIBUTING.md",
-      "contentHash": "b2aca1706f3cce4c6f9eb0df16f07304546a2f5b55ee3851f3d03da0dda7e786",
+      "contentHash": "89c578a53f416ffb1fb448de288febbf7255f69b2e83e9eede3cd6d757f57fe0",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 71,
+      "totalLines": 87,
       "hasStructuralAnalysis": false
     },
     "JEV_PROCESSING.md": {
@@ -95,12 +95,12 @@
     },
     "README.md": {
       "filePath": "README.md",
-      "contentHash": "4f3ec73a88146cee568e0b3ff20088a707aeacec95ea438f91a17d15a4e63c3b",
+      "contentHash": "fca585f0ed15144ae52dfe1995cd69616883676ce775612af317eafb6ba0a610",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 176,
+      "totalLines": 181,
       "hasStructuralAnalysis": false
     },
     "SECURITY.md": {
@@ -5420,12 +5420,12 @@
     },
     "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md": {
       "filePath": "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "contentHash": "6d2d76598c161d79bf6179e0128bb577b495271732b0976bd4dfa5df005b684e",
+      "contentHash": "8d3768a2b26e875bf6e91864625d09d37164cd04ff9c596a2e2a26e27bbea747",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 524,
+      "totalLines": 528,
       "hasStructuralAnalysis": false
     },
     "docs/BTC-PAPER-EXPERIMENT-ROADMAP.md": {
@@ -5520,12 +5520,12 @@
     },
     "docs/GOAL-PROMPT.md": {
       "filePath": "docs/GOAL-PROMPT.md",
-      "contentHash": "1c72f6db04b286d2d07bc16a74b665037b24fd49630331cdf02387766c461c03",
+      "contentHash": "761184002c185234b19d3540f3acc9a32aedabb1b40b741741dc1a88244903e8",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 124,
+      "totalLines": 126,
       "hasStructuralAnalysis": false
     },
     "docs/INTEGRATION-GUIDE.md": {
@@ -8640,12 +8640,12 @@
     },
     "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md": {
       "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "contentHash": "ba25b513819e8f2b9f370da6c834687b4e39a43fbaf7ef62459b3f0e8caaa888",
+      "contentHash": "cc86431e362f69ac502721a50de75583cf2c2045ecae4db9a6d4dfa89d92913a",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 52,
+      "totalLines": 68,
       "hasStructuralAnalysis": false
     },
     "docs/research/typesafe-jev-u3-b3.md": {
@@ -41681,12 +41681,22 @@
     },
     "docs/UNDERSTAND-GRAPH.md": {
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "contentHash": "b74afd6afa9f198595a1efaa2d3a17af753b2a70931747db076151ac89ce28b8",
+      "contentHash": "3ab035f7402c78f3ff0a3647803e6ebcc9e2a3c3c806dbb1419918da2ef2f54c",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 37,
+      "totalLines": 75,
+      "hasStructuralAnalysis": false
+    },
+    "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json": {
+      "filePath": "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json",
+      "contentHash": "010591cf314b4ac3baa928ed97244e50fea0222484c2482b1c1bae54ef6a8940",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 53,
       "hasStructuralAnalysis": false
     }
   }

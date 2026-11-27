@@ -29,9 +29,9 @@
       "GitHub Actions",
       "Terraform"
     ],
-    "description": "Autonomous Market OS foundation slice: synthetic, paper-only market research and portfolio inspection workspace with read-only defaults. Live trading, provider credentials, Binance transport, a public Python gateway, and HTTP/CLI mutation routes are disabled. This repository contains 705 files; scanning a smaller subdirectory can reduce analysis time.",
-    "analyzedAt": "2026-11-27T15:01:49.149Z",
-    "gitCommitHash": "1fa0ffac21bd43ccbc1040226a7b9866145307f3"
+    "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 706 repository files.",
+    "analyzedAt": "2026-11-27T15:51:29.890Z",
+    "gitCommitHash": "a7772b75b6cf2ee9ae205a47ceacf5d62fce642c"
   },
   "nodes": [
     {
@@ -29434,19 +29434,6 @@
       "complexity": "simple"
     },
     {
-      "id": "document:CONTRIBUTING.md",
-      "type": "document",
-      "name": "CONTRIBUTING.md",
-      "filePath": "CONTRIBUTING.md",
-      "summary": "Explains contribution scope, local setup and the checks expected before opening a pull request.",
-      "tags": [
-        "documentation",
-        "development",
-        "contribution"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "document:JEV_PROCESSING.md",
       "type": "document",
       "name": "JEV_PROCESSING.md",
@@ -30344,21 +30331,6 @@
       "complexity": "simple"
     },
     {
-      "id": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "type": "document",
-      "name": "BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "filePath": "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "summary": "Records the BTC-only MiniRAG evidence path and current Jev connectivity-only boundary, including strict recorded availability, local assessment for B3.1 packets, bounded retrieval evidence, and Jev connectivity checks.",
-      "tags": [
-        "documentation",
-        "btc",
-        "mini-rag",
-        "jev",
-        "evidence"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "document:docs/BTC-PAPER-EXPERIMENT-ROADMAP.md",
       "type": "document",
       "name": "BTC-PAPER-EXPERIMENT-ROADMAP.md",
@@ -30490,21 +30462,6 @@
         "fusion",
         "integration",
         "ownership"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/GOAL-PROMPT.md",
-      "type": "document",
-      "name": "GOAL-PROMPT.md",
-      "filePath": "docs/GOAL-PROMPT.md",
-      "summary": "Provides the next-chat handoff for the quantitative math and probability product direction, Market OS authority, Jev advisory role, current U6–U8 baseline, execution rules, and final reporting.",
-      "tags": [
-        "documentation",
-        "goal",
-        "handoff",
-        "product-direction",
-        "execution"
       ],
       "complexity": "moderate"
     },
@@ -35126,22 +35083,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "type": "document",
-      "name": "typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "summary": "Records a 2026-11-27 review of official TypeSafe sources, terms, artifact listings, and the existing vendor inquiry. Public sources describe hosted API access; no authentic local Jev runtime was verified, and a private offer remains possible.",
-      "tags": [
-        "research",
-        "typesafe",
-        "jev",
-        "runtime-recheck",
-        "hosted-api",
-        "local-runtime-unverified"
-      ],
-      "complexity": "simple"
-    },
-    {
       "id": "document:docs/research/typesafe-jev-u3-b3.md",
       "type": "document",
       "name": "typesafe-jev-u3-b3.md",
@@ -39060,17 +39001,61 @@
       "complexity": "moderate"
     },
     {
+      "id": "document:CONTRIBUTING.md",
+      "type": "document",
+      "name": "CONTRIBUTING.md",
+      "filePath": "CONTRIBUTING.md",
+      "summary": "Defines the paper-only contribution boundary, local setup and pre-PR checks, and shared-context expectations. It directs contributors to update canonical project knowledge and refresh the graph when a change affects it.",
+      "tags": [
+        "documentation",
+        "development",
+        "contribution",
+        "knowledge-workflow"
+      ],
+      "complexity": "moderate"
+    },
+    {
       "id": "document:README.md",
       "type": "document",
       "name": "README.md",
       "filePath": "README.md",
-      "summary": "Project onboarding and operations guide covering installation, Electron and container workflows, workspace boundaries, the current read-only product slice, checks, and contribution references. It now directs contributors to the shared Understand Anything graph and its refresh workflow.",
+      "summary": "Project onboarding and operations guide for the paper-only market research workspace. It states the quantitative math and probability direction, Market OS and Jev role boundary, current Jev local-runtime uncertainty, and how contributors share the project goal, handoff, evidence, decisions, and generated code graph.",
       "tags": [
         "documentation",
         "entry-point",
-        "setup",
         "project-overview",
-        "knowledge-graph"
+        "knowledge-graph",
+        "jev"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "type": "document",
+      "name": "BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "filePath": "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "summary": "Defines the BTC-only MiniRAG evidence path and separates quantitative market analysis from evidence assessment: Market OS owns features, calibration, stability, risk, and paper decisions; MiniRAG retrieves cited local context; Jev is connectivity-only; and Qwen remains a separate local assessor. It records strict availability rules, retrieval and runtime evidence, packet-egress limits, and the unverified status of authentic local Jev.",
+      "tags": [
+        "documentation",
+        "btc",
+        "mini-rag",
+        "jev",
+        "evidence-boundary"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/GOAL-PROMPT.md",
+      "type": "document",
+      "name": "GOAL-PROMPT.md",
+      "filePath": "docs/GOAL-PROMPT.md",
+      "summary": "Provides the next-chat handoff for the math-first quantitative product direction, Market OS decision authority, Jev's advisory evidence role, current U6–U8 and BTC research status, and execution constraints. It also identifies the committed English Understand graph as shared team context and links to its refresh workflow.",
+      "tags": [
+        "documentation",
+        "goal",
+        "handoff",
+        "product-direction",
+        "shared-knowledge"
       ],
       "complexity": "moderate"
     },
@@ -39079,13 +39064,43 @@
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "summary": "Documents the shared Understand Anything graph, tracked metadata, contributor workflow, and incremental refresh process. It explains that the `/understand-*` commands require the Understand Anything Codex skill, links to the upstream project, and notes that fresh clones can inspect the committed graph JSON without installing the skills.",
+      "summary": "Defines the repository's shared project knowledge sources and the Understand Anything graph workflow for contributors and coding agents. It covers graph exploration, incremental refresh, source-commit alignment, PR review, and safeguards against committing private or runtime data.",
       "tags": [
         "documentation",
         "knowledge-graph",
         "collaboration",
-        "incremental-analysis",
-        "codex"
+        "onboarding",
+        "incremental-analysis"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json",
+      "type": "config",
+      "name": "jev-hosted-synthetic-connectivity-2026-11-27.json",
+      "filePath": "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json",
+      "summary": "Records one user-authorized hosted TypeSafe Jev connectivity request using a synthetic truth-check statement, including model version and token usage. The evidence records that no BTC or project data was sent, no local Jev runtime was verified, and the response does not establish trading or production readiness.",
+      "tags": [
+        "evidence",
+        "jev",
+        "synthetic",
+        "connectivity",
+        "privacy-boundary"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "type": "document",
+      "name": "typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "summary": "Records the 2026-11-27 review of official TypeSafe sources, terms, public artifacts, the vendor inquiry, and bounded workstation files. It concludes that authentic local Jev remains unverified, distinguishes local alternatives from Jev, and records one synthetic hosted connectivity probe without changing the BTC packet boundary.",
+      "tags": [
+        "documentation",
+        "research",
+        "typesafe",
+        "jev",
+        "local-runtime-unverified"
       ],
       "complexity": "simple"
     }
@@ -58568,27 +58583,6 @@
       "weight": 0.5
     },
     {
-      "source": "document:docs/BTC-PAPER-EXPERIMENT-ROADMAP.md",
-      "target": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "target": "document:docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
-      "target": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/DEPLOYMENT-OPTIONS-REPORT.md",
       "target": "document:docs/DEPLOYMENT-REVIEW.md",
       "type": "related",
@@ -58633,20 +58627,6 @@
     {
       "source": "document:docs/FUSION-MAP.md",
       "target": "document:docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/BTC-PAPER-EXPERIMENT-ROADMAP.md",
       "type": "related",
       "direction": "forward",
       "weight": 0.5
@@ -59844,20 +59824,6 @@
     {
       "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md",
       "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "target": "document:docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-2026-11-20.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -62567,6 +62533,181 @@
       "direction": "forward",
       "weight": 0.5,
       "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "document:CONTRIBUTING.md",
+      "target": "document:docs/GOAL-PROMPT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONTRIBUTING.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CONTRIBUTING.md",
+      "target": "document:docs/UNDERSTAND-GRAPH.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:docs/GOAL-PROMPT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:docs/UNDERSTAND-GRAPH.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "document:docs/decisions/ADR-0056-minirag-btc-evidence-scope.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "document:docs/decisions/ADR-0057-btc-strict-recorded-availability.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "document:docs/U3-API-CONNECTIVITY-REPORT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "file:market_os/adapters/minirag.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "file:market_os/btc_evidence_packet.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "file:market_os/btc_source_corpus.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "file:market_os/btc_features.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "target": "file:market_os/btc_question_evaluation.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/GOAL-PROMPT.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/GOAL-PROMPT.md",
+      "target": "document:docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/GOAL-PROMPT.md",
+      "target": "document:docs/UNDERSTAND-GRAPH.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/UNDERSTAND-GRAPH.md",
+      "target": "document:README.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/UNDERSTAND-GRAPH.md",
+      "target": "document:docs/GOAL-PROMPT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/UNDERSTAND-GRAPH.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "target": "document:docs/U3-API-CONNECTIVITY-REPORT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "target": "document:docs/research/typesafe-jev-local-runtime-2026-11-20.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
     },
     {
       "source": "file:apps/cli/__init__.py",
@@ -66271,13 +66412,6 @@
       "direction": "forward",
       "weight": 0.7,
       "recoveredFromImportMap": true
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
     }
   ],
   "layers": [
@@ -66834,7 +66968,8 @@
         "document:docs/decisions/ADR-0061-btc-windows-appcontainer-cli.md",
         "document:observability/README.md",
         "document:mlops/README.md",
-        "document:docs/UNDERSTAND-GRAPH.md"
+        "document:docs/UNDERSTAND-GRAPH.md",
+        "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "name": "autonomous-market-os",
-  "description": "Autonomous Market OS foundation slice: synthetic, paper-only market research and portfolio inspection workspace with read-only defaults. Live trading, provider credentials, Binance transport, a public Python gateway, and HTTP/CLI mutation routes are disabled. This repository contains 704 files; scanning a smaller subdirectory can reduce analysis time.",
+  "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled.",
   "languages": [
     "config",
     "css",
@@ -74,7 +74,7 @@
     {
       "path": "CONTRIBUTING.md",
       "language": "markdown",
-      "sizeLines": 70,
+      "sizeLines": 86,
       "fileCategory": "docs"
     },
     {
@@ -86,7 +86,7 @@
     {
       "path": "README.md",
       "language": "markdown",
-      "sizeLines": 175,
+      "sizeLines": 180,
       "fileCategory": "docs"
     },
     {
@@ -956,7 +956,7 @@
     {
       "path": "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
       "language": "markdown",
-      "sizeLines": 523,
+      "sizeLines": 527,
       "fileCategory": "docs"
     },
     {
@@ -1016,7 +1016,7 @@
     {
       "path": "docs/GOAL-PROMPT.md",
       "language": "markdown",
-      "sizeLines": 123,
+      "sizeLines": 125,
       "fileCategory": "docs"
     },
     {
@@ -1502,7 +1502,7 @@
     {
       "path": "docs/UNDERSTAND-GRAPH.md",
       "language": "markdown",
-      "sizeLines": 36,
+      "sizeLines": 74,
       "fileCategory": "docs"
     },
     {
@@ -2232,6 +2232,12 @@
       "fileCategory": "config"
     },
     {
+      "path": "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json",
+      "language": "json",
+      "sizeLines": 52,
+      "fileCategory": "config"
+    },
+    {
       "path": "docs/evidence/local-exit-gate.json",
       "language": "json",
       "sizeLines": 113,
@@ -2894,7 +2900,7 @@
     {
       "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
       "language": "markdown",
-      "sizeLines": 51,
+      "sizeLines": 67,
       "fileCategory": "docs"
     },
     {
@@ -4260,7 +4266,7 @@
       "fileCategory": "code"
     }
   ],
-  "totalFiles": 705,
+  "totalFiles": 706,
   "filteredByIgnore": 0,
   "estimatedComplexity": "very-large",
   "importMap": {
@@ -4771,6 +4777,7 @@
     "docs/evidence/codebase-stack-understanding.json": [],
     "docs/evidence/directadmin-static-preview.json": [],
     "docs/evidence/jev-connectivity-reauthorized-2026-11-19.json": [],
+    "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json": [],
     "docs/evidence/local-exit-gate.json": [],
     "docs/evidence/m1.10-openharness-blockers.json": [],
     "docs/evidence/m1.11-openharness-blockers.json": [],
@@ -5607,5 +5614,5 @@
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "bfe084d500b560e6a4797262b9a940b0c9dedf46be98e6db14ac01ace07cdc45"
+  "contentDigest": "b776c285039ca1f4dec46f6cf5c39893f34e7f45647d1bb475f815f8913f085b"
 }
