@@ -1,9 +1,12 @@
 # Autonomous Market OS
 
 Synthetic, paper-only market research and portfolio inspection workspace.
-The default product boundary is read-only: no live trading, provider
-credentials, Binance transport, public Python gateway, or HTTP/CLI mutation
-route is enabled.
+The default product boundary is read-only and paper-only. The repository does
+not store provider credentials or expose exchange-account access. Public
+Binance market-data and hosted Jev requests are available only through bounded,
+explicit opt-in flows; BTC evidence packets remain local. The Python gateway
+is private/loopback-only, and there is no public HTTP/CLI mutation route or live
+trading path.
 
 ## Clone and run
 
@@ -170,6 +173,8 @@ deployment and authenticated access remain separate gates.
 - [MIT License](LICENSE)
 - [DevOps runbook](docs/DEVOPS-RUNBOOK.md)
 
-## Shared codebase knowledge graph
+## Shared project knowledge
 
-The repository tracks the Understand Anything snapshot at [`.ua/knowledge-graph.json`](.ua/knowledge-graph.json), so contributors can explore the same code, architecture layers, and guided tour. The small supporting baseline files make future graph refreshes incremental. See [the graph collaboration guide](docs/UNDERSTAND-GRAPH.md) for viewing and updating it.
+The repository is the shared memory for contributors and coding agents; project context should not depend on one person's chat history or local setup. The project direction is math and probability first: Market OS owns stability, calibration, risk, and paper decisions, while Jev's intended role is advisory evidence support, contradiction detection, and abstention. An authentic local Jev runtime remains unverified. Read [the current goal](docs/GOAL-PROMPT.md) and [next-work handoff](docs/NEXT-WORK-HANDOFF.md) before taking a new slice. Stable decisions live in [`docs/decisions/`](docs/decisions/), and dated findings and reproducible results live in [`docs/research/`](docs/research/) and [`docs/evidence/`](docs/evidence/).
+
+The committed Understand Anything snapshot at [`.ua/knowledge-graph.json`](.ua/knowledge-graph.json) gives every contributor the same code map, architecture layers, relationships, and guided tour. Its tracked scan and fingerprint baselines let the graph refresh incrementally. See [the shared graph and knowledge workflow](docs/UNDERSTAND-GRAPH.md) for onboarding, refresh steps, freshness rules, and what belongs in a pull request.

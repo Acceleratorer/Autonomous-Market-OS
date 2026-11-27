@@ -38,6 +38,10 @@ connectivity request failed local response validation; a later, separately
 approved synthetic connectivity request passed. Neither request assessed a
 BTC B3.1 packet. See the [U3 connectivity report](U3-API-CONNECTIVITY-REPORT.md)
 and [successful probe evidence](evidence/jev-connectivity-reauthorized-2026-11-19.json).
+On 2026-11-27, one user-authorized synthetic connectivity request resolved
+`jev-latest` to `jev-1.14.0`; the toy Noul answer was `0.99`. It used no BTC or
+project data and does not change the local-runtime finding. See the
+[2026-11-27 probe record](evidence/jev-hosted-synthetic-connectivity-2026-11-27.json).
 Under ADR-0058, Jev remains at connectivity for this BTC work. Packet text,
 citations, and assessments stay local; local Qwen is the selected packet path.
 The synthetic probe did not assess a packet. Future Jev connectivity calls

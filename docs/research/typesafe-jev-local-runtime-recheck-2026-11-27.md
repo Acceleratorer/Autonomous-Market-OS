@@ -49,3 +49,19 @@ This finding is consistent with [ADR-0058](../decisions/ADR-0058-btc-jev-connect
 ## Follow-up official integration check — 2026-11-27
 
 The TypeSafe-owned [`n8n-nodes-typesafe-ai`](https://github.com/typesafe-ai/n8n-nodes-typesafe-ai) repository's latest public commit (`f0ee24d`, 2026-11-26 UTC) was rechecked on 2026-11-27. Its README says operators create an API key in the TypeSafe console and that each input item sends one request containing its state, selected model, and questions. This node can orchestrate hosted Jev workflows, but it does not provide local Jev weights or a local runtime and does not satisfy the zero-provider/network runtime requirement. The current [model catalog](https://docs.typesafe.ai/models) still routes Jev 1.14 through `POST /v1/systemone`; the [API reference](https://docs.typesafe.ai/api/system-one) documents bearer authentication. This confirms the public hosted path only; it does not rule out a private TypeSafe offer or separate written agreement ([commit](https://github.com/typesafe-ai/n8n-nodes-typesafe-ai/commit/f0ee24d22de335b99a3127d1d15463e92d84e2f8)).
+
+## Separate synthetic hosted connectivity probe — 2026-11-27
+
+After the read-only local-availability checks above, one user-authorized
+synthetic request was sent to TypeSafe's hosted
+[`POST /v1/systemone`](https://docs.typesafe.ai/api/system-one) endpoint using
+the generic statement “A triangle has three sides.” The response identified
+the resolved model as `jev-1.14.0`, returned a Noul value of `0.99`, and
+reported 283 input and 21 output tokens. The sanitized request/response record
+is [here](../evidence/jev-hosted-synthetic-connectivity-2026-11-27.json).
+
+This proves the configured credential can reach hosted Jev for one synthetic
+request. It does not prove local weights, a local runtime, or local-use terms;
+it is not BTC evidence and does not establish calibration or trading quality.
+No API key, BTC packet, or project content was sent, and the response was not
+used to train, tune, or evaluate the separate local Qwen model.

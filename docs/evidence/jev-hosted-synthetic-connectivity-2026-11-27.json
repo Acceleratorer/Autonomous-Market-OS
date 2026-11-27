@@ -1,0 +1,52 @@
+{
+  "schema": "market-os.jev-hosted-synthetic-connectivity-evidence.v1",
+  "recorded_at": "2026-11-27T15:33:30Z",
+  "purpose": "One user-authorized hosted Jev connectivity probe using synthetic, non-market input.",
+  "provider": "TypeSafe",
+  "deployment": "hosted_api",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "request_count": 1,
+  "retry_count": 0,
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "statement": "A triangle has three sides."
+    },
+    "questions": {
+      "smoke": {
+        "type": "noul",
+        "instructions": "Is the statement true?",
+        "criteria": {
+          "yes": "The statement is true.",
+          "no": "The statement is false."
+        }
+      }
+    }
+  },
+  "response": {
+    "model": "jev-1.14.0",
+    "answers": {
+      "smoke": {
+        "type": "noul",
+        "noul": 0.99
+      }
+    },
+    "usage": {
+      "input_tokens": 283,
+      "output_tokens": 21
+    }
+  },
+  "boundary": {
+    "btc_packet_transmitted": false,
+    "project_data_transmitted": false,
+    "api_key_recorded": false,
+    "local_runtime_verified": false,
+    "production_readiness_established": false,
+    "output_used_for_local_model_training_or_tuning": false
+  },
+  "limitations": [
+    "This verifies one authenticated hosted Jev request only; it does not establish that Jev weights or a runtime can be installed locally.",
+    "The synthetic answer is not a BTC evidence assessment, a return probability, a calibration result, or a trading signal.",
+    "Provider-billed cost and latency were not recorded."
+  ]
+}

@@ -37,9 +37,11 @@ never grant execution or risk authority.
   per-user/no-elevation installation, CI-frozen CPython 3.11.x, preserved
   mutable state, manual rollback, and no native service. Read
   `docs/NEXT-WORK-HANDOFF.md` and verify the local slice before extending CI.
-- The Vietnamese Understand graph is an ignored local artifact at
-  `.ua/knowledge-graph.json`. Check its commit and project-scoped freshness
-  before using it; refresh after source or documentation changes.
+- The English Understand graph is a committed shared artifact at
+  `.ua/knowledge-graph.json`. Check its analyzed commit and project-scoped
+  freshness before relying on it; refresh it after meaningful source,
+  architecture, or contributor-facing documentation changes. See
+  [UNDERSTAND-GRAPH.md](UNDERSTAND-GRAPH.md) for the team workflow.
 - U6.4-F is merged under accepted ADR-0055: portable signed install,
   embedded-runtime identity, state preservation, rollback, uninstall retention,
   and evidence rendering. Hosted Windows/Linux evidence is complete and
