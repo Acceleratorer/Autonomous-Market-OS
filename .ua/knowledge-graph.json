@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-27T19:41:02.865Z",
-    "gitCommitHash": "030f0d7d4569dc7dd38302e86b1b6548c8744ca6"
+    "analyzedAt": "2026-11-27T21:10:27.983Z",
+    "gitCommitHash": "bcd3d3eeb256145afbe64b586290b0aa79d9dcc9"
   },
   "nodes": [
     {
@@ -24048,54 +24048,6 @@
       "complexity": "simple"
     },
     {
-      "id": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "type": "file",
-      "name": "btc_assessor_windows_appcontainer.py",
-      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
-      "summary": "Runs the local BTC evidence model inside a Windows AppContainer with zero network capabilities. The wrapper verifies packaged runtime artifacts, uses native process APIs, and captures bounded completion output without opening a host network path.",
-      "tags": [
-        "windows-appcontainer",
-        "sandbox",
-        "no-egress",
-        "local-model"
-      ],
-      "complexity": "complex"
-    },
-    {
-      "id": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
-      "type": "class",
-      "name": "AppContainerRuntimeError",
-      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
-      "lineRange": [
-        30,
-        34
-      ],
-      "summary": "Typed failure for AppContainer creation, package verification, model startup, or assessment completion.",
-      "tags": [
-        "error-type",
-        "validation",
-        "contract"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
-      "type": "class",
-      "name": "WindowsAppContainerCliRuntime",
-      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
-      "lineRange": [
-        95,
-        734
-      ],
-      "summary": "Native Windows wrapper that prepares and runs the assessor package inside a zero-capability AppContainer and validates its completion record.",
-      "tags": [
-        "windows-appcontainer",
-        "sandbox",
-        "runtime-boundary"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "file:market_os/btc_evidence_packet.py",
       "type": "file",
       "name": "btc_evidence_packet.py",
@@ -24227,276 +24179,6 @@
         "data-model"
       ],
       "complexity": "simple"
-    },
-    {
-      "id": "file:market_os/btc_local_assessor.py",
-      "type": "file",
-      "name": "btc_local_assessor.py",
-      "filePath": "market_os/btc_local_assessor.py",
-      "summary": "Implements a local-only B3.1 assessor through a pinned llama.cpp runtime using a separately identified local Qwen model. Qwen is explicitly not Jev; the assessor evaluates evidence support, contradiction, and abstention while holding no market-prediction, calibration, risk, or execution authority.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment",
-        "isolation",
-        "tested"
-      ],
-      "complexity": "complex"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
-      "type": "function",
-      "name": "_windows_powershell_path",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        282,
-        293
-      ],
-      "summary": "Implements the windows powershell path operation for the btc local assessor component.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
-      "type": "function",
-      "name": "_verify_windows_egress_rules",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        296,
-        367
-      ],
-      "summary": "Verifies the exact active Windows egress policy for the assessor executable and local model runtime before startup.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
-      "type": "function",
-      "name": "_verify_pinned_python_runtime",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        370,
-        389
-      ],
-      "summary": "Checks the selected interpreter against the pinned runtime manifest before model loading.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_result_schema",
-      "type": "function",
-      "name": "_result_schema",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        410,
-        451
-      ],
-      "summary": "Builds the bounded typed result schema exposed to the local completion model.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_comparable_ids",
-      "type": "function",
-      "name": "_comparable_ids",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        458,
-        471
-      ],
-      "summary": "Implements the comparable ids operation for the btc local assessor component.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_prompt_input",
-      "type": "function",
-      "name": "_prompt_input",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        474,
-        555
-      ],
-      "summary": "Constructs a bounded packet-only prompt input with explicit support, contradiction, and abstention instructions.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_messages",
-      "type": "function",
-      "name": "_messages",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        558,
-        581
-      ],
-      "summary": "Builds the local model message payload from the validated packet and constrained instructions.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:_response_json",
-      "type": "function",
-      "name": "_response_json",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        584,
-        597
-      ],
-      "summary": "Parses a bounded structured completion response and rejects malformed model output.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/btc_local_assessor.py:local_runtime_health",
-      "type": "function",
-      "name": "local_runtime_health",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        1286,
-        1301
-      ],
-      "summary": "Reports fail-closed local runtime and egress-isolation readiness without claiming Jev identity or model availability beyond observed checks.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:LocalAssessorError",
-      "type": "class",
-      "name": "LocalAssessorError",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        58,
-        64
-      ],
-      "summary": "Typed local assessor failure with safe reason and bounded runtime details.",
-      "tags": [
-        "error-type",
-        "validation",
-        "contract"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:CompletionRuntime",
-      "type": "class",
-      "name": "CompletionRuntime",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        67,
-        74
-      ],
-      "summary": "Protocol for starting a bounded local completion runtime and receiving its typed response.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "runtime-boundary"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
-      "type": "class",
-      "name": "_WindowsResourceJob",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        77,
-        233
-      ],
-      "summary": "Windows Job Object wrapper that constrains and safely closes the assessor process resource group.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "data-model"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
-      "type": "class",
-      "name": "LocalAssessmentRecord",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        237,
-        263
-      ],
-      "summary": "Immutable typed result of one local evidence assessment, including normalized status and runtime identity.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "data-model"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
-      "type": "class",
-      "name": "LocalLlamaRuntime",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        606,
-        1007
-      ],
-      "summary": "Pinned llama.cpp runtime wrapper for local Qwen completions with process, network-isolation, and health controls; it is not Jev.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "runtime-boundary"
-      ],
-      "complexity": "complex"
-    },
-    {
-      "id": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
-      "type": "class",
-      "name": "LocalB31Assessor",
-      "filePath": "market_os/btc_local_assessor.py",
-      "lineRange": [
-        1010,
-        1283
-      ],
-      "summary": "B3.1 evidence assessor that builds a packet-bound prompt, parses local Qwen results, and normalizes support, contradiction, and abstention without trading authority.",
-      "tags": [
-        "local-qwen",
-        "jev-distinct",
-        "evidence-assessment"
-      ],
-      "complexity": "complex"
     },
     {
       "id": "file:market_os/btc_local_assessor_store.py",
@@ -25376,416 +25058,6 @@
         "python-runtime",
         "supply-chain",
         "hash-verification"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "file:market_os/tests/test_btc_local_assessor.py",
-      "type": "file",
-      "name": "test_btc_local_assessor.py",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "summary": "Covers B3.1 packet timing eligibility and local Qwen assessment semantics, including contradiction, abstention, citation boundaries, explicit non-Jev identity, egress-isolation preflight, Windows AppContainer failures, bounded storage, deterministic replay, and resource limits.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "complex"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:_packet",
-      "type": "function",
-      "name": "_packet",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        46,
-        160
-      ],
-      "summary": "Checks that  packet for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
-      "type": "function",
-      "name": "test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        163,
-        173
-      ],
-      "summary": "Checks that b31 packet accepts bounded local receipt with unknown publication for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
-      "type": "function",
-      "name": "_usable_response",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        193,
-        219
-      ],
-      "summary": "Checks that  usable response for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
-      "type": "function",
-      "name": "test_local_assessor_normalizes_typed_results_without_claiming_jev",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        240,
-        253
-      ],
-      "summary": "Checks that local assessor normalizes typed results without claiming jev for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
-      "type": "function",
-      "name": "test_windows_egress_health_requires_exact_active_store_executable_paths",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        302,
-        339
-      ],
-      "summary": "Checks that windows egress health requires exact active store executable paths for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
-      "type": "function",
-      "name": "test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        342,
-        372
-      ],
-      "summary": "Checks that windows egress health fails closed on mismatched or unreadable policy for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
-      "type": "function",
-      "name": "test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        375,
-        397
-      ],
-      "summary": "Checks that windows egress health fails closed on matching policy without behavioral proof for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
-      "type": "function",
-      "name": "test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        400,
-        431
-      ],
-      "summary": "Checks that windows runtime uses appcontainer cli without firewall or socket for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
-      "type": "function",
-      "name": "test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        434,
-        449
-      ],
-      "summary": "Checks that windows runtime maps appcontainer failures to typed assessor errors for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
-      "type": "function",
-      "name": "test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        452,
-        463
-      ],
-      "summary": "Checks that windows runtime maps os start failures to typed assessor errors for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
-      "type": "function",
-      "name": "test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        466,
-        479
-      ],
-      "summary": "Checks that windows runtime maps os completion failures to typed assessor errors for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
-      "type": "function",
-      "name": "test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        482,
-        501
-      ],
-      "summary": "Checks that local runtime start fails closed when egress isolation is unverified for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
-      "type": "function",
-      "name": "test_local_runtime_health_uses_the_fail_closed_startup_preflight",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        504,
-        521
-      ],
-      "summary": "Checks that local runtime health uses the fail closed startup preflight for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
-      "type": "function",
-      "name": "test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        524,
-        537
-      ],
-      "summary": "Checks that linux runtime cannot bypass unverified isolation for health for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
-      "type": "function",
-      "name": "test_local_runtime_rejects_a_different_python_executable_before_loading_model",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        551,
-        590
-      ],
-      "summary": "Checks that local runtime rejects a different python executable before loading model for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
-      "type": "function",
-      "name": "test_local_assessment_store_replays_without_calling_an_inference_runtime",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        593,
-        610
-      ],
-      "summary": "Checks that local assessment store replays without calling an inference runtime for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
-      "type": "function",
-      "name": "test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        613,
-        633
-      ],
-      "summary": "Checks that local assessment store rejects new run when total store limit is full for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
-      "type": "function",
-      "name": "test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        636,
-        666
-      ],
-      "summary": "Checks that local assessment store serializes concurrent writes at total limit for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
-      "type": "function",
-      "name": "test_local_assessment_store_does_not_accept_a_jev_identity",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        669,
-        678
-      ],
-      "summary": "Checks that local assessment store does not accept a jev identity for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
-      "type": "function",
-      "name": "test_local_assessment_store_replays_typed_runtime_start_failure",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        681,
-        697
-      ],
-      "summary": "Checks that local assessment store replays typed runtime start failure for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
-      "type": "function",
-      "name": "test_local_assessment_store_rejects_modified_run_bundles",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        700,
-        714
-      ],
-      "summary": "Checks that local assessment store rejects modified run bundles for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
-      ],
-      "complexity": "simple"
-    },
-    {
-      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
-      "type": "function",
-      "name": "test_windows_resource_job_limits_memory_and_resumes_suspended_process",
-      "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "lineRange": [
-        718,
-        739
-      ],
-      "summary": "Checks that windows resource job limits memory and resumes suspended process for the btc local assessor contract.",
-      "tags": [
-        "test",
-        "local-qwen",
-        "jev-distinct",
-        "isolation"
       ],
       "complexity": "simple"
     },
@@ -38978,22 +38250,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "document",
-      "name": "NEXT-WORK-HANDOFF.md",
-      "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "summary": "Provides the detailed current-state handoff for the BTC MiniRAG and recorded Jev evidence path, including merged PR status, runtime and isolation status, unresolved local-Jev terms, constraints, and next steps.",
-      "tags": [
-        "documentation",
-        "handoff",
-        "btc-evidence",
-        "jev",
-        "runtime-status",
-        "collaboration"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
@@ -39007,22 +38263,6 @@
         "incremental-analysis"
       ],
       "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/UNDERSTANDING-LOG.md",
-      "type": "document",
-      "name": "UNDERSTANDING-LOG.md",
-      "filePath": "docs/UNDERSTANDING-LOG.md",
-      "summary": "Chronological project record from October 2026 through November 28, covering B4 and U6–U8 work, BTC MiniRAG/Jev decisions, release and deployment milestones, graph refreshes, and clock and local-model observations with evidence links.",
-      "tags": [
-        "documentation",
-        "project-history",
-        "chronology",
-        "worktree",
-        "evidence",
-        "collaboration"
-      ],
-      "complexity": "complex"
     },
     {
       "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
@@ -39190,6 +38430,800 @@
         209,
         226
       ]
+    },
+    {
+      "id": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "type": "file",
+      "name": "btc_assessor_windows_appcontainer.py",
+      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
+      "summary": "Runs the local BTC evidence model inside a Windows AppContainer with zero network capabilities. The wrapper verifies packaged runtime artifacts, uses native process APIs, and captures bounded completion output without opening a host network path.",
+      "tags": [
+        "windows-appcontainer",
+        "sandbox",
+        "no-egress",
+        "local-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
+      "type": "class",
+      "name": "AppContainerRuntimeError",
+      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
+      "lineRange": [
+        30,
+        34
+      ],
+      "summary": "Typed failure for AppContainer creation, package verification, model startup, or assessment completion.",
+      "tags": [
+        "error-type",
+        "validation",
+        "contract"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
+      "type": "class",
+      "name": "WindowsAppContainerCliRuntime",
+      "filePath": "market_os/btc_assessor_windows_appcontainer.py",
+      "lineRange": [
+        95,
+        782
+      ],
+      "summary": "Native Windows wrapper that prepares and runs the assessor package inside a zero-capability AppContainer and validates its completion record.",
+      "tags": [
+        "windows-appcontainer",
+        "sandbox",
+        "runtime-boundary"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:market_os/btc_local_assessor.py",
+      "type": "file",
+      "name": "btc_local_assessor.py",
+      "filePath": "market_os/btc_local_assessor.py",
+      "summary": "Implements a local-only B3.1 assessor through a pinned llama.cpp runtime using a separately identified local Qwen model. Qwen is explicitly not Jev; the assessor evaluates evidence support, contradiction, and abstention while holding no market-prediction, calibration, risk, or execution authority.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment",
+        "isolation",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
+      "type": "function",
+      "name": "_windows_powershell_path",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        284,
+        295
+      ],
+      "summary": "Implements the windows powershell path operation for the btc local assessor component.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
+      "type": "function",
+      "name": "_verify_windows_egress_rules",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        298,
+        369
+      ],
+      "summary": "Verifies the exact active Windows egress policy for the assessor executable and local model runtime before startup.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
+      "type": "function",
+      "name": "_verify_pinned_python_runtime",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        372,
+        391
+      ],
+      "summary": "Checks the selected interpreter against the pinned runtime manifest before model loading.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_result_schema",
+      "type": "function",
+      "name": "_result_schema",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        412,
+        453
+      ],
+      "summary": "Builds the bounded typed result schema exposed to the local completion model.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_comparable_ids",
+      "type": "function",
+      "name": "_comparable_ids",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        460,
+        473
+      ],
+      "summary": "Implements the comparable ids operation for the btc local assessor component.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_prompt_input",
+      "type": "function",
+      "name": "_prompt_input",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        476,
+        557
+      ],
+      "summary": "Constructs a bounded packet-only prompt input with explicit support, contradiction, and abstention instructions.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_messages",
+      "type": "function",
+      "name": "_messages",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        560,
+        583
+      ],
+      "summary": "Builds the local model message payload from the validated packet and constrained instructions.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:_response_json",
+      "type": "function",
+      "name": "_response_json",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        586,
+        658
+      ],
+      "summary": "Parses a bounded structured completion response and rejects malformed model output.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/btc_local_assessor.py:local_runtime_health",
+      "type": "function",
+      "name": "local_runtime_health",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        1347,
+        1362
+      ],
+      "summary": "Reports fail-closed local runtime and egress-isolation readiness without claiming Jev identity or model availability beyond observed checks.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:LocalAssessorError",
+      "type": "class",
+      "name": "LocalAssessorError",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        60,
+        66
+      ],
+      "summary": "Typed local assessor failure with safe reason and bounded runtime details.",
+      "tags": [
+        "error-type",
+        "validation",
+        "contract"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:CompletionRuntime",
+      "type": "class",
+      "name": "CompletionRuntime",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        69,
+        76
+      ],
+      "summary": "Protocol for starting a bounded local completion runtime and receiving its typed response.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "runtime-boundary"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
+      "type": "class",
+      "name": "_WindowsResourceJob",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        79,
+        235
+      ],
+      "summary": "Windows Job Object wrapper that constrains and safely closes the assessor process resource group.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
+      "type": "class",
+      "name": "LocalAssessmentRecord",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        239,
+        265
+      ],
+      "summary": "Immutable typed result of one local evidence assessment, including normalized status and runtime identity.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
+      "type": "class",
+      "name": "LocalLlamaRuntime",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        667,
+        1068
+      ],
+      "summary": "Pinned llama.cpp runtime wrapper for local Qwen completions with process, network-isolation, and health controls; it is not Jev.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "runtime-boundary"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
+      "type": "class",
+      "name": "LocalB31Assessor",
+      "filePath": "market_os/btc_local_assessor.py",
+      "lineRange": [
+        1071,
+        1344
+      ],
+      "summary": "B3.1 evidence assessor that builds a packet-bound prompt, parses local Qwen results, and normalizes support, contradiction, and abstention without trading authority.",
+      "tags": [
+        "local-qwen",
+        "jev-distinct",
+        "evidence-assessment"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:market_os/tests/test_btc_local_assessor.py",
+      "type": "file",
+      "name": "test_btc_local_assessor.py",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "summary": "Covers B3.1 packet timing eligibility and local Qwen assessment semantics, including contradiction, abstention, citation boundaries, explicit non-Jev identity, egress-isolation preflight, Windows AppContainer failures, bounded storage, deterministic replay, and resource limits.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:_packet",
+      "type": "function",
+      "name": "_packet",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        49,
+        163
+      ],
+      "summary": "Checks that  packet for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
+      "type": "function",
+      "name": "test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        166,
+        176
+      ],
+      "summary": "Checks that b31 packet accepts bounded local receipt with unknown publication for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
+      "type": "function",
+      "name": "_usable_response",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        196,
+        222
+      ],
+      "summary": "Checks that  usable response for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
+      "type": "function",
+      "name": "test_local_assessor_normalizes_typed_results_without_claiming_jev",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        243,
+        256
+      ],
+      "summary": "Checks that local assessor normalizes typed results without claiming jev for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
+      "type": "function",
+      "name": "test_windows_egress_health_requires_exact_active_store_executable_paths",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        327,
+        364
+      ],
+      "summary": "Checks that windows egress health requires exact active store executable paths for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
+      "type": "function",
+      "name": "test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        367,
+        397
+      ],
+      "summary": "Checks that windows egress health fails closed on mismatched or unreadable policy for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
+      "type": "function",
+      "name": "test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        400,
+        422
+      ],
+      "summary": "Checks that windows egress health fails closed on matching policy without behavioral proof for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
+      "type": "function",
+      "name": "test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        425,
+        456
+      ],
+      "summary": "Checks that windows runtime uses appcontainer cli without firewall or socket for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
+      "type": "function",
+      "name": "test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        484,
+        499
+      ],
+      "summary": "Checks that windows runtime maps appcontainer failures to typed assessor errors for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
+      "type": "function",
+      "name": "test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        502,
+        513
+      ],
+      "summary": "Checks that windows runtime maps os start failures to typed assessor errors for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
+      "type": "function",
+      "name": "test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        516,
+        529
+      ],
+      "summary": "Checks that windows runtime maps os completion failures to typed assessor errors for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
+      "type": "function",
+      "name": "test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        532,
+        551
+      ],
+      "summary": "Checks that local runtime start fails closed when egress isolation is unverified for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
+      "type": "function",
+      "name": "test_local_runtime_health_uses_the_fail_closed_startup_preflight",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        554,
+        571
+      ],
+      "summary": "Checks that local runtime health uses the fail closed startup preflight for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
+      "type": "function",
+      "name": "test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        574,
+        587
+      ],
+      "summary": "Checks that linux runtime cannot bypass unverified isolation for health for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
+      "type": "function",
+      "name": "test_local_runtime_rejects_a_different_python_executable_before_loading_model",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        601,
+        640
+      ],
+      "summary": "Checks that local runtime rejects a different python executable before loading model for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
+      "type": "function",
+      "name": "test_local_assessment_store_replays_without_calling_an_inference_runtime",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        643,
+        660
+      ],
+      "summary": "Checks that local assessment store replays without calling an inference runtime for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
+      "type": "function",
+      "name": "test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        663,
+        683
+      ],
+      "summary": "Checks that local assessment store rejects new run when total store limit is full for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
+      "type": "function",
+      "name": "test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        686,
+        716
+      ],
+      "summary": "Checks that local assessment store serializes concurrent writes at total limit for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
+      "type": "function",
+      "name": "test_local_assessment_store_does_not_accept_a_jev_identity",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        719,
+        728
+      ],
+      "summary": "Checks that local assessment store does not accept a jev identity for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
+      "type": "function",
+      "name": "test_local_assessment_store_replays_typed_runtime_start_failure",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        731,
+        747
+      ],
+      "summary": "Checks that local assessment store replays typed runtime start failure for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
+      "type": "function",
+      "name": "test_local_assessment_store_rejects_modified_run_bundles",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        750,
+        764
+      ],
+      "summary": "Checks that local assessment store rejects modified run bundles for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
+      "type": "function",
+      "name": "test_windows_resource_job_limits_memory_and_resumes_suspended_process",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        768,
+        789
+      ],
+      "summary": "Checks that windows resource job limits memory and resumes suspended process for the btc local assessor contract.",
+      "tags": [
+        "test",
+        "local-qwen",
+        "jev-distinct",
+        "isolation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_local_response_recovers_final_json_after_truncated_runtime_echo",
+      "type": "function",
+      "name": "test_local_response_recovers_final_json_after_truncated_runtime_echo",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        279,
+        288
+      ],
+      "summary": "Implements test local response recovers final json after truncated runtime echo for the test btc local assessor component.",
+      "tags": [
+        "utility",
+        "validation",
+        "runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:market_os/tests/test_btc_local_assessor.py:test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
+      "type": "function",
+      "name": "test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
+      "filePath": "market_os/tests/test_btc_local_assessor.py",
+      "lineRange": [
+        470,
+        481
+      ],
+      "summary": "Implements test appcontainer framing ignores marker like prompt and completion text for the test btc local assessor component.",
+      "tags": [
+        "utility",
+        "validation",
+        "runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "document",
+      "name": "NEXT-WORK-HANDOFF.md",
+      "filePath": "docs/NEXT-WORK-HANDOFF.md",
+      "summary": "Provides the detailed current-state handoff for the BTC MiniRAG and recorded Jev evidence path, including merged PR status, runtime and isolation status, unresolved local-Jev terms, constraints, and next steps.",
+      "tags": [
+        "documentation",
+        "handoff",
+        "btc-evidence",
+        "jev",
+        "runtime-status",
+        "collaboration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/UNDERSTANDING-LOG.md",
+      "type": "document",
+      "name": "UNDERSTANDING-LOG.md",
+      "filePath": "docs/UNDERSTANDING-LOG.md",
+      "summary": "Chronological project record from October 2026 through November 28, covering B4 and U6â€“U8 work, BTC MiniRAG/Jev decisions, release and deployment milestones, graph refreshes, and clock and local-model observations with evidence links.",
+      "tags": [
+        "documentation",
+        "project-history",
+        "chronology",
+        "worktree",
+        "evidence",
+        "collaboration"
+      ],
+      "complexity": "complex"
     }
   ],
   "edges": [
@@ -54953,34 +54987,6 @@
       "weight": 0.8
     },
     {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
       "source": "file:market_os/btc_evidence_packet.py",
       "target": "function:market_os/btc_evidence_packet.py:_validate_feature",
       "type": "contains",
@@ -55067,153 +55073,6 @@
     {
       "source": "file:market_os/btc_evidence_packet.py",
       "target": "class:market_os/btc_evidence_packet.py:SourceTimeBounds",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_result_schema",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_comparable_ids",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_prompt_input",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_messages",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_response_json",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
       "type": "exports",
       "direction": "forward",
       "weight": 0.8
@@ -55739,160 +55598,6 @@
     {
       "source": "file:market_os/tests/test_btc_assessor_python_runtime.py",
       "target": "function:market_os/tests/test_btc_assessor_python_runtime.py:test_pip_report_requires_wheel_sha256",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:_packet",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
       "type": "contains",
       "direction": "forward",
       "weight": 1
@@ -61141,20 +60846,6 @@
       "weight": 0.6
     },
     {
-      "source": "config:market_os/models/btc_local_assessor_runtime.lock.json",
-      "target": "file:market_os/btc_local_assessor.py",
-      "type": "configures",
-      "direction": "forward",
-      "weight": 0.6
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/btc_assessor_firewall.ps1",
-      "type": "depends_on",
-      "direction": "forward",
-      "weight": 0.6
-    },
-    {
       "source": "file:market_os/btc_assessor_linux_isolation.py",
       "target": "file:market_os/tests/test_btc_assessor_linux_isolation.py",
       "type": "tested_by",
@@ -61269,20 +60960,6 @@
     {
       "source": "file:market_os/tests/test_operator_surface.py",
       "target": "config:market_os/tests/fixtures/btc_paper/history.json",
-      "type": "depends_on",
-      "direction": "forward",
-      "weight": 0.6
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "config:market_os/models/btc_assessor_python_runtime.lock.json",
-      "type": "depends_on",
-      "direction": "forward",
-      "weight": 0.6
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "config:market_os/models/btc_local_assessor_runtime.lock.json",
       "type": "depends_on",
       "direction": "forward",
       "weight": 0.6
@@ -62440,14 +62117,6 @@
       "description": "Path-based pairing (deterministic)"
     },
     {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/tests/test_btc_local_assessor.py",
-      "type": "tested_by",
-      "direction": "forward",
-      "weight": 0.5,
-      "description": "Path-based pairing (deterministic)"
-    },
-    {
       "source": "file:market_os/btc_question_evaluation.py",
       "target": "file:market_os/tests/test_btc_question_evaluation.py",
       "type": "tested_by",
@@ -62623,13 +62292,6 @@
     },
     {
       "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
       "direction": "forward",
@@ -62700,13 +62362,6 @@
     },
     {
       "source": "document:README.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
       "direction": "forward",
@@ -62755,28 +62410,7 @@
       "weight": 0.5
     },
     {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:docs/UNDERSTANDING-LOG.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
       "target": "document:docs/COLLABORATION-WORKFLOW.md",
       "type": "documents",
       "direction": "forward",
@@ -62805,13 +62439,6 @@
     },
     {
       "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
       "target": "document:docs/COLLABORATION-WORKFLOW.md",
       "type": "documents",
       "direction": "forward",
@@ -62820,454 +62447,6 @@
     {
       "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "target": "document:docs/UNDERSTANDING-LOG.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-artifact-integrity-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-current-checkout-health-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-primary-checkout-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-resource-guard-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-21.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-minirag-retrieval-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-post-resync-observation-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-post-resync-retry-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/u6-4-f-hosted-installation.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/u6-4-f-installation-contract.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/PHASES.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/PROJECT-CONTEXT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/ROADMAP.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U3-API-CONNECTIVITY-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-D-INSTALLER-PREFLIGHT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-E-OFFLINE-INSTALL-SIMULATION.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U8-C-PERMANENT-PAPER-ONLY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0060-btc-local-assessment-store-quota.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-20.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-21.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-windows-egress-2026-11-27.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-utc-clock-error-bound.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/jev-local-runtime-availability-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/PHASES.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/ROADMAP.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTAND-GRAPH.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -63294,393 +62473,8 @@
       "weight": 0.5
     },
     {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/WORKTREE-BASELINE-MANIFEST.json",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-110054.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-114029.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4-LOCAL-SLICE-CLOSEOUT-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.10-FILL-TIME-RISK-OUTCOMES.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.11-BACKUP-RESTORE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.12-MIGRATION-PREFLIGHT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.13-CONCURRENCY-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.14-MUTATION-AUDIT-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.15-SHARED-PORTFOLIO-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.16-LIFECYCLE-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.17-RETENTION-ARCHIVE-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.2-LEDGER-RECOVERY-INTEGRITY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.3-EVENT-IDENTITY-INVARIANTS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.4-IDEMPOTENCY-SCOPE-INVARIANTS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.5-LEDGER-MALFORMED-TAIL.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.6-MALFORMED-PERSISTED-METADATA.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.7-MALFORMED-SNAPSHOT-RECOVERY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.8-SNAPSHOT-SCALAR-VALIDATION.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/B4.9-RISK-AUDIT-OUTCOMES.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5-LOCAL-ACCEPTANCE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5-LOCAL-READONLY-DASHBOARD.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.1-LOCAL-SERVICE-BOUNDARY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.10-BOUNDED-MEMBERS-RESERVATIONS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.11-BOUNDED-CATALOG-LEGACY-RESOURCES.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.12-ONE-PASS-AUDIT-PAGING.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.13-STREAMED-LEDGER-HEAD.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.14-CURSOR-AWARE-CATALOG-SORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.2-STATIC-DEPLOYMENT-READINESS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.24-MOBILE-GATEWAY-STATUS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.3-DEPLOYMENT-ACCESS-OBSERVABILITY-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.4-LOCAL-OPERATOR-SHELL.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.6-LOCAL-PORTFOLIO-INSPECTION.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.7-WEB-STACK-DEPLOYMENT-MATRIX.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/U5.9-BOUNDED-LOCAL-INSPECTION.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/WEB-STACK-OPTIONS.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/WEB-STACK-OPTIONS.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/WORKTREE-BASELINE-REPORT.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0027-web-stack-selection.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0034-u5-10-bounded-members-reservations.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0035-u5-11-bounded-catalog-legacy-resources.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0036-u5-12-one-pass-audit-paging.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0037-u5-13-streamed-ledger-head.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/decisions/ADR-0038-u5-14-cursor-aware-catalog-sort.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-20.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTANDING-LOG.md",
-      "target": "document:docs/runtime-benchmark.md",
-      "type": "related",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
       "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "target": "document:docs/UNDERSTANDING-LOG.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -64716,32 +63510,8 @@
       "recoveredFromImportMap": true
     },
     {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/btc_assessor_python_runtime.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/btc_question_evaluation.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
       "source": "file:market_os/btc_local_assessor_store.py",
       "target": "file:market_os/btc_evidence_packet.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/btc_local_assessor_store.py",
-      "target": "file:market_os/btc_local_assessor.py",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7,
@@ -65686,70 +64456,6 @@
     {
       "source": "file:market_os/tests/test_btc_jev_evaluation.py",
       "target": "file:market_os/workflow.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/__init__.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_evidence_packet.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_features.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_local_assessor.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_local_assessor_store.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_question_evaluation.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/providers.py",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7,
@@ -67510,6 +66216,445 @@
     {
       "source": "file:scripts/m2_8_live_smoke.py",
       "target": "file:market_os/research.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_result_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_comparable_ids",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_prompt_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_response_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:_packet",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_response_recovers_final_json_after_truncated_runtime_echo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/tests/test_btc_local_assessor.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:market_os/btc_local_assessor_store.py",
+      "target": "file:market_os/btc_local_assessor.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/btc_assessor_python_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/btc_question_evaluation.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_evidence_packet.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_features.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_local_assessor.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_local_assessor_store.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_question_evaluation.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/providers.py",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7,
