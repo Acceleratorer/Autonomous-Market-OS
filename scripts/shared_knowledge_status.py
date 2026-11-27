@@ -48,7 +48,17 @@ def main() -> int:
     metadata_match = len({checkpoint, meta.get("gitCommitHash", ""), fingerprints.get("gitCommitHash", "")}) == 1
     head = git("rev-parse", "HEAD")
     drift = project_changes(checkpoint) if metadata_match else ["<graph metadata mismatch>"]
-    worktree = git("status", "--short").splitlines()
+    status = subprocess.run(
+        ["git", "status", "--short"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if status.returncode:
+        raise SystemExit(status.stderr.strip() or "git status failed")
+    # Keep the two-column porcelain prefix; stripping it would turn `.ua/` into `ua/`.
+    worktree = status.stdout.splitlines()
     worktree_source = [
         line[3:]
         for line in worktree
