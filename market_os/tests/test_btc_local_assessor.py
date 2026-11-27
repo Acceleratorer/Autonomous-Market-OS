@@ -29,6 +29,7 @@ from market_os.btc_local_assessor import (
     _verify_windows_egress_rules,
     local_runtime_health,
 )
+from market_os.btc_assessor_windows_appcontainer import AppContainerRuntimeError
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -396,14 +397,100 @@ def test_windows_egress_health_fails_closed_on_matching_policy_without_behaviora
     assert health["reason"] == "active_store_policy_does_not_prove_runtime_egress_denial"
 
 
+def test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime._request_lock = threading.Lock()
+    appcontainer = Mock()
+    appcontainer.prepare.return_value = {
+        "status": "enforced",
+        "supervisor": "Windows AppContainer",
+        "network_capability_count": 0,
+    }
+    appcontainer.complete.return_value = ({"choices": [{"message": {"content": "{}"}}]}, 7)
+    appcontainer.health.return_value = {
+        "provider": "local_qwen_evidence_assessor",
+        "status": "healthy",
+        "network_isolation": {"status": "enforced", "network_capability_count": 0},
+    }
+    runtime._windows_runtime = appcontainer
+    with patch("market_os.btc_local_assessor.os.name", "nt"), patch(
+        "market_os.btc_local_assessor._verify_windows_egress_rules",
+        side_effect=AssertionError("AppContainer runtime must not rely on firewall metadata"),
+    ), patch(
+        "market_os.btc_local_assessor.socket.socket",
+        side_effect=AssertionError("Windows assessor inference must not open a socket"),
+    ):
+        runtime.start()
+        response = runtime.complete([{"role": "user", "content": "synthetic"}], {"type": "object"}, timeout_seconds=10)
+        health = runtime.health()
+
+    assert response == ({"choices": [{"message": {"content": "{}"}}]}, 7)
+    assert health["network_isolation"]["network_capability_count"] == 0
+    appcontainer.prepare.assert_called()
+    appcontainer.complete.assert_called_once()
+
+
+def test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime._request_lock = threading.Lock()
+    runtime._windows_runtime = Mock()
+    runtime._windows_runtime.prepare.side_effect = AppContainerRuntimeError(
+        "resource_limit", "synthetic job limit failure", retryable=True
+    )
+
+    with patch("market_os.btc_local_assessor.os.name", "nt"):
+        with pytest.raises(LocalAssessorError) as caught:
+            runtime.start()
+
+    assert caught.value.code == "resource_limit"
+    assert caught.value.retryable is True
+    runtime._windows_runtime.stop.assert_called_once_with()
+
+
+def test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime._windows_runtime = Mock()
+    runtime._windows_runtime.prepare.side_effect = OSError("synthetic AppContainer filesystem failure")
+
+    with patch("market_os.btc_local_assessor.os.name", "nt"):
+        with pytest.raises(LocalAssessorError) as caught:
+            runtime.start()
+
+    assert caught.value.code == "local_runtime_failed"
+    runtime._windows_runtime.stop.assert_called_once_with()
+
+
+def test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors() -> None:
+    runtime = object.__new__(LocalLlamaRuntime)
+    runtime._lock = threading.RLock()
+    runtime._request_lock = threading.Lock()
+    runtime._windows_runtime = Mock()
+    runtime._windows_runtime.prepare.return_value = {"status": "enforced"}
+    runtime._windows_runtime.complete.side_effect = OSError("synthetic AppContainer request failure")
+
+    with patch("market_os.btc_local_assessor.os.name", "nt"):
+        with pytest.raises(LocalAssessorError) as caught:
+            runtime.complete([], {}, timeout_seconds=10)
+
+    assert caught.value.code == "local_runtime_failed"
+    assert caught.value.retryable is True
+
+
 def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() -> None:
     runtime = object.__new__(LocalLlamaRuntime)
     runtime._lock = threading.RLock()
-    runtime.server_path = Path(sys.executable)
+    runtime._windows_runtime = Mock()
+    runtime._windows_runtime.prepare.return_value = {
+        "status": "unverified",
+        "reason": "synthetic missing AppContainer capability proof",
+    }
 
     with patch("market_os.btc_local_assessor.os.name", "nt"), patch(
         "market_os.btc_local_assessor._verify_windows_egress_rules",
-        return_value={"status": "unverified", "reason": "synthetic missing policy"},
+        side_effect=AssertionError("AppContainer startup must not consult firewall metadata"),
     ):
         try:
             runtime.start()
@@ -411,6 +498,7 @@ def test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified() 
             assert exc.code == "network_isolation_unverified"
         else:
             raise AssertionError("local runtime started without verified network isolation")
+    runtime._windows_runtime.prepare.assert_called_once_with()
 
 
 def test_local_runtime_health_uses_the_fail_closed_startup_preflight() -> None:

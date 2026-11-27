@@ -614,6 +614,7 @@ class LocalLlamaRuntime:
         self._lock = threading.RLock()
         self._process: subprocess.Popen[bytes] | None = None
         self._resource_job: _WindowsResourceJob | None = None
+        self._windows_runtime: Any | None = None
         self._api_key: str | None = None
         self._port: int | None = None
         self._key_file: Path | None = None
@@ -662,6 +663,19 @@ class LocalLlamaRuntime:
         self.runtime_version = f"llama.cpp-{lock['runtime']['release']}"
         self.manifest_fingerprint = _sha256(_canonical_json(manifest))
         self.gpu_layers = 99 if "cuda" in target else 0
+        if os.name == "nt":
+            from .btc_assessor_windows_appcontainer import WindowsAppContainerCliRuntime
+
+            appcontainer_runtime_spec = dict(target_spec)
+            appcontainer_runtime_spec["release"] = lock["runtime"]["release"]
+            self._windows_runtime = WindowsAppContainerCliRuntime(
+                root,
+                server,
+                lock["model"],
+                appcontainer_runtime_spec,
+                lock_sha256=_sha256(lock_bytes),
+                resource_job_factory=_WindowsResourceJob,
+            )
 
     @property
     def base_url(self) -> str:
@@ -694,7 +708,10 @@ class LocalLlamaRuntime:
 
     def require_network_isolation(self) -> dict[str, Any]:
         if os.name == "nt":
-            isolation = _verify_windows_egress_rules(self.server_path)
+            runtime = self._windows_runtime
+            if runtime is None:
+                raise LocalAssessorError("network_isolation_unverified", "Windows AppContainer runtime is unavailable")
+            isolation = runtime.network_isolation()
         else:
             from .btc_assessor_linux_isolation import verify_linux_isolation
 
@@ -708,6 +725,23 @@ class LocalLlamaRuntime:
         with self._lock:
             if not require_network_isolation:
                 raise LocalAssessorError("network_isolation_unverified", "runtime egress isolation cannot be disabled")
+            if os.name == "nt":
+                runtime = self._windows_runtime
+                if runtime is None:
+                    raise LocalAssessorError("network_isolation_unverified", "Windows AppContainer runtime is unavailable")
+                from .btc_assessor_windows_appcontainer import AppContainerRuntimeError
+
+                try:
+                    isolation = runtime.prepare()
+                except AppContainerRuntimeError as exc:
+                    runtime.stop()
+                    raise LocalAssessorError(exc.code, str(exc), retryable=exc.retryable) from exc
+                except OSError as exc:
+                    runtime.stop()
+                    raise LocalAssessorError("local_runtime_failed", "Windows AppContainer runtime could not start") from exc
+                if isolation.get("status") != "enforced":
+                    raise LocalAssessorError("network_isolation_unverified", "Windows AppContainer token and zero-capability policy were not verified")
+                return
             self.require_network_isolation()
             if self._process is not None:
                 if self._process.poll() is None:
@@ -821,6 +855,21 @@ class LocalLlamaRuntime:
         if not math.isfinite(timeout_seconds) or not 1 <= timeout_seconds <= 300:
             raise ValueError("timeout_seconds must be between 1 and 300")
         self.start()
+        if os.name == "nt":
+            runtime = self._windows_runtime
+            if runtime is None:
+                raise LocalAssessorError("network_isolation_unverified", "Windows AppContainer runtime is unavailable")
+            from .btc_assessor_windows_appcontainer import AppContainerRuntimeError
+
+            try:
+                with self._request_lock:
+                    return runtime.complete(messages, schema, timeout_seconds=timeout_seconds)
+            except AppContainerRuntimeError as exc:
+                raise LocalAssessorError(exc.code, str(exc), retryable=exc.retryable) from exc
+            except OSError as exc:
+                raise LocalAssessorError("local_runtime_failed", "Windows AppContainer completion failed", retryable=True) from exc
+            except UnicodeError as exc:
+                raise LocalAssessorError("invalid_response", "Windows AppContainer completion input is not valid UTF-8") from exc
         request_payload = {
             "model": LOCAL_MODEL,
             "messages": messages,
@@ -852,6 +901,17 @@ class LocalLlamaRuntime:
         return parsed, max(0, received - started)
 
     def health(self) -> dict[str, Any]:
+        if os.name == "nt":
+            if self._windows_runtime is None:
+                return {
+                    "provider": self.provider,
+                    "status": "unavailable",
+                    "runtime": self.runtime_version,
+                    "model_sha256": _sha256_file(self.model_path),
+                    "resource_limits": {"status": "not_running", "supervisor": "Windows Job Object"},
+                    "network_isolation": {"status": "unverified", "supervisor": "Windows AppContainer"},
+                }
+            return self._windows_runtime.health()
         process_running = self._process is not None and self._process.poll() is None
         resource_limits: dict[str, Any]
         if os.name == "nt":
@@ -876,8 +936,6 @@ class LocalLlamaRuntime:
                 reason = "the Linux assessor is not running inside a verified systemd scope and network namespace"
                 resource_limits = {"status": "not_running", "supervisor": "systemd user scope / cgroup v2", "reason": reason}
                 network_isolation = {"status": "unverified", "supervisor": "unshare user and network namespaces", "reason": reason}
-        if os.name == "nt":
-            network_isolation = _verify_windows_egress_rules(self.server_path)
         if not process_running:
             return {
                 "provider": self.provider,
@@ -924,6 +982,8 @@ class LocalLlamaRuntime:
 
     def stop(self) -> None:
         with self._lock:
+            if os.name == "nt" and self._windows_runtime is not None:
+                self._windows_runtime.stop()
             process, self._process = self._process, None
             if process is not None and process.poll() is None:
                 process.terminate()

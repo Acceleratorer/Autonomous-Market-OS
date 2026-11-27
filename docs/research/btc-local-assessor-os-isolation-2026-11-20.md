@@ -1,14 +1,14 @@
 # BTC Local Assessor OS Isolation Readiness
 
-**Checked:** 2026-11-20
-**Status:** Linux rootless boundary is implemented and unit-checked; no Linux target-host verification or host policy change has occurred.
+**Checked:** 2026-11-27
+**Status:** Windows AppContainer CPU inference passed a synthetic local smoke on this workstation; Linux target-host isolation remains unverified.
 **Scope:** OS-enforced egress and resource limits for the local Qwen assessor.
 
 ## Current result
 
 | Launch path | Resource boundary | Network boundary | Readiness |
 |---|---|---|---|
-| Windows `btc-paper local-assessor` CLI | The pinned `llama-server` child is assigned to a Windows Job Object before it is resumed. The current limits are a 6 GiB process/job commit cap and 25% CPU hard cap. CUDA fit is adaptive, not a VRAM quota. | ActiveStore has no enabled outbound block rule matching the Python executable, the pinned `llama-server.exe`, or `Any`; all profiles default to outbound `Allow`. A read-only ActiveStore verifier and opt-in per-program installer now exist, but the installer has not been run. | Health remains `degraded`; zero egress is unproved. |
+| Windows `btc-paper local-assessor` CLI | The pinned `llama-cli` runs per completion in a Windows AppContainer with a 25% CPU hard cap and 6 GiB process/job commit limits. Inference is CPU-only; captured stdout/stderr are combined under a 1 MiB pipe cap. | Startup verifies `TokenIsAppContainer` and zero token capabilities. The path opens no loopback server or Python socket. No outbound probe or packet capture was run. | Synthetic local inference and health passed on this workstation; no BTC packet, Jev request, or provider request was used. |
 | Linux `btc-paper local-assessor health/assess` CLI | The CLI re-executes in a transient `systemd --user` scope with `CPUQuota=25%`, `MemoryMax=6 GiB`, and `TasksMax=128`. It verifies the active cgroup-v2 files for both Python and `llama-server`. | `unshare --user --map-root-user --net` creates a separate network namespace. A small stdlib wrapper raises only `lo`; verification requires a distinct namespace inode, exactly the loopback interface, loopback-only IPv4/IPv6 routes, and matching Python/server cgroup and namespace membership. | Code and mocked boundary tests exist. No Linux host or live scope was available here, so deployment remains unverified and fails closed until target-host health passes. |
 | U5.5 system services | `market-os-python.service` and `market-os-next.service` have no explicit CPU or memory quota. | Both unit files configure `IPAddressDeny=any` with loopback allows. The package is disabled and the policy has not been verified on a target host. | Even when installed and supported, the policy covers those service processes, not a separate shell-launched CLI. |
 
@@ -103,11 +103,39 @@ and the same 6 GiB / 25% Windows Job Object limits as the current runtime. In
 single-turn chat mode, the process exited with code 0 but emitted no valid
 JSON and logged `Failed to initialize samplers: Unexpected empty grammar
 stack after accepting piece: <|im_start|>`. A second constrained invocation
-left its requested output file empty. Do not treat this CLI path as a drop-in
-replacement based on the help text or exit code alone. Keep the existing
-loopback `llama-server` adapter until a pinned build produces and validates a
-schema-conforming response through a bounded smoke. No network trace was
-collected during this local probe.
+left its requested output file empty. That historical probe predates the
+AppContainer adapter below. It remains evidence that strict grammar mode was
+unreliable in that invocation; it does not negate the later plain-completion
+smoke. Downstream Market OS response validation remains authoritative.
+
+## Windows AppContainer CLI smoke — 2026-11-27
+
+`LocalLlamaRuntime` now selects a pinned `llama-cli` process inside a
+zero-capability Windows AppContainer. The adapter stages the hash-verified
+model and non-CUDA runtime files under the AppContainer profile, checks the
+runtime build, verifies the process token, applies the existing Job Object
+limits before resuming the process, and captures output through bounded pipes.
+Staging is capped at 3 GiB; the locked model plus selected runtime files used
+2,549,864,192 bytes. Prompt input is capped at 128 KiB and combined output at
+1 MiB. It makes no HTTP or socket request and uses no hosted server.
+
+A live synthetic completion on 2026-11-27 returned
+`{"status":"ok","label":"abstain"}` with a 6,516 ms `llama-cli`
+process latency (excluding first-use staging, staged-file hash revalidation,
+and version preflight). Health reported
+`healthy`, CPU execution, a verified AppContainer token with zero capabilities,
+and enforced 25% CPU / 6 GiB process and job commit limits. The process did not
+receive BTC data, call Binance, call Jev, or call another model provider. No
+outbound network probe or packet capture was run, so do not describe this as a
+packet-trace denial result. The local AppContainer profile and staged model
+remain on disk for future runs.
+
+The result and limits are recorded in
+[`btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json`](../evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json).
+The live smoke used the changes on branch
+`fix/btc-appcontainer-cli-runtime` above base commit `6c8902e`; the branch was
+not committed at run time. Focused BTC runtime, paper, clock, and Linux
+isolation tests passed 50 tests with one platform skip.
 
 ## Platform findings
 
@@ -151,42 +179,17 @@ and [Windows Firewall defaults](https://learn.microsoft.com/en-us/windows/securi
    device permissions still allow the pinned CUDA runtime; otherwise use the
    locked CPU build or keep Linux health degraded. Do not call a mocked test or
    CI source build live target-host isolation evidence.
-2. For Windows, use the opt-in firewall installer only after the pinned,
-   project-local CPython 3.11 runtime and the locked llama.cpp target are
-   installed. From an elevated PowerShell session at the repository root, set
-   the paths and run the installer with a process-scoped execution-policy
-   override:
+2. On any additional Windows target, run the pinned local `health` command and
+   one synthetic-only completion through the AppContainer CLI path. Confirm
+   zero token capabilities and Job Object limits from that target. Do not add
+   the historical firewall rules to this launch path. If stronger evidence is
+   needed, separately approve a bounded network-denial test; no probe was made
+   in this workstation smoke.
+3. Keep Linux target-host isolation, GPU device access, and GPU resource caps
+   open until verified on the intended Linux hardware.
 
-   ```powershell
-   $project = (Resolve-Path .).Path
-   $python = Join-Path $project ".market_os\runtimes\btc-assessor-py311\python.exe"
-   $installRoot = Join-Path $project ".market_os\local-evidence-runtime\windows-x64-cuda-13.5"
-   $manifest = Get-Content (Join-Path $installRoot "install-manifest.json") -Raw | ConvertFrom-Json
-   $server = Join-Path $installRoot $manifest.runtime.server_relative_path
-   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" `
-     -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass `
-     -File (Join-Path $project "market_os\btc_assessor_firewall.ps1") `
-     -Mode Install -ProjectRoot $project -PythonExecutable $python -ServerExecutable $server
-   ```
-
-   The Python path must identify the installed, dedicated target interpreter;
-   adjust it if the pinned runtime manifest uses a different directory. The
-   installer is idempotent: if interrupted after creating one rule, rerunning
-   the same `Install` command verifies the existing rule and creates the
-   missing rule. Assessment startup fails closed until both rules verify. If
-   organizational Group Policy blocks script execution, the process-scoped
-   override cannot supersede it and the command reports the policy error.
-   After installation, run health against the same Python and server path, then
-   perform an actual bounded non-loopback denial probe while confirming
-   loopback IPC. Until that target-host verification, overall health remains
-   `degraded`. The installer has not been run and no host policy has been
-   changed here.
-3. Keep the assessor health `degraded` until one of these boundaries is
-   installed and its enforcement is observed on the actual launch path.
-
-This is independent of the capture clock gate: on the same Windows host,
-`w32tm /query /status` reported an unsynchronized `Local CMOS Clock`, Stratum 0,
-and no successful sync time. That snapshot cannot supply the UTC error bound
-required by [the prospective capture proposal](../BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md);
-it does not change the owner's accepted local-receipt availability rule in
-[ADR-0057](../decisions/ADR-0057-btc-strict-recorded-availability.md).
+The AppContainer smoke is independent of the capture-clock gate. W32Time
+status currently reports a network source, but the elevated 50-minute observer
+retry on 2026-11-27 was canceled before its process started, so no new samples
+or UTC error bound were produced. Keep `clock_error_bound_ms` null and B3.1
+ineligible under [ADR-0057](../decisions/ADR-0057-btc-strict-recorded-availability.md).

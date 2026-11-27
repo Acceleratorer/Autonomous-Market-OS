@@ -1,8 +1,8 @@
 # BTC UTC Receipt-Time Source Qualification — 2026-11-27
 
-**Result:** The current Windows status supports a conditional NTP operational-distance estimate of **1.06610145 seconds (1,066.10145 ms)**. This single status snapshot does not establish an end-to-end UTC error bound suitable for B3.1 eligibility. Keep clock_error_bound_ms null and packet eligibility false.
+**Result:** The latest unprivileged status-only observation reported a conditional NTP root-distance estimate of **7.8334786 seconds** after W32Time reported a newer successful sync. The earlier **1.06610145-second** estimate below is a historical snapshot. Neither reading establishes an end-to-end UTC error bound suitable for B3.1 eligibility. Keep `clock_error_bound_ms` null and packet eligibility false.
 
-## Local status snapshot
+## Earlier local status snapshot — 2026-11-27
 
 The read-only w32tm /query /status output available for this review reports:
 
@@ -60,3 +60,42 @@ RFC 5905’s estimate is useful as a model-based operational metric, but these m
 - This review queried no time server, did not resynchronize or change Windows settings, and made no Binance, Jev, or model-provider request. A prospective market-data capture still requires its separate date-bound approval under the existing project gate.
 
 This note is a technical evidence assessment, not a claim of an unconditional hard UTC guarantee.
+
+## Earlier passive observer attempt — 2026-11-27 08:51 +07:00
+
+The owner requested another 50-minute, read-only W32Time observation. Windows
+reported that the elevated launch was canceled before the observer process
+started. It collected no samples and produced no result or progress file. No
+W32Time service, registry, system-clock, or configuration change occurred.
+The attempt therefore adds no new clock evidence and does not change the
+decision above. See the
+[sanitized canceled-attempt record](../evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json).
+
+## Second elevated retry and status-only observation — 2026-11-27
+
+The owner requested another 50-minute retry. At about `09:32 +07:00`, Windows
+returned the operation-canceled error before the elevated observer child
+started. No samples or result/progress files were produced by that attempt,
+and the observer made no service, registry, or clock changes. See the
+[09:32 canceled-attempt record](../evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json).
+
+To keep moving without another elevation prompt, a status-only observer ran
+unprivileged from `09:36:22.824` to `10:26:22.861 +07:00`. The elevated
+`/query /configuration` step was omitted. It recorded 100/100 successful
+`/query /status /verbose` samples; W32Time stayed `Running/Manual`, with no
+query timeouts or observer-caused service, clock, resync, or configuration
+changes. The sampled wall span was `2,970.041 s` and monotonic span was
+`2,969.977 s`. Maximum relative wall/monotonic offset change was `26.131 ms`;
+the largest adjacent interval difference was `2.497 ms`, below the diagnostic
+`250 ms` threshold. This measures relative stability only.
+
+W32Time status reported a newer successful sync at about `10:23:18 +07:00`,
+and one Time-Service event ID 37 was recorded at `03:23:17.888Z`. The
+conditional RFC 5905 root-distance estimate changed from `0.54224385 s` in
+the first sample to `7.8334786 s` in the final sample, including final root
+dispersion of `7.8126761 s`. This is a model-based operational metric, not a
+capture-time UTC error bound. The source accuracy and effective configuration
+remain unverified; no explicit time-source request or packet capture was made,
+and ordinary W32Time traffic was not measured. Keep
+`clock_error_bound_ms` null and BTC B3.1 ineligible. See the
+[sanitized observation summary](../evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json).

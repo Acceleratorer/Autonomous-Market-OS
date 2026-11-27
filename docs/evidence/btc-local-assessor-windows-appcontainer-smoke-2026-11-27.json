@@ -1,0 +1,64 @@
+{
+  "schema": "market-os.btc-local-assessor-windows-appcontainer-smoke.v1",
+  "recorded_on": "2026-11-27",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch": "fix/btc-appcontainer-cli-runtime",
+    "commit_at_run": "6c8902e446a7cf46497f3ff364f4dd5d89282056",
+    "runtime_adapter_changes_uncommitted_at_run": true
+  },
+  "scope": {
+    "synthetic_prompt_only": true,
+    "btc_packet_used": false,
+    "market_data_request_count": 0,
+    "typesafe_jev_request_count": 0,
+    "other_model_provider_request_count": 0,
+    "credentials_used": false,
+    "external_network_probe_performed": false,
+    "hosted_server_started": false
+  },
+  "runtime": {
+    "provider_identity": "local_qwen_evidence_assessor",
+    "identity_note": "Qwen is not Jev; hosted Jev was not called.",
+    "model": "Qwen/Qwen3-4B-GGUF",
+    "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "model_file": "Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "llama_cpp_release": "b12478",
+    "llama_archive_sha256": "5b07f55c3c33e30f9e1227f14c6cb6863ab14b85bc86126809f5bc8a5ff4e0fb",
+    "execution_device": "CPU",
+    "execution_mode": "pinned llama-cli process per completion; no loopback HTTP server"
+  },
+  "network_isolation": {
+    "status": "enforced",
+    "supervisor": "Windows AppContainer",
+    "token_is_appcontainer": true,
+    "token_capability_count": 0,
+    "outbound_probe_performed": false,
+    "interpretation": "The runtime verified an AppContainer token with zero capabilities. No network-denial packet probe was run."
+  },
+  "resource_limits": {
+    "status": "enforced",
+    "supervisor": "Windows Job Object",
+    "cpu_hard_cap_percent": 25,
+    "process_commit_limit_bytes": 6442450944,
+    "job_commit_limit_bytes": 6442450944,
+    "max_captured_output_bytes": 1048576,
+    "max_prompt_bytes": 131072,
+    "max_staged_runtime_bytes": 3221225472,
+    "staged_artifact_bytes": 2549864192
+  },
+  "inference": {
+    "call_count": 1,
+    "completion_process_latency_ms": 6516,
+    "latency_scope": "llama-cli process only; excludes first-use staging, staged-file hash revalidation, and version preflight",
+    "result": "success",
+    "synthetic_output": "{\"status\":\"ok\",\"label\":\"abstain\"}",
+    "health_status": "healthy"
+  },
+  "limitations": [
+    "This is a synthetic local runtime smoke, not a market assessment or calibration result.",
+    "No external network probe or packet capture was performed.",
+    "Linux target-host isolation and Jev local runtime availability remain unverified."
+  ]
+}
