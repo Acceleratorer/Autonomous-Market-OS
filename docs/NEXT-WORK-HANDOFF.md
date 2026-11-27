@@ -1,5 +1,27 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28 — local completion parser seam
+
+The Windows AppContainer `llama-cli` adapter now has a regression guard for
+multiline file prompts. `llama-cli` can display the prompt with blank lines and
+echo a truncated JSON-shaped context before the final completion; the parser
+anchors on the stable first prompt line, bounds the completion by the CLI
+summary marker, removes a closed thinking block, and recovers only a complete
+final JSON object. It prefers the complete echoed prompt and uses a line-aware
+fallback when normalization differs. Incomplete or ambiguous output still fails closed as a
+typed `invalid_response` result. This is a local Qwen runtime fix and does
+not change Jev identity, packet egress, calibration, or paper-decision
+authority. The focused assessor suite passes 31 tests; no live BTC packet or
+provider request was used.
+
+The shared collaborator workflow remains Git-backed: source and canonical
+knowledge are committed first, then the English Understand graph is refreshed
+from that source checkpoint and its tracked metadata is committed separately.
+Use `docs/COLLABORATION-WORKFLOW.md` and
+`docs/KNOWLEDGE-MAINTENANCE.md` as the durable handoff instead of private chat
+state. The next action is to review this parser change, run the relevant
+repository checks, and refresh the graph after the source commit.
+
 ## Current collaborator checkpoint — 2026-11-28
 
 The latest first-party TypeSafe recheck is recorded in

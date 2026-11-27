@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "030f0d7d4569dc7dd38302e86b1b6548c8744ca6",
-  "generatedAt": "2026-11-27T19:41:03.210Z",
+  "gitCommitHash": "bcd3d3eeb256145afbe64b586290b0aa79d9dcc9",
+  "generatedAt": "2026-11-27T21:10:28.886Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "94590254bd2eb691f5cddf178df228a147cbb486807128a9835c7d16ad872ac2",
+      "contentHash": "a2b689142cb7acfabf6747bff484418cbdbe35029b2db27682632f880d50e91f",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 927,
+      "totalLines": 949,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "fb07b4eac231b6678ae5f50f04343a14c11aa794e72b9822287691e1673a3f8c",
+      "contentHash": "c3db488011634b2d025acb43c9c02cb17398f67778429aabda44fd6b0710eebd",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2671,
+      "totalLines": 2690,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {
@@ -10872,7 +10872,7 @@
     },
     "market_os/btc_assessor_windows_appcontainer.py": {
       "filePath": "market_os/btc_assessor_windows_appcontainer.py",
-      "contentHash": "0fc2575c9f5892f1348b6337dda412f6c50edcd0f7c797c326f6738e2d978bba",
+      "contentHash": "a7be220b9bfcf7872c0bcb07af35aac3726ceb9276c3c4f91bbdbbd1a5558650",
       "functions": [
         {
           "name": "_sha256_file",
@@ -10953,6 +10953,8 @@
             "prepare",
             "complete",
             "_extract_completion",
+            "_last_line_prefix",
+            "_last_line_exact",
             "_resolve_native_apis",
             "_token_value",
             "_run",
@@ -10962,7 +10964,7 @@
           ],
           "properties": [],
           "exported": true,
-          "lineCount": 640
+          "lineCount": 688
         }
       ],
       "imports": [
@@ -11052,7 +11054,7 @@
         "_safe_rmtree",
         "WindowsAppContainerCliRuntime"
       ],
-      "totalLines": 735,
+      "totalLines": 783,
       "hasStructuralAnalysis": true
     },
     "market_os/btc_b2.py": {
@@ -13563,7 +13565,7 @@
     },
     "market_os/btc_local_assessor.py": {
       "filePath": "market_os/btc_local_assessor.py",
-      "contentHash": "501cc2ebe56ff51021845517f2bcf24d00ede693d839eb2e6d5fe0a5f45105bf",
+      "contentHash": "2ae382e028f0d4b5935b8fff59b283aa66c414ef55059101958955b972ce05b8",
       "functions": [
         {
           "name": "_canonical_json",
@@ -13703,7 +13705,7 @@
           ],
           "returnType": "dict[str, Any]",
           "exported": true,
-          "lineCount": 14
+          "lineCount": 73
         },
         {
           "name": "_choose_result",
@@ -13979,7 +13981,7 @@
         "LocalB31Assessor",
         "local_runtime_health"
       ],
-      "totalLines": 1302,
+      "totalLines": 1363,
       "hasStructuralAnalysis": true
     },
     "market_os/btc_local_assessor_store.py": {
@@ -28321,7 +28323,7 @@
     },
     "market_os/tests/test_btc_local_assessor.py": {
       "filePath": "market_os/tests/test_btc_local_assessor.py",
-      "contentHash": "392118fed518513642de02fe90035d687f32ffd93f81b12223f5a58e12a78133",
+      "contentHash": "65a351f692018ec65a0c7ae9b9d1e9af9ef9f3cf054f8cfc7dc6a7fc9d6dcb54",
       "functions": [
         {
           "name": "_canonical",
@@ -28405,6 +28407,20 @@
           "lineCount": 7
         },
         {
+          "name": "test_local_response_recovers_final_json_after_truncated_runtime_echo",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_local_response_rejects_excessive_json_nesting_without_rescanning",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
           "name": "test_self_comparison_is_rejected_before_normalization",
           "params": [],
           "returnType": "None",
@@ -28460,6 +28476,20 @@
           "returnType": "None",
           "exported": true,
           "lineCount": 32
+        },
+        {
+          "name": "test_appcontainer_extracts_completion_after_multiline_prompt_display",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
         },
         {
           "name": "test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
@@ -28737,7 +28767,8 @@
         {
           "source": "market_os.btc_assessor_windows_appcontainer",
           "specifiers": [
-            "AppContainerRuntimeError"
+            "AppContainerRuntimeError",
+            "WindowsAppContainerCliRuntime"
           ]
         },
         {
@@ -28776,6 +28807,8 @@
         "test_local_assessor_normalizes_typed_results_without_claiming_jev",
         "test_local_prompt_defines_contradiction_and_does_not_abstain_on_classifiable_disagreement",
         "test_local_assessor_rejects_model_citations_outside_the_packet",
+        "test_local_response_recovers_final_json_after_truncated_runtime_echo",
+        "test_local_response_rejects_excessive_json_nesting_without_rescanning",
         "test_self_comparison_is_rejected_before_normalization",
         "test_model_abstention_remains_a_terminal_advisory_result",
         "_windows_powershell_fixture",
@@ -28783,6 +28816,8 @@
         "test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
         "test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
         "test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
+        "test_appcontainer_extracts_completion_after_multiline_prompt_display",
+        "test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
         "test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
         "test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
         "test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
@@ -28799,7 +28834,7 @@
         "test_local_assessment_store_rejects_modified_run_bundles",
         "test_windows_resource_job_limits_memory_and_resumes_suspended_process"
       ],
-      "totalLines": 740,
+      "totalLines": 790,
       "hasStructuralAnalysis": true
     },
     "market_os/tests/test_btc_paper.py": {

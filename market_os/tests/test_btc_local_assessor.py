@@ -29,7 +29,10 @@ from market_os.btc_local_assessor import (
     _verify_windows_egress_rules,
     local_runtime_health,
 )
-from market_os.btc_assessor_windows_appcontainer import AppContainerRuntimeError
+from market_os.btc_assessor_windows_appcontainer import (
+    AppContainerRuntimeError,
+    WindowsAppContainerCliRuntime,
+)
 from market_os.btc_local_assessor_store import LocalAssessmentStore, LocalAssessmentStoreError
 from market_os.btc_question_evaluation import B31Status
 from market_os.providers import DocumentRecord, LicenseMetadata, Provenance, RetrievedPassage, RetrievalResult
@@ -273,6 +276,28 @@ def test_local_assessor_rejects_model_citations_outside_the_packet() -> None:
     assert record.assessment is None
 
 
+def test_local_response_recovers_final_json_after_truncated_runtime_echo() -> None:
+    response = {
+        "choices": [{
+            "message": {
+                "content": '{"echo": "... (truncated)\\n' + '{"status":"ok"}'
+            }
+        }]
+    }
+
+    assert local_assessor._response_json(response) == {"status": "ok"}
+
+
+def test_local_response_rejects_excessive_json_nesting_without_rescanning() -> None:
+    response = {
+        "choices": [{"message": {"content": "{" * 5000}}]
+    }
+
+    with pytest.raises(LocalAssessorError) as caught:
+        local_assessor._response_json(response)
+    assert caught.value.code == "invalid_response"
+
+
 def test_self_comparison_is_rejected_before_normalization() -> None:
     record = LocalB31Assessor(FakeRuntime(_usable_response(self_comparison=True))).assess(_packet())
 
@@ -429,6 +454,31 @@ def test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket() -> N
     assert health["network_isolation"]["network_capability_count"] == 0
     appcontainer.prepare.assert_called()
     appcontainer.complete.assert_called_once()
+
+
+def test_appcontainer_extracts_completion_after_multiline_prompt_display() -> None:
+    user_text = 'line1\nline2\n{"a":1}'
+    stdout = (
+        "banner\n> line1\n\nline2\n\n{\"a\":1}\n\n"
+        "[Start thinking]\ninternal reasoning\n[End thinking]\n"
+        "{\"status\":\"ok\"}\n[ Prompt: 1.0 t/s | Generation: 1.0 t/s ]\n"
+    )
+
+    assert WindowsAppContainerCliRuntime._extract_completion(stdout, user_text) == '{"status":"ok"}'
+
+
+def test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text() -> None:
+    user_text = "line1\n[Start thinking]\nline2"
+    stdout = (
+        "banner\n> line1\n\n[Start thinking]\n\nline2\n"
+        "[Start thinking]\ninternal reasoning\n[End thinking]\n"
+        '{"text":"> line1", "marker":"[End thinking]"}\n'
+        "[ Prompt: 1.0 t/s | Generation: 1.0 t/s ]\n"
+    )
+
+    assert WindowsAppContainerCliRuntime._extract_completion(stdout, user_text) == (
+        '{"text":"> line1", "marker":"[End thinking]"}'
+    )
 
 
 def test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors() -> None:

@@ -438,20 +438,68 @@ class WindowsAppContainerCliRuntime:
     @staticmethod
     def _extract_completion(stdout: str, user_text: str) -> str:
         output = stdout.replace("\r\n", "\n")
-        marker = "> " + user_text
-        marker_at = output.rfind(marker)
-        if marker_at < 0:
-            raise AppContainerRuntimeError("invalid_response", "llama-cli output did not contain its exact prompt marker")
-        start = marker_at + len(marker)
-        if output[start:start + 1] == "\n":
-            start += 1
-        end = output.rfind("[ Prompt:")
-        if end < start:
+        end = WindowsAppContainerCliRuntime._last_line_prefix(output, "[ Prompt:")
+        if end < 0:
             raise AppContainerRuntimeError("invalid_response", "llama-cli output did not contain its completion summary")
+
+        # --file echoes a multiline prompt, but the display may insert blank
+        # lines between source lines. Prefer the complete echoed prompt so
+        # marker-like text inside untrusted packet content cannot become a
+        # framing marker. The single-line fallback is retained for runtimes
+        # that do not normalize the prompt display.
+        renderings = [user_text]
+        lines = user_text.splitlines()
+        if lines:
+            renderings.extend(("\n".join(lines), "\n\n".join(lines)))
+        marker_at = -1
+        marker = ""
+        for rendering in dict.fromkeys(renderings):
+            candidate = "> " + rendering
+            position = WindowsAppContainerCliRuntime._last_line_exact(output, candidate, end)
+            if position > marker_at:
+                marker_at = position
+                marker = candidate
+        if marker_at < 0:
+            raise AppContainerRuntimeError("invalid_response", "llama-cli output did not contain its prompt marker")
+
+        prompt_end = marker_at + len(marker)
+        thinking_end = WindowsAppContainerCliRuntime._last_line_exact(output, "[End thinking]", end)
+        thinking_start = -1
+        if thinking_end >= prompt_end:
+            thinking_start = WindowsAppContainerCliRuntime._last_line_exact(output, "[Start thinking]", thinking_end)
+        if thinking_start >= prompt_end and thinking_end >= thinking_start:
+            start = thinking_end + len("[End thinking]")
+        else:
+            start = prompt_end
         content = output[start:end].strip()
         if not content or content.startswith("Error:"):
             raise AppContainerRuntimeError("invalid_response", "llama-cli did not produce a usable completion")
         return content
+
+    @staticmethod
+    def _last_line_prefix(text: str, prefix: str, end: int | None = None) -> int:
+        """Return the last line-started prefix before ``end`` or ``-1``."""
+        limit = len(text) if end is None else end
+        position = text.rfind(prefix, 0, limit)
+        while position >= 0:
+            if position == 0 or text[position - 1] == "\n":
+                return position
+            position = text.rfind(prefix, 0, position)
+        return -1
+
+    @staticmethod
+    def _last_line_exact(text: str, marker: str, end: int | None = None) -> int:
+        """Return the last complete line marker before ``end`` or ``-1``."""
+        limit = len(text) if end is None else end
+        position = text.rfind(marker, 0, limit)
+        while position >= 0:
+            marker_end = position + len(marker)
+            if (position == 0 or text[position - 1] == "\n") and (
+                marker_end == len(text) or text[marker_end] == "\n"
+            ) and marker_end <= limit:
+                return position
+            position = text.rfind(marker, 0, position)
+        return -1
 
     def _resolve_native_apis(self) -> tuple[Any, Any, Any, Any]:
         self._require_windows()

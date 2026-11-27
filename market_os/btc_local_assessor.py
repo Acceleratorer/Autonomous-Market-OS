@@ -48,6 +48,8 @@ MAX_HYPOTHESES = 16
 MAX_PASSAGES = 32
 MAX_EVIDENCE_CHARACTERS = 18_000
 MAX_RESPONSE_BYTES = 1024 * 1024
+MAX_RESPONSE_RECOVERY_CANDIDATES = 64
+MAX_RESPONSE_JSON_DEPTH = 256
 MAX_CONTEXT_TOKENS = 8192
 MAX_OUTPUT_TOKENS = 2048
 MAX_RUNTIME_MEMORY_BYTES = 6 * 1024**3
@@ -588,10 +590,69 @@ def _response_json(raw: Mapping[str, Any]) -> dict[str, Any]:
     message = choices[0].get("message")
     if not isinstance(message, Mapping) or not isinstance(message.get("content"), str):
         raise LocalAssessorError("invalid_response", "local model response is missing JSON content")
+    content = message["content"]
     try:
-        parsed = json.loads(message["content"])
+        parsed = json.loads(content)
     except json.JSONDecodeError as exc:
-        raise LocalAssessorError("invalid_response", "local model response content is not valid JSON") from exc
+        # llama-cli can echo a truncated JSON-shaped context before emitting
+        # the final object. Locate one complete object in a single bounded
+        # brace/string scan, then parse only that candidate. This stays
+        # linear on malformed output instead of retrying JSON decoding at
+        # every opening brace.
+        final_end = len(content.rstrip())
+        decoder = json.JSONDecoder()
+        recovered: dict[str, Any] | None = None
+        candidate_offset = content.rfind("{", 0, final_end)
+        for _ in range(MAX_RESPONSE_RECOVERY_CANDIDATES):
+            if candidate_offset < 0:
+                break
+            parsed_end = -1
+            try:
+                candidate, parsed_end = decoder.raw_decode(content[candidate_offset:final_end])
+            except json.JSONDecodeError:
+                candidate = None
+            if isinstance(candidate, dict) and parsed_end == final_end - candidate_offset:
+                recovered = candidate
+                break
+            candidate_offset = content.rfind("{", 0, candidate_offset)
+
+        # If the final object contains nested objects, the last opening brace
+        # is not its root. A single linear brace/string scan finds the root
+        # span without retrying JSON decoding at every opening brace.
+        if recovered is None:
+            stack: list[int] = []
+            candidate_start: int | None = None
+            in_string = False
+            escaped = False
+            for index, character in enumerate(content[:final_end]):
+                if in_string:
+                    if escaped:
+                        escaped = False
+                    elif character == "\\":
+                        escaped = True
+                    elif character == '"':
+                        in_string = False
+                    continue
+                if character == '"':
+                    in_string = True
+                elif character == "{":
+                    if len(stack) >= MAX_RESPONSE_JSON_DEPTH:
+                        raise LocalAssessorError("invalid_response", "local model response JSON nesting is too deep") from exc
+                    stack.append(index)
+                elif character == "}" and stack:
+                    start = stack.pop()
+                    if index + 1 == final_end:
+                        candidate_start = start
+            if candidate_start is not None:
+                try:
+                    candidate = json.loads(content[candidate_start:final_end])
+                except json.JSONDecodeError:
+                    candidate = None
+                if isinstance(candidate, dict):
+                    recovered = candidate
+        if recovered is None:
+            raise LocalAssessorError("invalid_response", "local model response content is not valid JSON") from exc
+        parsed = recovered
     if not isinstance(parsed, dict):
         raise LocalAssessorError("invalid_response", "local model response JSON must be an object")
     return parsed
