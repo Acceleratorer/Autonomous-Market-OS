@@ -1,5 +1,22 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28 — shared knowledge handoff standardized
+
+The repository now includes a read-only `scripts/shared_knowledge_status.py`
+helper. It reports the shared graph checkpoint, source drift, inventory, and the
+next refresh action so a new collaborator, coding agent, or later chat can start
+from the same Git state. `README.md`, `COLLABORATION-WORKFLOW.md`, and
+`KNOWLEDGE-MAINTENANCE.md` document the start/update/close-out routine.
+
+The helper was introduced in source commit `9b4cfc1`; the committed English
+Understand snapshot is refreshed after this canonical handoff update and
+validated by `python scripts/ci_checks.py validate-shared-knowledge`. The graph
+contains 711 scanned files, 2,350 nodes, 3,817 edges, seven layers, and 14 tour
+steps.
+The next collaborator should run the status helper, read this handoff and the
+goal prompt, then work only on an approved gate; the shared graph is navigation
+metadata and the canonical docs remain authoritative.
+
 ## Current collaborator checkpoint — 2026-11-28 — hosted Jev probe refreshed
 
 The bounded CLI completed one synthetic `jev-1.14.0` hosted probe through the

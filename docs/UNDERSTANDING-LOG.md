@@ -3,6 +3,25 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — Shared knowledge status helper and graph checkpoint
+
+- Added the read-only `scripts/shared_knowledge_status.py` command and linked it
+  from the README and collaborator workflow. It reports graph/meta/fingerprint
+  agreement, project-scoped drift, graph size, and the next maintenance action;
+  it never stages files or rewrites generated state.
+- The source/canonical knowledge commit introducing the helper is `9b4cfc1`.
+  The English incremental Understand refresh was then finalized and committed
+  from the follow-up handoff state, producing 711 scanned files, 2,350 nodes,
+  3,817 edges, seven layers, and 14 tour steps.
+- Verification passed: `python scripts/shared_knowledge_status.py` reports
+  current metadata, `python scripts/ci_checks.py validate-shared-knowledge`
+  passes, and `git diff --check` passes. The graph snapshot is pushed with the
+  source and documentation commits so a fresh clone has the same navigation
+  state.
+- Next gate remains the approved Jev local-runtime/vendor evidence or a
+  separately approved prospective BTC capture; this maintenance change does not
+  alter Jev identity, packet egress, quantitative authority, or paper-only mode.
+
 ## 2026-11-28 — Hosted Jev connectivity probe and local replay
 
 - Ran the bounded CLI Jev probe once with `jev-1.14.0`, the synthetic
