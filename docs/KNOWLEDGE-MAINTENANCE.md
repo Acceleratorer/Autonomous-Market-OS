@@ -76,7 +76,7 @@ The dashboard reads the committed graph but binds to the machine that starts
 it. Each collaborator can clone or pull the repository and run
 `/understand-dashboard` locally; the committed graph gives everyone the same
 snapshot. Use the handoff and understanding log for progress visible in Git.
-Do not expose the loopback dashboard or a live BTC/JeV packet stream as a
+Do not expose the loopback dashboard or a live BTC/Jev packet stream as a
 collaboration mechanism.
 
 ## Pull-request checklist
