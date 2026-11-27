@@ -29,9 +29,9 @@
       "GitHub Actions",
       "Terraform"
     ],
-    "description": "Autonomous Market OS foundation slice: synthetic, paper-only market research and portfolio inspection workspace with read-only defaults. Live trading, provider credentials, Binance transport, a public Python gateway, and HTTP/CLI mutation routes are disabled. This repository contains 704 files; scanning a smaller subdirectory can reduce analysis time.",
-    "analyzedAt": "2026-11-27T14:48:52.316Z",
-    "gitCommitHash": "9e96d3cfb075b6f5cbccce26106b5898ce796b53"
+    "description": "Autonomous Market OS foundation slice: synthetic, paper-only market research and portfolio inspection workspace with read-only defaults. Live trading, provider credentials, Binance transport, a public Python gateway, and HTTP/CLI mutation routes are disabled. This repository contains 705 files; scanning a smaller subdirectory can reduce analysis time.",
+    "analyzedAt": "2026-11-27T15:01:49.149Z",
+    "gitCommitHash": "1fa0ffac21bd43ccbc1040226a7b9866145307f3"
   },
   "nodes": [
     {
@@ -39079,7 +39079,7 @@
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "summary": "Explains the committed Understand Anything graph, the metadata files needed for incremental refreshes, and how contributors can explore, update, review, and commit the shared snapshot. It clarifies that the interactive dashboard URL is local to the machine running it.",
+      "summary": "Documents the shared Understand Anything graph, tracked metadata, contributor workflow, and incremental refresh process. It explains that the `/understand-*` commands require the Understand Anything Codex skill, links to the upstream project, and notes that fresh clones can inspect the committed graph JSON without installing the skills.",
       "tags": [
         "documentation",
         "knowledge-graph",
@@ -62569,13 +62569,6 @@
       "description": "Path-based pairing (deterministic)"
     },
     {
-      "source": "document:README.md",
-      "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "file:apps/cli/__init__.py",
       "target": "file:market_os/cli.py",
       "type": "imports",
@@ -66278,6 +66271,13 @@
       "direction": "forward",
       "weight": 0.7,
       "recoveredFromImportMap": true
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:docs/UNDERSTAND-GRAPH.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
     }
   ],
   "layers": [

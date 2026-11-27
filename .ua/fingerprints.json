@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "9e96d3cfb075b6f5cbccce26106b5898ce796b53",
-  "generatedAt": "2026-11-27T14:48:52.692Z",
+  "gitCommitHash": "1fa0ffac21bd43ccbc1040226a7b9866145307f3",
+  "generatedAt": "2026-11-27T15:01:49.426Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -41681,12 +41681,12 @@
     },
     "docs/UNDERSTAND-GRAPH.md": {
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "contentHash": "b78f6580dea8dd25cc50fa5f6f343e01dabb54694e3d6e3f1c346c876c576bbf",
+      "contentHash": "b74afd6afa9f198595a1efaa2d3a17af753b2a70931747db076151ac89ce28b8",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 35,
+      "totalLines": 37,
       "hasStructuralAnalysis": false
     }
   }

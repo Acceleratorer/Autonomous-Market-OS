@@ -1502,7 +1502,7 @@
     {
       "path": "docs/UNDERSTAND-GRAPH.md",
       "language": "markdown",
-      "sizeLines": 34,
+      "sizeLines": 36,
       "fileCategory": "docs"
     },
     {
@@ -5607,5 +5607,5 @@
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "6921fde2f9384a60109ea5ea78bad76a591710ec04acf5d804f08a185f605ebc"
+  "contentDigest": "bfe084d500b560e6a4797262b9a940b0c9dedf46be98e6db14ac01ace07cdc45"
 }
