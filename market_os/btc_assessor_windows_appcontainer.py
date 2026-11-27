@@ -588,6 +588,8 @@ class WindowsAppContainerCliRuntime:
             }
             env_text = "\0".join(f"{key}={value}" for key, value in sorted(environment.items(), key=lambda item: item[0].casefold())) + "\0\0"
             env_block = ctypes.create_unicode_buffer(env_text)
+            # No shell is involved: CreateProcessW receives the executable separately.
+            # list2cmdline applies Windows CRT quoting to fixed flags and verified local paths.
             command = ctypes.create_unicode_buffer(subprocess.list2cmdline([str(executable), *args]))
             flags = 0x00000004 | 0x00080000 | 0x00000400 | 0x08000000
             if not kernel32.CreateProcessW(str(executable), command, None, None, True, flags, ctypes.cast(env_block, ctypes.c_void_p), str(executable.parent), ctypes.byref(startup), ctypes.byref(process_info)):
