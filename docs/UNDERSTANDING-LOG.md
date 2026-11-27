@@ -3,6 +3,27 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-27 — Shared collaborator workflow and Jev gate reconciliation
+
+- Added `docs/COLLABORATION-WORKFLOW.md` as the single contributor/agent
+  routine: start from live Git state, read the goal and handoff, update
+  canonical knowledge, refresh the English Understand graph after meaningful
+  changes, verify graph checkpoints, and leave a reviewable PR handoff.
+- Updated `README.md`, `CONTRIBUTING.md`, `docs/GOAL-PROMPT.md`, and
+  `docs/UNDERSTAND-GRAPH.md` so project knowledge is shared through Git rather
+  than one person's chat or local setup. The handoff now records that PR #109
+  and PR #112 are merged and marks older status sections historical.
+- Reconciled the Jev gate with the 2026-11-27 primary-source recheck:
+  TypeSafeAI/Qyvos is a separate Open-Jev-derived model, not Jev; authentic
+  local Jev and local-use rights remain unverified; and the already-sent Sales
+  inquiry has no reply. No BTC packet, API call, or credential entered this
+  documentation update.
+- The graph is intentionally refreshed after the documentation commit so its
+  source checkpoint and tracked fingerprints remain reviewable. The next gate
+  is written TypeSafe local-use terms plus a vendor-authenticated Jev runtime,
+  target, and weight manifest; until then Qwen remains separately named and
+  BTC packets remain local.
+
 ## 2026-11-27 — W32Time 50-minute passive observation completed
 
 - The elevated observer launches at `11:00:54` and `11:40:29 +07:00` were

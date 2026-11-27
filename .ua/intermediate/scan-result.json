@@ -74,7 +74,7 @@
     {
       "path": "CONTRIBUTING.md",
       "language": "markdown",
-      "sizeLines": 86,
+      "sizeLines": 92,
       "fileCategory": "docs"
     },
     {
@@ -86,7 +86,7 @@
     {
       "path": "README.md",
       "language": "markdown",
-      "sizeLines": 180,
+      "sizeLines": 195,
       "fileCategory": "docs"
     },
     {
@@ -978,6 +978,12 @@
       "fileCategory": "docs"
     },
     {
+      "path": "docs/COLLABORATION-WORKFLOW.md",
+      "language": "markdown",
+      "sizeLines": 80,
+      "fileCategory": "docs"
+    },
+    {
       "path": "docs/DEPLOYMENT-OPTIONS-REPORT.md",
       "language": "markdown",
       "sizeLines": 429,
@@ -1016,7 +1022,7 @@
     {
       "path": "docs/GOAL-PROMPT.md",
       "language": "markdown",
-      "sizeLines": 125,
+      "sizeLines": 133,
       "fileCategory": "docs"
     },
     {
@@ -1172,7 +1178,7 @@
     {
       "path": "docs/NEXT-WORK-HANDOFF.md",
       "language": "markdown",
-      "sizeLines": 879,
+      "sizeLines": 899,
       "fileCategory": "docs"
     },
     {
@@ -1502,13 +1508,13 @@
     {
       "path": "docs/UNDERSTAND-GRAPH.md",
       "language": "markdown",
-      "sizeLines": 74,
+      "sizeLines": 76,
       "fileCategory": "docs"
     },
     {
       "path": "docs/UNDERSTANDING-LOG.md",
       "language": "markdown",
-      "sizeLines": 2631,
+      "sizeLines": 2652,
       "fileCategory": "docs"
     },
     {
@@ -4266,7 +4272,7 @@
       "fileCategory": "code"
     }
   ],
-  "totalFiles": 706,
+  "totalFiles": 707,
   "filteredByIgnore": 0,
   "estimatedComplexity": "very-large",
   "importMap": {
@@ -4568,6 +4574,7 @@
     "docs/BTC-PAPER-EXPERIMENT-ROADMAP.md": [],
     "docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md": [],
     "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md": [],
+    "docs/COLLABORATION-WORKFLOW.md": [],
     "docs/DEPLOYMENT-OPTIONS-REPORT.md": [],
     "docs/DEPLOYMENT-REVIEW.md": [],
     "docs/DEVOPS-RUNBOOK.md": [],
@@ -5614,5 +5621,5 @@
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "b776c285039ca1f4dec46f6cf5c39893f34e7f45647d1bb475f815f8913f085b"
+  "contentDigest": "61d2080e24a44d0b4ee3759814afd0812ddd2b84564e795b505502f99b62945e"
 }
