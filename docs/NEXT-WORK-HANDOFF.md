@@ -75,20 +75,25 @@ the unprivileged user-namespace UID map. The report artifact records
 runner limitation. This is runner-capability evidence, not a verified Linux
 isolation result.
 
-## Current status — 2026-11-27 Asia/Ho_Chi_Minh (UTC+07:00; 2026-11-26 UTC)
+## Current status — 2026-11-27 Asia/Ho_Chi_Minh (UTC+07:00)
 
-The owner retried the elevated, read-only `w32tm /query /configuration` query;
-it returned exit code 0. The observer made no W32Time service, clock, or
-configuration changes, and no BTC or Jev request was issued. The latest passive retry
-recorded 100/100 successful status queries over a `2,970.042 s` sample span;
-the runner did not retain its final result file or exact exit code. A later
-status snapshot reported a new successful sync during that window, but the
-findings remain diagnostic only. The transport/capture path now records a
-monotonic marker at response receipt plus the measured wall/monotonic pairing
-uncertainty. It still leaves `clock_error_bound_ms` unknown and packet
-eligibility false.
-Continue only after the approved synchronization-quality source and holdover
-assumptions are available.
+The latest passive status-only observer completed from `11:43:26` to
+`12:33:27 +07:00`, with 100/100 successful status queries at 30-second intervals. The
+unprivileged configuration query was denied (`0x80070005`); the peer query
+succeeded. W32Time reported stale time data throughout: the last good sync
+remained `10:23:18 +07:00`, and its age grew from `4,808.713 s` to
+`7,778.036 s`. The conditional root-distance estimate was `7.8334786 s`.
+Relative wall/monotonic offset change was at most `23.436 ms`. These results
+establish relative stability only, not a qualified capture-time UTC error
+bound. Keep `clock_error_bound_ms` null and BTC B3.1 ineligible. The observer
+did not change the service, registry, clock, or time-service configuration,
+and sent no BTC or Jev request. Ordinary W32Time traffic was not measured. See the
+[sanitized observation evidence](evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json).
+
+The transport/capture path records a monotonic marker at response receipt and
+the measured wall/monotonic pairing uncertainty. This does not replace a
+qualified UTC bound. Continue clock qualification only when the approved
+synchronization-quality source and holdover assumptions are available.
 
 The earlier elevated query returned exit code 0. A later retry around 18:59
 local was canceled by Windows before the query process launched; it produced no

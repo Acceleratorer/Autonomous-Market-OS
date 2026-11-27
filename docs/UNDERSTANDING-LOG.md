@@ -3,6 +3,36 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-27 — W32Time 50-minute passive observation completed
+
+- The elevated observer launches at `11:00:54` and `11:40:29 +07:00` were
+  canceled before either child started; both produced zero samples and no
+  result/progress files. See the [first attempt](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-110054.json)
+  and [second attempt](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-114029.json).
+- An unprivileged read-only observer then ran from `11:43:26` to `12:33:27
+  +07:00`. It recorded 100/100 successful status queries at 30-second
+  intervals. W32Time was `Running/Manual` at start and end.
+- The configuration query was denied under the current account (`0x80070005`);
+  the peer query succeeded. Status reported `Last Sync Error: 2` (stale data),
+  with the last good sync at `10:23:18 +07:00`; its age grew from `4,808.713 s`
+  to `7,778.036 s`. Root delay was `0.041605 s` and root dispersion was
+  `7.8126761 s` in every sample. The conditional RFC 5905 root-distance
+  estimate is `7.8334786 s`, not a qualified capture-time UTC error bound
+  ([RFC 5905 §11.2](https://www.rfc-editor.org/rfc/rfc5905.html#section-11.2)).
+- UTC wall time varied by at most `23.436 ms` relative to the monotonic timer
+  across sampled points; the largest adjacent-interval difference was
+  `0.868 ms`. This establishes relative stability only. Stale synchronization,
+  the denied configuration query in this run, and unverified source accuracy
+  leave `clock_error_bound_ms` null and BTC B3.1 ineligible. Microsoft's W32Time
+  protocol defines stale data as a sample older than the last good sample
+  ([MS-W32T](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-w32t/e43aa118-82a9-486f-9c74-4a47a0c5e541)).
+- The observer did not resync, change service/registry/clock settings, or make
+  BTC, Jev, or model-provider requests. Ordinary W32Time background traffic was
+  not measured. Sanitized evidence is in
+  [the observation record](evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json);
+  the raw report and exact runner remain ignored local artifacts under
+  `.market_os/clock/`.
+
 ## 2026-11-27 — Windows AppContainer synthetic Qwen inference
 
 - The Windows `LocalLlamaRuntime` path now launches the pinned CPU `llama-cli`

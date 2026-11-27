@@ -1,0 +1,95 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-27",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_start": "main",
+    "commit_at_start": "e844e4f8c2bde8b965b37f8e8a775b199bf48326",
+    "working_tree_clean_before_observation": false
+  },
+  "observation": {
+    "id": "w32time-passive-status-only-50m-20261127-114326",
+    "status": "complete",
+    "configured_duration_seconds": 3000,
+    "observation_start_local": "2026-11-27T11:43:26.4607643+07:00",
+    "observation_end_local": "2026-11-27T12:33:27.0471315+07:00",
+    "sample_interval_seconds": 30,
+    "first_sample_at_local": "2026-11-27T11:43:27.2610305+07:00",
+    "last_sample_at_local": "2026-11-27T12:32:56.6070782+07:00",
+    "sampled_wall_span_seconds": 2969.346,
+    "sampled_monotonic_span_seconds": 2969.322,
+    "status_sample_count": 100,
+    "status_query_exit_codes": {
+      "0": 100
+    },
+    "status_query_failures": 0,
+    "status_query_timeouts": 0,
+    "configuration_query": "attempted without elevation; access denied (0x80070005)",
+    "peer_query_exit_code": 0,
+    "runner_exit_code_captured": false,
+    "result_failure": null,
+    "observer_process_absent_after_target_window": true
+  },
+  "synchronization": {
+    "source_identity": "omitted",
+    "first_sample_last_successful_sync_time_local": "2026-11-27 10:23:18",
+    "last_sample_last_successful_sync_time_local": "2026-11-27 10:23:18",
+    "last_sync_error": "2 (stale time data)",
+    "first_sample_time_since_last_good_sync_seconds": 4808.712743,
+    "last_sample_time_since_last_good_sync_seconds": 7778.0359675,
+    "root_delay_seconds_min_max": [
+      0.041605,
+      0.041605
+    ],
+    "root_dispersion_seconds_min_max": [
+      7.8126761,
+      7.8126761
+    ],
+    "conditional_ntp_distance_seconds": 7.8334786,
+    "conditional_ntp_distance_note": "Computed as root dispersion plus half the reported root delay under RFC 5905. This diagnostic is not a qualified capture-time UTC error bound."
+  },
+  "relative_clock_comparison": {
+    "method": "Sample UTC wall-clock midpoints compared with Stopwatch monotonic midpoints, relative to sample 1",
+    "max_absolute_relative_offset_change_milliseconds": 23.436,
+    "max_absolute_adjacent_interval_difference_milliseconds": 0.868,
+    "diagnostic_threshold_milliseconds": 250,
+    "threshold_crossed": false,
+    "interpretation": "Relative wall/monotonic stability only; this does not establish absolute UTC accuracy."
+  },
+  "service": {
+    "state_at_start_and_end": "Running",
+    "start_mode_at_start_and_end": "Manual",
+    "service_state_changed_by_observer": false,
+    "start_mode_changed_by_observer": false,
+    "service_started_or_stopped_by_observer": false,
+    "resync_performed_by_observer": false,
+    "system_clock_adjusted_by_observer": false,
+    "time_service_configuration_changed_by_observer": false
+  },
+  "actions": {
+    "configuration_query_attempted": true,
+    "event_log_query_performed": false,
+    "packet_capture_performed": false,
+    "raw_status_text_stored_in_repository": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-passive-observation-20261127-114326.json",
+    "raw_report_committed": false,
+    "raw_report_sha256": "A11A9BF81D2EAD99EDF34331CE7489E1E177276D7C355717F98158BA40B89714",
+    "runner_path": ".market_os/clock/w32time-passive-observation-20261127-114326.ps1",
+    "runner_sha256": "94FF8684542532A8DC49E4676BB3350BE19F7C208E79667EB058A2E5BF568AD8",
+    "runner_committed": false
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "The 50-minute observation established only relative wall/monotonic stability. W32Time reported stale time data throughout, the last good sync was over 80 minutes old at the first sample, the effective configuration query was denied, and source accuracy/holdover assumptions remain unqualified."
+  }
+}
