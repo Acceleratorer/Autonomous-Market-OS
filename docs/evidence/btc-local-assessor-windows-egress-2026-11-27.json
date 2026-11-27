@@ -1,0 +1,95 @@
+{
+  "schema": "market-os.btc-local-assessor-windows-egress-contradiction.v1",
+  "recorded_on": "2026-11-27",
+  "captured_at_utc": "2026-11-26T23:18:33.3290419Z",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch": "fix/btc-windows-egress-behavioral-check",
+    "base_commit": "2d85f4a8f9721724d9ca3095b95a4adfd5cda01f",
+    "working_tree_includes_unmerged_fail_closed_gate": true,
+    "current_branch_runtime_public_ip_probe": false
+  },
+  "scope": "read-only Windows egress diagnostics for the pinned local BTC assessor; no firewall, clock, service, or model changes",
+  "runtime": {
+    "python": "project-pinned CPython 3.11.18",
+    "python_relative_path": ".market_os/runtimes/btc-assessor-py311/python.exe",
+    "python_sha256": "2AA502336AA5207D58590F5317C7C0A82601D2FA541A59075EABF55DFF9A2E16",
+    "llama_server_relative_path": ".market_os/local-evidence-runtime/windows-x64-cuda-13.5/engine/llama-server.exe",
+    "llama_server_sha256": "4C872FCE2E47539D58EA0E324F60EB96CFBA818C683A55C1AFE1A0F55BDB7FA1",
+    "firewall_verifier_sha256": "1CBC3FB51CDC3354F7BFD247134741E66F58B80F8525F42B515DB8B967184984"
+  },
+  "active_store_policy_snapshot": {
+    "python_rule": "MarketOS-BTC-LocalAssessor-Python-OutboundBlock",
+    "primary_status": "OK",
+    "enforcement_status": ["ProfileInactive", "Enforced"],
+    "direction": "Outbound",
+    "action": "Block",
+    "profile": "Any",
+    "remote_address_filters": [
+      "0.0.0.0-126.255.255.255",
+      "128.0.0.0-255.255.255.255",
+      "::2-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+    ],
+    "profiles": {
+      "Domain": {"enabled": true, "default_outbound_action": "Allow"},
+      "Private": {"enabled": true, "default_outbound_action": "Allow"},
+      "Public": {"enabled": true, "default_outbound_action": "Allow"}
+    },
+    "firewall_service_running": true,
+    "base_filtering_engine_running": true
+  },
+  "behavioral_probe": {
+    "process_executable": "project-pinned CPython 3.11.18",
+    "destination": "1.1.1.1:443/TCP",
+    "tcp_connect_completed": true,
+    "application_payload_sent": false,
+    "result": "egress_not_denied",
+    "interpretation": "A TCP handshake completed despite the matching ActiveStore rule metadata. No BTC packet, Jev request, model-provider request, or application payload was sent; the successful handshake means this host's zero-egress boundary is not proven."
+  },
+  "same_host_control": {
+    "destination": "the host's own Wi-Fi IPv4 address",
+    "tcp_connect_completed": true,
+    "application_payload_sent": false,
+    "external_network_used": false,
+    "interpretation": "Local-only diagnostic; not treated as evidence about external egress enforcement."
+  },
+  "wfp_filter_diagnostic": {
+    "command": "netsh wfp show filters scoped to pinned Python, TCP, 1.1.1.1:443, outbound",
+    "result": "not_obtained",
+    "reason": "The read-only filter dump requires elevation; the UAC launch was canceled before the command ran.",
+    "firewall_policy_changed": false
+  },
+  "initial_probe_health_preflight": {
+    "health_status": "unavailable",
+    "network_isolation_status": "unverified",
+    "active_store_policy_status": "enforced",
+    "startup_failure_code": "network_isolation_unverified",
+    "reason": "active_egress_probe_connected",
+    "resource_limits_status": "not_running",
+    "llama_server_processes_before": 0,
+    "llama_server_processes_after": 0,
+    "health_exit_code": 2,
+    "model_inference_calls": 0,
+    "btc_packet_assessments": 0,
+    "typesafe_jev_requests": 0,
+    "model_provider_requests": 0
+  },
+  "branch_followup": {
+    "current_windows_gate": "active_store_policy_does_not_prove_runtime_egress_denial",
+    "matching_active_store_metadata_still_fails_closed": true,
+    "runtime_public_ip_probe_removed": true,
+    "verification_opens_socket": false,
+    "focused_regression_command": "py -3.12 -m pytest -q market_os/tests/test_btc_local_assessor.py -k 'windows_egress or windows_runtime_cannot_disable'",
+    "focused_regression_result": "4 passed, 19 deselected",
+    "assessor_test_file_command": "py -3.12 -m pytest -q market_os/tests/test_btc_local_assessor.py",
+    "assessor_test_file_result": "23 passed",
+    "btc_test_subset_command": "py -3.12 -m pytest -q market_os/tests -k btc",
+    "btc_test_subset_result": "216 passed, 1 skipped, 534 deselected"
+  },
+  "decision": {
+    "windows_zero_egress_proven": false,
+    "assessor_may_run": false,
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false
+  }
+}

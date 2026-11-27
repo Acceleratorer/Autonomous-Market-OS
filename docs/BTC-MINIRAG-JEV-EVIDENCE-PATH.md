@@ -186,6 +186,28 @@ made no inference or external request. See its
 [report](research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md)
 and [evidence](evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json).
 
+### Superseding Windows egress check — 2026-11-27
+
+The later live check found a contradiction that invalidates those historical
+health samples as current zero-egress proof: ActiveStore metadata still reported
+the pinned Python block rule as enforced, but a direct TCP connection from that
+Python process to `1.1.1.1:443` completed. No application payload was sent, but
+the TCP handshake succeeded. The Windows assessor is not currently cleared to
+run.
+
+The first PR draft repeated that public-IP connection as a runtime probe. Review
+removed it: a runtime isolation check must not create the outbound traffic it is
+meant to prevent. The current branch returns
+`network_isolation_unverified` when matching ActiveStore policy is the only
+available proof, stops before launching `llama-server`, and opens no socket.
+The scoped WFP filter dump was not obtained because its read-only `netsh`
+command requires elevation and the UAC request was canceled. No firewall
+policy was changed. The server executable still has policy-metadata-only
+verification. Keep assessment disabled until WFP behavior is reconciled or a
+stronger sandbox is installed and verified. See the
+[live report](research/btc-local-assessor-windows-egress-2026-11-27.md) and
+[sanitized evidence](evidence/btc-local-assessor-windows-egress-2026-11-27.json).
+
 The latest W32Time retry recorded 100 status samples and 10 peer snapshots.
 All status commands succeeded and reported Leap Indicator 0 / stratum 5, but
 73 samples reported stale time data and the peer was Pending for the final four

@@ -18,7 +18,7 @@ Authentic Jev local, VPC, or on-premises availability remains **unverified** fro
 
 The official [TypeSafe GitHub organization](https://github.com/orgs/typesafe-ai/repositories) lists 12 public repositories, including SDKs, examples, a System One adapter backed by other LLM APIs, and a generic [vLLM serving engine](https://github.com/typesafe-ai/vllm); the listings reviewed did not expose Jev weights or a local Jev runtime. The reviewed public docs, repository/package listings, and SDK/adapter releases exposed no Jev runtime manifest, checkpoint, container, download URL, or verifiable artifact hash. No public artifact URL or hash can therefore be recorded. This bounded search does not rule out private repositories, a vendor-only channel, or a private enterprise offer.
 
-The existing TypeSafe Sales inquiry thread was rechecked on 2026-11-27. It contains the sent inquiry and follow-up only; no vendor reply or deployment manifest is present. No new email was sent.
+The TypeSafe Sales inquiry thread was rechecked on 2026-11-27. It contains three sent messages (the original inquiry and two follow-ups) and no vendor reply or deployment manifest. The latest follow-up contained no BTC data or API key.
 
 ## Local workstation artifact check — 2026-11-27
 
