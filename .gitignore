@@ -18,7 +18,19 @@ build/
 # Local analysis, browser, scratch, and generated deployment artifacts.
 .playwright-cli/
 .tmp-*/
-.ua/
+# Keep the shared Understand Anything graph and its incremental baseline in Git;
+# ignore all local scratch, trash, logs, and unrelated graph files.
+/.ua/
+!/.ua/
+/.ua/*
+!/.ua/.understandignore
+!/.ua/config.json
+!/.ua/fingerprints.json
+!/.ua/knowledge-graph.json
+!/.ua/meta.json
+!/.ua/intermediate/
+/.ua/intermediate/*
+!/.ua/intermediate/scan-result.json
 output/
 site/
 .terraform/
