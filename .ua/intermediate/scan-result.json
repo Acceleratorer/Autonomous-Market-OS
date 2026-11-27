@@ -1,0 +1,5611 @@
+{
+  "name": "autonomous-market-os",
+  "description": "Autonomous Market OS foundation slice: synthetic, paper-only market research and portfolio inspection workspace with read-only defaults. Live trading, provider credentials, Binance transport, a public Python gateway, and HTTP/CLI mutation routes are disabled. This repository contains 704 files; scanning a smaller subdirectory can reduce analysis time.",
+  "languages": [
+    "config",
+    "css",
+    "dockerfile",
+    "example",
+    "html",
+    "hujson",
+    "javascript",
+    "json",
+    "markdown",
+    "powershell",
+    "python",
+    "service",
+    "shell",
+    "terraform",
+    "toml",
+    "txt",
+    "typescript",
+    "unknown",
+    "yaml"
+  ],
+  "frameworks": [
+    "Docker",
+    "Docker Compose",
+    "GitHub Actions",
+    "Terraform"
+  ],
+  "files": [
+    {
+      "path": ".dockerignore",
+      "language": "unknown",
+      "sizeLines": 25,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "language": "yaml",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "language": "yaml",
+      "sizeLines": 554,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".github/workflows/deploy-market-os.yml",
+      "language": "yaml",
+      "sizeLines": 109,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".github/workflows/devsecops.yml",
+      "language": "yaml",
+      "sizeLines": 88,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".github/workflows/security.yml",
+      "language": "yaml",
+      "sizeLines": 47,
+      "fileCategory": "infra"
+    },
+    {
+      "path": ".trivyignore",
+      "language": "unknown",
+      "sizeLines": 3,
+      "fileCategory": "code"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "JEV_PROCESSING.md",
+      "language": "markdown",
+      "sizeLines": 1000,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 175,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "SECURITY.md",
+      "language": "markdown",
+      "sizeLines": 43,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "STACK.md",
+      "language": "markdown",
+      "sizeLines": 148,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "STRUCTURE.md",
+      "language": "markdown",
+      "sizeLines": 236,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "TECH_DOCS.md",
+      "language": "markdown",
+      "sizeLines": 1405,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/README.md",
+      "language": "markdown",
+      "sizeLines": 14,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/__init__.py",
+      "language": "python",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/cli/README.md",
+      "language": "markdown",
+      "sizeLines": 4,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/cli/__init__.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/cli/__main__.py",
+      "language": "python",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/README.md",
+      "language": "markdown",
+      "sizeLines": 316,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/desktop/electron/package.json",
+      "language": "json",
+      "sizeLines": 41,
+      "fileCategory": "config"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/archive-artifact.cjs",
+      "language": "javascript",
+      "sizeLines": 111,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/audit-release-drift.cjs",
+      "language": "javascript",
+      "sizeLines": 347,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/catalog-release.cjs",
+      "language": "javascript",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/ci-release.cjs",
+      "language": "javascript",
+      "sizeLines": 178,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/index-portable-archives.cjs",
+      "language": "javascript",
+      "sizeLines": 143,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/install-portable.cjs",
+      "language": "javascript",
+      "sizeLines": 325,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/install-preflight.cjs",
+      "language": "javascript",
+      "sizeLines": 277,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/install-simulate.cjs",
+      "language": "javascript",
+      "sizeLines": 242,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/package.cjs",
+      "language": "javascript",
+      "sizeLines": 333,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/prepare-python-runtime.cjs",
+      "language": "javascript",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/python-runtime.cjs",
+      "language": "javascript",
+      "sizeLines": 59,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/release-drill.cjs",
+      "language": "javascript",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/release-slots.cjs",
+      "language": "javascript",
+      "sizeLines": 131,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/render-ci-evidence-report.cjs",
+      "language": "javascript",
+      "sizeLines": 168,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/render-installation-evidence.cjs",
+      "language": "javascript",
+      "sizeLines": 177,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/render-release-catalog-report.cjs",
+      "language": "javascript",
+      "sizeLines": 191,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/sign-artifact.cjs",
+      "language": "javascript",
+      "sizeLines": 97,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/smoke-artifact.cjs",
+      "language": "javascript",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/uninstall-portable.cjs",
+      "language": "javascript",
+      "sizeLines": 68,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/validate-ci-evidence.cjs",
+      "language": "javascript",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/scripts/validate-installation-contract.cjs",
+      "language": "javascript",
+      "sizeLines": 137,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/src/main.cjs",
+      "language": "javascript",
+      "sizeLines": 86,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/src/preload.cjs",
+      "language": "javascript",
+      "sizeLines": 8,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/src/release.cjs",
+      "language": "javascript",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/src/runtime.cjs",
+      "language": "javascript",
+      "sizeLines": 345,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/archive-index.test.cjs",
+      "language": "javascript",
+      "sizeLines": 76,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/install-portable.test.cjs",
+      "language": "javascript",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/install-preflight.test.cjs",
+      "language": "javascript",
+      "sizeLines": 120,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/install-simulation.test.cjs",
+      "language": "javascript",
+      "sizeLines": 159,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/installation-contract.test.cjs",
+      "language": "javascript",
+      "sizeLines": 49,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/release-catalog-report.test.cjs",
+      "language": "javascript",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/release-catalog.test.cjs",
+      "language": "javascript",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/release-drift.test.cjs",
+      "language": "javascript",
+      "sizeLines": 171,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/release.test.cjs",
+      "language": "javascript",
+      "sizeLines": 122,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/desktop/electron/tests/runtime.test.cjs",
+      "language": "javascript",
+      "sizeLines": 107,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/gateway/README.md",
+      "language": "markdown",
+      "sizeLines": 7,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/gateway/__init__.py",
+      "language": "python",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/gateway/__main__.py",
+      "language": "python",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/README.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/web/next-operator/AGENTS.md",
+      "language": "markdown",
+      "sizeLines": 9,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/web/next-operator/next-env.d.ts",
+      "language": "typescript",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/next.config.ts",
+      "language": "typescript",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/package.json",
+      "language": "json",
+      "sizeLines": 31,
+      "fileCategory": "config"
+    },
+    {
+      "path": "apps/web/next-operator/postcss.config.mjs",
+      "language": "javascript",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/api/btc/realtime/latest/route.ts",
+      "language": "typescript",
+      "sizeLines": 20,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/[recordType]/page.tsx",
+      "language": "typescript",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/page.tsx",
+      "language": "typescript",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/page.tsx",
+      "language": "typescript",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/datasets/[datasetRevision]/page.tsx",
+      "language": "typescript",
+      "sizeLines": 319,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/datasets/page.tsx",
+      "language": "typescript",
+      "sizeLines": 144,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/desk/page.tsx",
+      "language": "typescript",
+      "sizeLines": 214,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/experiments/[engine]/[runId]/page.tsx",
+      "language": "typescript",
+      "sizeLines": 226,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/experiments/page.tsx",
+      "language": "typescript",
+      "sizeLines": 169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/globals.css",
+      "language": "css",
+      "sizeLines": 3758,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/healthz/route.ts",
+      "language": "typescript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/layout.tsx",
+      "language": "typescript",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/not-found.tsx",
+      "language": "typescript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/overview/page.tsx",
+      "language": "typescript",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/page.tsx",
+      "language": "typescript",
+      "sizeLines": 142,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/portfolios/[portfolioId]/page.tsx",
+      "language": "typescript",
+      "sizeLines": 392,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/app/runtime/page.tsx",
+      "language": "typescript",
+      "sizeLines": 102,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/components/app-shell.tsx",
+      "language": "typescript",
+      "sizeLines": 223,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/components/live-btc-chart.tsx",
+      "language": "typescript",
+      "sizeLines": 98,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/components/market-desk.tsx",
+      "language": "typescript",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/components/ui.tsx",
+      "language": "typescript",
+      "sizeLines": 286,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/lib/connected-access.ts",
+      "language": "typescript",
+      "sizeLines": 91,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/lib/market-api.ts",
+      "language": "typescript",
+      "sizeLines": 1849,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/lib/release-metadata.ts",
+      "language": "typescript",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/src/proxy.ts",
+      "language": "typescript",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/next-operator/tsconfig.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "apps/web/operator/index.html",
+      "language": "html",
+      "sizeLines": 115,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "apps/web/operator/operator.css",
+      "language": "css",
+      "sizeLines": 66,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "apps/web/operator/operator.js",
+      "language": "javascript",
+      "sizeLines": 174,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/public/.htaccess",
+      "language": "unknown",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": "apps/web/public/DEPLOYMENT.txt",
+      "language": "txt",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "apps/web/public/index.html",
+      "language": "html",
+      "sizeLines": 151,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "deploy/data-plane/README.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "deploy/docker/README.md",
+      "language": "markdown",
+      "sizeLines": 15,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "deploy/docker/next.Dockerfile",
+      "language": "dockerfile",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/docker/python.Dockerfile",
+      "language": "dockerfile",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/iac/ansible/README.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "deploy/iac/ansible/inventory.example.ini",
+      "language": "config",
+      "sizeLines": 5,
+      "fileCategory": "config"
+    },
+    {
+      "path": "deploy/iac/ansible/site.yml",
+      "language": "yaml",
+      "sizeLines": 75,
+      "fileCategory": "config"
+    },
+    {
+      "path": "deploy/iac/terraform/README.md",
+      "language": "markdown",
+      "sizeLines": 18,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "deploy/iac/terraform/main.tf",
+      "language": "terraform",
+      "sizeLines": 37,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "deploy/iac/terraform/outputs.tf",
+      "language": "terraform",
+      "sizeLines": 7,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "deploy/iac/terraform/variables.tf",
+      "language": "terraform",
+      "sizeLines": 49,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "deploy/k8s/README.md",
+      "language": "markdown",
+      "sizeLines": 31,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "deploy/k8s/market-os.yaml",
+      "language": "yaml",
+      "sizeLines": 164,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "deploy/u5-5/README.md",
+      "language": "markdown",
+      "sizeLines": 88,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "deploy/u5-5/healthcheck.sh",
+      "language": "shell",
+      "sizeLines": 10,
+      "fileCategory": "script"
+    },
+    {
+      "path": "deploy/u5-5/market-os-next.service",
+      "language": "service",
+      "sizeLines": 26,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/u5-5/market-os-python.service",
+      "language": "service",
+      "sizeLines": 25,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/u5-5/operator.env.example",
+      "language": "example",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/u5-5/promote.sh",
+      "language": "shell",
+      "sizeLines": 61,
+      "fileCategory": "script"
+    },
+    {
+      "path": "deploy/u5-5/promotion_evidence.py",
+      "language": "python",
+      "sizeLines": 361,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/u5-5/rollback.sh",
+      "language": "shell",
+      "sizeLines": 14,
+      "fileCategory": "script"
+    },
+    {
+      "path": "deploy/u5-5/tailnet-policy.hujson",
+      "language": "hujson",
+      "sizeLines": 12,
+      "fileCategory": "code"
+    },
+    {
+      "path": "deploy/u5-5/tailscale-serve.sh",
+      "language": "shell",
+      "sizeLines": 7,
+      "fileCategory": "script"
+    },
+    {
+      "path": "design-system/autonomous-market-os/MASTER.md",
+      "language": "markdown",
+      "sizeLines": 227,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "design-system/autonomous-market-os/pages/dashboard.md",
+      "language": "markdown",
+      "sizeLines": 35,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "design-system/autonomous-market-os/pages/dataset-detail.md",
+      "language": "markdown",
+      "sizeLines": 14,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "design-system/autonomous-market-os/pages/datasets.md",
+      "language": "markdown",
+      "sizeLines": 13,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docker-compose.yml",
+      "language": "yaml",
+      "sizeLines": 182,
+      "fileCategory": "infra"
+    },
+    {
+      "path": "docs/APP-SURFACES-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B0-BTC-PAPER-REPLAY-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 68,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 153,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 253,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B3-1-QUESTION-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 381,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B3.1-OFFLINE-EVALUATION-PROTOCOL.md",
+      "language": "markdown",
+      "sizeLines": 552,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B3.1-OFFLINE-QUESTION-CONTRACT-PROPOSAL.md",
+      "language": "markdown",
+      "sizeLines": 481,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4-LOCAL-SLICE-CLOSEOUT-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 137,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.1-OWNER-DECISION-WORKSHEET.md",
+      "language": "markdown",
+      "sizeLines": 161,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.1-PAPER-PORTFOLIO-VIRTUAL-BROKER-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 140,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.10-FILL-TIME-RISK-OUTCOMES.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.11-BACKUP-RESTORE.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.12-MIGRATION-PREFLIGHT.md",
+      "language": "markdown",
+      "sizeLines": 16,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.13-CONCURRENCY-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.14-MUTATION-AUDIT-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.15-SHARED-PORTFOLIO-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.16-LIFECYCLE-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.17-RETENTION-ARCHIVE-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.18-SCHEMA-MIGRATION-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 166,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.19-LOCAL-MUTATION-CAPABILITY-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 122,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.2-LEDGER-RECOVERY-INTEGRITY.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.20-RETENTION-ARCHIVE-PREFLIGHT-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.3-EVENT-IDENTITY-INVARIANTS.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.4-IDEMPOTENCY-SCOPE-INVARIANTS.md",
+      "language": "markdown",
+      "sizeLines": 22,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.5-LEDGER-MALFORMED-TAIL.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.6-MALFORMED-PERSISTED-METADATA.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.7-MALFORMED-SNAPSHOT-RECOVERY.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.8-SNAPSHOT-SCALAR-VALIDATION.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/B4.9-RISK-AUDIT-OUTCOMES.md",
+      "language": "markdown",
+      "sizeLines": 23,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "language": "markdown",
+      "sizeLines": 523,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/BTC-PAPER-EXPERIMENT-ROADMAP.md",
+      "language": "markdown",
+      "sizeLines": 226,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
+      "language": "markdown",
+      "sizeLines": 198,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 190,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/DEPLOYMENT-OPTIONS-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 429,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/DEPLOYMENT-REVIEW.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/DEVOPS-RUNBOOK.md",
+      "language": "markdown",
+      "sizeLines": 276,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/FRONTEND-DESIGN-SYSTEM.md",
+      "language": "markdown",
+      "sizeLines": 203,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/FRONTEND-FINANCE-REFERENCE.md",
+      "language": "markdown",
+      "sizeLines": 86,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/FUSION-MAP.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/GOAL-PROMPT.md",
+      "language": "markdown",
+      "sizeLines": 123,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/INTEGRATION-GUIDE.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/JS-PACKAGE-MANAGEMENT.md",
+      "language": "markdown",
+      "sizeLines": 88,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/LOCAL-EXIT-GATE-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 112,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1-CONTRACTS.md",
+      "language": "markdown",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.10-DEPLOYMENT-WRAPPER.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.11-BLOCKER-REVIEW.md",
+      "language": "markdown",
+      "sizeLines": 76,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.12-FINAL-ORCHESTRATION-DECISION.md",
+      "language": "markdown",
+      "sizeLines": 54,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.5-OPENHARNESS-PARITY.md",
+      "language": "markdown",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.6-OPENHARNESS-RUNTIME.md",
+      "language": "markdown",
+      "sizeLines": 92,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.7-OPENHARNESS-RECOVERY.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.8-OPENHARNESS-RECOVERY.md",
+      "language": "markdown",
+      "sizeLines": 69,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M1.9-DEPLOYMENT-VALIDATION.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2-RESEARCH-ADAPTER-PLAN.md",
+      "language": "markdown",
+      "sizeLines": 174,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.1-VIBE-TRADING-ADAPTER.md",
+      "language": "markdown",
+      "sizeLines": 83,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.2-CITED-RETRIEVAL-ADAPTER.md",
+      "language": "markdown",
+      "sizeLines": 165,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.3-CITED-RESEARCH-SYNTHESIS.md",
+      "language": "markdown",
+      "sizeLines": 89,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.4-MODEL-GATED-SUMMARIES.md",
+      "language": "markdown",
+      "sizeLines": 151,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.5-RESEARCH-QUALITY-BENCHMARK.md",
+      "language": "markdown",
+      "sizeLines": 160,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.6-MODEL-ADAPTER-PLAN.md",
+      "language": "markdown",
+      "sizeLines": 167,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.6-QUALITY-REVIEW.md",
+      "language": "markdown",
+      "sizeLines": 166,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.7-CI-CD.md",
+      "language": "markdown",
+      "sizeLines": 48,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.7-RECORDED-MODEL-ADAPTER.md",
+      "language": "markdown",
+      "sizeLines": 81,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.8-LIVE-SMOKE.md",
+      "language": "markdown",
+      "sizeLines": 116,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/M2.9-LIVE-SMOKE-RESULT.md",
+      "language": "markdown",
+      "sizeLines": 35,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md",
+      "language": "markdown",
+      "sizeLines": 87,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/NEXT-WORK-HANDOFF.md",
+      "language": "markdown",
+      "sizeLines": 879,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/PHASES.md",
+      "language": "markdown",
+      "sizeLines": 92,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/PRODUCT-VISION.md",
+      "language": "markdown",
+      "sizeLines": 91,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/PROJECT-CONTEXT.md",
+      "language": "markdown",
+      "sizeLines": 322,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/PROJECT-INDEX.md",
+      "language": "markdown",
+      "sizeLines": 28,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/README.md",
+      "language": "markdown",
+      "sizeLines": 30,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "language": "markdown",
+      "sizeLines": 159,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/STACK-AND-RUNTIME-REVIEW.md",
+      "language": "markdown",
+      "sizeLines": 150,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/TARGET-STRUCTURE.md",
+      "language": "markdown",
+      "sizeLines": 95,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U3-API-CONNECTIVITY-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 284,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U3-B1-HISTORICAL-READINESS-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 171,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5-LOCAL-ACCEPTANCE.md",
+      "language": "markdown",
+      "sizeLines": 16,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5-LOCAL-READONLY-DASHBOARD.md",
+      "language": "markdown",
+      "sizeLines": 20,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.1-LOCAL-SERVICE-BOUNDARY.md",
+      "language": "markdown",
+      "sizeLines": 22,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.10-BOUNDED-MEMBERS-RESERVATIONS.md",
+      "language": "markdown",
+      "sizeLines": 76,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.11-BOUNDED-CATALOG-LEGACY-RESOURCES.md",
+      "language": "markdown",
+      "sizeLines": 70,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.12-ONE-PASS-AUDIT-PAGING.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.13-STREAMED-LEDGER-HEAD.md",
+      "language": "markdown",
+      "sizeLines": 48,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.14-CURSOR-AWARE-CATALOG-SORT.md",
+      "language": "markdown",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.15-NEXT-LOCAL-BTC-DATASET-REGISTRY.md",
+      "language": "markdown",
+      "sizeLines": 65,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.16-NEXT-BOUNDED-BTC-CANDLE-DETAIL.md",
+      "language": "markdown",
+      "sizeLines": 58,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.17-NEXT-BOUNDED-BTC-INGESTION-MANIFESTS.md",
+      "language": "markdown",
+      "sizeLines": 57,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.18-NEXT-BOUNDED-BTC-RESEARCH-INSPECTION.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.19-NEXT-BOUNDED-BTC-INGESTION-RECORDS.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.2-STATIC-DEPLOYMENT-READINESS.md",
+      "language": "markdown",
+      "sizeLines": 33,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.20-LOCAL-OPERATOR-OVERVIEW.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.21-BOUNDED-BTC-CANDLE-VISUALIZATION.md",
+      "language": "markdown",
+      "sizeLines": 34,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.22-BOUNDED-PORTFOLIO-EQUITY-HISTORY.md",
+      "language": "markdown",
+      "sizeLines": 62,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.23-RESPONSIVE-OPERATOR-NAVIGATION.md",
+      "language": "markdown",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.24-MOBILE-GATEWAY-STATUS.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.3-DEPLOYMENT-ACCESS-OBSERVABILITY-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.4-LOCAL-OPERATOR-SHELL.md",
+      "language": "markdown",
+      "sizeLines": 35,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 140,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.6-LOCAL-PORTFOLIO-INSPECTION.md",
+      "language": "markdown",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.7-WEB-STACK-DEPLOYMENT-MATRIX.md",
+      "language": "markdown",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.8-NEXT-LOCAL-OPERATOR-WEB.md",
+      "language": "markdown",
+      "sizeLines": 94,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U5.9-BOUNDED-LOCAL-INSPECTION.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U6-READ-ONLY-APP-SHELL-CONTRACT.md",
+      "language": "markdown",
+      "sizeLines": 170,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U6.4-D-INSTALLER-PREFLIGHT.md",
+      "language": "markdown",
+      "sizeLines": 59,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U6.4-E-OFFLINE-INSTALL-SIMULATION.md",
+      "language": "markdown",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
+      "language": "markdown",
+      "sizeLines": 135,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-G-QUALITY-BENCHMARK-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-H-SYNTHETIC-SESSION-ACCOUNTING-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-I-LOCAL-EVIDENCE-PACK.md",
+      "language": "markdown",
+      "sizeLines": 23,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-J-SYNTHETIC-ECONOMIC-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-K-CLI-TOOL-REGISTRY-AUDIT.md",
+      "language": "markdown",
+      "sizeLines": 33,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-L-PAPER2SLIDES-RESEARCH-BRIEF.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-M-RELEASE-EVIDENCE-DRIFT-AUDIT.md",
+      "language": "markdown",
+      "sizeLines": 92,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-N-UNIFIED-EVIDENCE-REGISTER.md",
+      "language": "markdown",
+      "sizeLines": 48,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-O-EVIDENCE-CATALOG.md",
+      "language": "markdown",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U7-P-EVIDENCE-REPRODUCIBILITY.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U8-A-LIVE-READINESS-DECISION-PACK.md",
+      "language": "markdown",
+      "sizeLines": 81,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U8-B-LOCAL-OPERATIONAL-READINESS.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/U8-C-PERMANENT-PAPER-ONLY.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/UNDERSTAND-GRAPH.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/UNDERSTANDING-LOG.md",
+      "language": "markdown",
+      "sizeLines": 2631,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/WEB-STACK-OPTIONS.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/WORKTREE-BASELINE-MANIFEST.json",
+      "language": "json",
+      "sizeLines": 395,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/WORKTREE-BASELINE-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 177,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/api/contracts.md",
+      "language": "markdown",
+      "sizeLines": 430,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0001-phase-0.md",
+      "language": "markdown",
+      "sizeLines": 75,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0002-orchestration-runtime.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0003-openharness-adapter.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0004-openharness-runtime.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0005-openharness-promotion.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0006-openharness-promotion.md",
+      "language": "markdown",
+      "sizeLines": 34,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0007-openharness-promotion.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0008-openharness-promotion.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0009-openharness-promotion.md",
+      "language": "markdown",
+      "sizeLines": 40,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0010-final-orchestration-owner.md",
+      "language": "markdown",
+      "sizeLines": 80,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0011-model-adapter-readiness.md",
+      "language": "markdown",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0012-model-adapter-and-ci.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0013-live-model-smoke.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0014-live-smoke-result.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0015-btc-math-first-jev-experiment.md",
+      "language": "markdown",
+      "sizeLines": 82,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0016-btc-b1-source-storage-policy.md",
+      "language": "markdown",
+      "sizeLines": 158,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0017-unified-roadmap.md",
+      "language": "markdown",
+      "sizeLines": 37,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0018-u3-b2-feature-evaluation-contract.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0019-u3-b3-jev-experimental-boundary.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0020-u3-api-connectivity-boundary.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0021-btc-historical-readiness-gate.md",
+      "language": "markdown",
+      "sizeLines": 123,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0022-b3-1-decision-freeze.md",
+      "language": "markdown",
+      "sizeLines": 100,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0023-b4-15-shared-portfolio-concurrency.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0024-b4-16-paper-order-lifecycle.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0025-b4-17-retention-archive.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0026-application-surfaces-and-naming.md",
+      "language": "markdown",
+      "sizeLines": 25,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0027-web-stack-selection.md",
+      "language": "markdown",
+      "sizeLines": 36,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0028-u5-3-deployment-access-observability.md",
+      "language": "markdown",
+      "sizeLines": 24,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0029-web-stack-and-auth-gate.md",
+      "language": "markdown",
+      "sizeLines": 29,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0030-local-portfolio-inspection-surface.md",
+      "language": "markdown",
+      "sizeLines": 27,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0031-web-stack-and-deployment-selection-matrix.md",
+      "language": "markdown",
+      "sizeLines": 30,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0032-local-next-operator-web.md",
+      "language": "markdown",
+      "sizeLines": 37,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0033-u5-9-bounded-local-inspection.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0034-u5-10-bounded-members-reservations.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0035-u5-11-bounded-catalog-legacy-resources.md",
+      "language": "markdown",
+      "sizeLines": 43,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0036-u5-12-one-pass-audit-paging.md",
+      "language": "markdown",
+      "sizeLines": 28,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0037-u5-13-streamed-ledger-head.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0038-u5-14-cursor-aware-catalog-sort.md",
+      "language": "markdown",
+      "sizeLines": 35,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0039-u5-15-next-local-btc-dataset-registry.md",
+      "language": "markdown",
+      "sizeLines": 33,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0040-u5-16-bounded-btc-candle-detail.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0041-u5-17-bounded-btc-manifest-inspection.md",
+      "language": "markdown",
+      "sizeLines": 34,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0042-u5-18-bounded-btc-research-inspection.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0043-u5-19-bounded-btc-ingestion-records.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0044-u5-22-bounded-portfolio-equity-history.md",
+      "language": "markdown",
+      "sizeLines": 34,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0045-u5-5-private-single-tenant-preview.md",
+      "language": "markdown",
+      "sizeLines": 52,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0046-directadmin-static-market-os-deployment.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0047-b4-18-versioned-schema-migration.md",
+      "language": "markdown",
+      "sizeLines": 58,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0048-b4-19-local-mutation-capability.md",
+      "language": "markdown",
+      "sizeLines": 48,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0049-b4-20-read-only-retention-archive-preflight.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0050-u5-5-runtime-identity-contract.md",
+      "language": "markdown",
+      "sizeLines": 122,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0051-platform-mlops-toolchain.md",
+      "language": "markdown",
+      "sizeLines": 43,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0052-u6-read-only-app-shell-contract.md",
+      "language": "markdown",
+      "sizeLines": 40,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0053-u6-native-platform-selection.md",
+      "language": "markdown",
+      "sizeLines": 0,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0054-u6-4-unsigned-packaging-contract.md",
+      "language": "markdown",
+      "sizeLines": 0,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0056-minirag-btc-evidence-scope.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0057-btc-strict-recorded-availability.md",
+      "language": "markdown",
+      "sizeLines": 78,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0059-btc-assessor-runtime-bundles.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0060-btc-local-assessment-store-quota.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/decisions/ADR-0061-btc-windows-appcontainer-cli.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/FRONTEND-DESIGN-BRIEF.md",
+      "language": "markdown",
+      "sizeLines": 69,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/FRONTEND-VERIFICATION-REPORT.md",
+      "language": "markdown",
+      "sizeLines": 139,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/app-surfaces.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b0-btc-paper-replay.json",
+      "language": "json",
+      "sizeLines": 90,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b1-binance-vision-execution-2026-11-18.json",
+      "language": "json",
+      "sizeLines": 161,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b1-btc-historical-ingestion.json",
+      "language": "json",
+      "sizeLines": 87,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b4-15-shared-portfolio.json",
+      "language": "json",
+      "sizeLines": 61,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b4-18-schema-migration-readiness.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b4-19-local-mutation-capability-readiness.json",
+      "language": "json",
+      "sizeLines": 44,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b4-20-retention-archive-preflight.json",
+      "language": "json",
+      "sizeLines": 33,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/b4-local-closeout.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 64,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 65,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 98,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-b2-daily-stability-diagnostic-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 524,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-b2-temporal-dependence-audit-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 100,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 228,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-artifact-integrity-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 50,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-current-checkout-health-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 89,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json",
+      "language": "json",
+      "sizeLines": 68,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-gpu-resource-observation-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-os-isolation-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 45,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-primary-checkout-50m-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 164,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-process-network-observation-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-resource-guard-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 95,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 104,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-smoke-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json",
+      "language": "json",
+      "sizeLines": 64,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-windows-egress-2026-11-21.json",
+      "language": "json",
+      "sizeLines": 115,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-local-assessor-windows-egress-2026-11-27.json",
+      "language": "json",
+      "sizeLines": 95,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-minirag-corpus-build-2026-11-18.json",
+      "language": "json",
+      "sizeLines": 68,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-minirag-post-guard-retrieval-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 95,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-minirag-retrieval-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 277,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt",
+      "language": "txt",
+      "sizeLines": 94,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/btc-prospective-capture-preflight-2026-11-20.json",
+      "language": "json",
+      "sizeLines": 42,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-config-retry-2026-11-26.json",
+      "language": "json",
+      "sizeLines": 12,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 82,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json",
+      "language": "json",
+      "sizeLines": 74,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json",
+      "language": "json",
+      "sizeLines": 76,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json",
+      "language": "json",
+      "sizeLines": 83,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json",
+      "language": "json",
+      "sizeLines": 84,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json",
+      "language": "json",
+      "sizeLines": 89,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json",
+      "language": "json",
+      "sizeLines": 113,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26.json",
+      "language": "json",
+      "sizeLines": 82,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json",
+      "language": "json",
+      "sizeLines": 108,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json",
+      "language": "json",
+      "sizeLines": 95,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json",
+      "language": "json",
+      "sizeLines": 39,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json",
+      "language": "json",
+      "sizeLines": 43,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-110054.json",
+      "language": "json",
+      "sizeLines": 47,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-114029.json",
+      "language": "json",
+      "sizeLines": 47,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-post-resync-observation-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 105,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/btc-w32time-post-resync-retry-2026-11-25.json",
+      "language": "json",
+      "sizeLines": 119,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/codebase-stack-understanding.json",
+      "language": "json",
+      "sizeLines": 172,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/directadmin-static-preview.json",
+      "language": "json",
+      "sizeLines": 88,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/jev-connectivity-reauthorized-2026-11-19.json",
+      "language": "json",
+      "sizeLines": 84,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/local-exit-gate.json",
+      "language": "json",
+      "sizeLines": 113,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.10-openharness-blockers.json",
+      "language": "json",
+      "sizeLines": 2715,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.11-openharness-blockers.json",
+      "language": "json",
+      "sizeLines": 2881,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.12-orchestration-decision.json",
+      "language": "json",
+      "sizeLines": 65,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.7-openharness-recovery.json",
+      "language": "json",
+      "sizeLines": 918,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.8-openharness-recovery.json",
+      "language": "json",
+      "sizeLines": 1022,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m1.9-deployment-validation.json",
+      "language": "json",
+      "sizeLines": 1193,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.1-vibe-trading-adapter.json",
+      "language": "json",
+      "sizeLines": 73,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.2-cited-retrieval.json",
+      "language": "json",
+      "sizeLines": 91,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.3-cited-research-synthesis.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.4-model-gated-summaries.json",
+      "language": "json",
+      "sizeLines": 93,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.5-research-quality.json",
+      "language": "json",
+      "sizeLines": 87,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.6-quality-review.json",
+      "language": "json",
+      "sizeLines": 125,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.7-ci.json",
+      "language": "json",
+      "sizeLines": 36,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.7-model-adapter.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.8-live-smoke.json",
+      "language": "json",
+      "sizeLines": 49,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/m2.9-live-smoke.json",
+      "language": "json",
+      "sizeLines": 49,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/platform-toolchain-readiness.json",
+      "language": "json",
+      "sizeLines": 43,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u3-api-connectivity.json",
+      "language": "json",
+      "sizeLines": 96,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u3-b1-btc-historical-readiness.json",
+      "language": "json",
+      "sizeLines": 133,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u3-b2-btc-features-baselines.json",
+      "language": "json",
+      "sizeLines": 180,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u3-b3-jev-incremental.json",
+      "language": "json",
+      "sizeLines": 97,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-10-bounded-members-reservations.json",
+      "language": "json",
+      "sizeLines": 75,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-11-bounded-catalog-legacy-resources.json",
+      "language": "json",
+      "sizeLines": 48,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-12-one-pass-audit-paging.json",
+      "language": "json",
+      "sizeLines": 49,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-13-streamed-ledger-head.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-14-cursor-aware-catalog-sort.json",
+      "language": "json",
+      "sizeLines": 47,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-15-next-local-btc-dataset-registry.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-16-next-bounded-btc-candle-detail.json",
+      "language": "json",
+      "sizeLines": 42,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-17-next-bounded-btc-ingestion-manifests.json",
+      "language": "json",
+      "sizeLines": 54,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-18-next-bounded-btc-research-inspection.json",
+      "language": "json",
+      "sizeLines": 58,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-19-next-bounded-btc-ingestion-records.json",
+      "language": "json",
+      "sizeLines": 54,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-2-static-deployment.json",
+      "language": "json",
+      "sizeLines": 36,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-20-local-operator-overview.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-21-bounded-btc-candle-visualization.json",
+      "language": "json",
+      "sizeLines": 49,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-22-bounded-portfolio-equity-history.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-23-responsive-operator-navigation.json",
+      "language": "json",
+      "sizeLines": 48,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-24-mobile-gateway-status.json",
+      "language": "json",
+      "sizeLines": 45,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-3-deployment-access-observability.json",
+      "language": "json",
+      "sizeLines": 31,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-4-local-operator-shell.json",
+      "language": "json",
+      "sizeLines": 42,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-5-connected-browser-smoke.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-5-promotion-evidence.json",
+      "language": "json",
+      "sizeLines": 92,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-5-stack-runtime-review.json",
+      "language": "json",
+      "sizeLines": 103,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-5-web-stack-auth-gate.json",
+      "language": "json",
+      "sizeLines": 28,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-6-local-portfolio-inspection.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-7-web-stack-deployment-matrix.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-8-next-local-operator-web.json",
+      "language": "json",
+      "sizeLines": 62,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-9-bounded-local-inspection.json",
+      "language": "json",
+      "sizeLines": 65,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u5-local-acceptance.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-f-hosted-installation.json",
+      "language": "json",
+      "sizeLines": 83,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-f-installation-contract.json",
+      "language": "json",
+      "sizeLines": 96,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-install-preflight.json",
+      "language": "json",
+      "sizeLines": 44,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-install-preflight.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u6-4-install-simulation.json",
+      "language": "json",
+      "sizeLines": 52,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-install-simulation.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u6-4-release-contract.json",
+      "language": "json",
+      "sizeLines": 72,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-release-hardening.json",
+      "language": "json",
+      "sizeLines": 110,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-4-unsigned-artifact.json",
+      "language": "json",
+      "sizeLines": 70,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-cli-btc-history-catalog.json",
+      "language": "json",
+      "sizeLines": 30,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-cli-btc-history-manifests.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-cli-btc-research-catalog.json",
+      "language": "json",
+      "sizeLines": 46,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-cli-btc-research-detail.json",
+      "language": "json",
+      "sizeLines": 46,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-electron-shell.json",
+      "language": "json",
+      "sizeLines": 78,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-native-platform-selection.json",
+      "language": "json",
+      "sizeLines": 73,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u6-read-only-app-shell-contract.json",
+      "language": "json",
+      "sizeLines": 79,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-d-portable-archive-index.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-e-cross-target-release-catalog.json",
+      "language": "json",
+      "sizeLines": 44,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-f-cross-target-release-catalog-report.json",
+      "language": "json",
+      "sizeLines": 37,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-g-quality-benchmark-report.json",
+      "language": "json",
+      "sizeLines": 56,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-h-synthetic-session-accounting-report.json",
+      "language": "json",
+      "sizeLines": 68,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-i-local-evidence-pack.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-j-synthetic-economic-report.json",
+      "language": "json",
+      "sizeLines": 135,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-j-synthetic-economic-report.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-k-cli-tool-registry-report.json",
+      "language": "json",
+      "sizeLines": 170,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-k-cli-tool-registry-report.md",
+      "language": "markdown",
+      "sizeLines": 31,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-l-research-brief-evidence.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-l-research-brief.md",
+      "language": "markdown",
+      "sizeLines": 62,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-m-release-evidence-drift.json",
+      "language": "json",
+      "sizeLines": 83,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-m-release-evidence-drift.md",
+      "language": "markdown",
+      "sizeLines": 27,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-n-unified-evidence-register.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-n-unified-evidence-register.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-o-evidence-catalog.json",
+      "language": "json",
+      "sizeLines": 173,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-o-evidence-catalog.md",
+      "language": "markdown",
+      "sizeLines": 62,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u7-p-evidence-reproducibility.json",
+      "language": "json",
+      "sizeLines": 67,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u7-p-evidence-reproducibility.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u8-a-live-readiness-decision.json",
+      "language": "json",
+      "sizeLines": 160,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u8-a-live-readiness-decision.md",
+      "language": "markdown",
+      "sizeLines": 80,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u8-b-local-operational-readiness.json",
+      "language": "json",
+      "sizeLines": 105,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u8-b-local-operational-readiness.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/evidence/u8-c-permanent-paper-only.json",
+      "language": "json",
+      "sizeLines": 130,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs/evidence/u8-c-permanent-paper-only.md",
+      "language": "markdown",
+      "sizeLines": 73,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/hosting/market-os/.htaccess",
+      "language": "unknown",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": "docs/hosting/market-os/DEPLOYMENT.txt",
+      "language": "txt",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/hosting/market-os/index.html",
+      "language": "html",
+      "sizeLines": 151,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/research/U6-NATIVE-PLATFORM-OPTIONS.md",
+      "language": "markdown",
+      "sizeLines": 0,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/binance-public-spot-market-data-2026-10-21.md",
+      "language": "markdown",
+      "sizeLines": 59,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-assessor-vram-budgeting-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 52,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-50m-observation-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 79,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-os-isolation-2026-11-20.md",
+      "language": "markdown",
+      "sizeLines": 195,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-os-isolation-2026-11-21.md",
+      "language": "markdown",
+      "sizeLines": 143,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 92,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 66,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-local-assessor-windows-egress-2026-11-27.md",
+      "language": "markdown",
+      "sizeLines": 63,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-utc-clock-error-bound.md",
+      "language": "markdown",
+      "sizeLines": 475,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/btc-utc-clock-source-qualification-2026-11-27.md",
+      "language": "markdown",
+      "sizeLines": 101,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/jev-local-runtime-availability-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 37,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-local-runtime-2026-11-20.md",
+      "language": "markdown",
+      "sizeLines": 123,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md",
+      "language": "markdown",
+      "sizeLines": 119,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md",
+      "language": "markdown",
+      "sizeLines": 95,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "language": "markdown",
+      "sizeLines": 51,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/typesafe-jev-u3-b3.md",
+      "language": "markdown",
+      "sizeLines": 37,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research/u5-5-connected-web-options-2026-10-29.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/runtime-benchmark.md",
+      "language": "markdown",
+      "sizeLines": 42,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "market_os/__init__.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/accounting.py",
+      "language": "python",
+      "sizeLines": 191,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/adapters/__init__.py",
+      "language": "python",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/adapters/lightrag.py",
+      "language": "python",
+      "sizeLines": 484,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/adapters/minirag.py",
+      "language": "python",
+      "sizeLines": 597,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/adapters/openai_summary.py",
+      "language": "python",
+      "sizeLines": 341,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/adapters/vibe_trading.py",
+      "language": "python",
+      "sizeLines": 370,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/api.py",
+      "language": "python",
+      "sizeLines": 1789,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b310_synthetic_server.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b311_synthetic_catalog.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b31_offline.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b31_synthetic_audit.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b31_synthetic_bundle.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b31_synthetic_reporting.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b31_synthetic_runner.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b34_strategy.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b35_strategy_replay.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b36_accounting.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b38_synthetic_session.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b39_synthetic_api.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b411_backup.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b412_migration.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/b41_broker.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_assessor_firewall.ps1",
+      "language": "powershell",
+      "sizeLines": 316,
+      "fileCategory": "script"
+    },
+    {
+      "path": "market_os/btc_assessor_linux_isolation.py",
+      "language": "python",
+      "sizeLines": 221,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_assessor_python_runtime.py",
+      "language": "python",
+      "sizeLines": 491,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_assessor_windows_appcontainer.py",
+      "language": "python",
+      "sizeLines": 734,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_b2.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_b3.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_b31.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_clock.py",
+      "language": "python",
+      "sizeLines": 65,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_connectivity.py",
+      "language": "python",
+      "sizeLines": 1110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_evidence_packet.py",
+      "language": "python",
+      "sizeLines": 681,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_features.py",
+      "language": "python",
+      "sizeLines": 608,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_history.py",
+      "language": "python",
+      "sizeLines": 3021,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_jev_evaluation.py",
+      "language": "python",
+      "sizeLines": 772,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_local_assessor.py",
+      "language": "python",
+      "sizeLines": 1301,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_local_assessor_store.py",
+      "language": "python",
+      "sizeLines": 299,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_paper.py",
+      "language": "python",
+      "sizeLines": 562,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_question_evaluation.py",
+      "language": "python",
+      "sizeLines": 1345,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_realtime_capture.py",
+      "language": "python",
+      "sizeLines": 532,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_research_inspection.py",
+      "language": "python",
+      "sizeLines": 497,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/btc_source_corpus.py",
+      "language": "python",
+      "sizeLines": 426,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/cli.py",
+      "language": "python",
+      "sizeLines": 819,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/contracts.py",
+      "language": "python",
+      "sizeLines": 565,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/deployment/__init__.py",
+      "language": "python",
+      "sizeLines": 5,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/deployment/wrapper.py",
+      "language": "python",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/deployment_probe.py",
+      "language": "python",
+      "sizeLines": 256,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/evaluation_protocol.py",
+      "language": "python",
+      "sizeLines": 1187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/evidence_pack.py",
+      "language": "python",
+      "sizeLines": 308,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/local_mutation.py",
+      "language": "python",
+      "sizeLines": 186,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/metrics.py",
+      "language": "python",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/model_summary.py",
+      "language": "python",
+      "sizeLines": 668,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/models/btc_assessor_python_runtime.lock.json",
+      "language": "json",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/models/btc_local_assessor_runtime.lock.json",
+      "language": "json",
+      "sizeLines": 64,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/orchestration/__init__.py",
+      "language": "python",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/openharness_adapter.py",
+      "language": "python",
+      "sizeLines": 466,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/openharness_probe.py",
+      "language": "python",
+      "sizeLines": 149,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/openharness_recovery_probe.py",
+      "language": "python",
+      "sizeLines": 670,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/parity.py",
+      "language": "python",
+      "sizeLines": 372,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/protocol.py",
+      "language": "python",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/orchestration/recovery.py",
+      "language": "python",
+      "sizeLines": 265,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/paper_venue.py",
+      "language": "python",
+      "sizeLines": 632,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/portfolio_backup.py",
+      "language": "python",
+      "sizeLines": 370,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/portfolio_broker.py",
+      "language": "python",
+      "sizeLines": 1770,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/portfolio_migration.py",
+      "language": "python",
+      "sizeLines": 35,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/provider_selection.py",
+      "language": "python",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/providers.py",
+      "language": "python",
+      "sizeLines": 420,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/quality_benchmark.py",
+      "language": "python",
+      "sizeLines": 920,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/quality_report.py",
+      "language": "python",
+      "sizeLines": 182,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/research.py",
+      "language": "python",
+      "sizeLines": 543,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/research_brief.py",
+      "language": "python",
+      "sizeLines": 236,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/schema_migration.py",
+      "language": "python",
+      "sizeLines": 722,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/store.py",
+      "language": "python",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/strategy.py",
+      "language": "python",
+      "sizeLines": 191,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/strategy_replay.py",
+      "language": "python",
+      "sizeLines": 215,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_artifacts.py",
+      "language": "python",
+      "sizeLines": 190,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_audit.py",
+      "language": "python",
+      "sizeLines": 422,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_catalog.py",
+      "language": "python",
+      "sizeLines": 115,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_economic_report.py",
+      "language": "python",
+      "sizeLines": 345,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_evaluation.py",
+      "language": "python",
+      "sizeLines": 999,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_replay.py",
+      "language": "python",
+      "sizeLines": 550,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_reporting.py",
+      "language": "python",
+      "sizeLines": 275,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_server.py",
+      "language": "python",
+      "sizeLines": 206,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_session.py",
+      "language": "python",
+      "sizeLines": 235,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_session_api.py",
+      "language": "python",
+      "sizeLines": 192,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/synthetic_session_report.py",
+      "language": "python",
+      "sizeLines": 295,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/fixtures/b38/synthetic_session.json",
+      "language": "json",
+      "sizeLines": 103,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_b3/recorded_responses.json",
+      "language": "json",
+      "sizeLines": 83,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_b31/recorded_assessments.json",
+      "language": "json",
+      "sizeLines": 1236,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_connectivity/jev_cases.json",
+      "language": "json",
+      "sizeLines": 93,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_connectivity/jev_request.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_connectivity/jev_response.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_connectivity/klines.json",
+      "language": "json",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_connectivity/ticker.json",
+      "language": "json",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_paper/history.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/btc_paper/replay.json",
+      "language": "json",
+      "sizeLines": 26,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/artifact.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/backtest_result.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/evidence.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/order.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/order_negative.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/order_plan.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/order_plan_live.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/research_result.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/risk_decision.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/risk_missing_reason.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/run.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/run_bad_status.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/run_event.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/run_event_bad_cost.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task_bad_symbol.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task_bad_version.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task_live.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task_missing_id.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/contracts/task_naive_timestamp.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/economic/u7_j_synthetic_economic.json",
+      "language": "json",
+      "sizeLines": 70,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/lightrag/corpus.json",
+      "language": "json",
+      "sizeLines": 60,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/model_summary/openai_responses.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/quality/benchmark.json",
+      "language": "json",
+      "sizeLines": 102,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/research/u7_l_cited_research.json",
+      "language": "json",
+      "sizeLines": 257,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/tools/u7_k_cli_anything_registry.json",
+      "language": "json",
+      "sizeLines": 116,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/fixtures/vibe_trading/etf_ohlcv.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": "market_os/tests/provider_runtimes.py",
+      "language": "python",
+      "sizeLines": 64,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_accounting.py",
+      "language": "python",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_app_surfaces.py",
+      "language": "python",
+      "sizeLines": 68,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_assessor_linux_isolation.py",
+      "language": "python",
+      "sizeLines": 222,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_assessor_python_runtime.py",
+      "language": "python",
+      "sizeLines": 189,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_clock.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_connectivity.py",
+      "language": "python",
+      "sizeLines": 560,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_features.py",
+      "language": "python",
+      "sizeLines": 230,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_history.py",
+      "language": "python",
+      "sizeLines": 1099,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_jev_evaluation.py",
+      "language": "python",
+      "sizeLines": 321,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_local_assessor.py",
+      "language": "python",
+      "sizeLines": 739,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_paper.py",
+      "language": "python",
+      "sizeLines": 213,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_paper_cli.py",
+      "language": "python",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_question_evaluation.py",
+      "language": "python",
+      "sizeLines": 365,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_realtime_capture.py",
+      "language": "python",
+      "sizeLines": 273,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_btc_research_inspection.py",
+      "language": "python",
+      "sizeLines": 388,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_cited_research.py",
+      "language": "python",
+      "sizeLines": 417,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_contracts.py",
+      "language": "python",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_deployment_probe.py",
+      "language": "python",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_deployment_wrapper.py",
+      "language": "python",
+      "sizeLines": 61,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_evaluation_protocol.py",
+      "language": "python",
+      "sizeLines": 342,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_evidence_pack.py",
+      "language": "python",
+      "sizeLines": 74,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_lightrag_adapter.py",
+      "language": "python",
+      "sizeLines": 220,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_live_smoke.py",
+      "language": "python",
+      "sizeLines": 134,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_local_mutation.py",
+      "language": "python",
+      "sizeLines": 254,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_metrics.py",
+      "language": "python",
+      "sizeLines": 53,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_model_summary.py",
+      "language": "python",
+      "sizeLines": 639,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_openai_summary_adapter.py",
+      "language": "python",
+      "sizeLines": 252,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_openharness_coordination.py",
+      "language": "python",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_openharness_recovery.py",
+      "language": "python",
+      "sizeLines": 42,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_openharness_runtime.py",
+      "language": "python",
+      "sizeLines": 66,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_operator_surface.py",
+      "language": "python",
+      "sizeLines": 908,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_orchestration_parity.py",
+      "language": "python",
+      "sizeLines": 95,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_paper_venue.py",
+      "language": "python",
+      "sizeLines": 170,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_backup.py",
+      "language": "python",
+      "sizeLines": 321,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_broker.py",
+      "language": "python",
+      "sizeLines": 748,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_concurrency.py",
+      "language": "python",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_lifecycle.py",
+      "language": "python",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_migration.py",
+      "language": "python",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_mutation.py",
+      "language": "python",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_portfolio_shared.py",
+      "language": "python",
+      "sizeLines": 184,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_provider_contracts.py",
+      "language": "python",
+      "sizeLines": 72,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_quality_benchmark.py",
+      "language": "python",
+      "sizeLines": 276,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_quality_report.py",
+      "language": "python",
+      "sizeLines": 72,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_schema_migration.py",
+      "language": "python",
+      "sizeLines": 183,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_strategy.py",
+      "language": "python",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_strategy_replay.py",
+      "language": "python",
+      "sizeLines": 91,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_acceptance.py",
+      "language": "python",
+      "sizeLines": 175,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_artifacts.py",
+      "language": "python",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_audit.py",
+      "language": "python",
+      "sizeLines": 163,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_catalog.py",
+      "language": "python",
+      "sizeLines": 96,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_cli.py",
+      "language": "python",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_economic_report.py",
+      "language": "python",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_evaluation.py",
+      "language": "python",
+      "sizeLines": 182,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_replay.py",
+      "language": "python",
+      "sizeLines": 174,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_reporting.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_server.py",
+      "language": "python",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_session.py",
+      "language": "python",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_session_api.py",
+      "language": "python",
+      "sizeLines": 77,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_synthetic_session_report.py",
+      "language": "python",
+      "sizeLines": 128,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_tool_registry_report.py",
+      "language": "python",
+      "sizeLines": 111,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u55_access.py",
+      "language": "python",
+      "sizeLines": 447,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u5_local_acceptance.py",
+      "language": "python",
+      "sizeLines": 57,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u7_evidence_catalog.py",
+      "language": "python",
+      "sizeLines": 92,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u7_evidence_register.py",
+      "language": "python",
+      "sizeLines": 65,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u7_evidence_reproducibility.py",
+      "language": "python",
+      "sizeLines": 212,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u8a_readiness.py",
+      "language": "python",
+      "sizeLines": 116,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u8b_operations.py",
+      "language": "python",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_u8c_paper_mode.py",
+      "language": "python",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_vibe_trading_adapter.py",
+      "language": "python",
+      "sizeLines": 166,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tests/test_workflow.py",
+      "language": "python",
+      "sizeLines": 530,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/tool_registry_report.py",
+      "language": "python",
+      "sizeLines": 331,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u55_access.py",
+      "language": "python",
+      "sizeLines": 544,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u7_evidence_catalog.py",
+      "language": "python",
+      "sizeLines": 307,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u7_evidence_register.py",
+      "language": "python",
+      "sizeLines": 274,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u7_evidence_reproducibility.py",
+      "language": "python",
+      "sizeLines": 395,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u8a_readiness.py",
+      "language": "python",
+      "sizeLines": 307,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u8b_operations.py",
+      "language": "python",
+      "sizeLines": 328,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/u8c_paper_mode.py",
+      "language": "python",
+      "sizeLines": 252,
+      "fileCategory": "code"
+    },
+    {
+      "path": "market_os/workflow.py",
+      "language": "python",
+      "sizeLines": 601,
+      "fileCategory": "code"
+    },
+    {
+      "path": "mlops/README.md",
+      "language": "markdown",
+      "sizeLines": 32,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "mlops/experiment-manifest.example.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "mlops/validate_manifest.py",
+      "language": "python",
+      "sizeLines": 48,
+      "fileCategory": "code"
+    },
+    {
+      "path": "observability/README.md",
+      "language": "markdown",
+      "sizeLines": 28,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "observability/grafana/provisioning/datasources/datasources.yml",
+      "language": "yaml",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "observability/loki/loki-config.yml",
+      "language": "yaml",
+      "sizeLines": 29,
+      "fileCategory": "config"
+    },
+    {
+      "path": "observability/prometheus/prometheus.yml",
+      "language": "yaml",
+      "sizeLines": 9,
+      "fileCategory": "config"
+    },
+    {
+      "path": "observability/promtail/promtail-config.yml",
+      "language": "yaml",
+      "sizeLines": 27,
+      "fileCategory": "config"
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "scripts/bootstrap_btc_local_assessor.py",
+      "language": "python",
+      "sizeLines": 215,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/btc_b2_daily_stability.py",
+      "language": "python",
+      "sizeLines": 231,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/build_web_artifact.py",
+      "language": "python",
+      "sizeLines": 113,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/ci_checks.py",
+      "language": "python",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/deploy_market_os_directadmin.sh",
+      "language": "shell",
+      "sizeLines": 381,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/m2_8_live_smoke.py",
+      "language": "python",
+      "sizeLines": 301,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/market-os-readonly-dashboard.test.ts",
+      "language": "typescript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/market-os-u6-4-artifact.test.ts",
+      "language": "typescript",
+      "sizeLines": 116,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/market-os-u6-app-shell.test.ts",
+      "language": "typescript",
+      "sizeLines": 52,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/market-os-u6-electron-shell.test.ts",
+      "language": "typescript",
+      "sizeLines": 58,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/market-os-u6-native-platform-selection.test.ts",
+      "language": "typescript",
+      "sizeLines": 73,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 705,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "very-large",
+  "importMap": {
+    ".dockerignore": [],
+    ".github/dependabot.yml": [],
+    ".github/workflows/ci.yml": [],
+    ".github/workflows/deploy-market-os.yml": [],
+    ".github/workflows/devsecops.yml": [],
+    ".github/workflows/security.yml": [],
+    ".trivyignore": [],
+    "CONTRIBUTING.md": [],
+    "JEV_PROCESSING.md": [],
+    "README.md": [],
+    "SECURITY.md": [],
+    "STACK.md": [],
+    "STRUCTURE.md": [],
+    "TECH_DOCS.md": [],
+    "apps/README.md": [],
+    "apps/__init__.py": [],
+    "apps/cli/README.md": [],
+    "apps/cli/__init__.py": [
+      "market_os/cli.py"
+    ],
+    "apps/cli/__main__.py": [
+      "market_os/cli.py"
+    ],
+    "apps/desktop/electron/README.md": [],
+    "apps/desktop/electron/package.json": [],
+    "apps/desktop/electron/scripts/archive-artifact.cjs": [
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/audit-release-drift.cjs": [
+      "apps/desktop/electron/scripts/render-release-catalog-report.cjs"
+    ],
+    "apps/desktop/electron/scripts/catalog-release.cjs": [
+      "apps/desktop/electron/scripts/validate-ci-evidence.cjs"
+    ],
+    "apps/desktop/electron/scripts/ci-release.cjs": [],
+    "apps/desktop/electron/scripts/index-portable-archives.cjs": [
+      "apps/desktop/electron/scripts/validate-ci-evidence.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/install-portable.cjs": [
+      "apps/desktop/electron/scripts/install-preflight.cjs",
+      "apps/desktop/electron/scripts/install-simulate.cjs",
+      "apps/desktop/electron/scripts/python-runtime.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/install-preflight.cjs": [
+      "apps/desktop/electron/scripts/python-runtime.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/install-simulate.cjs": [
+      "apps/desktop/electron/scripts/install-preflight.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/package.cjs": [
+      "apps/desktop/electron/scripts/install-simulate.cjs",
+      "apps/desktop/electron/scripts/python-runtime.cjs"
+    ],
+    "apps/desktop/electron/scripts/prepare-python-runtime.cjs": [
+      "apps/desktop/electron/scripts/python-runtime.cjs"
+    ],
+    "apps/desktop/electron/scripts/python-runtime.cjs": [],
+    "apps/desktop/electron/scripts/release-drill.cjs": [
+      "apps/desktop/electron/scripts/release-slots.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/release-slots.cjs": [
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/render-ci-evidence-report.cjs": [],
+    "apps/desktop/electron/scripts/render-installation-evidence.cjs": [
+      "apps/desktop/electron/scripts/install-portable.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/render-release-catalog-report.cjs": [
+      "apps/desktop/electron/scripts/validate-ci-evidence.cjs"
+    ],
+    "apps/desktop/electron/scripts/sign-artifact.cjs": [
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/smoke-artifact.cjs": [],
+    "apps/desktop/electron/scripts/uninstall-portable.cjs": [
+      "apps/desktop/electron/scripts/install-portable.cjs"
+    ],
+    "apps/desktop/electron/scripts/validate-ci-evidence.cjs": [
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/scripts/validate-installation-contract.cjs": [],
+    "apps/desktop/electron/src/main.cjs": [
+      "apps/desktop/electron/src/runtime.cjs"
+    ],
+    "apps/desktop/electron/src/preload.cjs": [],
+    "apps/desktop/electron/src/release.cjs": [],
+    "apps/desktop/electron/src/runtime.cjs": [
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/tests/archive-index.test.cjs": [
+      "apps/desktop/electron/scripts/index-portable-archives.cjs"
+    ],
+    "apps/desktop/electron/tests/install-portable.test.cjs": [
+      "apps/desktop/electron/scripts/install-portable.cjs",
+      "apps/desktop/electron/scripts/install-simulate.cjs",
+      "apps/desktop/electron/scripts/python-runtime.cjs"
+    ],
+    "apps/desktop/electron/tests/install-preflight.test.cjs": [
+      "apps/desktop/electron/scripts/install-preflight.cjs"
+    ],
+    "apps/desktop/electron/tests/install-simulation.test.cjs": [
+      "apps/desktop/electron/scripts/install-simulate.cjs"
+    ],
+    "apps/desktop/electron/tests/installation-contract.test.cjs": [
+      "apps/desktop/electron/scripts/validate-installation-contract.cjs"
+    ],
+    "apps/desktop/electron/tests/release-catalog-report.test.cjs": [
+      "apps/desktop/electron/scripts/render-release-catalog-report.cjs"
+    ],
+    "apps/desktop/electron/tests/release-catalog.test.cjs": [
+      "apps/desktop/electron/scripts/catalog-release.cjs"
+    ],
+    "apps/desktop/electron/tests/release-drift.test.cjs": [
+      "apps/desktop/electron/scripts/audit-release-drift.cjs",
+      "apps/desktop/electron/scripts/catalog-release.cjs"
+    ],
+    "apps/desktop/electron/tests/release.test.cjs": [
+      "apps/desktop/electron/scripts/release-slots.cjs",
+      "apps/desktop/electron/src/release.cjs"
+    ],
+    "apps/desktop/electron/tests/runtime.test.cjs": [
+      "apps/desktop/electron/src/runtime.cjs"
+    ],
+    "apps/gateway/README.md": [],
+    "apps/gateway/__init__.py": [
+      "market_os/cli.py"
+    ],
+    "apps/gateway/__main__.py": [],
+    "apps/web/README.md": [],
+    "apps/web/next-operator/AGENTS.md": [],
+    "apps/web/next-operator/next-env.d.ts": [],
+    "apps/web/next-operator/next.config.ts": [],
+    "apps/web/next-operator/package.json": [],
+    "apps/web/next-operator/postcss.config.mjs": [],
+    "apps/web/next-operator/src/app/api/btc/realtime/latest/route.ts": [
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/[recordType]/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/[manifestId]/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/manifests/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/datasets/[datasetRevision]/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/datasets/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/desk/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/live-btc-chart.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/experiments/[engine]/[runId]/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/experiments/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/globals.css": [],
+    "apps/web/next-operator/src/app/healthz/route.ts": [],
+    "apps/web/next-operator/src/app/layout.tsx": [
+      "apps/web/next-operator/src/app/globals.css"
+    ],
+    "apps/web/next-operator/src/app/not-found.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx"
+    ],
+    "apps/web/next-operator/src/app/overview/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/portfolios/[portfolioId]/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/app/runtime/page.tsx": [
+      "apps/web/next-operator/src/components/app-shell.tsx",
+      "apps/web/next-operator/src/components/ui.tsx",
+      "apps/web/next-operator/src/lib/release-metadata.ts"
+    ],
+    "apps/web/next-operator/src/components/app-shell.tsx": [
+      "apps/web/next-operator/src/lib/connected-access.ts"
+    ],
+    "apps/web/next-operator/src/components/live-btc-chart.tsx": [
+      "apps/web/next-operator/src/components/market-desk.tsx",
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/components/market-desk.tsx": [
+      "apps/web/next-operator/src/lib/market-api.ts"
+    ],
+    "apps/web/next-operator/src/components/ui.tsx": [],
+    "apps/web/next-operator/src/lib/connected-access.ts": [],
+    "apps/web/next-operator/src/lib/market-api.ts": [
+      "apps/web/next-operator/src/lib/connected-access.ts"
+    ],
+    "apps/web/next-operator/src/lib/release-metadata.ts": [],
+    "apps/web/next-operator/src/proxy.ts": [],
+    "apps/web/next-operator/tsconfig.json": [],
+    "apps/web/operator/index.html": [],
+    "apps/web/operator/operator.css": [],
+    "apps/web/operator/operator.js": [],
+    "apps/web/public/.htaccess": [],
+    "apps/web/public/DEPLOYMENT.txt": [],
+    "apps/web/public/index.html": [],
+    "deploy/data-plane/README.md": [],
+    "deploy/docker/README.md": [],
+    "deploy/docker/next.Dockerfile": [],
+    "deploy/docker/python.Dockerfile": [],
+    "deploy/iac/ansible/README.md": [],
+    "deploy/iac/ansible/inventory.example.ini": [],
+    "deploy/iac/ansible/site.yml": [],
+    "deploy/iac/terraform/README.md": [],
+    "deploy/iac/terraform/main.tf": [],
+    "deploy/iac/terraform/outputs.tf": [],
+    "deploy/iac/terraform/variables.tf": [],
+    "deploy/k8s/README.md": [],
+    "deploy/k8s/market-os.yaml": [],
+    "deploy/u5-5/README.md": [],
+    "deploy/u5-5/healthcheck.sh": [],
+    "deploy/u5-5/market-os-next.service": [],
+    "deploy/u5-5/market-os-python.service": [],
+    "deploy/u5-5/operator.env.example": [],
+    "deploy/u5-5/promote.sh": [],
+    "deploy/u5-5/promotion_evidence.py": [],
+    "deploy/u5-5/rollback.sh": [],
+    "deploy/u5-5/tailnet-policy.hujson": [],
+    "deploy/u5-5/tailscale-serve.sh": [],
+    "design-system/autonomous-market-os/MASTER.md": [],
+    "design-system/autonomous-market-os/pages/dashboard.md": [],
+    "design-system/autonomous-market-os/pages/dataset-detail.md": [],
+    "design-system/autonomous-market-os/pages/datasets.md": [],
+    "docker-compose.yml": [],
+    "docs/APP-SURFACES-CONTRACT.md": [],
+    "docs/B0-BTC-PAPER-REPLAY-REPORT.md": [],
+    "docs/B1-BTC-HISTORICAL-INGESTION-REPORT.md": [],
+    "docs/B2-BTC-FEATURES-BASELINES-REPORT.md": [],
+    "docs/B3-1-QUESTION-CONTRACT.md": [],
+    "docs/B3.1-OFFLINE-EVALUATION-PROTOCOL.md": [],
+    "docs/B3.1-OFFLINE-QUESTION-CONTRACT-PROPOSAL.md": [],
+    "docs/B4-LOCAL-SLICE-CLOSEOUT-REPORT.md": [],
+    "docs/B4.1-OWNER-DECISION-WORKSHEET.md": [],
+    "docs/B4.1-PAPER-PORTFOLIO-VIRTUAL-BROKER-CONTRACT.md": [],
+    "docs/B4.10-FILL-TIME-RISK-OUTCOMES.md": [],
+    "docs/B4.11-BACKUP-RESTORE.md": [],
+    "docs/B4.12-MIGRATION-PREFLIGHT.md": [],
+    "docs/B4.13-CONCURRENCY-CONTRACT.md": [],
+    "docs/B4.14-MUTATION-AUDIT-CONTRACT.md": [],
+    "docs/B4.15-SHARED-PORTFOLIO-CONTRACT.md": [],
+    "docs/B4.16-LIFECYCLE-CONTRACT.md": [],
+    "docs/B4.17-RETENTION-ARCHIVE-CONTRACT.md": [],
+    "docs/B4.18-SCHEMA-MIGRATION-CONTRACT.md": [],
+    "docs/B4.19-LOCAL-MUTATION-CAPABILITY-CONTRACT.md": [],
+    "docs/B4.2-LEDGER-RECOVERY-INTEGRITY.md": [],
+    "docs/B4.20-RETENTION-ARCHIVE-PREFLIGHT-CONTRACT.md": [],
+    "docs/B4.3-EVENT-IDENTITY-INVARIANTS.md": [],
+    "docs/B4.4-IDEMPOTENCY-SCOPE-INVARIANTS.md": [],
+    "docs/B4.5-LEDGER-MALFORMED-TAIL.md": [],
+    "docs/B4.6-MALFORMED-PERSISTED-METADATA.md": [],
+    "docs/B4.7-MALFORMED-SNAPSHOT-RECOVERY.md": [],
+    "docs/B4.8-SNAPSHOT-SCALAR-VALIDATION.md": [],
+    "docs/B4.9-RISK-AUDIT-OUTCOMES.md": [],
+    "docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md": [],
+    "docs/BTC-PAPER-EXPERIMENT-ROADMAP.md": [],
+    "docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md": [],
+    "docs/CODEBASE-AND-STACK-UNDERSTANDING-REPORT.md": [],
+    "docs/DEPLOYMENT-OPTIONS-REPORT.md": [],
+    "docs/DEPLOYMENT-REVIEW.md": [],
+    "docs/DEVOPS-RUNBOOK.md": [],
+    "docs/FRONTEND-DESIGN-SYSTEM.md": [],
+    "docs/FRONTEND-FINANCE-REFERENCE.md": [],
+    "docs/FUSION-MAP.md": [],
+    "docs/GOAL-PROMPT.md": [],
+    "docs/INTEGRATION-GUIDE.md": [],
+    "docs/JS-PACKAGE-MANAGEMENT.md": [],
+    "docs/LOCAL-EXIT-GATE-REPORT.md": [],
+    "docs/M1-CONTRACTS.md": [],
+    "docs/M1.10-DEPLOYMENT-WRAPPER.md": [],
+    "docs/M1.11-BLOCKER-REVIEW.md": [],
+    "docs/M1.12-FINAL-ORCHESTRATION-DECISION.md": [],
+    "docs/M1.5-OPENHARNESS-PARITY.md": [],
+    "docs/M1.6-OPENHARNESS-RUNTIME.md": [],
+    "docs/M1.7-OPENHARNESS-RECOVERY.md": [],
+    "docs/M1.8-OPENHARNESS-RECOVERY.md": [],
+    "docs/M1.9-DEPLOYMENT-VALIDATION.md": [],
+    "docs/M2-RESEARCH-ADAPTER-PLAN.md": [],
+    "docs/M2.1-VIBE-TRADING-ADAPTER.md": [],
+    "docs/M2.2-CITED-RETRIEVAL-ADAPTER.md": [],
+    "docs/M2.3-CITED-RESEARCH-SYNTHESIS.md": [],
+    "docs/M2.4-MODEL-GATED-SUMMARIES.md": [],
+    "docs/M2.5-RESEARCH-QUALITY-BENCHMARK.md": [],
+    "docs/M2.6-MODEL-ADAPTER-PLAN.md": [],
+    "docs/M2.6-QUALITY-REVIEW.md": [],
+    "docs/M2.7-CI-CD.md": [],
+    "docs/M2.7-RECORDED-MODEL-ADAPTER.md": [],
+    "docs/M2.8-LIVE-SMOKE.md": [],
+    "docs/M2.9-LIVE-SMOKE-RESULT.md": [],
+    "docs/NEXT-STACK-AND-DEPLOYMENT-PLAN.md": [],
+    "docs/NEXT-WORK-HANDOFF.md": [],
+    "docs/PHASES.md": [],
+    "docs/PRODUCT-VISION.md": [],
+    "docs/PROJECT-CONTEXT.md": [],
+    "docs/PROJECT-INDEX.md": [],
+    "docs/README.md": [],
+    "docs/ROADMAP.md": [],
+    "docs/STACK-AND-RUNTIME-REVIEW.md": [],
+    "docs/TARGET-STRUCTURE.md": [],
+    "docs/U3-API-CONNECTIVITY-REPORT.md": [],
+    "docs/U3-B1-HISTORICAL-READINESS-REPORT.md": [],
+    "docs/U3-B3-JEV-INCREMENTAL-BENCHMARK-REPORT.md": [],
+    "docs/U5-LOCAL-ACCEPTANCE.md": [],
+    "docs/U5-LOCAL-READONLY-DASHBOARD.md": [],
+    "docs/U5.1-LOCAL-SERVICE-BOUNDARY.md": [],
+    "docs/U5.10-BOUNDED-MEMBERS-RESERVATIONS.md": [],
+    "docs/U5.11-BOUNDED-CATALOG-LEGACY-RESOURCES.md": [],
+    "docs/U5.12-ONE-PASS-AUDIT-PAGING.md": [],
+    "docs/U5.13-STREAMED-LEDGER-HEAD.md": [],
+    "docs/U5.14-CURSOR-AWARE-CATALOG-SORT.md": [],
+    "docs/U5.15-NEXT-LOCAL-BTC-DATASET-REGISTRY.md": [],
+    "docs/U5.16-NEXT-BOUNDED-BTC-CANDLE-DETAIL.md": [],
+    "docs/U5.17-NEXT-BOUNDED-BTC-INGESTION-MANIFESTS.md": [],
+    "docs/U5.18-NEXT-BOUNDED-BTC-RESEARCH-INSPECTION.md": [],
+    "docs/U5.19-NEXT-BOUNDED-BTC-INGESTION-RECORDS.md": [],
+    "docs/U5.2-STATIC-DEPLOYMENT-READINESS.md": [],
+    "docs/U5.20-LOCAL-OPERATOR-OVERVIEW.md": [],
+    "docs/U5.21-BOUNDED-BTC-CANDLE-VISUALIZATION.md": [],
+    "docs/U5.22-BOUNDED-PORTFOLIO-EQUITY-HISTORY.md": [],
+    "docs/U5.23-RESPONSIVE-OPERATOR-NAVIGATION.md": [],
+    "docs/U5.24-MOBILE-GATEWAY-STATUS.md": [],
+    "docs/U5.3-DEPLOYMENT-ACCESS-OBSERVABILITY-CONTRACT.md": [],
+    "docs/U5.4-LOCAL-OPERATOR-SHELL.md": [],
+    "docs/U5.5-AUTHENTICATED-CONNECTED-WEB-CONTRACT.md": [],
+    "docs/U5.6-LOCAL-PORTFOLIO-INSPECTION.md": [],
+    "docs/U5.7-WEB-STACK-DEPLOYMENT-MATRIX.md": [],
+    "docs/U5.8-NEXT-LOCAL-OPERATOR-WEB.md": [],
+    "docs/U5.9-BOUNDED-LOCAL-INSPECTION.md": [],
+    "docs/U6-READ-ONLY-APP-SHELL-CONTRACT.md": [],
+    "docs/U6.4-D-INSTALLER-PREFLIGHT.md": [],
+    "docs/U6.4-E-OFFLINE-INSTALL-SIMULATION.md": [],
+    "docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md": [],
+    "docs/U7-G-QUALITY-BENCHMARK-REPORT.md": [],
+    "docs/U7-H-SYNTHETIC-SESSION-ACCOUNTING-REPORT.md": [],
+    "docs/U7-I-LOCAL-EVIDENCE-PACK.md": [],
+    "docs/U7-J-SYNTHETIC-ECONOMIC-REPORT.md": [],
+    "docs/U7-K-CLI-TOOL-REGISTRY-AUDIT.md": [],
+    "docs/U7-L-PAPER2SLIDES-RESEARCH-BRIEF.md": [],
+    "docs/U7-M-RELEASE-EVIDENCE-DRIFT-AUDIT.md": [],
+    "docs/U7-N-UNIFIED-EVIDENCE-REGISTER.md": [],
+    "docs/U7-O-EVIDENCE-CATALOG.md": [],
+    "docs/U7-P-EVIDENCE-REPRODUCIBILITY.md": [],
+    "docs/U8-A-LIVE-READINESS-DECISION-PACK.md": [],
+    "docs/U8-B-LOCAL-OPERATIONAL-READINESS.md": [],
+    "docs/U8-C-PERMANENT-PAPER-ONLY.md": [],
+    "docs/UNDERSTAND-GRAPH.md": [],
+    "docs/UNDERSTANDING-LOG.md": [],
+    "docs/WEB-STACK-OPTIONS.md": [],
+    "docs/WORKTREE-BASELINE-MANIFEST.json": [],
+    "docs/WORKTREE-BASELINE-REPORT.md": [],
+    "docs/api/contracts.md": [],
+    "docs/decisions/ADR-0001-phase-0.md": [],
+    "docs/decisions/ADR-0002-orchestration-runtime.md": [],
+    "docs/decisions/ADR-0003-openharness-adapter.md": [],
+    "docs/decisions/ADR-0004-openharness-runtime.md": [],
+    "docs/decisions/ADR-0005-openharness-promotion.md": [],
+    "docs/decisions/ADR-0006-openharness-promotion.md": [],
+    "docs/decisions/ADR-0007-openharness-promotion.md": [],
+    "docs/decisions/ADR-0008-openharness-promotion.md": [],
+    "docs/decisions/ADR-0009-openharness-promotion.md": [],
+    "docs/decisions/ADR-0010-final-orchestration-owner.md": [],
+    "docs/decisions/ADR-0011-model-adapter-readiness.md": [],
+    "docs/decisions/ADR-0012-model-adapter-and-ci.md": [],
+    "docs/decisions/ADR-0013-live-model-smoke.md": [],
+    "docs/decisions/ADR-0014-live-smoke-result.md": [],
+    "docs/decisions/ADR-0015-btc-math-first-jev-experiment.md": [],
+    "docs/decisions/ADR-0016-btc-b1-source-storage-policy.md": [],
+    "docs/decisions/ADR-0017-unified-roadmap.md": [],
+    "docs/decisions/ADR-0018-u3-b2-feature-evaluation-contract.md": [],
+    "docs/decisions/ADR-0019-u3-b3-jev-experimental-boundary.md": [],
+    "docs/decisions/ADR-0020-u3-api-connectivity-boundary.md": [],
+    "docs/decisions/ADR-0021-btc-historical-readiness-gate.md": [],
+    "docs/decisions/ADR-0022-b3-1-decision-freeze.md": [],
+    "docs/decisions/ADR-0023-b4-15-shared-portfolio-concurrency.md": [],
+    "docs/decisions/ADR-0024-b4-16-paper-order-lifecycle.md": [],
+    "docs/decisions/ADR-0025-b4-17-retention-archive.md": [],
+    "docs/decisions/ADR-0026-application-surfaces-and-naming.md": [],
+    "docs/decisions/ADR-0027-web-stack-selection.md": [],
+    "docs/decisions/ADR-0028-u5-3-deployment-access-observability.md": [],
+    "docs/decisions/ADR-0029-web-stack-and-auth-gate.md": [],
+    "docs/decisions/ADR-0030-local-portfolio-inspection-surface.md": [],
+    "docs/decisions/ADR-0031-web-stack-and-deployment-selection-matrix.md": [],
+    "docs/decisions/ADR-0032-local-next-operator-web.md": [],
+    "docs/decisions/ADR-0033-u5-9-bounded-local-inspection.md": [],
+    "docs/decisions/ADR-0034-u5-10-bounded-members-reservations.md": [],
+    "docs/decisions/ADR-0035-u5-11-bounded-catalog-legacy-resources.md": [],
+    "docs/decisions/ADR-0036-u5-12-one-pass-audit-paging.md": [],
+    "docs/decisions/ADR-0037-u5-13-streamed-ledger-head.md": [],
+    "docs/decisions/ADR-0038-u5-14-cursor-aware-catalog-sort.md": [],
+    "docs/decisions/ADR-0039-u5-15-next-local-btc-dataset-registry.md": [],
+    "docs/decisions/ADR-0040-u5-16-bounded-btc-candle-detail.md": [],
+    "docs/decisions/ADR-0041-u5-17-bounded-btc-manifest-inspection.md": [],
+    "docs/decisions/ADR-0042-u5-18-bounded-btc-research-inspection.md": [],
+    "docs/decisions/ADR-0043-u5-19-bounded-btc-ingestion-records.md": [],
+    "docs/decisions/ADR-0044-u5-22-bounded-portfolio-equity-history.md": [],
+    "docs/decisions/ADR-0045-u5-5-private-single-tenant-preview.md": [],
+    "docs/decisions/ADR-0046-directadmin-static-market-os-deployment.md": [],
+    "docs/decisions/ADR-0047-b4-18-versioned-schema-migration.md": [],
+    "docs/decisions/ADR-0048-b4-19-local-mutation-capability.md": [],
+    "docs/decisions/ADR-0049-b4-20-read-only-retention-archive-preflight.md": [],
+    "docs/decisions/ADR-0050-u5-5-runtime-identity-contract.md": [],
+    "docs/decisions/ADR-0051-platform-mlops-toolchain.md": [],
+    "docs/decisions/ADR-0052-u6-read-only-app-shell-contract.md": [],
+    "docs/decisions/ADR-0053-u6-native-platform-selection.md": [],
+    "docs/decisions/ADR-0054-u6-4-unsigned-packaging-contract.md": [],
+    "docs/decisions/ADR-0055-u6-4-f-installer-planning.md": [],
+    "docs/decisions/ADR-0056-minirag-btc-evidence-scope.md": [],
+    "docs/decisions/ADR-0057-btc-strict-recorded-availability.md": [],
+    "docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md": [],
+    "docs/decisions/ADR-0059-btc-assessor-runtime-bundles.md": [],
+    "docs/decisions/ADR-0060-btc-local-assessment-store-quota.md": [],
+    "docs/decisions/ADR-0061-btc-windows-appcontainer-cli.md": [],
+    "docs/evidence/FRONTEND-DESIGN-BRIEF.md": [],
+    "docs/evidence/FRONTEND-VERIFICATION-REPORT.md": [],
+    "docs/evidence/app-surfaces.json": [],
+    "docs/evidence/b0-btc-paper-replay.json": [],
+    "docs/evidence/b1-binance-vision-execution-2026-11-18.json": [],
+    "docs/evidence/b1-btc-historical-ingestion.json": [],
+    "docs/evidence/b4-15-shared-portfolio.json": [],
+    "docs/evidence/b4-18-schema-migration-readiness.json": [],
+    "docs/evidence/b4-19-local-mutation-capability-readiness.json": [],
+    "docs/evidence/b4-20-retention-archive-preflight.json": [],
+    "docs/evidence/b4-local-closeout.json": [],
+    "docs/evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json": [],
+    "docs/evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json": [],
+    "docs/evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json": [],
+    "docs/evidence/btc-b2-daily-stability-diagnostic-2026-11-20.json": [],
+    "docs/evidence/btc-b2-temporal-dependence-audit-2026-11-19.json": [],
+    "docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json": [],
+    "docs/evidence/btc-local-artifact-integrity-2026-11-19.json": [],
+    "docs/evidence/btc-local-assessor-current-checkout-health-2026-11-25.json": [],
+    "docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json": [],
+    "docs/evidence/btc-local-assessor-gpu-resource-observation-2026-11-19.json": [],
+    "docs/evidence/btc-local-assessor-os-isolation-2026-11-20.json": [],
+    "docs/evidence/btc-local-assessor-primary-checkout-50m-2026-11-25.json": [],
+    "docs/evidence/btc-local-assessor-process-network-observation-2026-11-19.json": [],
+    "docs/evidence/btc-local-assessor-resource-guard-2026-11-20.json": [],
+    "docs/evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json": [],
+    "docs/evidence/btc-local-assessor-smoke-2026-11-19.json": [],
+    "docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json": [],
+    "docs/evidence/btc-local-assessor-windows-egress-2026-11-21.json": [],
+    "docs/evidence/btc-local-assessor-windows-egress-2026-11-27.json": [],
+    "docs/evidence/btc-minirag-corpus-build-2026-11-18.json": [],
+    "docs/evidence/btc-minirag-post-guard-retrieval-2026-11-19.json": [],
+    "docs/evidence/btc-minirag-retrieval-2026-11-19.json": [],
+    "docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt": [],
+    "docs/evidence/btc-prospective-capture-preflight-2026-11-20.json": [],
+    "docs/evidence/btc-w32time-config-retry-2026-11-26.json": [],
+    "docs/evidence/btc-w32time-observation-50m-2026-11-25.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json": [],
+    "docs/evidence/btc-w32time-observation-50m-retry-2026-11-26.json": [],
+    "docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json": [],
+    "docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json": [],
+    "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json": [],
+    "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json": [],
+    "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-110054.json": [],
+    "docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-114029.json": [],
+    "docs/evidence/btc-w32time-post-resync-observation-2026-11-25.json": [],
+    "docs/evidence/btc-w32time-post-resync-retry-2026-11-25.json": [],
+    "docs/evidence/codebase-stack-understanding.json": [],
+    "docs/evidence/directadmin-static-preview.json": [],
+    "docs/evidence/jev-connectivity-reauthorized-2026-11-19.json": [],
+    "docs/evidence/local-exit-gate.json": [],
+    "docs/evidence/m1.10-openharness-blockers.json": [],
+    "docs/evidence/m1.11-openharness-blockers.json": [],
+    "docs/evidence/m1.12-orchestration-decision.json": [],
+    "docs/evidence/m1.7-openharness-recovery.json": [],
+    "docs/evidence/m1.8-openharness-recovery.json": [],
+    "docs/evidence/m1.9-deployment-validation.json": [],
+    "docs/evidence/m2.1-vibe-trading-adapter.json": [],
+    "docs/evidence/m2.2-cited-retrieval.json": [],
+    "docs/evidence/m2.3-cited-research-synthesis.json": [],
+    "docs/evidence/m2.4-model-gated-summaries.json": [],
+    "docs/evidence/m2.5-research-quality.json": [],
+    "docs/evidence/m2.6-quality-review.json": [],
+    "docs/evidence/m2.7-ci.json": [],
+    "docs/evidence/m2.7-model-adapter.json": [],
+    "docs/evidence/m2.8-live-smoke.json": [],
+    "docs/evidence/m2.9-live-smoke.json": [],
+    "docs/evidence/platform-toolchain-readiness.json": [],
+    "docs/evidence/u3-api-connectivity.json": [],
+    "docs/evidence/u3-b1-btc-historical-readiness.json": [],
+    "docs/evidence/u3-b2-btc-features-baselines.json": [],
+    "docs/evidence/u3-b3-jev-incremental.json": [],
+    "docs/evidence/u5-10-bounded-members-reservations.json": [],
+    "docs/evidence/u5-11-bounded-catalog-legacy-resources.json": [],
+    "docs/evidence/u5-12-one-pass-audit-paging.json": [],
+    "docs/evidence/u5-13-streamed-ledger-head.json": [],
+    "docs/evidence/u5-14-cursor-aware-catalog-sort.json": [],
+    "docs/evidence/u5-15-next-local-btc-dataset-registry.json": [],
+    "docs/evidence/u5-16-next-bounded-btc-candle-detail.json": [],
+    "docs/evidence/u5-17-next-bounded-btc-ingestion-manifests.json": [],
+    "docs/evidence/u5-18-next-bounded-btc-research-inspection.json": [],
+    "docs/evidence/u5-19-next-bounded-btc-ingestion-records.json": [],
+    "docs/evidence/u5-2-static-deployment.json": [],
+    "docs/evidence/u5-20-local-operator-overview.json": [],
+    "docs/evidence/u5-21-bounded-btc-candle-visualization.json": [],
+    "docs/evidence/u5-22-bounded-portfolio-equity-history.json": [],
+    "docs/evidence/u5-23-responsive-operator-navigation.json": [],
+    "docs/evidence/u5-24-mobile-gateway-status.json": [],
+    "docs/evidence/u5-3-deployment-access-observability.json": [],
+    "docs/evidence/u5-4-local-operator-shell.json": [],
+    "docs/evidence/u5-5-connected-browser-smoke.json": [],
+    "docs/evidence/u5-5-promotion-evidence.json": [],
+    "docs/evidence/u5-5-stack-runtime-review.json": [],
+    "docs/evidence/u5-5-web-stack-auth-gate.json": [],
+    "docs/evidence/u5-6-local-portfolio-inspection.json": [],
+    "docs/evidence/u5-7-web-stack-deployment-matrix.json": [],
+    "docs/evidence/u5-8-next-local-operator-web.json": [],
+    "docs/evidence/u5-9-bounded-local-inspection.json": [],
+    "docs/evidence/u5-local-acceptance.json": [],
+    "docs/evidence/u6-4-f-hosted-installation.json": [],
+    "docs/evidence/u6-4-f-installation-contract.json": [],
+    "docs/evidence/u6-4-install-preflight.json": [],
+    "docs/evidence/u6-4-install-preflight.md": [],
+    "docs/evidence/u6-4-install-simulation.json": [],
+    "docs/evidence/u6-4-install-simulation.md": [],
+    "docs/evidence/u6-4-release-contract.json": [],
+    "docs/evidence/u6-4-release-hardening.json": [],
+    "docs/evidence/u6-4-unsigned-artifact.json": [],
+    "docs/evidence/u6-cli-btc-history-catalog.json": [],
+    "docs/evidence/u6-cli-btc-history-manifests.json": [],
+    "docs/evidence/u6-cli-btc-research-catalog.json": [],
+    "docs/evidence/u6-cli-btc-research-detail.json": [],
+    "docs/evidence/u6-electron-shell.json": [],
+    "docs/evidence/u6-native-platform-selection.json": [],
+    "docs/evidence/u6-read-only-app-shell-contract.json": [],
+    "docs/evidence/u7-d-portable-archive-index.json": [],
+    "docs/evidence/u7-e-cross-target-release-catalog.json": [],
+    "docs/evidence/u7-f-cross-target-release-catalog-report.json": [],
+    "docs/evidence/u7-g-quality-benchmark-report.json": [],
+    "docs/evidence/u7-h-synthetic-session-accounting-report.json": [],
+    "docs/evidence/u7-i-local-evidence-pack.json": [],
+    "docs/evidence/u7-j-synthetic-economic-report.json": [],
+    "docs/evidence/u7-j-synthetic-economic-report.md": [],
+    "docs/evidence/u7-k-cli-tool-registry-report.json": [],
+    "docs/evidence/u7-k-cli-tool-registry-report.md": [],
+    "docs/evidence/u7-l-research-brief-evidence.json": [],
+    "docs/evidence/u7-l-research-brief.md": [],
+    "docs/evidence/u7-m-release-evidence-drift.json": [],
+    "docs/evidence/u7-m-release-evidence-drift.md": [],
+    "docs/evidence/u7-n-unified-evidence-register.json": [],
+    "docs/evidence/u7-n-unified-evidence-register.md": [],
+    "docs/evidence/u7-o-evidence-catalog.json": [],
+    "docs/evidence/u7-o-evidence-catalog.md": [],
+    "docs/evidence/u7-p-evidence-reproducibility.json": [],
+    "docs/evidence/u7-p-evidence-reproducibility.md": [],
+    "docs/evidence/u8-a-live-readiness-decision.json": [],
+    "docs/evidence/u8-a-live-readiness-decision.md": [],
+    "docs/evidence/u8-b-local-operational-readiness.json": [],
+    "docs/evidence/u8-b-local-operational-readiness.md": [],
+    "docs/evidence/u8-c-permanent-paper-only.json": [],
+    "docs/evidence/u8-c-permanent-paper-only.md": [],
+    "docs/hosting/market-os/.htaccess": [],
+    "docs/hosting/market-os/DEPLOYMENT.txt": [],
+    "docs/hosting/market-os/index.html": [],
+    "docs/research/U6-NATIVE-PLATFORM-OPTIONS.md": [],
+    "docs/research/binance-public-spot-market-data-2026-10-21.md": [],
+    "docs/research/btc-assessor-vram-budgeting-2026-11-25.md": [],
+    "docs/research/btc-local-assessor-50m-observation-2026-11-25.md": [],
+    "docs/research/btc-local-assessor-os-isolation-2026-11-20.md": [],
+    "docs/research/btc-local-assessor-os-isolation-2026-11-21.md": [],
+    "docs/research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md": [],
+    "docs/research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md": [],
+    "docs/research/btc-local-assessor-windows-egress-2026-11-27.md": [],
+    "docs/research/btc-utc-clock-error-bound.md": [],
+    "docs/research/btc-utc-clock-source-qualification-2026-11-27.md": [],
+    "docs/research/jev-local-runtime-availability-2026-11-25.md": [],
+    "docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md": [],
+    "docs/research/typesafe-jev-local-runtime-2026-11-20.md": [],
+    "docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md": [],
+    "docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md": [],
+    "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md": [],
+    "docs/research/typesafe-jev-u3-b3.md": [],
+    "docs/research/u5-5-connected-web-options-2026-10-29.md": [],
+    "docs/runtime-benchmark.md": [],
+    "market_os/__init__.py": [
+      "market_os/workflow.py"
+    ],
+    "market_os/accounting.py": [
+      "market_os/strategy_replay.py"
+    ],
+    "market_os/adapters/__init__.py": [],
+    "market_os/adapters/lightrag.py": [
+      "market_os/contracts.py",
+      "market_os/providers.py"
+    ],
+    "market_os/adapters/minirag.py": [
+      "market_os/providers.py"
+    ],
+    "market_os/adapters/openai_summary.py": [
+      "market_os/model_summary.py",
+      "market_os/research.py"
+    ],
+    "market_os/adapters/vibe_trading.py": [
+      "market_os/contracts.py",
+      "market_os/providers.py"
+    ],
+    "market_os/api.py": [
+      "market_os/contracts.py",
+      "market_os/metrics.py",
+      "market_os/u55_access.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/b310_synthetic_server.py": [],
+    "market_os/b311_synthetic_catalog.py": [],
+    "market_os/b31_offline.py": [],
+    "market_os/b31_synthetic_audit.py": [],
+    "market_os/b31_synthetic_bundle.py": [],
+    "market_os/b31_synthetic_reporting.py": [],
+    "market_os/b31_synthetic_runner.py": [],
+    "market_os/b34_strategy.py": [],
+    "market_os/b35_strategy_replay.py": [],
+    "market_os/b36_accounting.py": [],
+    "market_os/b38_synthetic_session.py": [],
+    "market_os/b39_synthetic_api.py": [],
+    "market_os/b411_backup.py": [],
+    "market_os/b412_migration.py": [],
+    "market_os/b41_broker.py": [],
+    "market_os/btc_assessor_firewall.ps1": [],
+    "market_os/btc_assessor_linux_isolation.py": [],
+    "market_os/btc_assessor_python_runtime.py": [],
+    "market_os/btc_assessor_windows_appcontainer.py": [],
+    "market_os/btc_b2.py": [],
+    "market_os/btc_b3.py": [],
+    "market_os/btc_b31.py": [],
+    "market_os/btc_clock.py": [],
+    "market_os/btc_connectivity.py": [
+      "market_os/btc_history.py",
+      "market_os/btc_paper.py"
+    ],
+    "market_os/btc_evidence_packet.py": [
+      "market_os/btc_features.py",
+      "market_os/btc_question_evaluation.py",
+      "market_os/providers.py"
+    ],
+    "market_os/btc_features.py": [
+      "market_os/btc_history.py"
+    ],
+    "market_os/btc_history.py": [
+      "market_os/btc_paper.py",
+      "market_os/contracts.py"
+    ],
+    "market_os/btc_jev_evaluation.py": [
+      "market_os/btc_features.py",
+      "market_os/btc_history.py"
+    ],
+    "market_os/btc_local_assessor.py": [
+      "market_os/btc_assessor_python_runtime.py",
+      "market_os/btc_question_evaluation.py"
+    ],
+    "market_os/btc_local_assessor_store.py": [
+      "market_os/btc_evidence_packet.py",
+      "market_os/btc_local_assessor.py"
+    ],
+    "market_os/btc_paper.py": [
+      "market_os/contracts.py"
+    ],
+    "market_os/btc_question_evaluation.py": [],
+    "market_os/btc_realtime_capture.py": [
+      "market_os/btc_clock.py",
+      "market_os/btc_connectivity.py",
+      "market_os/btc_history.py"
+    ],
+    "market_os/btc_research_inspection.py": [],
+    "market_os/btc_source_corpus.py": [
+      "market_os/btc_evidence_packet.py",
+      "market_os/btc_history.py",
+      "market_os/providers.py"
+    ],
+    "market_os/cli.py": [
+      "market_os/api.py",
+      "market_os/metrics.py",
+      "market_os/store.py",
+      "market_os/u55_access.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/contracts.py": [],
+    "market_os/deployment/__init__.py": [
+      "market_os/deployment/wrapper.py"
+    ],
+    "market_os/deployment/wrapper.py": [],
+    "market_os/deployment_probe.py": [
+      "market_os/api.py",
+      "market_os/contracts.py",
+      "market_os/deployment/wrapper.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/evaluation_protocol.py": [],
+    "market_os/evidence_pack.py": [],
+    "market_os/local_mutation.py": [
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/metrics.py": [],
+    "market_os/model_summary.py": [
+      "market_os/research.py"
+    ],
+    "market_os/models/btc_assessor_python_runtime.lock.json": [],
+    "market_os/models/btc_local_assessor_runtime.lock.json": [],
+    "market_os/orchestration/__init__.py": [],
+    "market_os/orchestration/openharness_adapter.py": [
+      "market_os/contracts.py",
+      "market_os/providers.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/orchestration/openharness_probe.py": [
+      "market_os/contracts.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/orchestration/openharness_recovery_probe.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/orchestration/parity.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/orchestration/recovery.py",
+      "market_os/providers.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/orchestration/protocol.py": [
+      "market_os/contracts.py"
+    ],
+    "market_os/orchestration/recovery.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/paper_venue.py": [],
+    "market_os/portfolio_backup.py": [
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/portfolio_broker.py": [
+      "market_os/paper_venue.py"
+    ],
+    "market_os/portfolio_migration.py": [
+      "market_os/portfolio_backup.py",
+      "market_os/portfolio_broker.py",
+      "market_os/schema_migration.py"
+    ],
+    "market_os/provider_selection.py": [
+      "market_os/adapters/lightrag.py",
+      "market_os/adapters/vibe_trading.py",
+      "market_os/model_summary.py",
+      "market_os/providers.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/providers.py": [
+      "market_os/contracts.py"
+    ],
+    "market_os/quality_benchmark.py": [
+      "market_os/model_summary.py",
+      "market_os/providers.py",
+      "market_os/research.py"
+    ],
+    "market_os/quality_report.py": [
+      "market_os/quality_benchmark.py"
+    ],
+    "market_os/research.py": [
+      "market_os/providers.py"
+    ],
+    "market_os/research_brief.py": [
+      "market_os/research.py"
+    ],
+    "market_os/schema_migration.py": [
+      "market_os/portfolio_backup.py",
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/store.py": [
+      "market_os/contracts.py"
+    ],
+    "market_os/strategy.py": [
+      "market_os/paper_venue.py"
+    ],
+    "market_os/strategy_replay.py": [
+      "market_os/paper_venue.py",
+      "market_os/strategy.py",
+      "market_os/synthetic_replay.py"
+    ],
+    "market_os/synthetic_artifacts.py": [
+      "market_os/synthetic_evaluation.py",
+      "market_os/synthetic_reporting.py"
+    ],
+    "market_os/synthetic_audit.py": [
+      "market_os/synthetic_artifacts.py"
+    ],
+    "market_os/synthetic_catalog.py": [
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/synthetic_economic_report.py": [],
+    "market_os/synthetic_evaluation.py": [
+      "market_os/btc_question_evaluation.py",
+      "market_os/evaluation_protocol.py"
+    ],
+    "market_os/synthetic_replay.py": [
+      "market_os/paper_venue.py"
+    ],
+    "market_os/synthetic_reporting.py": [
+      "market_os/evaluation_protocol.py",
+      "market_os/synthetic_evaluation.py"
+    ],
+    "market_os/synthetic_server.py": [
+      "market_os/synthetic_catalog.py",
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/synthetic_session.py": [
+      "market_os/accounting.py",
+      "market_os/paper_venue.py",
+      "market_os/strategy.py",
+      "market_os/strategy_replay.py"
+    ],
+    "market_os/synthetic_session_api.py": [
+      "market_os/accounting.py",
+      "market_os/strategy_replay.py"
+    ],
+    "market_os/synthetic_session_report.py": [
+      "market_os/accounting.py",
+      "market_os/strategy_replay.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/tests/fixtures/b38/synthetic_session.json": [],
+    "market_os/tests/fixtures/btc_b3/recorded_responses.json": [],
+    "market_os/tests/fixtures/btc_b31/recorded_assessments.json": [],
+    "market_os/tests/fixtures/btc_connectivity/jev_cases.json": [],
+    "market_os/tests/fixtures/btc_connectivity/jev_request.json": [],
+    "market_os/tests/fixtures/btc_connectivity/jev_response.json": [],
+    "market_os/tests/fixtures/btc_connectivity/klines.json": [],
+    "market_os/tests/fixtures/btc_connectivity/ticker.json": [],
+    "market_os/tests/fixtures/btc_paper/history.json": [],
+    "market_os/tests/fixtures/btc_paper/replay.json": [],
+    "market_os/tests/fixtures/contracts/artifact.json": [],
+    "market_os/tests/fixtures/contracts/backtest_result.json": [],
+    "market_os/tests/fixtures/contracts/evidence.json": [],
+    "market_os/tests/fixtures/contracts/order.json": [],
+    "market_os/tests/fixtures/contracts/order_negative.json": [],
+    "market_os/tests/fixtures/contracts/order_plan.json": [],
+    "market_os/tests/fixtures/contracts/order_plan_live.json": [],
+    "market_os/tests/fixtures/contracts/research_result.json": [],
+    "market_os/tests/fixtures/contracts/risk_decision.json": [],
+    "market_os/tests/fixtures/contracts/risk_missing_reason.json": [],
+    "market_os/tests/fixtures/contracts/run.json": [],
+    "market_os/tests/fixtures/contracts/run_bad_status.json": [],
+    "market_os/tests/fixtures/contracts/run_event.json": [],
+    "market_os/tests/fixtures/contracts/run_event_bad_cost.json": [],
+    "market_os/tests/fixtures/contracts/task.json": [],
+    "market_os/tests/fixtures/contracts/task_bad_symbol.json": [],
+    "market_os/tests/fixtures/contracts/task_bad_version.json": [],
+    "market_os/tests/fixtures/contracts/task_live.json": [],
+    "market_os/tests/fixtures/contracts/task_missing_id.json": [],
+    "market_os/tests/fixtures/contracts/task_naive_timestamp.json": [],
+    "market_os/tests/fixtures/economic/u7_j_synthetic_economic.json": [],
+    "market_os/tests/fixtures/lightrag/corpus.json": [],
+    "market_os/tests/fixtures/model_summary/openai_responses.json": [],
+    "market_os/tests/fixtures/quality/benchmark.json": [],
+    "market_os/tests/fixtures/research/u7_l_cited_research.json": [],
+    "market_os/tests/fixtures/tools/u7_k_cli_anything_registry.json": [],
+    "market_os/tests/fixtures/vibe_trading/etf_ohlcv.json": [],
+    "market_os/tests/provider_runtimes.py": [],
+    "market_os/tests/test_accounting.py": [
+      "market_os/accounting.py",
+      "market_os/paper_venue.py",
+      "market_os/strategy.py",
+      "market_os/strategy_replay.py"
+    ],
+    "market_os/tests/test_app_surfaces.py": [],
+    "market_os/tests/test_btc_assessor_linux_isolation.py": [
+      "market_os/btc_assessor_linux_isolation.py"
+    ],
+    "market_os/tests/test_btc_assessor_python_runtime.py": [
+      "market_os/btc_assessor_python_runtime.py"
+    ],
+    "market_os/tests/test_btc_clock.py": [
+      "market_os/__init__.py",
+      "market_os/btc_clock.py"
+    ],
+    "market_os/tests/test_btc_connectivity.py": [
+      "market_os/api.py",
+      "market_os/btc_connectivity.py",
+      "market_os/cli.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_btc_features.py": [
+      "market_os/api.py",
+      "market_os/btc_features.py",
+      "market_os/btc_history.py",
+      "market_os/cli.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_btc_history.py": [
+      "market_os/__init__.py",
+      "market_os/api.py",
+      "market_os/btc_history.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_btc_jev_evaluation.py": [
+      "market_os/api.py",
+      "market_os/btc_features.py",
+      "market_os/btc_history.py",
+      "market_os/btc_jev_evaluation.py",
+      "market_os/cli.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_btc_local_assessor.py": [
+      "market_os/__init__.py",
+      "market_os/btc_assessor_windows_appcontainer.py",
+      "market_os/btc_evidence_packet.py",
+      "market_os/btc_features.py",
+      "market_os/btc_local_assessor.py",
+      "market_os/btc_local_assessor_store.py",
+      "market_os/btc_question_evaluation.py",
+      "market_os/providers.py"
+    ],
+    "market_os/tests/test_btc_paper.py": [
+      "market_os/btc_paper.py",
+      "market_os/contracts.py"
+    ],
+    "market_os/tests/test_btc_paper_cli.py": [
+      "market_os/cli.py"
+    ],
+    "market_os/tests/test_btc_question_evaluation.py": [
+      "market_os/btc_question_evaluation.py"
+    ],
+    "market_os/tests/test_btc_realtime_capture.py": [
+      "market_os/__init__.py",
+      "market_os/btc_paper.py",
+      "market_os/btc_realtime_capture.py"
+    ],
+    "market_os/tests/test_btc_research_inspection.py": [
+      "market_os/api.py",
+      "market_os/btc_features.py",
+      "market_os/btc_history.py",
+      "market_os/btc_jev_evaluation.py",
+      "market_os/btc_research_inspection.py",
+      "market_os/cli.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_cited_research.py": [
+      "market_os/__init__.py",
+      "market_os/api.py",
+      "market_os/cli.py",
+      "market_os/contracts.py",
+      "market_os/providers.py",
+      "market_os/research.py",
+      "market_os/research_brief.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_contracts.py": [
+      "market_os/contracts.py"
+    ],
+    "market_os/tests/test_deployment_probe.py": [
+      "market_os/deployment_probe.py"
+    ],
+    "market_os/tests/test_deployment_wrapper.py": [
+      "market_os/deployment/wrapper.py"
+    ],
+    "market_os/tests/test_evaluation_protocol.py": [
+      "market_os/evaluation_protocol.py"
+    ],
+    "market_os/tests/test_evidence_pack.py": [
+      "market_os/evidence_pack.py"
+    ],
+    "market_os/tests/test_lightrag_adapter.py": [
+      "market_os/__init__.py",
+      "market_os/adapters/lightrag.py",
+      "market_os/api.py",
+      "market_os/cli.py",
+      "market_os/provider_selection.py",
+      "market_os/providers.py",
+      "market_os/store.py",
+      "market_os/tests/provider_runtimes.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_live_smoke.py": [],
+    "market_os/tests/test_local_mutation.py": [
+      "market_os/local_mutation.py",
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/tests/test_metrics.py": [
+      "market_os/api.py",
+      "market_os/metrics.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_model_summary.py": [
+      "market_os/__init__.py",
+      "market_os/api.py",
+      "market_os/cli.py",
+      "market_os/model_summary.py",
+      "market_os/provider_selection.py",
+      "market_os/providers.py",
+      "market_os/research.py",
+      "market_os/store.py",
+      "market_os/tests/provider_runtimes.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_openai_summary_adapter.py": [
+      "market_os/model_summary.py",
+      "market_os/provider_selection.py",
+      "market_os/store.py",
+      "market_os/tests/test_model_summary.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_openharness_coordination.py": [
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/orchestration/recovery.py"
+    ],
+    "market_os/tests/test_openharness_recovery.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/orchestration/recovery.py",
+      "market_os/store.py"
+    ],
+    "market_os/tests/test_openharness_runtime.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/orchestration/parity.py"
+    ],
+    "market_os/tests/test_operator_surface.py": [
+      "market_os/api.py",
+      "market_os/btc_history.py",
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py",
+      "market_os/store.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_orchestration_parity.py": [
+      "market_os/contracts.py",
+      "market_os/orchestration/openharness_adapter.py",
+      "market_os/orchestration/parity.py",
+      "market_os/store.py"
+    ],
+    "market_os/tests/test_paper_venue.py": [
+      "market_os/paper_venue.py"
+    ],
+    "market_os/tests/test_portfolio_backup.py": [
+      "market_os/portfolio_backup.py",
+      "market_os/portfolio_broker.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/tests/test_portfolio_shared.py"
+    ],
+    "market_os/tests/test_portfolio_broker.py": [
+      "market_os/api.py",
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_portfolio_concurrency.py": [
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py",
+      "market_os/tests/test_portfolio_broker.py"
+    ],
+    "market_os/tests/test_portfolio_lifecycle.py": [
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/tests/test_portfolio_migration.py": [
+      "market_os/portfolio_broker.py",
+      "market_os/portfolio_migration.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/tests/test_portfolio_shared.py"
+    ],
+    "market_os/tests/test_portfolio_mutation.py": [
+      "market_os/portfolio_broker.py",
+      "market_os/tests/test_portfolio_broker.py"
+    ],
+    "market_os/tests/test_portfolio_shared.py": [
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py"
+    ],
+    "market_os/tests/test_provider_contracts.py": [
+      "market_os/providers.py"
+    ],
+    "market_os/tests/test_quality_benchmark.py": [
+      "market_os/__init__.py",
+      "market_os/api.py",
+      "market_os/cli.py",
+      "market_os/quality_benchmark.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_quality_report.py": [
+      "market_os/__init__.py",
+      "market_os/cli.py",
+      "market_os/quality_benchmark.py",
+      "market_os/quality_report.py"
+    ],
+    "market_os/tests/test_schema_migration.py": [
+      "market_os/paper_venue.py",
+      "market_os/portfolio_broker.py",
+      "market_os/schema_migration.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/tests/test_portfolio_shared.py"
+    ],
+    "market_os/tests/test_strategy.py": [
+      "market_os/paper_venue.py",
+      "market_os/strategy.py"
+    ],
+    "market_os/tests/test_strategy_replay.py": [
+      "market_os/paper_venue.py",
+      "market_os/strategy.py",
+      "market_os/strategy_replay.py"
+    ],
+    "market_os/tests/test_synthetic_acceptance.py": [
+      "market_os/synthetic_server.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/tests/test_synthetic_artifacts.py": [
+      "market_os/evaluation_protocol.py",
+      "market_os/synthetic_artifacts.py",
+      "market_os/synthetic_evaluation.py",
+      "market_os/synthetic_reporting.py"
+    ],
+    "market_os/tests/test_synthetic_audit.py": [
+      "market_os/synthetic_artifacts.py",
+      "market_os/synthetic_audit.py",
+      "market_os/tests/test_synthetic_artifacts.py"
+    ],
+    "market_os/tests/test_synthetic_catalog.py": [
+      "market_os/synthetic_catalog.py",
+      "market_os/synthetic_server.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/tests/test_synthetic_cli.py": [
+      "market_os/synthetic_session.py"
+    ],
+    "market_os/tests/test_synthetic_economic_report.py": [
+      "market_os/__init__.py",
+      "market_os/cli.py",
+      "market_os/synthetic_economic_report.py"
+    ],
+    "market_os/tests/test_synthetic_evaluation.py": [
+      "market_os/evaluation_protocol.py",
+      "market_os/synthetic_evaluation.py"
+    ],
+    "market_os/tests/test_synthetic_replay.py": [
+      "market_os/paper_venue.py",
+      "market_os/synthetic_replay.py"
+    ],
+    "market_os/tests/test_synthetic_reporting.py": [
+      "market_os/synthetic_evaluation.py",
+      "market_os/synthetic_reporting.py"
+    ],
+    "market_os/tests/test_synthetic_server.py": [
+      "market_os/synthetic_server.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py"
+    ],
+    "market_os/tests/test_synthetic_session.py": [
+      "market_os/paper_venue.py",
+      "market_os/strategy.py",
+      "market_os/strategy_replay.py",
+      "market_os/synthetic_session.py"
+    ],
+    "market_os/tests/test_synthetic_session_api.py": [
+      "market_os/api.py",
+      "market_os/store.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_synthetic_session_report.py": [
+      "market_os/__init__.py",
+      "market_os/cli.py",
+      "market_os/synthetic_session.py",
+      "market_os/synthetic_session_api.py",
+      "market_os/synthetic_session_report.py"
+    ],
+    "market_os/tests/test_tool_registry_report.py": [
+      "market_os/__init__.py",
+      "market_os/cli.py",
+      "market_os/tool_registry_report.py"
+    ],
+    "market_os/tests/test_u55_access.py": [
+      "market_os/api.py",
+      "market_os/portfolio_broker.py",
+      "market_os/store.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/u55_access.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_u5_local_acceptance.py": [
+      "market_os/api.py",
+      "market_os/portfolio_broker.py",
+      "market_os/store.py",
+      "market_os/tests/test_portfolio_broker.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_u7_evidence_catalog.py": [
+      "market_os/research_brief.py",
+      "market_os/synthetic_economic_report.py",
+      "market_os/tool_registry_report.py",
+      "market_os/u7_evidence_catalog.py"
+    ],
+    "market_os/tests/test_u7_evidence_register.py": [
+      "market_os/u7_evidence_register.py"
+    ],
+    "market_os/tests/test_u7_evidence_reproducibility.py": [
+      "market_os/cli.py",
+      "market_os/u7_evidence_reproducibility.py"
+    ],
+    "market_os/tests/test_u8a_readiness.py": [
+      "market_os/u8a_readiness.py"
+    ],
+    "market_os/tests/test_u8b_operations.py": [
+      "market_os/u8b_operations.py"
+    ],
+    "market_os/tests/test_u8c_paper_mode.py": [
+      "market_os/u8c_paper_mode.py"
+    ],
+    "market_os/tests/test_vibe_trading_adapter.py": [
+      "market_os/__init__.py",
+      "market_os/adapters/vibe_trading.py",
+      "market_os/api.py",
+      "market_os/cli.py",
+      "market_os/provider_selection.py",
+      "market_os/providers.py",
+      "market_os/store.py",
+      "market_os/tests/provider_runtimes.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tests/test_workflow.py": [
+      "market_os/api.py",
+      "market_os/contracts.py",
+      "market_os/providers.py",
+      "market_os/store.py",
+      "market_os/workflow.py"
+    ],
+    "market_os/tool_registry_report.py": [],
+    "market_os/u55_access.py": [],
+    "market_os/u7_evidence_catalog.py": [],
+    "market_os/u7_evidence_register.py": [],
+    "market_os/u7_evidence_reproducibility.py": [
+      "market_os/research_brief.py",
+      "market_os/synthetic_economic_report.py",
+      "market_os/tool_registry_report.py",
+      "market_os/u7_evidence_catalog.py",
+      "market_os/u7_evidence_register.py"
+    ],
+    "market_os/u8a_readiness.py": [],
+    "market_os/u8b_operations.py": [
+      "market_os/u8a_readiness.py"
+    ],
+    "market_os/u8c_paper_mode.py": [
+      "market_os/u8a_readiness.py"
+    ],
+    "market_os/workflow.py": [
+      "market_os/contracts.py",
+      "market_os/model_summary.py",
+      "market_os/providers.py",
+      "market_os/research.py",
+      "market_os/research_brief.py",
+      "market_os/store.py"
+    ],
+    "mlops/README.md": [],
+    "mlops/experiment-manifest.example.json": [],
+    "mlops/validate_manifest.py": [],
+    "observability/README.md": [],
+    "observability/grafana/provisioning/datasources/datasources.yml": [],
+    "observability/loki/loki-config.yml": [],
+    "observability/prometheus/prometheus.yml": [],
+    "observability/promtail/promtail-config.yml": [],
+    "pyproject.toml": [],
+    "scripts/bootstrap_btc_local_assessor.py": [],
+    "scripts/btc_b2_daily_stability.py": [],
+    "scripts/build_web_artifact.py": [],
+    "scripts/ci_checks.py": [],
+    "scripts/deploy_market_os_directadmin.sh": [],
+    "scripts/m2_8_live_smoke.py": [
+      "market_os/adapters/openai_summary.py",
+      "market_os/model_summary.py",
+      "market_os/providers.py",
+      "market_os/research.py"
+    ],
+    "tests/market-os-readonly-dashboard.test.ts": [],
+    "tests/market-os-u6-4-artifact.test.ts": [],
+    "tests/market-os-u6-app-shell.test.ts": [],
+    "tests/market-os-u6-electron-shell.test.ts": [],
+    "tests/market-os-u6-native-platform-selection.test.ts": []
+  },
+  "contentDigest": "bfe084d500b560e6a4797262b9a940b0c9dedf46be98e6db14ac01ace07cdc45"
+}

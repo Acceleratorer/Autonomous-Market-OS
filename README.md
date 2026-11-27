@@ -169,3 +169,7 @@ deployment and authenticated access remain separate gates.
 - [Security policy](SECURITY.md)
 - [MIT License](LICENSE)
 - [DevOps runbook](docs/DEVOPS-RUNBOOK.md)
+
+## Shared codebase knowledge graph
+
+The repository tracks the Understand Anything snapshot at [`.ua/knowledge-graph.json`](.ua/knowledge-graph.json), so contributors can explore the same code, architecture layers, and guided tour. The small supporting baseline files make future graph refreshes incremental. See [the graph collaboration guide](docs/UNDERSTAND-GRAPH.md) for viewing and updating it.
