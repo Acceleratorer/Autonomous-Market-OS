@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-27T22:06:24.551Z",
-    "gitCommitHash": "9b4cfc1b2c2fd17ccada1c0181c1648f39365f17"
+    "analyzedAt": "2026-11-27T22:13:20.574Z",
+    "gitCommitHash": "cb563f8e4b13382eb9e8278699d3044aef97361d"
   },
   "nodes": [
     {
@@ -39133,36 +39133,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "document",
-      "name": "NEXT-WORK-HANDOFF.md",
-      "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the fresh hosted connectivity probe, local assessor status, unresolved local Jev gate, and the next prospective-data action.",
-      "tags": [
-        "documentation",
-        "handoff",
-        "btc-evidence",
-        "jev",
-        "collaboration"
-      ],
-      "complexity": "complex"
-    },
-    {
-      "id": "document:docs/UNDERSTANDING-LOG.md",
-      "type": "document",
-      "name": "UNDERSTANDING-LOG.md",
-      "filePath": "docs/UNDERSTANDING-LOG.md",
-      "summary": "Append-only project history recording parser fixes, hosted Jev probes, replay evidence, knowledge maintenance, and unresolved quantitative and deployment gates.",
-      "tags": [
-        "documentation",
-        "history",
-        "evidence",
-        "jev",
-        "knowledge-maintenance"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json",
       "type": "config",
       "name": "jev-hosted-synthetic-connectivity-2026-11-28.json",
@@ -39319,6 +39289,36 @@
         "knowledge-graph"
       ],
       "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "document",
+      "name": "NEXT-WORK-HANDOFF.md",
+      "filePath": "docs/NEXT-WORK-HANDOFF.md",
+      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the fresh hosted connectivity probe, local assessor status, unresolved local Jev gate, and the next prospective-data action.",
+      "tags": [
+        "documentation",
+        "handoff",
+        "btc-evidence",
+        "jev",
+        "collaboration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/UNDERSTANDING-LOG.md",
+      "type": "document",
+      "name": "UNDERSTANDING-LOG.md",
+      "filePath": "docs/UNDERSTANDING-LOG.md",
+      "summary": "Append-only project history recording parser fixes, hosted Jev probes, replay evidence, knowledge maintenance, and unresolved quantitative and deployment gates.",
+      "tags": [
+        "documentation",
+        "history",
+        "evidence",
+        "jev",
+        "knowledge-maintenance"
+      ],
+      "complexity": "complex"
     }
   ],
   "edges": [
