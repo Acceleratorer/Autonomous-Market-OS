@@ -1,0 +1,39 @@
+{
+  "schema": "market-os.btc-w32time-observation-attempt.v1",
+  "recorded_on": "2026-11-27",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "attempt": {
+    "id": "w32time-passive-observation-20261127-085131",
+    "status": "cancelled_before_child_start",
+    "requested_duration_seconds": 3000,
+    "sample_interval_seconds": 30,
+    "sample_count": 0,
+    "elevation_result": "Windows reported that the UAC launch was canceled.",
+    "result_file_persisted": false,
+    "progress_file_persisted": false
+  },
+  "actions": {
+    "observer_child_started": false,
+    "w32time_service_changed": false,
+    "system_clock_adjusted": false,
+    "time_service_configuration_changed": false,
+    "resync_performed": false,
+    "btc_market_data_requests": 0,
+    "typesafe_jev_requests": 0,
+    "model_provider_requests": 0,
+    "normal_w32time_traffic_measured": false
+  },
+  "local_artifact": {
+    "runner_path": ".market_os/clock/w32time-passive-observation-20261127-085131.ps1",
+    "runner_sha256": "801DE4F3F10E3EEADB7616562BA30359ACEF76A9B23B9DD57BF359D3819C69C8",
+    "result_path": ".market_os/clock/w32time-passive-observation-20261127-085131.json",
+    "result_present": false,
+    "progress_path": ".market_os/clock/w32time-passive-observation-20261127-085131.progress.json",
+    "progress_present": false
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "No observation process started, so this attempt supplies no synchronization or clock-bound evidence."
+  }
+}

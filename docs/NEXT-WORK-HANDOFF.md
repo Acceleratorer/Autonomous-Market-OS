@@ -29,13 +29,22 @@ The owner-requested W32Time 50-minute retry was attempted again at about
 There were zero samples, no result/progress file, and no service, registry,
 clock, or time-configuration change. See
 [the canceled-attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json).
-No new UTC bound was established; keep `clock_error_bound_ms` null and B3.1
-ineligible. BTC packets remain local, and authentic Jev local runtime remains
-unverified.
+The later `09:32 +07:00` elevated retry was also canceled before its child
+started; see its [attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json).
+An unprivileged status-only observer completed from `09:36` to `10:26 +07:00`
+with 100/100 successful status samples. Relative wall/monotonic offset change
+was at most `26.131 ms`, but W32Time reported a newer successful sync and the
+final conditional root-distance estimate was `7.8334786 s`. This does not
+establish a capture-time UTC error bound; keep `clock_error_bound_ms` null and
+B3.1 ineligible. See the
+[sanitized observation evidence](evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json).
+BTC packets remain local, and authentic Jev local runtime remains unverified.
 
-Next: finish code review and CI for this branch; verify Linux isolation on an
-intended Linux host; keep the strict clock qualification gate open. Do not
-reintroduce the old loopback Windows server or firewall-metadata claim.
+PR #109 carries the AppContainer runtime and the clock-evidence follow-up.
+Merge it only after every workflow passes for the current PR head, then delete
+the feature branch. Follow-on gates remain Linux isolation on the intended
+target host and clock qualification; do not reintroduce the old loopback
+Windows server or firewall-metadata claim.
 
 ### Historical Windows egress contradiction — 2026-11-27
 

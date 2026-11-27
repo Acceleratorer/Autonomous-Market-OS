@@ -33,6 +33,26 @@ Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
   evidence. Keep `clock_error_bound_ms` unknown and B3.1 ineligible. See the
   [attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json).
 
+## 2026-11-27 — UAC retry canceled; status-only clock observation completed
+
+- The requested elevated retry around `09:32 +07:00` returned the Windows
+  operation-canceled error before the child process started. It produced no
+  samples and made no W32Time or clock changes. See the
+  [canceled-attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json).
+- An unprivileged status-only observer then ran from `09:36:22` to `10:26:22
+  +07:00`, omitting the elevated configuration query. It recorded 100/100
+  successful local status queries. W32Time remained `Running/Manual`; the
+  sampled monotonic span was `2,969.977 s`, maximum relative wall/monotonic
+  offset change was `26.131 ms`, and maximum adjacent interval difference was
+  `2.497 ms`. One Time-Service event ID 37 and a newer successful-sync time
+  were reported during the window.
+- The final conditional NTP distance estimate was `7.8334786 s`, including
+  `7.8126761 s` root dispersion. The effective configuration and source
+  accuracy remain unknown; relative clock stability is not a UTC bound. Keep
+  `clock_error_bound_ms` null and B3.1 ineligible. No BTC, Jev, or model
+  provider request, resync, or clock/configuration change was made. See the
+  [sanitized observation evidence](evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json).
+
 ## 2026-11-27 — W32Time configuration fallback
 
 - The owner retried the elevated, read-only `w32tm /query /configuration`

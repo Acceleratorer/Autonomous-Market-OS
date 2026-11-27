@@ -1,0 +1,108 @@
+{
+  "schema": "market-os.btc-w32time-observation.v1",
+  "recorded_on": "2026-11-27",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch_at_start": "fix/btc-appcontainer-cli-runtime",
+    "commit_at_start": "a530baa61440100db7228bc63de3917d89082df6",
+    "working_tree_clean_before_observation": false
+  },
+  "observation": {
+    "id": "w32time-passive-status-only-50m-20261127-093621",
+    "status": "complete",
+    "configured_duration_seconds": 3000,
+    "observation_start_local": "2026-11-27T09:36:22.8243229+07:00",
+    "observation_end_local": "2026-11-27T10:26:22.8610768+07:00",
+    "sample_interval_seconds": 30,
+    "first_sample_at_local": "2026-11-27T09:36:22.8392491+07:00",
+    "last_sample_at_local": "2026-11-27T10:25:52.8801955+07:00",
+    "sampled_wall_span_seconds": 2970.041,
+    "first_sample_monotonic_elapsed_seconds": 0.101,
+    "last_sample_monotonic_elapsed_seconds": 2970.078,
+    "sampled_monotonic_span_seconds": 2969.977,
+    "status_sample_count": 100,
+    "status_query_exit_codes": {
+      "0": 100
+    },
+    "status_query_failures": 0,
+    "status_query_timeouts": 0,
+    "service_status_samples": {
+      "Running": 100
+    },
+    "configuration_query": "omitted; unprivileged status-only run",
+    "runner_exit_code_captured": false,
+    "result_failure": null,
+    "observer_process_absent_after_target_window": true
+  },
+  "synchronization": {
+    "source_identity": "omitted",
+    "newer_successful_sync_reported_during_observation": true,
+    "first_sample_last_successful_sync_time_local": "2026-11-27 05:50:14",
+    "last_sample_last_successful_sync_time_local": "2026-11-27 10:23:18",
+    "initial_status_snapshot": {
+      "leap_indicator": "0 (no warning)",
+      "stratum": 5,
+      "root_delay_seconds": 0.0414013,
+      "root_dispersion_seconds": 0.5215432,
+      "conditional_ntp_distance_seconds": 0.54224385
+    },
+    "last_sample_status_snapshot": {
+      "leap_indicator": "0 (no warning)",
+      "stratum": 5,
+      "root_delay_seconds": 0.041605,
+      "root_dispersion_seconds": 7.8126761,
+      "conditional_ntp_distance_seconds": 7.8334786
+    },
+    "w32time_event_ids": [
+      {
+        "event_id": 37,
+        "time_utc": "2026-11-27T03:23:17.8882315Z"
+      }
+    ],
+    "conditional_ntp_distance_note": "The RFC 5905 root-distance calculation is a model-based operational metric, not a qualified capture-time UTC error bound."
+  },
+  "relative_clock_comparison": {
+    "method": "Sample UTC timestamps compared with Stopwatch monotonic elapsed time, relative to sample 1",
+    "max_absolute_relative_offset_change_milliseconds": 26.131,
+    "max_absolute_adjacent_interval_difference_milliseconds": 2.497,
+    "diagnostic_threshold_milliseconds": 250,
+    "threshold_crossed": false,
+    "interpretation": "Relative wall/monotonic stability only; this does not establish absolute UTC accuracy."
+  },
+  "service": {
+    "state_in_sample_log": "Running for all 100 samples",
+    "start_mode_at_start_and_end": "Manual",
+    "service_state_changed_by_observer": false,
+    "start_mode_changed_by_observer": false,
+    "service_started_or_stopped_by_observer": false,
+    "resync_performed_by_observer": false,
+    "system_clock_adjusted_by_observer": false,
+    "time_service_configuration_changed_by_observer": false
+  },
+  "actions": {
+    "configuration_query_performed": false,
+    "packet_capture_performed": false,
+    "raw_status_text_stored": false
+  },
+  "external_requests": {
+    "btc_market_data": 0,
+    "typesafe_jev": 0,
+    "model_provider": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_service_traffic_measured": false
+  },
+  "local_artifact": {
+    "raw_report_path": ".market_os/clock/w32time-passive-observation-20261127-093621.json",
+    "raw_report_committed": false,
+    "raw_report_bytes": 119611,
+    "raw_report_sha256": "B2860721453BF25CF91998E318BF9D65AC567CDB842EE48DBD5D7CC3F5352401",
+    "runner_path": ".market_os/clock/w32time-passive-observation-20261127-093621.ps1",
+    "runner_sha256": "97FBE2258486A33E7A9A75E0F5B861DAA13FD71D6B58B1114B38E9C6B1F4C8C3",
+    "runner_committed": false
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "The status-only observation showed a relative wall/monotonic offset below 250 ms, but source accuracy, effective configuration, capture-time freshness, and holdover assumptions remain unqualified. The final conditional NTP distance estimate was 7.8334786 seconds."
+  }
+}
