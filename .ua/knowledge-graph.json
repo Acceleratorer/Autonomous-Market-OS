@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 706 repository files.",
-    "analyzedAt": "2026-11-27T17:20:49.084Z",
-    "gitCommitHash": "98cbde6f1f6061c99e5deebe8f4728a8017ee663"
+    "analyzedAt": "2026-11-27T18:01:00.325Z",
+    "gitCommitHash": "a682359f5a2b98e48395c098f90ffad9f745a221"
   },
   "nodes": [
     {
@@ -39078,22 +39078,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "document",
-      "name": "NEXT-WORK-HANDOFF.md",
-      "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "summary": "Provides the detailed current-state handoff for the BTC MiniRAG and recorded Jev evidence path, including merged PR status, runtime and isolation status, unresolved local-Jev terms, constraints, and next steps.",
-      "tags": [
-        "documentation",
-        "handoff",
-        "btc-evidence",
-        "jev",
-        "runtime-status",
-        "collaboration"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
@@ -39120,6 +39104,22 @@
         "chronology",
         "worktree",
         "evidence",
+        "collaboration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "document",
+      "name": "NEXT-WORK-HANDOFF.md",
+      "filePath": "docs/NEXT-WORK-HANDOFF.md",
+      "summary": "Provides the detailed current-state handoff for the BTC MiniRAG and recorded Jev evidence path, including merged PR status, runtime and isolation status, unresolved local-Jev terms, constraints, and next steps.",
+      "tags": [
+        "documentation",
+        "handoff",
+        "btc-evidence",
+        "jev",
+        "runtime-status",
         "collaboration"
       ],
       "complexity": "complex"
@@ -62626,13 +62626,6 @@
     },
     {
       "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
       "direction": "forward",
@@ -62696,13 +62689,6 @@
     },
     {
       "source": "document:README.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
       "direction": "forward",
@@ -62745,13 +62731,6 @@
     },
     {
       "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
       "target": "document:docs/UNDERSTANDING-LOG.md",
       "type": "documents",
       "direction": "forward",
@@ -62765,13 +62744,6 @@
       "weight": 0.5
     },
     {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/UNDERSTAND-GRAPH.md",
       "target": "document:docs/COLLABORATION-WORKFLOW.md",
       "type": "documents",
@@ -62781,13 +62753,6 @@
     {
       "source": "document:docs/GOAL-PROMPT.md",
       "target": "document:docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -62800,435 +62765,8 @@
       "weight": 0.5
     },
     {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/UNDERSTAND-GRAPH.md",
       "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-artifact-integrity-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-current-checkout-health-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-primary-checkout-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-resource-guard-2026-11-20.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-21.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-27.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-minirag-retrieval-2026-11-19.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-post-resync-observation-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/btc-w32time-post-resync-retry-2026-11-25.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/u6-4-f-hosted-installation.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "config:docs/evidence/u6-4-f-installation-contract.json",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/PHASES.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/PROJECT-CONTEXT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/ROADMAP.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U3-API-CONNECTIVITY-REPORT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-D-INSTALLER-PREFLIGHT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-E-OFFLINE-INSTALL-SIMULATION.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/U8-C-PERMANENT-PAPER-ONLY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/decisions/ADR-0060-btc-local-assessment-store-quota.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-20.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-21.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-local-assessor-windows-egress-2026-11-27.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/btc-utc-clock-error-bound.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/jev-local-runtime-availability-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/NEXT-WORK-HANDOFF.md",
-      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/PHASES.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/ROADMAP.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTAND-GRAPH.md",
-      "target": "document:docs/NEXT-WORK-HANDOFF.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -67307,6 +66845,468 @@
       "direction": "forward",
       "weight": 0.7,
       "recoveredFromImportMap": true
+    },
+    {
+      "source": "document:CONTRIBUTING.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/COLLABORATION-WORKFLOW.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/COLLABORATION-WORKFLOW.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/GOAL-PROMPT.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/GOAL-PROMPT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-assessor-cpython-3.11-runtime-2026-11-20.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-assessor-cpython-3.11.18-local-health-2026-11-20.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-assessor-runtime-isolation-implementation-2026-11-20.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-b31-synthetic-alignment-2026-11-19.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-artifact-integrity-2026-11-19.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-current-checkout-health-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-current-main-verification-2026-11-27.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-primary-checkout-50m-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-resource-guard-2026-11-20.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-secondary-checkout-50m-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-21.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-local-assessor-windows-egress-2026-11-27.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-minirag-retrieval-2026-11-19.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-045839.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-062923.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-085131.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-101323.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-143611.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26-202154.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-50m-retry-2026-11-26.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-status-only-50m-2026-11-27-114326.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-observation-uac-cancelled-2026-11-27-093233.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-post-resync-observation-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/btc-w32time-post-resync-retry-2026-11-25.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/u6-4-f-hosted-installation.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "config:docs/evidence/u6-4-f-installation-contract.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/B2-BTC-FEATURES-BASELINES-REPORT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/BTC-MINIRAG-JEV-EVIDENCE-PATH.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/PHASES.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/PROJECT-CONTEXT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/ROADMAP.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/U3-API-CONNECTIVITY-REPORT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/U6.4-D-INSTALLER-PREFLIGHT.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/U6.4-E-OFFLINE-INSTALL-SIMULATION.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/U6.4-F-INSTALLER-AND-PYTHON-RUNTIME-PLANNING.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/U8-C-PERMANENT-PAPER-ONLY.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/decisions/ADR-0055-u6-4-f-installer-planning.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/decisions/ADR-0060-btc-local-assessment-store-quota.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/evidence/btc-minirag-runtime-freeze-2026-11-19.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-50m-observation-2026-11-25.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-20.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-os-isolation-2026-11-21.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-primary-checkout-50m-observation-2026-11-25.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-secondary-checkout-50m-observation-2026-11-25.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-local-assessor-windows-egress-2026-11-27.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/btc-utc-clock-error-bound.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/jev-local-runtime-availability-2026-11-25.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/typesafe-jev-local-deployment-primary-source-check-2026-11-26.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/NEXT-WORK-HANDOFF.md",
+      "target": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/PHASES.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/ROADMAP.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/UNDERSTAND-GRAPH.md",
+      "target": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
     }
   ],
   "layers": [

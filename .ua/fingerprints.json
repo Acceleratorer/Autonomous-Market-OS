@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "98cbde6f1f6061c99e5deebe8f4728a8017ee663",
-  "generatedAt": "2026-11-27T17:20:49.231Z",
+  "gitCommitHash": "a682359f5a2b98e48395c098f90ffad9f745a221",
+  "generatedAt": "2026-11-27T18:01:00.469Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -5780,7 +5780,7 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "98a3ab260dc157cac4bb5cf1ce87ad445c90727f7afd8feea5bd5ef54910c6a3",
+      "contentHash": "9cf190d6eef0323fbfdeef333079b88f9148dd8ada9bc4d2c853380a7a7e32fb",
       "functions": [],
       "classes": [],
       "imports": [],
