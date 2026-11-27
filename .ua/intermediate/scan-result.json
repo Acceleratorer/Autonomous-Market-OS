@@ -44,7 +44,7 @@
     {
       "path": ".github/workflows/ci.yml",
       "language": "yaml",
-      "sizeLines": 554,
+      "sizeLines": 558,
       "fileCategory": "infra"
     },
     {
@@ -74,7 +74,7 @@
     {
       "path": "CONTRIBUTING.md",
       "language": "markdown",
-      "sizeLines": 92,
+      "sizeLines": 95,
       "fileCategory": "docs"
     },
     {
@@ -86,7 +86,7 @@
     {
       "path": "README.md",
       "language": "markdown",
-      "sizeLines": 195,
+      "sizeLines": 197,
       "fileCategory": "docs"
     },
     {
@@ -980,7 +980,7 @@
     {
       "path": "docs/COLLABORATION-WORKFLOW.md",
       "language": "markdown",
-      "sizeLines": 80,
+      "sizeLines": 84,
       "fileCategory": "docs"
     },
     {
@@ -1035,6 +1035,12 @@
       "path": "docs/JS-PACKAGE-MANAGEMENT.md",
       "language": "markdown",
       "sizeLines": 88,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/KNOWLEDGE-MAINTENANCE.md",
+      "language": "markdown",
+      "sizeLines": 91,
       "fileCategory": "docs"
     },
     {
@@ -1178,7 +1184,7 @@
     {
       "path": "docs/NEXT-WORK-HANDOFF.md",
       "language": "markdown",
-      "sizeLines": 899,
+      "sizeLines": 926,
       "fileCategory": "docs"
     },
     {
@@ -1508,13 +1514,13 @@
     {
       "path": "docs/UNDERSTAND-GRAPH.md",
       "language": "markdown",
-      "sizeLines": 76,
+      "sizeLines": 79,
       "fileCategory": "docs"
     },
     {
       "path": "docs/UNDERSTANDING-LOG.md",
       "language": "markdown",
-      "sizeLines": 2652,
+      "sizeLines": 2670,
       "fileCategory": "docs"
     },
     {
@@ -2910,6 +2916,12 @@
       "fileCategory": "docs"
     },
     {
+      "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "language": "markdown",
+      "sizeLines": 90,
+      "fileCategory": "docs"
+    },
+    {
       "path": "docs/research/typesafe-jev-u3-b3.md",
       "language": "markdown",
       "sizeLines": 37,
@@ -4226,7 +4238,7 @@
     {
       "path": "scripts/ci_checks.py",
       "language": "python",
-      "sizeLines": 140,
+      "sizeLines": 230,
       "fileCategory": "code"
     },
     {
@@ -4272,7 +4284,7 @@
       "fileCategory": "code"
     }
   ],
-  "totalFiles": 707,
+  "totalFiles": 709,
   "filteredByIgnore": 0,
   "estimatedComplexity": "very-large",
   "importMap": {
@@ -4584,6 +4596,7 @@
     "docs/GOAL-PROMPT.md": [],
     "docs/INTEGRATION-GUIDE.md": [],
     "docs/JS-PACKAGE-MANAGEMENT.md": [],
+    "docs/KNOWLEDGE-MAINTENANCE.md": [],
     "docs/LOCAL-EXIT-GATE-REPORT.md": [],
     "docs/M1-CONTRACTS.md": [],
     "docs/M1.10-DEPLOYMENT-WRAPPER.md": [],
@@ -4896,6 +4909,7 @@
     "docs/research/typesafe-jev-local-runtime-recheck-2026-11-23.md": [],
     "docs/research/typesafe-jev-local-runtime-recheck-2026-11-25.md": [],
     "docs/research/typesafe-jev-local-runtime-recheck-2026-11-27.md": [],
+    "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md": [],
     "docs/research/typesafe-jev-u3-b3.md": [],
     "docs/research/u5-5-connected-web-options-2026-10-29.md": [],
     "docs/runtime-benchmark.md": [],
@@ -5621,5 +5635,5 @@
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "121a050df250853697944a4ff98a54c0d2a853756ffc0da6504ac6cefa5dd42b"
+  "contentDigest": "c4cbaa3cbe24bd68897af5715c34c50c2da0c3a4214f8aa5d7c5c325d93d6ce4"
 }
