@@ -18,6 +18,8 @@ Other `.ua/` files, including `.trash-*` directories, logs, and intermediate bat
 
 Open `.ua/knowledge-graph.json` in the repository, or use the Understand Anything skills with the repository as the current project:
 
+The slash commands require Understand Anything installed in your Codex environment. See the [official Understand Anything project](https://github.com/Egonex-AI/Understand-Anything). A fresh clone can still inspect the committed JSON graph without installing the skills.
+
 - `/understand-chat` asks questions against the shared graph.
 - `/understand-explain` explains a file or module.
 - `/understand-onboard` builds a newcomer guide.
