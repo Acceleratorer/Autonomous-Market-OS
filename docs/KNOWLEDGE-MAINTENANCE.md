@@ -37,6 +37,17 @@ At the end of every meaningful slice:
 4. Refresh the English Understand graph when source, architecture, file
    inventory, or contributor-facing documentation changed.
 
+Use the read-only status helper at the start of a slice and before handoff:
+
+```powershell
+python scripts/shared_knowledge_status.py
+```
+
+It reports the analyzed commit, graph size, metadata agreement, project-scoped
+drift, and whether the next action is a refresh. It never stages, rewrites, or
+uploads artifacts. This keeps the same workflow usable from a local clone,
+another coding agent, or a later chat.
+
 The graph is a generated map, not the authority for behavior. Verify important
 claims against source and the canonical documents.
 

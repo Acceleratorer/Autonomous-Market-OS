@@ -22,6 +22,8 @@ in this repository and treat the source, decisions, and evidence as authority.
    the code only after checking its source checkpoint and freshness. Confirm
    important behavior in current code and canonical docs; the graph is a map,
    not a source of truth.
+5. Run `python scripts/shared_knowledge_status.py` so the handoff starts with
+   the same checkpoint and stale/current result for every collaborator.
 
 ## Keep the shared knowledge coherent
 
@@ -70,6 +72,10 @@ Before the pull request is ready for review:
    edge endpoint exists; and only the six documented shared `.ua/` files are
    staged. Keep `.ua/.trash-*`, intermediate batches, logs, credentials, and
    runtime data out of Git.
+
+The status helper is deliberately read-only. It does not rewrite the graph or
+silently stage files; the collaborator who changes source or canonical knowledge
+owns the source commit, graph refresh, validation, and PR handoff.
 
 If the Understand skill is unavailable, read the committed graph and continue
 from source and canonical docs. Do not edit generated graph JSON by hand or

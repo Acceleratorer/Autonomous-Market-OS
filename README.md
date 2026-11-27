@@ -195,3 +195,14 @@ tracked scan and fingerprint baselines support incremental refreshes. See the
 [knowledge maintenance contract](docs/KNOWLEDGE-MAINTENANCE.md) for exploration,
 freshness, refresh, and pull-request checks. CI runs the same dependency-free
 shared-knowledge validator used locally.
+
+Quick check for a fresh clone or handoff:
+
+```powershell
+python scripts/shared_knowledge_status.py
+python scripts/ci_checks.py validate-shared-knowledge
+```
+
+The status command reports the graph checkpoint, source drift, inventory, and
+the exact next maintenance action. Run it before editing and include its result
+in the PR handoff when the graph or canonical knowledge changed.
