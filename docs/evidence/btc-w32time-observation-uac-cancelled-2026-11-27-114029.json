@@ -1,0 +1,47 @@
+{
+  "schema": "market-os.btc-w32time-observation-attempt.v1",
+  "recorded_on": "2026-11-27",
+  "repository": "Acceleratorer/Autonomous-Market-OS",
+  "checkout": {
+    "branch": "main",
+    "commit": "e844e4f8c2bde8b965b37f8e8a775b199bf48326",
+    "working_tree_clean_before_attempt": false
+  },
+  "attempt": {
+    "id": "w32time-passive-observation-20261127-114029",
+    "started_at_local": "2026-11-27T11:40:29+07:00",
+    "status": "cancelled_before_child_start",
+    "requested_duration_seconds": 3000,
+    "sample_interval_seconds": 30,
+    "sample_count": 0,
+    "elevation_result": "Start-Process -Verb RunAs returned the Windows operation-canceled error before an elevated child started.",
+    "result_file_persisted": false,
+    "progress_file_persisted": false
+  },
+  "actions": {
+    "observer_child_started": false,
+    "w32time_service_changed": false,
+    "system_clock_adjusted": false,
+    "time_service_configuration_changed": false,
+    "resync_performed": false,
+    "btc_market_data_requests": 0,
+    "typesafe_jev_requests": 0,
+    "model_provider_requests": 0,
+    "explicit_time_source_requests": 0,
+    "normal_w32time_traffic_measured": false
+  },
+  "local_artifact": {
+    "runner_path": ".market_os/clock/w32time-passive-observation-20261127-114029.ps1",
+    "runner_sha256": "94FF8684542532A8DC49E4676BB3350BE19F7C208E79667EB058A2E5BF568AD8",
+    "runner_committed": false,
+    "result_path": ".market_os/clock/w32time-passive-observation-20261127-114029.json",
+    "result_present": false,
+    "progress_path": ".market_os/clock/w32time-passive-observation-20261127-114029.progress.json",
+    "progress_present": false
+  },
+  "result": {
+    "clock_error_bound_ms": null,
+    "btc_b31_packet_eligible": false,
+    "reason": "The elevated observer child did not start, so this attempt supplies no clock or synchronization evidence."
+  }
+}
