@@ -1,5 +1,9 @@
 # Shared collaborator workflow
 
+For the compact artifact-to-file mapping, cadence, graph commit sequence, and
+CI gate, read [KNOWLEDGE-MAINTENANCE.md](KNOWLEDGE-MAINTENANCE.md). This file
+keeps the start, update, and handoff procedure explicit.
+
 This repository is the shared memory for contributors and coding agents. A new
 collaborator should be able to continue from Git without access to anyone's
 private chat, local notes, or model context. Keep project knowledge reviewable

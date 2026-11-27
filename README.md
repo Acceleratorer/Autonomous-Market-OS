@@ -191,5 +191,7 @@ The committed Understand Anything snapshot at
 [`.ua/knowledge-graph.json`](.ua/knowledge-graph.json) gives every collaborator
 the same code map, architecture layers, relationships, and guided tour. Its
 tracked scan and fingerprint baselines support incremental refreshes. See the
-[graph guide](docs/UNDERSTAND-GRAPH.md) for exploration, freshness, and refresh
-steps.
+[graph guide](docs/UNDERSTAND-GRAPH.md) and
+[knowledge maintenance contract](docs/KNOWLEDGE-MAINTENANCE.md) for exploration,
+freshness, refresh, and pull-request checks. CI runs the same dependency-free
+shared-knowledge validator used locally.

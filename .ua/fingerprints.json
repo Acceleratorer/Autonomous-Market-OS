@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "a682359f5a2b98e48395c098f90ffad9f745a221",
-  "generatedAt": "2026-11-27T18:01:00.469Z",
+  "gitCommitHash": "030f0d7d4569dc7dd38302e86b1b6548c8744ca6",
+  "generatedAt": "2026-11-27T19:41:03.210Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -25,12 +25,12 @@
     },
     ".github/workflows/ci.yml": {
       "filePath": ".github/workflows/ci.yml",
-      "contentHash": "bd091bc47bbdadd96a0696017576e1b541bf146cbeae96f580199a3261a1a2f8",
+      "contentHash": "a9390b1168fdb9a4ed2f400ff604478562cdccbef6d955e1e155fa2c9e1a1b48",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 555,
+      "totalLines": 559,
       "hasStructuralAnalysis": false
     },
     ".github/workflows/deploy-market-os.yml": {
@@ -75,12 +75,12 @@
     },
     "CONTRIBUTING.md": {
       "filePath": "CONTRIBUTING.md",
-      "contentHash": "e4ea42ec97fcec813231876447ef5410332612559dcdad972d300bed48c7b046",
+      "contentHash": "631f06ed0df376258111722d5e89ae03a4956ef23156943763ce8f706674ab63",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 93,
+      "totalLines": 96,
       "hasStructuralAnalysis": false
     },
     "JEV_PROCESSING.md": {
@@ -95,12 +95,12 @@
     },
     "README.md": {
       "filePath": "README.md",
-      "contentHash": "8a46e2c82af2fd9aef04c5b52a5a59f3e2c5c6450bcadcbc86dbee9fb6f5ed4c",
+      "contentHash": "224fd55287a47f7c505b16db07d1c329b861eb05b75e622ed0b2251be00ce824",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 196,
+      "totalLines": 198,
       "hasStructuralAnalysis": false
     },
     "SECURITY.md": {
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "9cf190d6eef0323fbfdeef333079b88f9148dd8ada9bc4d2c853380a7a7e32fb",
+      "contentHash": "94590254bd2eb691f5cddf178df228a147cbb486807128a9835c7d16ad872ac2",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 900,
+      "totalLines": 927,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "991c92e5d3b57bf74b017143375664c7b98a7d6f0506e72e390f665403751baa",
+      "contentHash": "fb07b4eac231b6678ae5f50f04343a14c11aa794e72b9822287691e1673a3f8c",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2653,
+      "totalLines": 2671,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {
@@ -41211,7 +41211,7 @@
     },
     "scripts/ci_checks.py": {
       "filePath": "scripts/ci_checks.py",
-      "contentHash": "0c2d3385485bc8df93205fe2152d50d85195a306c07403cc3d26ab8673e6d7fc",
+      "contentHash": "2b7783d73ebd842e430fe34cc61b2cda39c824afa63ede7572f39992462908b6",
       "functions": [
         {
           "name": "validate_evidence",
@@ -41246,7 +41246,21 @@
           "params": [],
           "returnType": "None",
           "exported": true,
-          "lineCount": 13
+          "lineCount": 11
+        },
+        {
+          "name": "_git",
+          "params": [],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "validate_shared_knowledge",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 73
         },
         {
           "name": "main",
@@ -41255,7 +41269,7 @@
           ],
           "returnType": "int",
           "exported": true,
-          "lineCount": 15
+          "lineCount": 18
         }
       ],
       "classes": [],
@@ -41270,6 +41284,12 @@
           "source": "re",
           "specifiers": [
             "re"
+          ]
+        },
+        {
+          "source": "subprocess",
+          "specifiers": [
+            "subprocess"
           ]
         },
         {
@@ -41291,9 +41311,11 @@
         "_tracked_text_files",
         "secret_scan",
         "validate_mlops_manifest",
+        "_git",
+        "validate_shared_knowledge",
         "main"
       ],
-      "totalLines": 141,
+      "totalLines": 231,
       "hasStructuralAnalysis": true
     },
     "scripts/deploy_market_os_directadmin.sh": {
@@ -41681,12 +41703,12 @@
     },
     "docs/UNDERSTAND-GRAPH.md": {
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "contentHash": "3abe99dc99e6e36c896dc265a15ce328cec4f34664171c7e9dbd0113a0586a4b",
+      "contentHash": "867a7b33f8851a9f92e3061b33fcbd0882f18ae4e429e50e265631b5b12059e8",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 77,
+      "totalLines": 80,
       "hasStructuralAnalysis": false
     },
     "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json": {
@@ -41701,12 +41723,32 @@
     },
     "docs/COLLABORATION-WORKFLOW.md": {
       "filePath": "docs/COLLABORATION-WORKFLOW.md",
-      "contentHash": "7092cee24134bc6a8b463495e4e6ac5af81c407847ea44ca1770641363d87dc5",
+      "contentHash": "46caa75855d5c8e2c1a4d21c649cd948d26bf7a0a9c114120386655257767249",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 81,
+      "totalLines": 85,
+      "hasStructuralAnalysis": false
+    },
+    "docs/KNOWLEDGE-MAINTENANCE.md": {
+      "filePath": "docs/KNOWLEDGE-MAINTENANCE.md",
+      "contentHash": "0383452e599de11bd88e429206cca3be4d972991d6a6bd43c53585cf62329c89",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 92,
+      "hasStructuralAnalysis": false
+    },
+    "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md": {
+      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "contentHash": "c7740bd4c037bde29f5d68b315a82e586a00efc27aa493bd1a5aa3434f6bf538",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 91,
       "hasStructuralAnalysis": false
     }
   }

@@ -3,6 +3,24 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — First-party Jev recheck and knowledge freshness gate
+
+- Rechecked current TypeSafe primary sources, the official GitHub organization,
+  and TypeSafeAI Hugging Face API listings. Public materials still expose
+  hosted Jev only; no public Jev weights, local runtime, signed manifest, or
+  local-use terms were found. The Enterprise VPC/on-prem question remains
+  unanswered, and the existing Sales inquiry is still the next evidence gate.
+  Qyvos and Open-Jev remain separate artifacts, not Jev.
+- Added the dated source note
+  `docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md` and kept
+  ADR-0058 unchanged: hosted Jev is connectivity-only and BTC packets stay
+  local.
+- Added `docs/KNOWLEDGE-MAINTENANCE.md` and a dependency-free
+  `validate-shared-knowledge` CI/local check. It validates one shared graph
+  checkpoint, graph/meta/fingerprint agreement, source-after-checkpoint drift,
+  edge endpoints, and scan/fingerprint inventory parity. No credentials,
+  packets, hosted Jev request, or model download entered this update.
+
 ## 2026-11-27 — Shared collaborator workflow and Jev gate reconciliation
 
 - Added `docs/COLLABORATION-WORKFLOW.md` as the single contributor/agent

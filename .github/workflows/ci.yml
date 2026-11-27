@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v6
         with:
           version: 11.25.0
@@ -244,6 +246,8 @@ jobs:
           market_os/tests/test_openai_summary_adapter.py::test_default_selection_does_not_import_or_call_openai
       - name: Diff check
         run: git diff --check
+      - name: Validate shared knowledge checkpoint
+        run: python scripts/ci_checks.py validate-shared-knowledge
       - name: TypeScript dashboard contract test
         run: pnpm dlx tsx tests/market-os-readonly-dashboard.test.ts
       - name: Verify web preview compatibility copy
