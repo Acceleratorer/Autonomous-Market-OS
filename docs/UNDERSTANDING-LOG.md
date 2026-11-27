@@ -22,6 +22,18 @@ Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
   separately approved prospective BTC capture; this maintenance change does not
   alter Jev identity, packet egress, quantitative authority, or paper-only mode.
 
+## 2026-11-28 — BTC verification pass
+
+- The focused BTC assessment/connectivity/inspection group passed 100 tests.
+- The full local suite reached 750 passed and 8 skipped. One synthetic
+  read-only HTTP query/path test failed with Windows `WinError 10053` while
+  reading the response; rerunning that exact test in isolation passed. This is
+  recorded as an environment/socket flake, not a changed product result, and
+  the aggregate is not called a clean full-suite gate.
+- No BTC packet, Jev packet assessment, credential, or model download was used.
+  The local Qwen/hosted Jev boundary and Market OS decision authority remain
+  unchanged.
+
 ## 2026-11-28 — Hosted Jev connectivity probe and local replay
 
 - Ran the bounded CLI Jev probe once with `jev-1.14.0`, the synthetic

@@ -17,6 +17,13 @@ The next collaborator should run the status helper, read this handoff and the
 goal prompt, then work only on an approved gate; the shared graph is navigation
 metadata and the canonical docs remain authoritative.
 
+The 2026-11-28 verification pass covered 100 BTC assessment/connectivity/
+inspection tests with all passing. A full local suite reached 750 passed, 8
+skipped, and one known Windows `WinError 10053` failure in the synthetic
+read-only HTTP boundary test; rerunning that test in isolation passed. Treat the
+full-suite aggregate as diagnostic until a clean rerun, not as a new release
+gate.
+
 ## Current collaborator checkpoint — 2026-11-28 — hosted Jev probe refreshed
 
 The bounded CLI completed one synthetic `jev-1.14.0` hosted probe through the
