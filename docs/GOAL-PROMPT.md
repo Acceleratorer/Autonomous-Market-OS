@@ -41,6 +41,7 @@ never grant execution or risk authority.
   `.ua/knowledge-graph.json`. Check its analyzed commit and project-scoped
   freshness before relying on it; refresh it after meaningful source,
   architecture, or contributor-facing documentation changes. See
+  [COLLABORATION-WORKFLOW.md](COLLABORATION-WORKFLOW.md) and
   [UNDERSTAND-GRAPH.md](UNDERSTAND-GRAPH.md) for the team workflow.
 - U6.4-F is merged under accepted ADR-0055: portable signed install,
   embedded-runtime identity, state preservation, rollback, uninstall retention,
@@ -66,8 +67,12 @@ never grant execution or risk authority.
   separately identified Qwen. The current public Master Customer Agreement
   raises a restriction on developing similar products using TypeSafe Services
   or outputs; check any account-specific agreement or obtain written clearance
-  before expanding the local assessor. Do not use Jev outputs to train, tune,
-  or evaluate it.
+  before expanding the local assessor. The 2026-11-27 primary-source recheck
+  also found that TypeSafeAI/Qyvos describes a separate Julia-1-based model
+  trained on Open-Jev data; it is not Jev and does not establish Jev weights or
+  local rights. The already-approved Sales inquiry still has no reply. The next
+  Jev gate is written local-use terms plus a verifiable vendor runtime/weight
+  manifest. Do not use Jev outputs to train, tune, or evaluate a substitute.
 - The Windows CPython 3.11.18 runtime is installed locally. Historical health
   and denial probes from 2026-11-25 do not prove the current boundary: on
   2026-11-27, a direct TCP connection from the pinned Python to `1.1.1.1:443`
@@ -90,7 +95,10 @@ archive run is retrospective. The next meaningful evaluation requires
 prospective, time-aligned history with recorded receipt and a qualified UTC
 error bound, plus eligible packets for B3.1. Until those gates are met, retain
 the B2 results as retrospective diagnostics and leave the B3.1/Jev comparison
-unrun.
+unrun. First resolve whether TypeSafe offers an authentic Jev runtime with
+  written local-use rights and a vendor-verifiable manifest. If that remains
+  unverified, keep the project goal open and continue only work that does not
+  misidentify or train a substitute as Jev.
 
 ## Execution rules
 

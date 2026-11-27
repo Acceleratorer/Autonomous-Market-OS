@@ -1,6 +1,6 @@
 # Shared Understand Anything Graph
 
-The committed snapshot under `.ua/` gives every contributor and coding agent the same source-derived map of Autonomous Market OS. It contains file, function, and class nodes; dependency and test edges; architectural layers; and a guided tour. It does not contain market candles, API credentials, private packets, or runtime data. The repository's project goal, decisions, research, and evidence remain the authoritative written knowledge; the graph helps people find and connect that material.
+The committed snapshot under `.ua/` gives every contributor and coding agent the same source-derived map of Autonomous Market OS. It contains file, function, and class nodes; dependency and test edges; architectural layers; and a guided tour. It does not contain market candles, API credentials, private packets, or runtime data. The repository's project goal, decisions, research, and evidence remain the authoritative written knowledge; the graph helps people find and connect that material. Follow the [collaborator workflow](COLLABORATION-WORKFLOW.md) for the shared start, update, and pull-request routine.
 
 ## Shared files
 
@@ -30,7 +30,9 @@ The dashboard URL uses `127.0.0.1`, so it is reachable only on the machine runni
 ## Keep team knowledge current
 
 Use the project files as shared memory so work can continue across contributors,
-agents, machines, and chats:
+agents, machines, and chats. Update the live handoff and append to the dated log
+after each meaningful slice; update README when the stable orientation,
+onboarding, setup, or project boundary changes:
 
 - [`README.md`](../README.md) is the short orientation and project boundary.
 - [`GOAL-PROMPT.md`](GOAL-PROMPT.md) records the north star and execution

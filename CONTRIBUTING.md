@@ -4,14 +4,17 @@ Thanks for helping improve Autonomous-Market-OS.
 
 ## Shared project context
 
-Before starting a slice, read the [project goal](docs/GOAL-PROMPT.md), the
+Before starting a slice, follow the
+[collaborator workflow](docs/COLLABORATION-WORKFLOW.md), read the
+[project goal](docs/GOAL-PROMPT.md), the
 [next-work handoff](docs/NEXT-WORK-HANDOFF.md), and the contracts, ADRs, and
 evidence relevant to the files you will change. Treat the graph as a navigation
 aid; verify behavior and decisions against source files and their durable docs.
-When a change alters a contract, decision, research finding, or architecture,
-update its canonical project document in the same pull request and refresh the
-shared graph when its summaries or relationships are affected. See the
-[shared knowledge workflow](docs/UNDERSTAND-GRAPH.md).
+For every meaningful slice, refresh the handoff and append a dated entry to the
+understanding log. When a change alters a contract, decision, research finding,
+or architecture, update its canonical project document in the same pull
+request and refresh the shared graph. See the
+[shared graph guide](docs/UNDERSTAND-GRAPH.md).
 
 ## Scope
 
@@ -71,10 +74,13 @@ python scripts/ci_checks.py validate-mlops-manifest
 git diff --check
 ```
 
-If code or project documentation changed, include the refreshed Understand
-graph and its tracked baselines when the graph is stale. Keep the graph's
-recorded source commit consistent with the commit it analyzed; the workflow is
-documented in [UNDERSTAND-GRAPH.md](docs/UNDERSTAND-GRAPH.md).
+If source, architecture, file inventory, or contributor-facing documentation
+changed, include an incremental Understand graph refresh and its tracked
+baselines in this PR. Commit canonical sources first; the graph metadata must
+identify that source commit. Follow
+[COLLABORATION-WORKFLOW.md](docs/COLLABORATION-WORKFLOW.md) and
+[UNDERSTAND-GRAPH.md](docs/UNDERSTAND-GRAPH.md) for the exact update and review
+steps.
 
 Frontend changes should also include browser evidence for desktop and mobile,
 keyboard focus, reduced motion, no horizontal overflow, and GET-only network

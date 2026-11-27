@@ -1,5 +1,39 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-27
+
+The reviewed base was clean `main` at `5e0edd4`. PR #109 (Windows AppContainer
+assessor and clock follow-up) merged at `2026-11-27T04:22:40Z`; PR #112 (Jev
+hosted-connectivity evidence and shared graph refresh) merged at
+`2026-11-27T16:12:39Z`. The current graph snapshot covers 706 files at source
+checkpoint `a7772b7`; refresh it after the current contributor-documentation
+changes before relying on the new snapshot. The shared start/update routine is
+in [COLLABORATION-WORKFLOW.md](COLLABORATION-WORKFLOW.md).
+
+Authentic local Jev remains **unverified**. The 2026-11-27 primary-source
+recheck found hosted API documentation, no public Jev runtime or weights, no
+answer to the Enterprise VPC/on-prem question, and no reply in the already-sent
+Sales inquiry. TypeSafeAI/Qyvos describes a separate model based on Julia-1
+and the Open-Jev dataset; it is not Jev. The posted Master Customer Agreement
+also restricts some uses of TypeSafe services and outputs to develop similar
+products, so local deployment and local-use rights both need written
+confirmation. See the [dated research note](research/typesafe-jev-local-runtime-recheck-2026-11-27.md).
+
+**Next Jev gate:** wait for the existing vendor inquiry. Any response must
+establish local/VPC/on-prem deployment rights and provide a vendor-authenticated
+manifest for Jev version, runtime/container and weight hashes, supported
+targets, and offline behavior. Do not send BTC packets to hosted Jev, use Jev
+outputs to train a substitute, or call Qwen/Qyvos Jev. No additional vendor
+outreach is in flight.
+
+Market OS remains the owner of quantitative math, probability, calibration,
+stability, risk, and paper decisions. B3.1 remains ineligible: the historical
+archive receipt followed the B2 observations, and current local receipt time
+still lacks a defensible continuous UTC error bound. Prospective Binance
+capture remains unapproved. The Windows AppContainer synthetic smoke is
+bounded local-Qwen evidence, not Jev validation or a packet-capture proof of
+zero network traffic. U8-C permanent paper-only mode remains in force.
+
 ## Current Windows runtime status — 2026-11-27
 
 The prior Windows Firewall/`llama-server` path is not used by the current
@@ -40,11 +74,10 @@ B3.1 ineligible. See the
 [sanitized observation evidence](evidence/btc-w32time-observation-status-only-50m-2026-11-27-093621.json).
 BTC packets remain local, and authentic Jev local runtime remains unverified.
 
-PR #109 carries the AppContainer runtime and the clock-evidence follow-up.
-Merge it only after every workflow passes for the current PR head, then delete
-the feature branch. Follow-on gates remain Linux isolation on the intended
-target host and clock qualification; do not reintroduce the old loopback
-Windows server or firewall-metadata claim.
+PR #109 has merged to `main`; do not treat its original feature branch as live
+work. Follow-on gates remain Linux isolation on the intended target host and
+clock qualification; do not reintroduce the old loopback Windows server or
+firewall-metadata claim.
 
 ### Historical Windows egress contradiction — 2026-11-27
 
@@ -404,7 +437,7 @@ The historical Binance archive supports retrospective B2 math diagnostics,
 not event-time evidence or an execution result. The synthetic Qwen run does
 not establish BTC prediction quality or validate Jev.
 
-## Current milestone — qualify UTC receipt clock — 2026-11-23
+## Historical milestone — qualify UTC receipt clock — 2026-11-23
 
 The live chart and finite Binance capture are integrated, but captures remain
 ineligible for B3.1 because `clock_error_bound_ms` is unknown. The authorized
@@ -439,7 +472,7 @@ terms, regional eligibility, and retention, and obtain fresh date-bound
 approval before any new market-data connection. See the
 [prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
 
-## Owner goal: verify authentic local Jev — 2026-11-20
+## Historical owner goal: verify authentic local Jev — 2026-11-20
 
 The owner now wants the BTC evidence flow to run locally and use authentic Jev
 if TypeSafe provides a lawful, technically supported local runtime. Market OS
@@ -459,7 +492,7 @@ hosted Jev outputs to train an imitator, and do not send BTC packets to hosted
 Jev. The existing ADR-0058 boundary remains in force while authentic local Jev
 is unverified. The public-source review made no Jev API call.
 
-## Current verification — 2026-11-23
+## Historical verification — 2026-11-23 (superseded by the 2026-11-27 checkpoint)
 
 The [2026-11-23 public-source recheck](research/typesafe-jev-local-runtime-recheck-2026-11-23.md)
 confirms that public TypeSafe materials document hosted Jev only. No
@@ -767,9 +800,10 @@ approval. Keep Jev connectivity-only and BTC packets local to Qwen.
 - U6.4-F now packages a target-native embedded CPython runtime when CI passes
   `--python-runtime`; the U6.4-D preflight and U6.4-E simulation accept and
   validate that runtime. No native service is registered.
-- The Understand Anything graph is a local generated artifact under ignored
-  `.ua/`; refresh it after substantive source changes. Local `.market_os/` data
-  remains excluded by Git ignore.
+- The Understand Anything graph and freshness baselines are tracked shared
+  artifacts under `.ua/`; refresh them after substantive source, architecture,
+  or contributor-documentation changes. Local `.market_os/` data remains
+  excluded by Git ignore.
 - The graph includes the U6.4-F contract, accepted ADR-0055, runtime validator,
   portable installer, focused regression tests, and the U7-P reproducibility module, contract, tests, and evidence; `.ua/` remains an ignored generated working artifact.
 - U6.4-F is accepted as signed portable tar.gz for Windows/Linux, per-user
@@ -835,37 +869,23 @@ offline packaging work and does not reopen connected or live execution.
 
 ## Next steps
 
-1. Do not repeat or extend the approved B1 acquisition without fresh,
-   date-bound approval. The local integrity audit is in
-   [`btc-local-artifact-integrity-2026-11-19.json`](evidence/btc-local-artifact-integrity-2026-11-19.json).
-2. Keep B2 classified as a retrospective chronological diagnostic. Its
-   features use current and prior candles with five-minute purge/embargo, but
-   archived receipt times do not reconstruct per-candle live availability.
-3. Follow the accepted strict recorded-availability rule in
-   [ADR-0057](decisions/ADR-0057-btc-strict-recorded-availability.md).
-   Original Binance publication time remains unknown; do not infer it from
-   candle event time or local archive receipt. A separately recorded local
-   receipt with a defensible UTC error bound may establish availability.
-4. Review [the prospective-capture proposal](BTC-PROSPECTIVE-CAPTURE-PROPOSAL.md).
-   This stream remains diagnostics-only and is not authorized. Before any new
-   market-data request, establish that the configured time source can provide
-   a defensible UTC error bound throughout the run, recheck terms and regional
-   eligibility, and obtain separate date-bound approval. Do not reopen an
-   event-time proxy for B1.
-5. Treat the post-guard retrieval as a functional check only. It does not prove
-   zero egress. No Jev API or other provider call is allowed without separate
-   authorization.
-6. Once packet eligibility and response provenance are established, use B3.1
-   recorded assessments tied to exact packet fingerprints. Freeze the matched
-   comparison before looking at held-out results. Keep Jev's support,
-   contradiction, and abstention labels semantic; Market OS owns all market
-   probability, calibration, stability, risk, and execution decisions.
-7. The Windows egress rules, denial probe, loopback health, synthetic-only
-   Qwen abstention, and offline replay are now verified in the 2026-11-21
-   evidence linked above. Linux still needs a supported x64 host to verify the
-   live scope, cgroup, namespace, loopback, and GPU access.
-8. Preserve U7-P and U6.4-F evidence. Keep the older B3 bullish/bearish
-   direction benchmark unpromoted and retain the project-wide LightRAG choice.
+1. Resolve the authentic Jev availability gate using the existing TypeSafe
+   inquiry: require written local-use terms and a vendor-authenticated Jev
+   version/runtime/weight manifest. Until then, preserve Jev identity and keep
+   the goal open; see the current checkpoint above.
+2. Keep BTC packet content local and Qwen separately identified. Do not use
+   hosted Jev output to train, tune, or evaluate Qwen or another substitute.
+3. Keep B2 results classified as retrospective diagnostics and B3.1 blocked
+   until point-in-time eligible packets, recorded assessments, and a qualified
+   UTC error bound exist. Do not extend Binance acquisition without a current
+   review and separate date-bound approval.
+4. If continuing independent runtime hardening, verify Linux isolation on the
+   intended supported host. The hosted-runner report is not target-host proof;
+   the Windows AppContainer smoke is synthetic and does not constitute a packet
+   capture.
+5. Preserve U8-C permanent paper-only mode, U7-P and U6.4-F evidence, and the
+   project-wide LightRAG decision. Keep Market OS as the sole authority for
+   market math, probability, calibration, stability, risk, and paper decisions.
 
 ## Reference artifacts
 

@@ -175,6 +175,21 @@ deployment and authenticated access remain separate gates.
 
 ## Shared project knowledge
 
-The repository is the shared memory for contributors and coding agents; project context should not depend on one person's chat history or local setup. The project direction is math and probability first: Market OS owns stability, calibration, risk, and paper decisions, while Jev's intended role is advisory evidence support, contradiction detection, and abstention. An authentic local Jev runtime remains unverified. Read [the current goal](docs/GOAL-PROMPT.md) and [next-work handoff](docs/NEXT-WORK-HANDOFF.md) before taking a new slice. Stable decisions live in [`docs/decisions/`](docs/decisions/), and dated findings and reproducible results live in [`docs/research/`](docs/research/) and [`docs/evidence/`](docs/evidence/).
+Git is the shared memory for contributors and coding agents; project context
+should not depend on one person's chat history, account, or local setup. The
+project direction is math and probability first: Market OS owns stability,
+calibration, risk, and paper decisions, while Jev's intended role is advisory
+evidence support, contradiction detection, and abstention. Authentic local Jev
+availability and local-use terms remain unverified.
 
-The committed Understand Anything snapshot at [`.ua/knowledge-graph.json`](.ua/knowledge-graph.json) gives every contributor the same code map, architecture layers, relationships, and guided tour. Its tracked scan and fingerprint baselines let the graph refresh incrementally. See [the shared graph and knowledge workflow](docs/UNDERSTAND-GRAPH.md) for onboarding, refresh steps, freshness rules, and what belongs in a pull request.
+Before taking a slice, read the [current goal](docs/GOAL-PROMPT.md),
+[next-work handoff](docs/NEXT-WORK-HANDOFF.md), and the
+[collaborator workflow](docs/COLLABORATION-WORKFLOW.md). Stable decisions live
+in [`docs/decisions/`](docs/decisions/); dated findings and reproducible results
+live in [`docs/research/`](docs/research/) and [`docs/evidence/`](docs/evidence/).
+The committed Understand Anything snapshot at
+[`.ua/knowledge-graph.json`](.ua/knowledge-graph.json) gives every collaborator
+the same code map, architecture layers, relationships, and guided tour. Its
+tracked scan and fingerprint baselines support incremental refreshes. See the
+[graph guide](docs/UNDERSTAND-GRAPH.md) for exploration, freshness, and refresh
+steps.
