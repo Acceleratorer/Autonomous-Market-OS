@@ -5,10 +5,10 @@
 The reviewed base was clean `main` at `5e0edd4`. PR #109 (Windows AppContainer
 assessor and clock follow-up) merged at `2026-11-27T04:22:40Z`; PR #112 (Jev
 hosted-connectivity evidence and shared graph refresh) merged at
-`2026-11-27T16:12:39Z`. The current graph snapshot covers 706 files at source
-checkpoint `a7772b7`; refresh it after the current contributor-documentation
-changes before relying on the new snapshot. The shared start/update routine is
-in [COLLABORATION-WORKFLOW.md](COLLABORATION-WORKFLOW.md).
+`2026-11-27T16:12:39Z`. The refreshed graph covers 707 files at source
+checkpoint `98cbde6`; `.ua/knowledge-graph.json`, `.ua/meta.json`, and
+`.ua/fingerprints.json` agree on that checkpoint. The shared start/update
+routine is in [COLLABORATION-WORKFLOW.md](COLLABORATION-WORKFLOW.md).
 
 Authentic local Jev remains **unverified**. The 2026-11-27 primary-source
 recheck found hosted API documentation, no public Jev runtime or weights, no
