@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "cb563f8e4b13382eb9e8278699d3044aef97361d",
-  "generatedAt": "2026-11-27T22:13:20.692Z",
+  "gitCommitHash": "610b9e3657c8c5a75b58bdb2ee72dade8cfdeb3d",
+  "generatedAt": "2026-11-27T22:23:40.585Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "4e844099f298c5f12af96e11575e365d5b271daf4402c858a27ee391561c4dbc",
+      "contentHash": "666ad7e52b823b0239378be91ad5372ed07e7ac0967733507c809dd850b577bf",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 983,
+      "totalLines": 990,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "8a47b30dee45de41b91d1b843a5d214734dbb60fe6c32ee0f6f84ba6688a5e0e",
+      "contentHash": "4f3ed6e0081632d7d13e042add46593a64e7255add3c7b874047665bca6a408f",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2726,
+      "totalLines": 2738,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {

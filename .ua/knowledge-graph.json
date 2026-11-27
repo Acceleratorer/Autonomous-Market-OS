@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-27T22:13:20.574Z",
-    "gitCommitHash": "cb563f8e4b13382eb9e8278699d3044aef97361d"
+    "analyzedAt": "2026-11-27T22:23:40.461Z",
+    "gitCommitHash": "610b9e3657c8c5a75b58bdb2ee72dade8cfdeb3d"
   },
   "nodes": [
     {
