@@ -3,6 +3,25 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — AppContainer multiline completion parser regression
+
+- Reproduced the Windows `llama-cli` seam failure with a minimal multiline
+  prompt (`line1\nline2\n{"a":1}`): the CLI display is normalized and the exact
+  prompt marker is not stable. Added a regression test and changed the parser
+  to prefer a complete echoed prompt with line-aware framing, use the
+  completion summary marker, and strip a closed thinking block.
+- Added a narrow JSON recovery path for a truncated runtime echo. It accepts
+  only a complete final object with no non-whitespace suffix; all other
+  malformed output remains a typed `invalid_response` failure.
+- Verification: `python -m pytest -q
+  market_os/tests/test_btc_local_assessor.py` — 31 passed. No BTC packet,
+  hosted Jev request, credential, or model download was used.
+- The change is local Qwen runtime behavior only. Jev remains hosted-only and
+  unverified for local deployment; Market OS still owns quantitative math,
+  probability, calibration, stability, risk, and paper decisions. Next gate:
+  review the source diff, commit canonical files, then refresh the shared
+  English Understand graph from that source checkpoint.
+
 ## 2026-11-28 — First-party Jev recheck and knowledge freshness gate
 
 - Rechecked current TypeSafe primary sources, the official GitHub organization,
