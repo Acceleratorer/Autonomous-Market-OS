@@ -1,33 +1,50 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
-## New highest-priority blocker — Windows egress contradiction (2026-11-27)
+## Current Windows runtime status — 2026-11-27
 
-This section supersedes the earlier Windows health and denial-probe claims
-below. ActiveStore metadata still reports outbound block rules as enforced for
-the pinned Python and `llama-server` paths, but a fresh direct TCP connection
-from pinned CPython to `1.1.1.1:443` completed. No application payload was sent;
-the TCP handshake did complete, so current zero-egress is not proven.
-
-The branch
-`fix/btc-windows-egress-behavioral-check` originally added a runtime TCP probe
-to `1.1.1.1:443`. It completed a handshake despite matching ActiveStore
-metadata. That probe itself could create outbound traffic when the boundary is
-broken, so the current branch removes it and fails closed with
-`active_store_policy_does_not_prove_runtime_egress_denial` when Windows policy
-metadata is the only available evidence. Startup remains unavailable and
-`llama-server` is not launched. A focused regression test asserts policy
-verification opens no socket. No inference, BTC packet assessment, Jev request,
-or model-provider request occurred during the runtime preflight.
-
-The attempted read-only `netsh wfp show filters` diagnostic requires elevation;
-the UAC launch was canceled before the command ran. No firewall policy changed.
-Next, reconcile the active WFP filter table with this successful connection, or
-implement and verify a stronger process sandbox. The server executable still
-has metadata-only verification. WSL is not installed on this workstation, and
-no Linux target host has been verified. Keep the assessor disabled, B3.1
-ineligible, and BTC packets local.
-See [the live egress evidence](evidence/btc-local-assessor-windows-egress-2026-11-27.json)
+The prior Windows Firewall/`llama-server` path is not used by the current
+Windows local assessor. It had a verified contradiction: a pinned-CPython TCP
+handshake to `1.1.1.1:443` completed despite matching ActiveStore block-rule
+metadata. The handshake sent no application payload, but it proved that
+metadata alone was not a safe egress claim. Historical details remain in
+[the live egress evidence](evidence/btc-local-assessor-windows-egress-2026-11-27.json)
 and [diagnostic report](research/btc-local-assessor-windows-egress-2026-11-27.md).
+
+Branch `fix/btc-appcontainer-cli-runtime` switches the Windows inference path
+to the pinned CPU `llama-cli` in a zero-capability Windows AppContainer. A live
+synthetic prompt returned `{"status":"ok","label":"abstain"}` with a
+6,516 ms CLI-process latency; that excludes first-use staging and artifact
+revalidation. Health reported `healthy`, token capability count 0, and Job Object
+limits of 25% CPU / 6 GiB process and job commit. The runtime uses bounded
+1 MiB output pipes and a 3 GiB staging cap. This run made no BTC, Binance,
+hosted Jev, or model-provider request. No network-denial probe or packet capture
+was run; the evidence is token/capability and runtime evidence, not a packet
+trace. Qwen remains a separate model and is not Jev. The staged local profile
+and model remain on disk. See
+[sanitized smoke evidence](evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json)
+and [OS isolation notes](research/btc-local-assessor-os-isolation-2026-11-20.md).
+
+The owner-requested W32Time 50-minute retry was attempted again at about
+`08:51 +07:00`, but Windows canceled UAC before the observer child started.
+There were zero samples, no result/progress file, and no service, registry,
+clock, or time-configuration change. See
+[the canceled-attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json).
+No new UTC bound was established; keep `clock_error_bound_ms` null and B3.1
+ineligible. BTC packets remain local, and authentic Jev local runtime remains
+unverified.
+
+Next: finish code review and CI for this branch; verify Linux isolation on an
+intended Linux host; keep the strict clock qualification gate open. Do not
+reintroduce the old loopback Windows server or firewall-metadata claim.
+
+### Historical Windows egress contradiction — 2026-11-27
+
+The previous branch failed closed with
+`active_store_policy_does_not_prove_runtime_egress_denial` when ActiveStore
+metadata was the only evidence. The attempted read-only `netsh wfp show filters`
+diagnostic required elevation; UAC was canceled before it ran. No firewall
+policy changed. The AppContainer path above replaces that launch path without
+using a local HTTP server or Python sockets.
 
 ### Linux assessor isolation diagnostic and CI evidence — 2026-11-26
 

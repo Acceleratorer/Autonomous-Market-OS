@@ -3,6 +3,36 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-27 — Windows AppContainer synthetic Qwen inference
+
+- The Windows `LocalLlamaRuntime` path now launches the pinned CPU `llama-cli`
+  in a zero-capability AppContainer instead of relying on firewall metadata or
+  a loopback HTTP server. The model and selected runtime files were hash checked
+  and staged into the local AppContainer profile; the staging cap is 3 GiB.
+- A live synthetic completion returned `{"status":"ok","label":"abstain"}`
+  with a 6,516 ms `llama-cli` process latency, excluding first-use staging,
+  package hash revalidation, and version preflight. Health reported `healthy`;
+  the runtime verified `TokenIsAppContainer=true`, zero token capabilities,
+  and Job Object limits of
+  25% CPU / 6 GiB process and job commit. Output uses a bounded 1 MiB pipe.
+- The run used no BTC packet, Binance, TypeSafe/Jev, credentials, or other model
+  provider. No outbound probe or packet capture was performed. This verifies
+  the local Qwen execution path only; Qwen is not Jev. See
+  [smoke evidence](evidence/btc-local-assessor-windows-appcontainer-smoke-2026-11-27.json)
+  and [OS isolation notes](research/btc-local-assessor-os-isolation-2026-11-20.md).
+- Focused local assessor, Linux isolation, paper, CLI, and clock tests passed
+  50 tests with one platform skip.
+
+## 2026-11-27 — W32Time 50-minute retry canceled at UAC
+
+- The owner requested another elevated passive observer launch at about
+  `08:51 +07:00`. Windows reported that UAC was canceled before the observer
+  child started. It produced zero samples and no result/progress file.
+- No W32Time service, registry, clock, or configuration change occurred; no
+  BTC, Jev, or provider request was made. This attempt adds no synchronization
+  evidence. Keep `clock_error_bound_ms` unknown and B3.1 ineligible. See the
+  [attempt evidence](evidence/btc-w32time-observation-uac-cancelled-2026-11-27-085131.json).
+
 ## 2026-11-27 — W32Time configuration fallback
 
 - The owner retried the elevated, read-only `w32tm /query /configuration`
