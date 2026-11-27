@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-27T21:10:27.983Z",
-    "gitCommitHash": "bcd3d3eeb256145afbe64b586290b0aa79d9dcc9"
+    "analyzedAt": "2026-11-27T22:06:24.551Z",
+    "gitCommitHash": "9b4cfc1b2c2fd17ccada1c0181c1648f39365f17"
   },
   "nodes": [
     {
@@ -38204,52 +38204,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:README.md",
-      "type": "document",
-      "name": "README.md",
-      "filePath": "README.md",
-      "summary": "Project onboarding and operations guide for the paper-only market research workspace. It states the quantitative math and probability direction, Market OS and Jev role boundary, current Jev local-runtime uncertainty, and the Git-shared contributor knowledge workflow.",
-      "tags": [
-        "documentation",
-        "entry-point",
-        "project-overview",
-        "knowledge-graph",
-        "collaboration",
-        "jev"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "document",
-      "name": "COLLABORATION-WORKFLOW.md",
-      "filePath": "docs/COLLABORATION-WORKFLOW.md",
-      "summary": "Defines the shared contributor and coding-agent workflow: read the live goal and handoff, update canonical knowledge, refresh and verify the English Understand graph, and leave a reviewable Git handoff without committing private data.",
-      "tags": [
-        "documentation",
-        "collaboration",
-        "onboarding",
-        "knowledge-workflow",
-        "pull-requests"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "type": "document",
-      "name": "KNOWLEDGE-MAINTENANCE.md",
-      "filePath": "docs/KNOWLEDGE-MAINTENANCE.md",
-      "summary": "Defines the shared knowledge chain, update cadence, source-then-graph commit sequence, dashboard boundary, and pull-request checklist for collaborators and coding agents.",
-      "tags": [
-        "documentation",
-        "collaboration",
-        "knowledge-workflow",
-        "knowledge-graph",
-        "onboarding"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
@@ -38261,21 +38215,6 @@
         "collaboration",
         "onboarding",
         "incremental-analysis"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "type": "document",
-      "name": "typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "summary": "Records a dated, read-only first-party check of TypeSafe Jev's hosted API documentation, public repositories, Hugging Face listings, and terms; it keeps authentic local Jev and local-use rights unverified.",
-      "tags": [
-        "documentation",
-        "research",
-        "jev",
-        "provider-boundary",
-        "evidence"
       ],
       "complexity": "moderate"
     },
@@ -39198,13 +39137,12 @@
       "type": "document",
       "name": "NEXT-WORK-HANDOFF.md",
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "summary": "Provides the detailed current-state handoff for the BTC MiniRAG and recorded Jev evidence path, including merged PR status, runtime and isolation status, unresolved local-Jev terms, constraints, and next steps.",
+      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the fresh hosted connectivity probe, local assessor status, unresolved local Jev gate, and the next prospective-data action.",
       "tags": [
         "documentation",
         "handoff",
         "btc-evidence",
         "jev",
-        "runtime-status",
         "collaboration"
       ],
       "complexity": "complex"
@@ -39214,16 +39152,173 @@
       "type": "document",
       "name": "UNDERSTANDING-LOG.md",
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "summary": "Chronological project record from October 2026 through November 28, covering B4 and U6â€“U8 work, BTC MiniRAG/Jev decisions, release and deployment milestones, graph refreshes, and clock and local-model observations with evidence links.",
+      "summary": "Append-only project history recording parser fixes, hosted Jev probes, replay evidence, knowledge maintenance, and unresolved quantitative and deployment gates.",
       "tags": [
         "documentation",
-        "project-history",
-        "chronology",
-        "worktree",
+        "history",
         "evidence",
-        "collaboration"
+        "jev",
+        "knowledge-maintenance"
       ],
       "complexity": "complex"
+    },
+    {
+      "id": "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json",
+      "type": "config",
+      "name": "jev-hosted-synthetic-connectivity-2026-11-28.json",
+      "filePath": "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json",
+      "summary": "Redacted evidence record for one bounded hosted Jev synthetic connectivity probe, including model identity, response fingerprints, provider usage, and zero-network local replay metadata.",
+      "tags": [
+        "evidence",
+        "jev",
+        "connectivity",
+        "replay",
+        "synthetic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "type": "document",
+      "name": "typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "summary": "First-party TypeSafe recheck documenting the hosted-only public Jev path, absent local runtime and weight evidence, legal identity limits, and the separately recorded synthetic hosted probe.",
+      "tags": [
+        "documentation",
+        "research",
+        "jev",
+        "runtime",
+        "provider-boundary"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project onboarding and operations guide for the paper-only market research workspace. It states the quantitative math and probability direction, Market OS and Jev role boundary, current Jev local-runtime uncertainty, and the Git-shared contributor knowledge workflow.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "project-overview",
+        "knowledge-graph",
+        "collaboration",
+        "jev"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/COLLABORATION-WORKFLOW.md",
+      "type": "document",
+      "name": "COLLABORATION-WORKFLOW.md",
+      "filePath": "docs/COLLABORATION-WORKFLOW.md",
+      "summary": "Defines the shared contributor and coding-agent workflow: read the live goal and handoff, update canonical knowledge, refresh and verify the English Understand graph, and leave a reviewable Git handoff without committing private data.",
+      "tags": [
+        "documentation",
+        "collaboration",
+        "onboarding",
+        "knowledge-workflow",
+        "pull-requests"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/KNOWLEDGE-MAINTENANCE.md",
+      "type": "document",
+      "name": "KNOWLEDGE-MAINTENANCE.md",
+      "filePath": "docs/KNOWLEDGE-MAINTENANCE.md",
+      "summary": "Defines the shared knowledge chain, update cadence, source-then-graph commit sequence, dashboard boundary, and pull-request checklist for collaborators and coding agents.",
+      "tags": [
+        "documentation",
+        "collaboration",
+        "knowledge-workflow",
+        "knowledge-graph",
+        "onboarding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/shared_knowledge_status.py",
+      "type": "file",
+      "name": "shared_knowledge_status.py",
+      "filePath": "scripts/shared_knowledge_status.py",
+      "summary": "Provides shared knowledge status and graph refresh diagnostics for the project.",
+      "tags": [
+        "utility",
+        "status",
+        "knowledge-graph",
+        "cli"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/shared_knowledge_status.py:git",
+      "type": "function",
+      "name": "git",
+      "filePath": "scripts/shared_knowledge_status.py",
+      "lineRange": [
+        14,
+        24
+      ],
+      "summary": "Implements git for the shared knowledge status utility.",
+      "tags": [
+        "utility",
+        "status",
+        "knowledge-graph"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/shared_knowledge_status.py:read_json",
+      "type": "function",
+      "name": "read_json",
+      "filePath": "scripts/shared_knowledge_status.py",
+      "lineRange": [
+        27,
+        31
+      ],
+      "summary": "Implements read json for the shared knowledge status utility.",
+      "tags": [
+        "utility",
+        "status",
+        "knowledge-graph"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/shared_knowledge_status.py:project_changes",
+      "type": "function",
+      "name": "project_changes",
+      "filePath": "scripts/shared_knowledge_status.py",
+      "lineRange": [
+        34,
+        38
+      ],
+      "summary": "Implements project changes for the shared knowledge status utility.",
+      "tags": [
+        "utility",
+        "status",
+        "knowledge-graph"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/shared_knowledge_status.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/shared_knowledge_status.py",
+      "lineRange": [
+        41,
+        85
+      ],
+      "summary": "Implements main for the shared knowledge status utility.",
+      "tags": [
+        "utility",
+        "status",
+        "knowledge-graph"
+      ],
+      "complexity": "moderate"
     }
   ],
   "edges": [
@@ -62264,13 +62359,6 @@
     },
     {
       "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
       "target": "document:docs/GOAL-PROMPT.md",
       "type": "documents",
       "direction": "forward",
@@ -62285,167 +62373,6 @@
     },
     {
       "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:CONTRIBUTING.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:SECURITY.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:deploy/k8s/README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:deploy/u5-5/README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/DEVOPS-RUNBOOK.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/JS-PACKAGE-MANAGEMENT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:mlops/README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "document:observability/README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTAND-GRAPH.md",
-      "target": "document:README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/COLLABORATION-WORKFLOW.md",
-      "target": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/GOAL-PROMPT.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTAND-GRAPH.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "target": "document:README.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "target": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/KNOWLEDGE-MAINTENANCE.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
       "direction": "forward",
@@ -62461,20 +62388,6 @@
     {
       "source": "document:docs/UNDERSTAND-GRAPH.md",
       "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/UNDERSTAND-GRAPH.md",
-      "target": "document:docs/KNOWLEDGE-MAINTENANCE.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "target": "document:docs/decisions/ADR-0058-btc-jev-connectivity-only-local-assessor.md",
       "type": "documents",
       "direction": "forward",
       "weight": 0.5
@@ -62602,6 +62515,413 @@
       "source": "function:scripts/ci_checks.py:main",
       "target": "function:scripts/ci_checks.py:validate_shared_knowledge",
       "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_result_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_comparable_ids",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_prompt_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_messages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:_response_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:_packet",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_response_recovers_final_json_after_truncated_runtime_echo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "function:market_os/tests/test_btc_local_assessor.py:test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/tests/test_btc_local_assessor.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5,
+      "description": "Path-based pairing (deterministic)"
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:git",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:git",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:read_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:read_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:project_changes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:project_changes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:scripts/shared_knowledge_status.py",
+      "target": "function:scripts/shared_knowledge_status.py:main",
+      "type": "exports",
       "direction": "forward",
       "weight": 0.8
     },
@@ -63510,8 +63830,32 @@
       "recoveredFromImportMap": true
     },
     {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/btc_assessor_python_runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/btc_local_assessor.py",
+      "target": "file:market_os/btc_question_evaluation.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
       "source": "file:market_os/btc_local_assessor_store.py",
       "target": "file:market_os/btc_evidence_packet.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/btc_local_assessor_store.py",
+      "target": "file:market_os/btc_local_assessor.py",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7,
@@ -64456,6 +64800,70 @@
     {
       "source": "file:market_os/tests/test_btc_jev_evaluation.py",
       "target": "file:market_os/workflow.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_assessor_windows_appcontainer.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_evidence_packet.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_features.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_local_assessor.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_local_assessor_store.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/btc_question_evaluation.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:market_os/tests/test_btc_local_assessor.py",
+      "target": "file:market_os/providers.py",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7,
@@ -66220,445 +66628,6 @@
       "direction": "forward",
       "weight": 0.7,
       "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:AppContainerRuntimeError",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "target": "class:market_os/btc_assessor_windows_appcontainer.py:WindowsAppContainerCliRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_windows_powershell_path",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_verify_windows_egress_rules",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_verify_pinned_python_runtime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_result_schema",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_comparable_ids",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_prompt_input",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_messages",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:_response_json",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "function:market_os/btc_local_assessor.py:local_runtime_health",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessorError",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:CompletionRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:_WindowsResourceJob",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalAssessmentRecord",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalLlamaRuntime",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "class:market_os/btc_local_assessor.py:LocalB31Assessor",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:_packet",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_b31_packet_accepts_bounded_local_receipt_with_unknown_publication",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:_usable_response",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessor_normalizes_typed_results_without_claiming_jev",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_requires_exact_active_store_executable_paths",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_mismatched_or_unreadable_policy",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_egress_health_fails_closed_on_matching_policy_without_behavioral_proof",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_uses_appcontainer_cli_without_firewall_or_socket",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_appcontainer_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_start_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_runtime_maps_os_completion_failures_to_typed_assessor_errors",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_start_fails_closed_when_egress_isolation_is_unverified",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_health_uses_the_fail_closed_startup_preflight",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_linux_runtime_cannot_bypass_unverified_isolation_for_health",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_runtime_rejects_a_different_python_executable_before_loading_model",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_without_calling_an_inference_runtime",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_new_run_when_total_store_limit_is_full",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_serializes_concurrent_writes_at_total_limit",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_does_not_accept_a_jev_identity",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_replays_typed_runtime_start_failure",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_assessment_store_rejects_modified_run_bundles",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_windows_resource_job_limits_memory_and_resumes_suspended_process",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_local_response_recovers_final_json_after_truncated_runtime_echo",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "function:market_os/tests/test_btc_local_assessor.py:test_appcontainer_framing_ignores_marker_like_prompt_and_completion_text",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/tests/test_btc_local_assessor.py",
-      "type": "tested_by",
-      "direction": "forward",
-      "weight": 0.5,
-      "description": "Path-based pairing (deterministic)"
-    },
-    {
-      "source": "file:market_os/btc_local_assessor_store.py",
-      "target": "file:market_os/btc_local_assessor.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/btc_assessor_python_runtime.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/btc_local_assessor.py",
-      "target": "file:market_os/btc_question_evaluation.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/__init__.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_assessor_windows_appcontainer.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_evidence_packet.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_features.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_local_assessor.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_local_assessor_store.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/btc_question_evaluation.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
-    },
-    {
-      "source": "file:market_os/tests/test_btc_local_assessor.py",
-      "target": "file:market_os/providers.py",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7,
-      "recoveredFromImportMap": true
     }
   ],
   "layers": [
@@ -67219,7 +67188,8 @@
         "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json",
         "document:docs/COLLABORATION-WORKFLOW.md",
         "document:docs/KNOWLEDGE-MAINTENANCE.md",
-        "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md"
+        "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+        "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json"
       ]
     },
     {
@@ -67388,7 +67358,8 @@
         "file:scripts/btc_b2_daily_stability.py",
         "file:scripts/build_web_artifact.py",
         "file:mlops/validate_manifest.py",
-        "config:mlops/experiment-manifest.example.json"
+        "config:mlops/experiment-manifest.example.json",
+        "file:scripts/shared_knowledge_status.py"
       ]
     },
     {

@@ -86,7 +86,7 @@
     {
       "path": "README.md",
       "language": "markdown",
-      "sizeLines": 197,
+      "sizeLines": 208,
       "fileCategory": "docs"
     },
     {
@@ -980,7 +980,7 @@
     {
       "path": "docs/COLLABORATION-WORKFLOW.md",
       "language": "markdown",
-      "sizeLines": 84,
+      "sizeLines": 90,
       "fileCategory": "docs"
     },
     {
@@ -1040,7 +1040,7 @@
     {
       "path": "docs/KNOWLEDGE-MAINTENANCE.md",
       "language": "markdown",
-      "sizeLines": 91,
+      "sizeLines": 102,
       "fileCategory": "docs"
     },
     {
@@ -1184,7 +1184,7 @@
     {
       "path": "docs/NEXT-WORK-HANDOFF.md",
       "language": "markdown",
-      "sizeLines": 948,
+      "sizeLines": 965,
       "fileCategory": "docs"
     },
     {
@@ -1520,7 +1520,7 @@
     {
       "path": "docs/UNDERSTANDING-LOG.md",
       "language": "markdown",
-      "sizeLines": 2689,
+      "sizeLines": 2706,
       "fileCategory": "docs"
     },
     {
@@ -2250,6 +2250,12 @@
       "fileCategory": "config"
     },
     {
+      "path": "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json",
+      "language": "json",
+      "sizeLines": 77,
+      "fileCategory": "config"
+    },
+    {
       "path": "docs/evidence/local-exit-gate.json",
       "language": "json",
       "sizeLines": 113,
@@ -2918,7 +2924,7 @@
     {
       "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
       "language": "markdown",
-      "sizeLines": 90,
+      "sizeLines": 106,
       "fileCategory": "docs"
     },
     {
@@ -4254,6 +4260,12 @@
       "fileCategory": "code"
     },
     {
+      "path": "scripts/shared_knowledge_status.py",
+      "language": "python",
+      "sizeLines": 99,
+      "fileCategory": "code"
+    },
+    {
       "path": "tests/market-os-readonly-dashboard.test.ts",
       "language": "typescript",
       "sizeLines": 18,
@@ -4284,7 +4296,7 @@
       "fileCategory": "code"
     }
   ],
-  "totalFiles": 709,
+  "totalFiles": 711,
   "filteredByIgnore": 0,
   "estimatedComplexity": "very-large",
   "importMap": {
@@ -4798,6 +4810,7 @@
     "docs/evidence/directadmin-static-preview.json": [],
     "docs/evidence/jev-connectivity-reauthorized-2026-11-19.json": [],
     "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json": [],
+    "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json": [],
     "docs/evidence/local-exit-gate.json": [],
     "docs/evidence/m1.10-openharness-blockers.json": [],
     "docs/evidence/m1.11-openharness-blockers.json": [],
@@ -5629,11 +5642,12 @@
       "market_os/providers.py",
       "market_os/research.py"
     ],
+    "scripts/shared_knowledge_status.py": [],
     "tests/market-os-readonly-dashboard.test.ts": [],
     "tests/market-os-u6-4-artifact.test.ts": [],
     "tests/market-os-u6-app-shell.test.ts": [],
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "d433464d9978022627945ef0010c54a1b509775281d71fa9a58a7ff24dc4b9fe"
+  "contentDigest": "cf2283d1fa735c1e515b0adb31aabe343572ac9aa1e75ec39801e689fa6cb91c"
 }
