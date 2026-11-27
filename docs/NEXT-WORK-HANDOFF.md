@@ -1,5 +1,21 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28 — hosted Jev probe refreshed
+
+The bounded CLI completed one synthetic `jev-1.14.0` hosted probe through the
+documented TypeSafe endpoint with zero retries and paper-only action `none`.
+The response was valid (484 input tokens, 92 output tokens, 402 ms observed
+latency), and the persisted run replayed with zero network/provider requests.
+The redacted result is
+[jev-hosted-synthetic-connectivity-2026-11-28.json](evidence/jev-hosted-synthetic-connectivity-2026-11-28.json).
+It contains no BTC packet or raw credential. This verifies hosted connectivity
+and replay only; it does not establish a local Jev runtime or change ADR-0058.
+
+The next Jev gate remains a written local/VPC/on-premises offer plus a
+vendor-authenticated Jev runtime/container and weight manifest. Keep the local
+Qwen assessor separately named, and keep Market OS authoritative for math,
+probability, calibration, stability, risk, and paper decisions.
+
 ## Current collaborator checkpoint — 2026-11-28 — local completion parser seam
 
 The Windows AppContainer `llama-cli` adapter now has a regression guard for
@@ -19,8 +35,9 @@ knowledge are committed first, then the English Understand graph is refreshed
 from that source checkpoint and its tracked metadata is committed separately.
 Use `docs/COLLABORATION-WORKFLOW.md` and
 `docs/KNOWLEDGE-MAINTENANCE.md` as the durable handoff instead of private chat
-state. The next action is to review this parser change, run the relevant
-repository checks, and refresh the graph after the source commit.
+state. The parser change, focused checks, PR merge, and graph refresh are
+complete. The next action is the vendor local-runtime gate or, independently,
+prospective BTC capture with a qualified UTC receipt bound.
 
 ## Current collaborator checkpoint — 2026-11-28
 

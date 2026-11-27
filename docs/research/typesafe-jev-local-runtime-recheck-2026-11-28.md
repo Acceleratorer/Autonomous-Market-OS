@@ -4,8 +4,10 @@
 
 **Scope:** Public first-party TypeSafe documentation, legal terms, the public
 TypeSafe GitHub organization, and the TypeSafeAI Hugging Face API/profile.
-Read-only. No hosted Jev request, email, installation, credential inspection,
-BTC packet, or model download was performed.
+The public-source portion was read-only. A separately authorized, synthetic
+hosted Jev connectivity probe was run after this source review; it did not
+include a BTC packet or private project data. No installation or model download
+was performed.
 
 ## Finding
 
@@ -88,3 +90,17 @@ that supplies both:
 Until both are present, the project must not call a substitute Jev, send BTC
 packets to hosted Jev, or use hosted Jev outputs to train or evaluate a local
 substitute.
+
+## Fresh hosted connectivity probe — 2026-11-28
+
+The bounded CLI ran one `jev-1.14.0` request against the documented hosted
+endpoint with the committed synthetic descriptive question set, paper-only
+mode, a `$0.05` estimate cap, and zero retries. The result was valid with 484
+input tokens, 92 output tokens, and 402 ms observed adapter latency. The
+normalized result and fingerprints are in
+[`jev-hosted-synthetic-connectivity-2026-11-28.json`](../evidence/jev-hosted-synthetic-connectivity-2026-11-28.json).
+
+The persisted run replayed with zero network and provider requests. The probe
+confirms the hosted API path and the local replay contract only. It does not
+change the local-runtime finding, establish Jev weights, qualify B3.1 packet
+egress, or grant Jev any math, calibration, risk, or execution authority.

@@ -3,6 +3,23 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — Hosted Jev connectivity probe and local replay
+
+- Ran the bounded CLI Jev probe once with `jev-1.14.0`, the synthetic
+  `btc.connectivity.synthetic-descriptive.v1` contract, paper-only mode, one
+  request, zero retries, and the `$0.05` estimate cap. The hosted response was
+  valid with 484 input tokens, 92 output tokens, and 402 ms observed latency.
+- Persisted redacted evidence at
+  `docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json`; no raw
+  credential, raw provider response, BTC packet, or project data was stored.
+  Offline replay returned `replayed: true` with zero network/provider requests.
+- This confirms the hosted endpoint and replay path only. It does not verify
+  local Jev weights/runtime, B3.1 eligibility, calibration, or trading value;
+  Qwen remains separately identified and ADR-0058 remains unchanged.
+- Next gate: written TypeSafe local-use terms plus a vendor-authenticated
+  runtime/container and weight manifest. The graph must be refreshed after
+  this source/document commit.
+
 ## 2026-11-28 — AppContainer multiline completion parser regression
 
 - Reproduced the Windows `llama-cli` seam failure with a minimal multiline
