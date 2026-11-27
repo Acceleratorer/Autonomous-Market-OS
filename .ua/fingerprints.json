@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "a7772b75b6cf2ee9ae205a47ceacf5d62fce642c",
-  "generatedAt": "2026-11-27T15:51:30.180Z",
+  "gitCommitHash": "98cbde6f1f6061c99e5deebe8f4728a8017ee663",
+  "generatedAt": "2026-11-27T17:20:49.231Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -75,12 +75,12 @@
     },
     "CONTRIBUTING.md": {
       "filePath": "CONTRIBUTING.md",
-      "contentHash": "89c578a53f416ffb1fb448de288febbf7255f69b2e83e9eede3cd6d757f57fe0",
+      "contentHash": "e4ea42ec97fcec813231876447ef5410332612559dcdad972d300bed48c7b046",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 87,
+      "totalLines": 93,
       "hasStructuralAnalysis": false
     },
     "JEV_PROCESSING.md": {
@@ -95,12 +95,12 @@
     },
     "README.md": {
       "filePath": "README.md",
-      "contentHash": "fca585f0ed15144ae52dfe1995cd69616883676ce775612af317eafb6ba0a610",
+      "contentHash": "8a46e2c82af2fd9aef04c5b52a5a59f3e2c5c6450bcadcbc86dbee9fb6f5ed4c",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 181,
+      "totalLines": 196,
       "hasStructuralAnalysis": false
     },
     "SECURITY.md": {
@@ -5520,12 +5520,12 @@
     },
     "docs/GOAL-PROMPT.md": {
       "filePath": "docs/GOAL-PROMPT.md",
-      "contentHash": "761184002c185234b19d3540f3acc9a32aedabb1b40b741741dc1a88244903e8",
+      "contentHash": "5012ee4060646c441c6876eecb1f9bc0cdab597d33131667c054efcd0b73a82b",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 126,
+      "totalLines": 134,
       "hasStructuralAnalysis": false
     },
     "docs/INTEGRATION-GUIDE.md": {
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "f3a23381984e97dd92340536aad4181728589a18e75d04173583c812a642fa8f",
+      "contentHash": "98a3ab260dc157cac4bb5cf1ce87ad445c90727f7afd8feea5bd5ef54910c6a3",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 880,
+      "totalLines": 900,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "dcef5f0a39ef8efff677ab5dd75b697404f29eabaf1759b5aef695515d6bb431",
+      "contentHash": "991c92e5d3b57bf74b017143375664c7b98a7d6f0506e72e390f665403751baa",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2632,
+      "totalLines": 2653,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {
@@ -41681,12 +41681,12 @@
     },
     "docs/UNDERSTAND-GRAPH.md": {
       "filePath": "docs/UNDERSTAND-GRAPH.md",
-      "contentHash": "3ab035f7402c78f3ff0a3647803e6ebcc9e2a3c3c806dbb1419918da2ef2f54c",
+      "contentHash": "3abe99dc99e6e36c896dc265a15ce328cec4f34664171c7e9dbd0113a0586a4b",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 75,
+      "totalLines": 77,
       "hasStructuralAnalysis": false
     },
     "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-27.json": {
@@ -41697,6 +41697,16 @@
       "imports": [],
       "exports": [],
       "totalLines": 53,
+      "hasStructuralAnalysis": false
+    },
+    "docs/COLLABORATION-WORKFLOW.md": {
+      "filePath": "docs/COLLABORATION-WORKFLOW.md",
+      "contentHash": "7092cee24134bc6a8b463495e4e6ac5af81c407847ea44ca1770641363d87dc5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 81,
       "hasStructuralAnalysis": false
     }
   }
