@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-28T15:01:54.155Z",
-    "gitCommitHash": "b4066891ad989c774a4814f45404875837b61c61"
+    "analyzedAt": "2026-11-28T19:23:54.419Z",
+    "gitCommitHash": "072c145fe6a29c2447f22c0a52d241448633a651"
   },
   "nodes": [
     {
@@ -39309,6 +39309,11 @@
       "complexity": "simple"
     },
     {
+      "id": "document:docs/NEXT-WORK-HANDOFF.md",
+      "type": "document",
+      "name": "NEXT-WORK-HANDOFF.md",
+      "filePath": "docs/NEXT-WORK-HANDOFF.md",
+      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the 2026-11-29 TypeSafe support inquiry sent to support@typesafe.ai, its no-reply/no-manifest status, contributor knowledge maintenance, hosted connectivity probe, local assessor status, and unresolved local Jev gate.",
       "tags": [
         "documentation",
         "handoff",
@@ -39317,14 +39322,14 @@
         "collaboration",
         "knowledge-maintenance"
       ],
-      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the TypeSafe mailbox recheck, contributor start packet, hosted connectivity probe, local assessor status, unresolved local Jev gate, and next prospective-data action.",
-      "id": "document:docs/NEXT-WORK-HANDOFF.md",
-      "name": "NEXT-WORK-HANDOFF.md",
-      "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "complexity": "complex",
-      "type": "document"
+      "complexity": "complex"
     },
     {
+      "id": "document:docs/UNDERSTANDING-LOG.md",
+      "type": "document",
+      "name": "UNDERSTANDING-LOG.md",
+      "filePath": "docs/UNDERSTANDING-LOG.md",
+      "summary": "Append-only project history recording the 2026-11-29 TypeSafe support inquiry, its no-reply/no-manifest status, contributor knowledge maintenance, hosted Jev probes, replay evidence, parser fixes, and unresolved quantitative and deployment gates.",
       "tags": [
         "documentation",
         "history",
@@ -39333,14 +39338,14 @@
         "knowledge-maintenance",
         "collaboration"
       ],
-      "summary": "Append-only project history recording the TypeSafe mailbox recheck, contributor knowledge maintenance, hosted Jev probes, replay evidence, parser fixes, and unresolved quantitative and deployment gates.",
-      "id": "document:docs/UNDERSTANDING-LOG.md",
-      "name": "UNDERSTANDING-LOG.md",
-      "filePath": "docs/UNDERSTANDING-LOG.md",
-      "complexity": "complex",
-      "type": "document"
+      "complexity": "complex"
     },
     {
+      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "type": "document",
+      "name": "typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
+      "summary": "First-party TypeSafe recheck documenting the hosted-only public Jev path, absent local runtime and weight evidence, the unanswered mailbox inquiry, and the 2026-11-29 support inquiry sent to support@typesafe.ai; no vendor reply or manifest is available, so local Jev remains unverified.",
       "tags": [
         "documentation",
         "research",
@@ -39349,12 +39354,7 @@
         "provider-boundary",
         "mailbox"
       ],
-      "summary": "First-party TypeSafe recheck documenting the hosted-only public Jev path, absent local runtime and weight evidence, the unanswered mailbox inquiry, legal identity limits, and the separately recorded synthetic hosted probe.",
-      "id": "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "name": "typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "complexity": "moderate",
-      "type": "document"
+      "complexity": "moderate"
     }
   ],
   "edges": [

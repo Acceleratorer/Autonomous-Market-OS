@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "b4066891ad989c774a4814f45404875837b61c61",
-  "generatedAt": "2026-11-28T15:01:54.297Z",
+  "gitCommitHash": "072c145fe6a29c2447f22c0a52d241448633a651",
+  "generatedAt": "2026-11-28T19:23:54.541Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "fc6a2d8fc2901b99bcb98d2b06dfe21dcb2c33f29a849f8448bfc721b904a567",
+      "contentHash": "1a946d5a5881fcea84d0b3773f6469d210d5c6ff018e29c94f7bb8a85ab9e469",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 1016,
+      "totalLines": 1032,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "61fdf22b450d16fcb8482621535c7c614bbbce94aad7656d01dfb66f1285b316",
+      "contentHash": "12f7e9294d68d7298b063d091ab1cea93bc0f2a99a0e3b2b43905c09e9bfc395",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2761,
+      "totalLines": 2774,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {
@@ -41778,12 +41778,12 @@
     },
     "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md": {
       "filePath": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-      "contentHash": "d17619984fbe5997d519b448abe47837cc325cb77fc2ea43731992e5b1eda996",
+      "contentHash": "ddffd81d8a277a9b2558819fc006a148ef126090ceeea80ce076fcefcfbdef87",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 118,
+      "totalLines": 134,
       "hasStructuralAnalysis": false
     },
     "docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json": {
