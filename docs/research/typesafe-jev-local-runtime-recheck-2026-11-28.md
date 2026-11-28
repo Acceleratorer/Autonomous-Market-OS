@@ -115,3 +115,19 @@ The persisted run replayed with zero network and provider requests. The probe
 confirms the hosted API path and the local replay contract only. It does not
 change the local-runtime finding, establish Jev weights, qualify B3.1 packet
 egress, or grant Jev any math, calibration, risk, or execution authority.
+
+## Support inquiry sent — 2026-11-29
+
+The owner-corrected follow-up inquiry was sent from `noobtan77@gmail.com` to
+`support@typesafe.ai` with the subject **“Inquiry: authentic local Jev runtime
+and deployment terms”**. Gmail visibly confirmed **“Đã gửi thư”**. The message
+asks for an authentic local/VPC/on-premises package, written personal
+non-commercial local-use terms, a vendor-authenticated Jev/runtime/container
+and weight SHA-256 manifest, supported targets, and offline/telemetry/egress
+behavior. It states that no BTC data, credentials, API keys, or private
+artifacts are being sent.
+
+No reply or vendor artifact is evidenced yet. This outreach does not change
+the local-runtime finding: hosted Jev remains connectivity-only, BTC packets
+remain local, and Qwen remains separately named until both written terms and a
+vendor-authenticated manifest are received and verified.

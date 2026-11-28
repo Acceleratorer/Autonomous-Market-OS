@@ -1,5 +1,21 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-29 — TypeSafe support inquiry sent
+
+The corrected inquiry was sent from `noobtan77@gmail.com` to
+`support@typesafe.ai` with subject **“Inquiry: authentic local Jev runtime and
+deployment terms”**. Gmail visibly confirmed **“Đã gửi thư”**. The message
+requests written local/VPC/on-premises terms, a vendor-authenticated Jev
+runtime/container and weight SHA-256 manifest, supported targets, and
+offline/telemetry/egress behavior; it contains no BTC data, credentials, API
+keys, or private artifacts.
+
+There is no vendor reply or manifest yet. Keep authentic local Jev **unverified**
+until both the written terms and the vendor-authenticated manifest arrive and
+are independently checked. Hosted Jev remains connectivity-only, BTC packets
+remain local, Qwen remains separately named, and Market OS retains authority
+over math, probability, calibration, stability, risk, and paper decisions.
+
 ## Current collaborator checkpoint — 2026-11-28 — TypeSafe mailbox recheck
 
 The existing Sales thread was checked read-only in the owner mailbox. It still

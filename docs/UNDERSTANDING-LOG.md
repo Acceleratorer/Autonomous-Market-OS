@@ -3,6 +3,19 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-29 — TypeSafe support inquiry sent
+
+- Sent the corrected inquiry from `noobtan77@gmail.com` to
+  `support@typesafe.ai` with subject **“Inquiry: authentic local Jev runtime
+  and deployment terms”**. Gmail visibly confirmed **“Đã gửi thư”**.
+- The message requests written local/VPC/on-premises terms, a
+  vendor-authenticated Jev/runtime/container and weight SHA-256 manifest,
+  supported targets, and offline/telemetry/egress behavior. It includes no BTC
+  data, credentials, API keys, or private artifacts.
+- No reply or manifest is available yet. Authentic local Jev remains
+  unverified; hosted Jev is connectivity-only, BTC packets remain local, and
+  Qwen remains explicitly separate from Jev.
+
 ## 2026-11-28 — TypeSafe mailbox recheck
 
 - Read the existing TypeSafe Sales thread without sending or modifying mail.
