@@ -3,6 +3,19 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — Contributor start packet and PR knowledge gate
+
+- Added `docs/CONTRIBUTOR-START.md` as a single Git-backed onboarding path for
+  humans, coding agents, and later chats. It defines the read order, canonical
+  file ownership, graph refresh sequence, and handoff expectations.
+- Added `.github/pull_request_template.md` so meaningful PRs record canonical
+  knowledge updates, the graph source checkpoint, exact checks, and data/Jev
+  boundary hygiene. Linked the packet from `README.md`, `CONTRIBUTING.md`, and
+  `docs/COLLABORATION-WORKFLOW.md`.
+- No BTC packet, credential, Jev request, model download, or runtime behavior
+  changed. The source commit must be followed by an English Understand graph
+  refresh and tracked graph snapshot commit.
+
 ## 2026-11-28 — Shared knowledge status helper and graph checkpoint
 
 - Added the read-only `scripts/shared_knowledge_status.py` command and linked it

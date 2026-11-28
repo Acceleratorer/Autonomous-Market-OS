@@ -4,7 +4,8 @@ Thanks for helping improve Autonomous-Market-OS.
 
 ## Shared project context
 
-Before starting a slice, follow the
+Before starting a slice, read the [contributor start packet](docs/CONTRIBUTOR-START.md)
+and follow the
 [collaborator workflow](docs/COLLABORATION-WORKFLOW.md), read the
 [project goal](docs/GOAL-PROMPT.md), the
 [next-work handoff](docs/NEXT-WORK-HANDOFF.md), and the contracts, ADRs, and

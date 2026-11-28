@@ -1,5 +1,21 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28 — contributor start packet and PR knowledge gate
+
+Added [`docs/CONTRIBUTOR-START.md`](CONTRIBUTOR-START.md) as the one-page
+entry point for humans, coding agents, and later chats. It points to the
+goal, handoff, understanding log, canonical evidence, graph dashboard, and
+status/validation commands in a fixed order. Added the repository PR template
+so every meaningful change records its canonical knowledge updates, graph source
+checkpoint, exact verification, and unresolved provider/data/legal gates.
+
+This is documentation-only. It does not change the Market OS decision boundary,
+Jev identity, packet egress, credentials, or paper-only mode. After this source
+commit, refresh the English Understand graph and commit its tracked snapshot as
+the graph-only follow-up. The next implementation gate remains the written
+TypeSafe local-runtime/vendor evidence or a separately approved prospective BTC
+capture.
+
 ## Current collaborator checkpoint — 2026-11-28 — shared knowledge handoff standardized
 
 The repository now includes a read-only `scripts/shared_knowledge_status.py`

@@ -182,7 +182,8 @@ calibration, risk, and paper decisions, while Jev's intended role is advisory
 evidence support, contradiction detection, and abstention. Authentic local Jev
 availability and local-use terms remain unverified.
 
-Before taking a slice, read the [current goal](docs/GOAL-PROMPT.md),
+Before taking a slice, start with the [contributor start packet](docs/CONTRIBUTOR-START.md),
+then read the [current goal](docs/GOAL-PROMPT.md),
 [next-work handoff](docs/NEXT-WORK-HANDOFF.md), and the
 [collaborator workflow](docs/COLLABORATION-WORKFLOW.md). Stable decisions live
 in [`docs/decisions/`](docs/decisions/); dated findings and reproducible results
@@ -205,4 +206,5 @@ python scripts/ci_checks.py validate-shared-knowledge
 
 The status command reports the graph checkpoint, source drift, inventory, and
 the exact next maintenance action. Run it before editing and include its result
-in the PR handoff when the graph or canonical knowledge changed.
+in the PR handoff when the graph or canonical knowledge changed. The repository
+PR template carries the same knowledge and graph checklist into every review.

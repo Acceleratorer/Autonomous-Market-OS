@@ -1,5 +1,8 @@
 # Shared collaborator workflow
 
+For a one-page start, use the [contributor start packet](CONTRIBUTOR-START.md).
+This document is the detailed routine behind that packet.
+
 For the compact artifact-to-file mapping, cadence, graph commit sequence, and
 CI gate, read [KNOWLEDGE-MAINTENANCE.md](KNOWLEDGE-MAINTENANCE.md). This file
 keeps the start, update, and handoff procedure explicit.
