@@ -30,8 +30,8 @@
       "Terraform"
     ],
     "description": "Autonomous Market OS is a paper-only quantitative market-research and portfolio-inspection workspace. Market OS owns quantitative math, probability, stability, calibration, risk, and paper decisions; Jev's intended role is advisory evidence assessment, but authentic local Jev remains unverified. Public market-data capture and synthetic hosted-Jev connectivity require bounded explicit opt-in. BTC evidence packets stay local; live trading and public mutation routes are disabled. The graph maps 709 repository files.",
-    "analyzedAt": "2026-11-27T22:23:40.461Z",
-    "gitCommitHash": "610b9e3657c8c5a75b58bdb2ee72dade8cfdeb3d"
+    "analyzedAt": "2026-11-28T14:02:18.878Z",
+    "gitCommitHash": "a5ce851f00fd0e68266c652887f1044f3e516d79"
   },
   "nodes": [
     {
@@ -38189,21 +38189,6 @@
       "complexity": "complex"
     },
     {
-      "id": "document:CONTRIBUTING.md",
-      "type": "document",
-      "name": "CONTRIBUTING.md",
-      "filePath": "CONTRIBUTING.md",
-      "summary": "Defines the paper-only contribution boundary, local setup and pre-PR checks, and the shared collaborator, knowledge-maintenance, and graph-refresh workflow.",
-      "tags": [
-        "documentation",
-        "development",
-        "contribution",
-        "knowledge-workflow",
-        "pull-requests"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "document",
       "name": "UNDERSTAND-GRAPH.md",
@@ -39163,37 +39148,6 @@
       "complexity": "moderate"
     },
     {
-      "id": "document:README.md",
-      "type": "document",
-      "name": "README.md",
-      "filePath": "README.md",
-      "summary": "Project onboarding and operations guide for the paper-only market research workspace. It states the quantitative math and probability direction, Market OS and Jev role boundary, current Jev local-runtime uncertainty, and the Git-shared contributor knowledge workflow.",
-      "tags": [
-        "documentation",
-        "entry-point",
-        "project-overview",
-        "knowledge-graph",
-        "collaboration",
-        "jev"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "document:docs/COLLABORATION-WORKFLOW.md",
-      "type": "document",
-      "name": "COLLABORATION-WORKFLOW.md",
-      "filePath": "docs/COLLABORATION-WORKFLOW.md",
-      "summary": "Defines the shared contributor and coding-agent workflow: read the live goal and handoff, update canonical knowledge, refresh and verify the English Understand graph, and leave a reviewable Git handoff without committing private data.",
-      "tags": [
-        "documentation",
-        "collaboration",
-        "onboarding",
-        "knowledge-workflow",
-        "pull-requests"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "document:docs/KNOWLEDGE-MAINTENANCE.md",
       "type": "document",
       "name": "KNOWLEDGE-MAINTENANCE.md",
@@ -39291,17 +39245,82 @@
       "complexity": "moderate"
     },
     {
+      "id": "document:CONTRIBUTING.md",
+      "type": "document",
+      "name": "CONTRIBUTING.md",
+      "filePath": "CONTRIBUTING.md",
+      "summary": "Defines the paper-only contribution boundary, local setup and pre-PR checks, and the shared contributor start packet, knowledge-maintenance, and graph-refresh workflow.",
+      "tags": [
+        "documentation",
+        "development",
+        "contribution",
+        "knowledge-workflow",
+        "pull-requests",
+        "onboarding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project onboarding and operations guide for the paper-only market research workspace. It states the quantitative math and probability direction, Market OS and Jev role boundary, current Jev local-runtime uncertainty, and the Git-shared contributor knowledge workflow.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "project-overview",
+        "knowledge-graph",
+        "collaboration",
+        "jev",
+        "onboarding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/COLLABORATION-WORKFLOW.md",
+      "type": "document",
+      "name": "COLLABORATION-WORKFLOW.md",
+      "filePath": "docs/COLLABORATION-WORKFLOW.md",
+      "summary": "Defines the shared contributor and coding-agent workflow: start from Git-backed project knowledge, update canonical documents, refresh and verify the English Understand graph, and leave a reviewable handoff without committing private data.",
+      "tags": [
+        "documentation",
+        "collaboration",
+        "onboarding",
+        "knowledge-workflow",
+        "pull-requests"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/CONTRIBUTOR-START.md",
+      "type": "document",
+      "name": "CONTRIBUTOR-START.md",
+      "filePath": "docs/CONTRIBUTOR-START.md",
+      "summary": "One-page contributor start packet that fixes the read order, canonical knowledge ownership, graph refresh sequence, and PR handoff for humans, coding agents, and later chats.",
+      "tags": [
+        "documentation",
+        "collaboration",
+        "onboarding",
+        "knowledge-workflow",
+        "understand-graph",
+        "pull-requests"
+      ],
+      "complexity": "moderate"
+    },
+    {
       "id": "document:docs/NEXT-WORK-HANDOFF.md",
       "type": "document",
       "name": "NEXT-WORK-HANDOFF.md",
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the fresh hosted connectivity probe, local assessor status, unresolved local Jev gate, and the next prospective-data action.",
+      "summary": "Live handoff for the BTC MiniRAG and Jev evidence path, including the contributor start packet and PR knowledge gate, hosted connectivity probe, local assessor status, unresolved local Jev gate, and next prospective-data action.",
       "tags": [
         "documentation",
         "handoff",
         "btc-evidence",
         "jev",
-        "collaboration"
+        "collaboration",
+        "knowledge-maintenance"
       ],
       "complexity": "complex"
     },
@@ -39310,15 +39329,31 @@
       "type": "document",
       "name": "UNDERSTANDING-LOG.md",
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "summary": "Append-only project history recording parser fixes, hosted Jev probes, replay evidence, knowledge maintenance, and unresolved quantitative and deployment gates.",
+      "summary": "Append-only project history recording contributor knowledge maintenance, hosted Jev probes, replay evidence, parser fixes, and unresolved quantitative and deployment gates.",
       "tags": [
         "documentation",
         "history",
         "evidence",
         "jev",
-        "knowledge-maintenance"
+        "knowledge-maintenance",
+        "collaboration"
       ],
       "complexity": "complex"
+    },
+    {
+      "id": "document:.github/pull_request_template.md",
+      "type": "document",
+      "name": "pull_request_template.md",
+      "filePath": ".github/pull_request_template.md",
+      "summary": "Pull request checklist that makes canonical knowledge updates, Understand graph checkpoints, exact verification, boundary hygiene, and unresolved gates reviewable for every collaborator.",
+      "tags": [
+        "documentation",
+        "pull-request",
+        "knowledge-workflow",
+        "graph-refresh",
+        "boundary-validation"
+      ],
+      "complexity": "simple"
     }
   ],
   "edges": [
@@ -62358,27 +62393,6 @@
       "weight": 0.5
     },
     {
-      "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/GOAL-PROMPT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/JS-PACKAGE-MANAGEMENT.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:CONTRIBUTING.md",
-      "target": "document:docs/UNDERSTAND-GRAPH.md",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
       "source": "document:docs/GOAL-PROMPT.md",
       "target": "document:docs/UNDERSTAND-GRAPH.md",
       "type": "documents",
@@ -67189,7 +67203,8 @@
         "document:docs/COLLABORATION-WORKFLOW.md",
         "document:docs/KNOWLEDGE-MAINTENANCE.md",
         "document:docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
-        "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json"
+        "config:docs/evidence/jev-hosted-synthetic-connectivity-2026-11-28.json",
+        "document:docs/CONTRIBUTOR-START.md"
       ]
     },
     {
@@ -67359,7 +67374,8 @@
         "file:scripts/build_web_artifact.py",
         "file:mlops/validate_manifest.py",
         "config:mlops/experiment-manifest.example.json",
-        "file:scripts/shared_knowledge_status.py"
+        "file:scripts/shared_knowledge_status.py",
+        "document:.github/pull_request_template.md"
       ]
     },
     {

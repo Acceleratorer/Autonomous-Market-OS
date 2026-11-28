@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "610b9e3657c8c5a75b58bdb2ee72dade8cfdeb3d",
-  "generatedAt": "2026-11-27T22:23:40.585Z",
+  "gitCommitHash": "a5ce851f00fd0e68266c652887f1044f3e516d79",
+  "generatedAt": "2026-11-28T14:02:18.971Z",
   "files": {
     ".dockerignore": {
       "filePath": ".dockerignore",
@@ -75,12 +75,12 @@
     },
     "CONTRIBUTING.md": {
       "filePath": "CONTRIBUTING.md",
-      "contentHash": "631f06ed0df376258111722d5e89ae03a4956ef23156943763ce8f706674ab63",
+      "contentHash": "67e6a5cbbd6f29cc474d162acfa24e76beb2637bdccde76a18db57bd9dd44ba1",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 96,
+      "totalLines": 97,
       "hasStructuralAnalysis": false
     },
     "JEV_PROCESSING.md": {
@@ -95,12 +95,12 @@
     },
     "README.md": {
       "filePath": "README.md",
-      "contentHash": "d24f1ec6fe0a0edb90cac04d8e2b48c23dacf166afa742b3d80e0513c1cbbfb8",
+      "contentHash": "e4aec0329b2eb91d2386cc574a7c789ac18eb771708e09119c1ec0b340d6ccab",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 209,
+      "totalLines": 211,
       "hasStructuralAnalysis": false
     },
     "SECURITY.md": {
@@ -5780,12 +5780,12 @@
     },
     "docs/NEXT-WORK-HANDOFF.md": {
       "filePath": "docs/NEXT-WORK-HANDOFF.md",
-      "contentHash": "666ad7e52b823b0239378be91ad5372ed07e7ac0967733507c809dd850b577bf",
+      "contentHash": "f88fd384283b26eea0f56b9c488933aa0726c835e812473161f3af69840b5dd7",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 990,
+      "totalLines": 1006,
       "hasStructuralAnalysis": false
     },
     "docs/PHASES.md": {
@@ -6330,12 +6330,12 @@
     },
     "docs/UNDERSTANDING-LOG.md": {
       "filePath": "docs/UNDERSTANDING-LOG.md",
-      "contentHash": "4f3ed6e0081632d7d13e042add46593a64e7255add3c7b874047665bca6a408f",
+      "contentHash": "d01307bd82ea608abc937408e0c4d78c4c8eaa8783f1fcff2e973cdcf0dbfaeb",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 2738,
+      "totalLines": 2751,
       "hasStructuralAnalysis": false
     },
     "docs/WEB-STACK-OPTIONS.md": {
@@ -41758,12 +41758,12 @@
     },
     "docs/COLLABORATION-WORKFLOW.md": {
       "filePath": "docs/COLLABORATION-WORKFLOW.md",
-      "contentHash": "c0654fed797a0669ad464b1968643e6908656ed7f9df7373b86142238cfeaa1f",
+      "contentHash": "116f2262591cc6df0effa0ba239130f6b6810173304c1a6a9eb8408c309a2bd9",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 91,
+      "totalLines": 94,
       "hasStructuralAnalysis": false
     },
     "docs/KNOWLEDGE-MAINTENANCE.md": {
@@ -41868,6 +41868,26 @@
       ],
       "totalLines": 100,
       "hasStructuralAnalysis": true
+    },
+    ".github/pull_request_template.md": {
+      "filePath": ".github/pull_request_template.md",
+      "contentHash": "86951c5f15405abefeb05c553c62e6c4847617eefb1e8b3c1db8e9a2ad89f4f0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": false
+    },
+    "docs/CONTRIBUTOR-START.md": {
+      "filePath": "docs/CONTRIBUTOR-START.md",
+      "contentHash": "f4dd407a4a0a8b3ba77a2b10371a71b22659e16a72342771e16b6ce676478912",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": false
     }
   }
 }
