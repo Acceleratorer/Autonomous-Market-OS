@@ -3,6 +3,16 @@
 Dates and times in this log use the workstation timezone, Asia/Ho_Chi_Minh
 (UTC+07:00), unless an entry explicitly says UTC.
 
+## 2026-11-28 — TypeSafe mailbox recheck
+
+- Read the existing TypeSafe Sales thread without sending or modifying mail.
+  It contains three sent messages dated 21, 25, and 27 November and no vendor
+  reply, local-deployment terms, or Jev runtime/weight manifest.
+- Updated the 2026-11-28 research note and current handoff with this mailbox
+  evidence. Authentic local Jev remains unverified; no new outreach, BTC
+  packet, credential, hosted request, model download, or runtime behavior was
+  introduced.
+
 ## 2026-11-28 — Contributor start packet and PR knowledge gate
 
 - Added `docs/CONTRIBUTOR-START.md` as a single Git-backed onboarding path for

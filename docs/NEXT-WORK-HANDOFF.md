@@ -1,5 +1,15 @@
 # Next Work Handoff — BTC MiniRAG and recorded Jev evidence path
 
+## Current collaborator checkpoint — 2026-11-28 — TypeSafe mailbox recheck
+
+The existing Sales thread was checked read-only in the owner mailbox. It still
+contains three sent messages to `sales@typesafe.ai` (21, 25, and 27 November)
+and no vendor reply or runtime/weight manifest. Authentic local Jev remains
+unverified. This updates the observation date only; it does not authorize new
+outreach, hosted BTC packet egress, or a substitute model under the Jev name.
+The next gate remains written local/VPC/on-premises terms plus a
+vendor-authenticated Jev runtime/container and weight manifest.
+
 ## Current collaborator checkpoint — 2026-11-28 — contributor start packet and PR knowledge gate
 
 Added [`docs/CONTRIBUTOR-START.md`](CONTRIBUTOR-START.md) as the one-page

@@ -7,7 +7,8 @@ TypeSafe GitHub organization, and the TypeSafeAI Hugging Face API/profile.
 The public-source portion was read-only. A separately authorized, synthetic
 hosted Jev connectivity probe was run after this source review; it did not
 include a BTC packet or private project data. No installation or model download
-was performed.
+was performed. The existing TypeSafe Sales thread was also checked read-only
+in the owner's mailbox.
 
 ## Finding
 
@@ -90,6 +91,16 @@ that supplies both:
 Until both are present, the project must not call a substitute Jev, send BTC
 packets to hosted Jev, or use hosted Jev outputs to train or evaluate a local
 substitute.
+
+## Mailbox follow-up — 2026-11-28
+
+The existing thread titled **“Inquiry: authentic local Jev runtime and
+deployment terms”** contains three sent messages to `sales@typesafe.ai`: the
+original 21 November inquiry and follow-ups on 25 and 27 November. The latest
+message is still unanswered. No vendor-supplied terms, runtime manifest,
+artifact hash, weight hash, or local-deployment confirmation was present in the
+thread. This is mailbox evidence for the pending gate, not evidence that a
+private offer is impossible.
 
 ## Fresh hosted connectivity probe — 2026-11-28
 
