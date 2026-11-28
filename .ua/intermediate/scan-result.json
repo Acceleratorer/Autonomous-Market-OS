@@ -1196,7 +1196,7 @@
     {
       "path": "docs/NEXT-WORK-HANDOFF.md",
       "language": "markdown",
-      "sizeLines": 1005,
+      "sizeLines": 1015,
       "fileCategory": "docs"
     },
     {
@@ -1532,7 +1532,7 @@
     {
       "path": "docs/UNDERSTANDING-LOG.md",
       "language": "markdown",
-      "sizeLines": 2750,
+      "sizeLines": 2760,
       "fileCategory": "docs"
     },
     {
@@ -2936,7 +2936,7 @@
     {
       "path": "docs/research/typesafe-jev-local-runtime-recheck-2026-11-28.md",
       "language": "markdown",
-      "sizeLines": 106,
+      "sizeLines": 117,
       "fileCategory": "docs"
     },
     {
@@ -5663,5 +5663,5 @@
     "tests/market-os-u6-electron-shell.test.ts": [],
     "tests/market-os-u6-native-platform-selection.test.ts": []
   },
-  "contentDigest": "1006cb676cd6766214c50549fd9e0fada532c97f8523bc22cb66f2729108e6ed"
+  "contentDigest": "3932e9ba5ed8c062174a8faa1fa5c8ace5aaca226bfee79b3c7d008fedaa02b1"
 }
